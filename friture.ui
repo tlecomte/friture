@@ -1,0 +1,238 @@
+<ui version="4.0" >
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>719</width>
+    <height>573</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>Friture</string>
+  </property>
+  <widget class="QWidget" name="centralwidget" >
+   <layout class="QVBoxLayout" name="verticalLayout_3" >
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout" >
+      <item>
+       <layout class="QVBoxLayout" name="verticalLayout" >
+        <item>
+         <widget class="QPushButton" name="pushButton_start" >
+          <property name="text" >
+           <string>Start</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pushButton_stop" >
+          <property name="text" >
+           <string>Stop</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="verticalSpacer" >
+          <property name="orientation" >
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0" >
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <widget class="ClassPlot" name="PlotZoneUp" >
+        <property name="frameShape" >
+         <enum>QFrame::StyledPanel</enum>
+        </property>
+        <property name="frameShadow" >
+         <enum>QFrame::Raised</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="ClassPlot" name="PlotZoneSpect" >
+        <property name="frameShape" >
+         <enum>QFrame::StyledPanel</enum>
+        </property>
+        <property name="frameShadow" >
+         <enum>QFrame::Raised</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <layout class="QVBoxLayout" name="verticalLayout_2" >
+        <item>
+         <widget class="QwtThermo" name="PlotLevel" />
+        </item>
+        <item>
+         <widget class="QLabel" name="LabelLevel" >
+          <property name="text" >
+           <string>TextLabel</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <widget class="ImagePlot" name="PlotZoneImage" >
+      <property name="frameShape" >
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <property name="frameShadow" >
+       <enum>QFrame::Raised</enum>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_3" >
+      <item>
+       <widget class="QComboBox" name="comboBox_freqscale" >
+        <item>
+         <property name="text" >
+          <string>Linear</string>
+         </property>
+        </item>
+        <item>
+         <property name="text" >
+          <string>Logarithmic</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item>
+       <widget class="QComboBox" name="comboBox_fftsize" >
+        <property name="currentIndex" >
+         <number>3</number>
+        </property>
+        <item>
+         <property name="text" >
+          <string>32</string>
+         </property>
+        </item>
+        <item>
+         <property name="text" >
+          <string>64</string>
+         </property>
+        </item>
+        <item>
+         <property name="text" >
+          <string>128</string>
+         </property>
+        </item>
+        <item>
+         <property name="text" >
+          <string>256</string>
+         </property>
+        </item>
+        <item>
+         <property name="text" >
+          <string>512</string>
+         </property>
+        </item>
+        <item>
+         <property name="text" >
+          <string>1024</string>
+         </property>
+        </item>
+        <item>
+         <property name="text" >
+          <string>2048</string>
+         </property>
+        </item>
+        <item>
+         <property name="text" >
+          <string>4096</string>
+         </property>
+        </item>
+        <item>
+         <property name="text" >
+          <string>8192</string>
+         </property>
+        </item>
+        <item>
+         <property name="text" >
+          <string>16384</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item>
+       <widget class="QSpinBox" name="spinBox_specmin" >
+        <property name="keyboardTracking" >
+         <bool>false</bool>
+        </property>
+        <property name="minimum" >
+         <number>-200</number>
+        </property>
+        <property name="maximum" >
+         <number>200</number>
+        </property>
+        <property name="value" >
+         <number>-100</number>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QSpinBox" name="spinBox_specmax" >
+        <property name="keyboardTracking" >
+         <bool>false</bool>
+        </property>
+        <property name="minimum" >
+         <number>-200</number>
+        </property>
+        <property name="maximum" >
+         <number>200</number>
+        </property>
+        <property name="value" >
+         <number>-20</number>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar" >
+   <property name="geometry" >
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>719</width>
+     <height>27</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QStatusBar" name="statusbar" />
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QwtThermo</class>
+   <extends>QWidget</extends>
+   <header>qwt_thermo.h</header>
+  </customwidget>
+  <customwidget>
+   <class>ClassPlot</class>
+   <extends>QFrame</extends>
+   <header>classplot.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>ImagePlot</class>
+   <extends>QFrame</extends>
+   <header>imageplot.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>
