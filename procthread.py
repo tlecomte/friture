@@ -73,6 +73,7 @@ class ProcThread(QtCore.QThread):
 	def run(self):
 
 		while True:
+			# update (synchronize) parameters
 			self.mutex.lock()
 			adata = self.adata
 			fft_size = self.fft_size
