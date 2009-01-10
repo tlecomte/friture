@@ -27,7 +27,6 @@ import sys
 import numpy
 import pyaudio
 import audiodata
-#import audioproc
 from PyQt4 import QtCore, QtGui
 
 class AcqThread(QtCore.QThread):
