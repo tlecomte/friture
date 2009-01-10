@@ -173,16 +173,14 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 if __name__ == "__main__":
 	app = QtGui.QApplication(sys.argv)
 	window = Friture()
-
-	import os
-	import cProfile
-	import lsprofcalltree
-
 	window.show()
 	
 	profile = True
 	
 	if profile:
+		import cProfile
+		import lsprofcalltree
+
 		p = cProfile.Profile()
 		p.run('app.exec_()')
 		k = lsprofcalltree.KCacheGrind(p)
