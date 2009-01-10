@@ -124,10 +124,8 @@ class AcqThread(QtCore.QThread):
 
 				try:
 					i = 0
-					#all = []
 					while i<=fft_size/1024:
 						data = stream.read(1024)
-						#all.append(data)
 						adata = audiodata.AudioData(rawdata = data,
 									nchannels = channels,
 									format = format,
