@@ -76,10 +76,10 @@ class ProcThread(QtCore.QThread):
 			self.mutex.lock()
 			adata = self.adata
 			fft_size = self.fft_size
-			if self.abort:
-				self.mutex.unlock()
-				return
+			abort = self.abort
 			self.mutex.unlock()
+			if abort:
+				return
 		
 			spectrograms = None
 			for point in numpy.arange(0, adata.nframes/fft_size)*fft_size:
@@ -92,7 +92,10 @@ class ProcThread(QtCore.QThread):
 			self.emit(QtCore.SIGNAL("recorded_freq"), spectrograms)
 	
 			self.mutex.lock()
-			if not self.restart:
+			restart = self.restart
+			self.mutex.unlock()
+			if not restart:
+				self.mutex.lock()
 				self.condition.wait(self.mutex)
 				self.restart = False
 				self.mutex.unlock()

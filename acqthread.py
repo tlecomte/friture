@@ -106,18 +106,19 @@ class AcqThread(QtCore.QThread):
 
 			while True:
 				self.mutex.lock()
-				if self.stop or self.restart:
-					self.mutex.unlock()
+				stop = self.stop
+				restart = self.restart
+				abort = self.abort
+				self.mutex.unlock()			
+				if stop or restart:
 					stream.stop_stream()
 					stream.close()
 					break
-				if self.abort:
-					self.mutex.unlock()
+				if abort:
 					stream.stop_stream()
 					stream.close()
 					self.p.terminate()
 					return
-				self.mutex.unlock()
 
 				try:
 					i = 0
@@ -138,7 +139,10 @@ class AcqThread(QtCore.QThread):
 					print "capture overflow", noverflow
 
 			self.mutex.lock()
-			if self.stop:
+			stop = self.stop
+			self.mutex.unlock()
+			if stop:
+				self.mutex.lock()
 				self.condition.wait(self.mutex)
 				self.restart = False
 				self.stop = False
