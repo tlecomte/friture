@@ -1,0 +1,5 @@
+TODO
+
+- move code from friture.py to widget-specific class, for time and frequency plots
+- continue profiling (why replot() calls are so long ?)
+- allow to choose input channel
