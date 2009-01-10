@@ -109,11 +109,13 @@ class AcqThread(QtCore.QThread):
 				stop = self.stop
 				restart = self.restart
 				abort = self.abort
-				self.mutex.unlock()			
+				self.mutex.unlock()
+
 				if stop or restart:
 					stream.stop_stream()
 					stream.close()
 					break
+
 				if abort:
 					stream.stop_stream()
 					stream.close()
