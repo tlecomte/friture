@@ -1,7 +1,7 @@
 TODO
 
 - Code : move code from friture.py to widget-specific class, for time and frequency plots
-- Code : continue profiling (why replot() calls are so long ?)
+- Code : continue profiling (why replot() calls are so long ?, try to profile acquisition and profiling threads)
 - Code/GUI : allow to choose input channel from a list of available channels, with description
 - Code : comments in the code
 - Code/GUI : new widget for long run level measurements
