@@ -6,7 +6,7 @@
 # This file is part of Friture.
 #
 # Friture is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License version 2.0 as published by
+# it under the terms of the GNU General Public License version 3 as published by
 # the Free Software Foundation.
 #
 # Friture is distributed in the hope that it will be useful,
