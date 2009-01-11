@@ -1,27 +1,21 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
-############################################################################
-# 
-#  Copyright (C) 2004-2005 Trolltech AS. All rights reserved.
-# 
-#  This file is part of the example classes of the Qt Toolkit.
-# 
-#  This file may be used under the terms of the GNU General Public
-#  License version 2.0 as published by the Free Software Foundation
-#  and appearing in the file LICENSE.GPL included in the packaging of
-#  self file.  Please review the following information to ensure GNU
-#  General Public Licensing requirements will be met:
-#  http://www.trolltech.com/products/qt/opensource.html
-# 
-#  If you are unsure which license is appropriate for your use, please
-#  review the following information:
-#  http://www.trolltech.com/products/qt/licensing.html or contact the
-#  sales department at sales@trolltech.com.
-# 
-#  This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
-#  WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-# 
-############################################################################
+# Copyright (C) 2009 Timothée Lecomte
+
+# This file is part of Friture.
+#
+# Friture is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License version 2.0 as published by
+# the Free Software Foundation.
+#
+# Friture is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
 import sys
 import numpy
