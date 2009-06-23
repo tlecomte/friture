@@ -17,180 +17,211 @@
 # You should have received a copy of the GNU General Public License
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
-import pyaudio
-import wave
 import sys
-import numpy
+from pyaudio import PyAudio, paInt16
+from numpy import transpose, log10, sqrt, ceil, linspace, arange
 from PyQt4 import QtGui, QtCore, Qt
-from Ui_friture import Ui_MainWindow
 import PyQt4.Qwt5 as Qwt
+from Ui_friture import Ui_MainWindow
+import resource
 import audiodata
-import acqthread
-import procthread
-import Image
+import proc
+
+#pyuic4 friture.ui > Ui_friture.py
+#pyrcc4 resource.qrc > resource.py
+
+#had to install pyqwt from source
+#first : sudo ln -s libqwt-qt4.so libqwt.so
+#then, in the pyqwt configure subdirectory (for ubuntu jaunty):
+#python configure.py -Q ../qwt-5.1 -4 -L /usr/lib -I /usr/include/ --module-install-path=/usr/lib/python2.6/dist-packages/PyQt4/Qwt5
+#make
+#sudo make install
+
+SAMPLING_RATE = 44100
+NUM_SAMPLES = 1024
+TIMER_PERIOD_MS = int(ceil(1000.*NUM_SAMPLES/float(SAMPLING_RATE)))
+DEVICE_INDEX = 0
 
 class Friture(QtGui.QMainWindow, Ui_MainWindow):
 	def __init__(self):
 		QtGui.QMainWindow.__init__(self)
 		Ui_MainWindow.__init__(self)
-		
+
 		# Configure l'interface utilisateur.
 		self.setupUi(self)
-		
-		self.connect(self.pushButton_start, QtCore.SIGNAL('clicked()'), self.getaudio)
-		self.connect(self.pushButton_stop, QtCore.SIGNAL('clicked()'), self.stop_record)
+
+		self.i = 0
+		self.spec_min = -100.
+		self.spec_max = -20.
+		self.fft_size = 256
+
+		print "Initializing PyAudio"
+		self.pa = PyAudio()
+
+		self.get_devices_infos()
+
+		print "Opening the stream"
+		self.stream = self.pa.open(format=paInt16, channels=1, rate=SAMPLING_RATE, input=True,
+                     frames_per_buffer=NUM_SAMPLES, input_device_index=DEVICE_INDEX)
+
+		print "Trying to read from the specified input device"
+		n_try = 0
+		while self.stream.get_read_available() < NUM_SAMPLES and n_try < 1000000:
+			n_try +=1
+
+		if n_try == 1000000:
+			print "Fail : exiting"
+			sys.exit(0)
+		else:
+			print "Success"
+
+		self.procclass = proc.ProcClass()
+		self.canvasscaledspectrogram = audiodata.CanvasScaledSpectrogram()
+		self.dest_pixmap = QtGui.QPixmap(600, 300)
+		self.dest_pixmap.fill()
+		self.painter = QtGui.QPainter(self.dest_pixmap)
+
+		print "Setting up the timer"
+		self.timer = QtCore.QTimer()
+		#timer that fires roughly every 20 ms
+		self.timer.setInterval(TIMER_PERIOD_MS)
+
+		self.connect(self.pushButton_startstop, QtCore.SIGNAL('clicked()'), self.timer_toggle)
 		self.connect(self.comboBox_freqscale, QtCore.SIGNAL('currentIndexChanged(int)'), self.freqscalechanged)
 		self.connect(self.comboBox_fftsize, QtCore.SIGNAL('currentIndexChanged(int)'), self.fftsizechanged)
 		self.connect(self.spinBox_specmax, QtCore.SIGNAL('valueChanged(int)'), self.specrangechanged)
 		self.connect(self.spinBox_specmin, QtCore.SIGNAL('valueChanged(int)'), self.specrangechanged)
-		
-		self.thread = acqthread.AcqThread()
-		self.connect(self.thread, QtCore.SIGNAL("recorded_time"), self.record_slot_time)
-		self.connect(self.thread, QtCore.SIGNAL("recorded_freq"), self.record_slot_freq)
-		
-		self.procthread = procthread.ProcThread()
-		self.connect(self.procthread, QtCore.SIGNAL("recorded_freq"), self.record_slot_freq)
-		
-		self.FORMAT = pyaudio.paInt32
-		self.CHANNELS = 1
-		self.RATE = 44100
-		self.fft_size = 256
-		
-		self.spec_min = -100.
-		self.spec_max = -20.
-		
-		self.started = False
-		
-		self.display_overflow = 0
-		
-		self.printinfos()
-		
-		self.PlotZoneSpect.setAxisScale(Qwt.QwtPlot.yLeft, -180., 0.)
-		self.PlotZoneSpect.setAxisTitle(Qwt.QwtPlot.xBottom, 'Frequency (Hz)')
-		self.PlotZoneSpect.setAxisTitle(Qwt.QwtPlot.yLeft, 'PSD (dBFS)')
-		self.PlotZoneSpect.setAxisScale(Qwt.QwtPlot.xBottom, 20., 22050.)
-		
-		self.PlotZoneUp.setAxisTitle(Qwt.QwtPlot.xBottom, 'Time (s)')
-		self.PlotZoneUp.setAxisTitle(Qwt.QwtPlot.yLeft, 'Signal')
-		
-		self.PlotLevel.setRange(-180,0)
+		self.connect(self.comboBox_inputDevice, QtCore.SIGNAL('currentIndexChanged(int)'), self.input_device_changed)
+		self.connect(self.timer, QtCore.SIGNAL('timeout()'), self.timer_slot)
 
-	def printinfos(self):
-		print "APIs list :"
-		
-		#api_number = self.p.get_host_api_count()
-		#for i in range(0,api_number):
-			#print self.p.get_host_api_info_by_index(i)
-	
-		#print "Devices list :"
-	
-		#dev_number = self.p.get_device_count()
-		#for i in range(0,dev_number):
-			#print self.p.get_device_info_by_index(i)
-	
-		#print "Default input device :"
-		#print self.p.get_default_input_device_info()
+		self.timer_toggle()
+		print "Done"
 
-	def getaudio(self):
-		self.started = True
-		self.thread.record(self.FORMAT, self.CHANNELS, self.RATE, self.fft_size)
-	
-	def stop_record(self):
-		print "stop record"
-		self.started = False
-		self.thread.recordstop()
-
-	def record_slot_time(self, data, sigcount):
-		if sigcount < self.thread.read_signal_count():
-			self.display_overflow += 1
-			if self.display_overflow%20 == 0:
-				print "display_overflow", self.display_overflow
-			self.overflow = True
+	def timer_toggle(self):
+		if self.timer.isActive():
+			self.timer.stop()
 		else:
-			self.overflow = False
-		#	self.overflow = False
+			self.timer.start()
 
-		self.update_time_plot(data.floatdata)
-	
-		level = 20*numpy.log10(numpy.sqrt((data.floatdata**2).sum())/len(data.floatdata) + 1e-60)
-		self.update_level(level)
+	def timer_slot(self):
+		rawdata = self.stream.read(NUM_SAMPLES)
 
-		self.procthread.process(data, self.fft_size)
+		channels = 1
+		format = paInt16
+		rate = SAMPLING_RATE
+		adata = audiodata.AudioData(rawdata = rawdata,
+					nchannels = channels,
+					format = format,
+					samplesize = self.pa.get_sample_size(format),
+					samplerate = rate)
 
-	def update_level(self, level):
-		# this could go in a specific plot widget class
-		self.PlotLevel.setValue(level)
-		level_label = "%.01f dBFS" % level
+		self.i += 1
+		time = adata.floatdata
+		level_rms = 20*log10(sqrt((time**2).sum()/len(time)*2.) + 0*1e-80) #*2. to get 0dB for a sine wave
+		level_max = 20*log10(abs(time).max() + 0*1e-80)
+		level_label = "Chunk #%d\n%.01f dBFS RMS\n%.01f dBFS peak\n%.03f max" % (self.i, level_rms, level_max, time.max())
 		self.LabelLevel.setText(level_label)
 
-	def update_time_plot(self, floatdata):
-		# this could go in a specific plot widget class
+		self.meter.setValue(0, sqrt((time**2).sum()/len(time)*2.))
+		self.meter.setValue(1, abs(time).max())
 
-		#warning: downsampling makes the waveform unrealistic
-		#downsampled_data = floatdata[:(len(floatdata)/200)*200]
-		#downsampled_data = downsampled_data.reshape(200,len(floatdata)/200)
-		#downsampled_data = downsampled_data.sum(axis=1)
-		#x = numpy.arange(0, len(downsampled_data))*len(floatdata)/(float(self.RATE)*len(downsampled_data))
-		x = numpy.arange(0, len(floatdata))/float(self.RATE)
-		self.PlotZoneUp.setAxisScale(Qwt.QwtPlot.xBottom, 0., x.max())
-		self.PlotZoneUp.setdata(x, floatdata)
-		#self.PlotZoneUp.setdata(x, downsampled_data)
+		signal = adata.floatdata
+		time = linspace(0., len(signal)/float(rate), len(signal))
+		
+		self.PlotZoneUp.setdata(time, signal)
 
-	def record_slot_freq(self, spectrogram):#, sigcount, sigcountperacq):
-		#print "record_slot"
-		#if sigcount < self.thread.read_signal_count() - sigcountperacq:
-			#self.display_overflow += 1
-			#print "display_overflow", self.display_overflow, sigcountperacq
-			#return
-		if not self.overflow:
-			clip = lambda val, low, high: min(high, max(low, val))
-			# scale the db spectrum from [- spec_range db ... 0 db] > [0..1]
-			epsilon = 1e-30
-			db_spectrogram = (20*numpy.log10(spectrogram + epsilon))
-			norm_spectrogram = (db_spectrogram.clip(self.spec_min, self.spec_max) - self.spec_min)/(self.spec_max - self.spec_min)
+		sp = self.procclass.process(adata, self.fft_size)
+		if sp == None:
+			return
 
-			if db_spectrogram.ndim == 1:
-				y = db_spectrogram.transpose()
-			else:
-				y = db_spectrogram[0,:].transpose()
-			x = numpy.arange(0, len(y))*22050./len(y)
-			self.PlotZoneSpect.setdata(x, y)
+		clip = lambda val, low, high: min(high, max(low, val))
+		# scale the db spectrum from [- spec_range db ... 0 db] > [0..1]
+		epsilon = 1e-30
+		db_spectrogram = (20*log10(sp + epsilon))
+		norm_spectrogram = (db_spectrogram.clip(self.spec_min, self.spec_max) - self.spec_min)/(self.spec_max - self.spec_min)
 
-			self.PlotZoneImage.addData(norm_spectrogram.transpose())
-	
-	def fftsizechanged(self,index):
+		if db_spectrogram.ndim == 1:
+			y = db_spectrogram.transpose()
+		else:
+			y = db_spectrogram[0,:].transpose()
+		freq = linspace(0., 22050., len(y))
+		self.PlotZoneSpect.setdata(freq, y)
+		self.PlotZoneImage.addData(norm_spectrogram.transpose())
+
+	def fftsizechanged(self, index):
 		print "fft_size_changed slot", index, 2**index*32, 150000/self.fft_size
 		self.fft_size = 2**index*32
-		if self.started:
-			self.getaudio()
 
-	def freqscalechanged(self,index):
+	def freqscalechanged(self, index):
 		print "freq_scale slot", index
 		if index == 1:
-			self.PlotZoneSpect.setAxisScaleEngine(Qwt.QwtPlot.xBottom, Qwt.QwtLog10ScaleEngine())
+			self.PlotZoneSpect.setlogfreqscale()
 			self.PlotZoneImage.setlogfreqscale()
 		else:
-			self.PlotZoneSpect.setAxisScaleEngine(Qwt.QwtPlot.xBottom, Qwt.QwtLinearScaleEngine())
+			self.PlotZoneSpect.setlinfreqscale()
 			self.PlotZoneImage.setlinfreqscale()
 
-	def specrangechanged(self,value):
+	def specrangechanged(self, value):
 		self.spec_max = self.spinBox_specmax.value()
 		self.spec_min = self.spinBox_specmin.value()
 
-	def store(self):
-		self.WAVE_OUTPUT_FILENAME = "output.wav"
-		print "saving"
-		wf = wave.open(self.WAVE_OUTPUT_FILENAME, 'wb')
-		wf.setnchannels(self.audiodata.nchannels)
-		wf.setsampwidth(self.audiodata.samplesize)
-		wf.setframerate(self.audiodata.samplerate)
-		wf.writeframes(self.audiodata.rawdata)
-		wf.close()
+	def get_devices_infos(self):
+		#print "APIs list :"
+		#api_number = self.pa.get_host_api_count()
+		#for i in range(0, api_number):
+		#	api = self.pa.get_host_api_info_by_index(i)
+		#	print api['index'], api['name']
+	
+		#print "Devices list (*: default input device, #: selected input device):"
+
+		default_dev_index = self.pa.get_default_input_device_info()['index']
+		dev_number = self.pa.get_device_count()
+		for i in range(0, dev_number):
+			dev = self.pa.get_device_info_by_index(i)
+			api = self.pa.get_host_api_info_by_index(dev['hostApi'])['name']
+			desc = "%d: (%s) %s" %(dev['index'], api, dev['name'])
+			if i == default_dev_index:
+				desc += ' (system default)'
+			
+			self.comboBox_inputDevice.addItem(desc)
+
+			#if i == DEVICE_INDEX:
+			#	desc += ' #'
+			#print desc
+		self.comboBox_inputDevice.setCurrentIndex(DEVICE_INDEX)
+
+	def input_device_changed(self, index):
+		print index
+		self.timer_toggle()
+
+		self.stream.close()
+		self.stream = self.pa.open(format=paInt16, channels=1, rate=SAMPLING_RATE, input=True,
+                     frames_per_buffer=NUM_SAMPLES, input_device_index=index)
+
+		print "Trying to read from the specified input device"
+		n_try = 0
+		while self.stream.get_read_available() < NUM_SAMPLES and n_try < 1000000:
+			n_try +=1
+
+		if n_try == 1000000:
+			print "Fail : exiting"
+			sys.exit(0)
+		else:
+			print "Success"
+
+		self.timer_toggle()
 
 if __name__ == "__main__":
 	app = QtGui.QApplication(sys.argv)
+
+	pixmap = QtGui.QPixmap(":/splash.png")
+	splash = QtGui.QSplashScreen(pixmap)
+	splash.show()
+	splash.showMessage("Initializing the audio subsystem")
+	app.processEvents()
 	window = Friture()
 	window.show()
+	splash.finish(window)
 	
 	profile = True
 	
@@ -201,7 +232,7 @@ if __name__ == "__main__":
 		p = cProfile.Profile()
 		p.run('app.exec_()')
 		k = lsprofcalltree.KCacheGrind(p)
-		data = open('prof.kgrind.out', 'w+')
+		data = open('prof.kgrind.out.00000', 'w+')
 		k.output(data)
 		data.close()
 		sys.exit(0)

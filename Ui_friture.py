@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file '/home/tipote/dev/spectrogram/qwtsp/friture.ui'
+# Form implementation generated from reading ui file 'friture.ui'
 #
-# Created: Thu Jan  8 00:04:56 2009
+# Created: Fri May  1 00:14:40 2009
 #      by: PyQt4 UI code generator 4.4.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -21,39 +21,44 @@ class Ui_MainWindow(object):
         self.horizontalLayout.setObjectName("horizontalLayout")
         self.verticalLayout = QtGui.QVBoxLayout()
         self.verticalLayout.setObjectName("verticalLayout")
-        self.pushButton_start = QtGui.QPushButton(self.centralwidget)
-        self.pushButton_start.setObjectName("pushButton_start")
-        self.verticalLayout.addWidget(self.pushButton_start)
-        self.pushButton_stop = QtGui.QPushButton(self.centralwidget)
-        self.pushButton_stop.setObjectName("pushButton_stop")
-        self.verticalLayout.addWidget(self.pushButton_stop)
-        spacerItem = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
-        self.verticalLayout.addItem(spacerItem)
+        self.pushButton_startstop = QtGui.QPushButton(self.centralwidget)
+        self.pushButton_startstop.setCheckable(True)
+        self.pushButton_startstop.setChecked(True)
+        self.pushButton_startstop.setAutoDefault(True)
+        self.pushButton_startstop.setObjectName("pushButton_startstop")
+        self.verticalLayout.addWidget(self.pushButton_startstop)
+        self.comboBox_inputDevice = QtGui.QComboBox(self.centralwidget)
+        self.comboBox_inputDevice.setObjectName("comboBox_inputDevice")
+        self.verticalLayout.addWidget(self.comboBox_inputDevice)
+        self.LabelLevel = QtGui.QLabel(self.centralwidget)
+        self.LabelLevel.setObjectName("LabelLevel")
+        self.verticalLayout.addWidget(self.LabelLevel)
+        self.groupBox = QtGui.QGroupBox(self.centralwidget)
+        self.groupBox.setObjectName("groupBox")
+        self.gridLayout_2 = QtGui.QGridLayout(self.groupBox)
+        self.gridLayout_2.setObjectName("gridLayout_2")
+        self.meter = qsynthMeter(self.groupBox)
+        self.meter.setObjectName("meter")
+        self.gridLayout_2.addWidget(self.meter, 0, 0, 1, 1)
+        self.verticalLayout.addWidget(self.groupBox)
         self.horizontalLayout.addLayout(self.verticalLayout)
-        self.PlotZoneUp = ClassPlot(self.centralwidget)
+        self.PlotZoneUp = TimePlot(self.centralwidget)
         self.PlotZoneUp.setFrameShape(QtGui.QFrame.StyledPanel)
         self.PlotZoneUp.setFrameShadow(QtGui.QFrame.Raised)
         self.PlotZoneUp.setObjectName("PlotZoneUp")
         self.horizontalLayout.addWidget(self.PlotZoneUp)
-        self.PlotZoneSpect = ClassPlot(self.centralwidget)
+        self.PlotZoneSpect = SpectPlot(self.centralwidget)
         self.PlotZoneSpect.setFrameShape(QtGui.QFrame.StyledPanel)
         self.PlotZoneSpect.setFrameShadow(QtGui.QFrame.Raised)
         self.PlotZoneSpect.setObjectName("PlotZoneSpect")
         self.horizontalLayout.addWidget(self.PlotZoneSpect)
-        self.verticalLayout_2 = QtGui.QVBoxLayout()
-        self.verticalLayout_2.setObjectName("verticalLayout_2")
-        self.PlotLevel = QwtThermo(self.centralwidget)
-        self.PlotLevel.setObjectName("PlotLevel")
-        self.verticalLayout_2.addWidget(self.PlotLevel)
-        self.LabelLevel = QtGui.QLabel(self.centralwidget)
-        self.LabelLevel.setObjectName("LabelLevel")
-        self.verticalLayout_2.addWidget(self.LabelLevel)
-        self.horizontalLayout.addLayout(self.verticalLayout_2)
         self.verticalLayout_3.addLayout(self.horizontalLayout)
         self.PlotZoneImage = ImagePlot(self.centralwidget)
         self.PlotZoneImage.setFrameShape(QtGui.QFrame.StyledPanel)
         self.PlotZoneImage.setFrameShadow(QtGui.QFrame.Raised)
         self.PlotZoneImage.setObjectName("PlotZoneImage")
+        self.gridLayout = QtGui.QGridLayout(self.PlotZoneImage)
+        self.gridLayout.setObjectName("gridLayout")
         self.verticalLayout_3.addWidget(self.PlotZoneImage)
         self.horizontalLayout_3 = QtGui.QHBoxLayout()
         self.horizontalLayout_3.setObjectName("horizontalLayout_3")
@@ -92,7 +97,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_3.addLayout(self.horizontalLayout_3)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtGui.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 719, 27))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 719, 26))
         self.menubar.setObjectName("menubar")
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QtGui.QStatusBar(MainWindow)
@@ -105,9 +110,9 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QtGui.QApplication.translate("MainWindow", "Friture", None, QtGui.QApplication.UnicodeUTF8))
-        self.pushButton_start.setText(QtGui.QApplication.translate("MainWindow", "Start", None, QtGui.QApplication.UnicodeUTF8))
-        self.pushButton_stop.setText(QtGui.QApplication.translate("MainWindow", "Stop", None, QtGui.QApplication.UnicodeUTF8))
+        self.pushButton_startstop.setText(QtGui.QApplication.translate("MainWindow", "Start", None, QtGui.QApplication.UnicodeUTF8))
         self.LabelLevel.setText(QtGui.QApplication.translate("MainWindow", "TextLabel", None, QtGui.QApplication.UnicodeUTF8))
+        self.groupBox.setTitle(QtGui.QApplication.translate("MainWindow", "Input levels", None, QtGui.QApplication.UnicodeUTF8))
         self.comboBox_freqscale.setItemText(0, QtGui.QApplication.translate("MainWindow", "Linear", None, QtGui.QApplication.UnicodeUTF8))
         self.comboBox_freqscale.setItemText(1, QtGui.QApplication.translate("MainWindow", "Logarithmic", None, QtGui.QApplication.UnicodeUTF8))
         self.comboBox_fftsize.setItemText(0, QtGui.QApplication.translate("MainWindow", "32", None, QtGui.QApplication.UnicodeUTF8))
@@ -121,16 +126,7 @@ class Ui_MainWindow(object):
         self.comboBox_fftsize.setItemText(8, QtGui.QApplication.translate("MainWindow", "8192", None, QtGui.QApplication.UnicodeUTF8))
         self.comboBox_fftsize.setItemText(9, QtGui.QApplication.translate("MainWindow", "16384", None, QtGui.QApplication.UnicodeUTF8))
 
+from timeplot import TimePlot
+from qsynthmeter import qsynthMeter
+from spectplot import SpectPlot
 from imageplot import ImagePlot
-from classplot import ClassPlot
-from PyQt4.Qwt5 import QwtThermo
-
-if __name__ == "__main__":
-    import sys
-    app = QtGui.QApplication(sys.argv)
-    MainWindow = QtGui.QMainWindow()
-    ui = Ui_MainWindow()
-    ui.setupUi(MainWindow)
-    MainWindow.show()
-    sys.exit(app.exec_())
-

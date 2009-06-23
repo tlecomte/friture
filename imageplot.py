@@ -17,50 +17,13 @@
 # You should have received a copy of the GNU General Public License
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
-import sys
-from PyQt4 import Qt, QtCore
 import PyQt4.Qwt5 as Qwt
-from PyQt4.Qwt5.anynumpy import *
-import ImageQt
-import Image
-import numpy
 from audiodata import *
-
-class ImageRepaintHelper(Qt.QObject):
-	def __init__(self, image, plot):
-		Qt.QObject.__init__(self)
-		self.image = image
-		self.plot = plot
-
-	def eventFilter(self, qobject, qevent):
-		if qevent.type() == Qt.QEvent.Paint:
-			canvas = self.plot.canvas()
-
-			xMap = self.plot.canvasMap(self.image.xAxis())
-			yMap = self.plot.canvasMap(self.image.yAxis())
-
-#	    if canvas.testPaintAttribute(Qwt.QwtPlotCanvas.PaintCached) and canvas.paintCache() and not canvas.paintCache().isNull():
-#		  cachePainter = Qt.QPainter(canvas.paintCache())
-#		  cachePainter.translate(-canvas.contentsRect().x(), -canvas.contentsRect().y())
-#
-#		  cachePainter.setClipping(True)
-#		  cachePainter.setClipRect(canvas.contentsRect())
-#
-#		  self.image.draw(cachePainter, xMap, yMap, canvas.contentsRect())
-
-			painter = Qt.QPainter(canvas)
-			#painter.setClipping(True)
-			#painter.setClipRect(canvas.contentsRect())
-
-			self.image.draw(painter, xMap, yMap, canvas.contentsRect())
-
-			return True
-		else:
-			return False
 
 class PlotImage(Qwt.QwtPlotItem):
 
 	def __init__(self):
+		pass
 		Qwt.QwtPlotItem.__init__(self)
 
 		self.parent_plot = None
@@ -72,9 +35,11 @@ class PlotImage(Qwt.QwtPlotItem):
 	def addData(self, xyzs, logfreqscale):
 		#self.rawspectrogram.addData(xyzs)
 		#self.freqscaledspectrogram.addData(xyzs, logfreqscale)
-		self.canvasscaledspectrogram.addData(xyzs, logfreqscale)
+		self.canvasscaledspectrogram.setlogfreqscale(logfreqscale)
+		self.canvasscaledspectrogram.addData(xyzs)
 
 	def draw(self, painter, xMap, yMap, rect):
+		#pass
 		self.canvasscaledspectrogram.setcanvas_vsize(rect.height())
 		self.canvasscaledspectrogram.setcanvas_hsize(rect.width())
 
@@ -82,17 +47,8 @@ class PlotImage(Qwt.QwtPlotItem):
 		offset = self.canvasscaledspectrogram.getpixmapoffset()
 		painter.drawPixmap(rect.left(), rect.top(), pixmap,  offset,  0,  0,  0)
 
-	def redraw(self):
-		if self.parent_plot == None: self.parent_plot = self.plot()
-		helper = ImageRepaintHelper(self,  self.parent_plot)
-		canvas = self.parent_plot.canvas()
-		canvas.installEventFilter(helper)
-		noSystemBackground = canvas.testAttribute(QtCore.Qt.WA_NoSystemBackground)
-		canvas.setAttribute(QtCore.Qt.WA_NoSystemBackground, True)
-		canvas.repaint()
-		canvas.setAttribute(QtCore.Qt.WA_NoSystemBackground, noSystemBackground)
-
 	def erase(self):
+		#pass
 		# set the data array to zero
 		#self.rawspectrogram.erase()
 		#self.freqscaledspectrogram.erase()
@@ -102,41 +58,52 @@ class ImagePlot(Qwt.QwtPlot):
 
 	def __init__(self, *args):
 		Qwt.QwtPlot.__init__(self, *args)
+
+		# we do not need caching
+		self.canvas().setPaintAttribute(Qwt.QwtPlotCanvas.PaintCached, False)
+		self.canvas().setPaintAttribute(Qwt.QwtPlotCanvas.PaintPacked, False)
+
 		# set plot layout
 		self.plotLayout().setMargin(0)
 		self.plotLayout().setCanvasMargin(0)
 		self.plotLayout().setAlignCanvasToScales(True)
 		# set axis titles
-		self.setAxisTitle(Qwt.QwtPlot.xBottom, 'time (s)')
-		self.setAxisTitle(Qwt.QwtPlot.yLeft, 'frequency (Hz)')
+		self.setAxisTitle(Qwt.QwtPlot.xBottom, 'Time (s)')
+		self.setAxisTitle(Qwt.QwtPlot.yLeft, 'Frequency (Hz)')
+		self.enableAxis(Qwt.QwtPlot.yRight)
 		# attach a plot image
 		self.plotImage = PlotImage()
 		self.plotImage.attach(self)
 		self.setlinfreqscale()
 		
-		# replot
 		self.replot()
 		
-		#def setData(self, xyzs):
-		#self.plotImage.setData(xyzs)
-		#self.replot()
+	def setData(self, xyzs):
+		self.plotImage.setData(xyzs)
+		self.replot()
 
 	def addData(self, xyzs):
 		self.plotImage.addData(xyzs, self.logfreqscale)
-		# we should just update the image here
-		self.replot()
-		#self.plotImage.redraw()
+		# self.replot() would call updateAxes() which is dead slow (probably because it
+		# computes label sizes); instead, let's just ask Qt to repaint the canvas next time
+		# This works because we disable the cache
+		self.canvas().update()
 
 	def setlogfreqscale(self):
 		self.plotImage.erase()
 		self.logfreqscale = 1
 		self.setAxisScaleEngine(Qwt.QwtPlot.yLeft, Qwt.QwtLog10ScaleEngine())
 		self.setAxisScale(Qwt.QwtPlot.yLeft, 20., 22050.)
+		self.setAxisScaleEngine(Qwt.QwtPlot.yRight, Qwt.QwtLog10ScaleEngine())
+		self.setAxisScale(Qwt.QwtPlot.yRight, 20., 22050.)
 		self.replot()
 
 	def setlinfreqscale(self):
+		#pass
 		self.plotImage.erase()
 		self.logfreqscale = 0
 		self.setAxisScaleEngine(Qwt.QwtPlot.yLeft, Qwt.QwtLinearScaleEngine())
 		self.setAxisScale(Qwt.QwtPlot.yLeft, 0., 22050.)
+		self.setAxisScaleEngine(Qwt.QwtPlot.yRight, Qwt.QwtLinearScaleEngine())
+		self.setAxisScale(Qwt.QwtPlot.yRight, 0., 22050.)
 		self.replot()
