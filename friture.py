@@ -104,7 +104,11 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 			self.timer.start()
 
 	def timer_slot(self):
-		rawdata = self.stream.read(NUM_SAMPLES)
+		if self.stream.get_read_available() < NUM_SAMPLES:
+			return
+		
+		while self.stream.get_read_available() >= NUM_SAMPLES:
+			rawdata = self.stream.read(NUM_SAMPLES)
 
 		channels = 1
 		format = paInt16
