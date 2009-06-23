@@ -58,22 +58,32 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		print "Initializing PyAudio"
 		self.pa = PyAudio()
 
-		self.get_devices_infos()
+		self.set_devices_list()
+		device_count = self.get_device_count()
+		default_device_index = self.get_default_input_device()
+		
+		# we will try to open all the devices until one works, starting by the default input device
+		devices = range(0, device_count)
+		devices.remove(default_device_index)
+		devices = [default_device_index] + devices
 
-		print "Opening the stream"
-		self.stream = self.pa.open(format=paInt16, channels=1, rate=SAMPLING_RATE, input=True,
-                     frames_per_buffer=NUM_SAMPLES, input_device_index=DEVICE_INDEX)
+		for index in devices:
+			print "Opening the stream"
+			self.stream = self.pa.open(format=paInt16, channels=1, rate=SAMPLING_RATE, input=True,
+			frames_per_buffer=NUM_SAMPLES, input_device_index=index)
 
-		print "Trying to read from the specified input device"
-		n_try = 0
-		while self.stream.get_read_available() < NUM_SAMPLES and n_try < 1000000:
-			n_try +=1
+			print "Trying to read from the specified input device"
+			n_try = 0
+			while self.stream.get_read_available() < NUM_SAMPLES and n_try < 1000000:
+				n_try +=1
 
-		if n_try == 1000000:
-			print "Fail : exiting"
-			sys.exit(0)
-		else:
-			print "Success"
+			if n_try == 1000000:
+				print "Fail"
+			else:
+				print "Success"
+				break
+
+		self.comboBox_inputDevice.setCurrentIndex(index)
 
 		self.procclass = proc.ProcClass()
 		self.canvasscaledspectrogram = audiodata.CanvasScaledSpectrogram()
@@ -169,7 +179,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		self.spec_max = self.spinBox_specmax.value()
 		self.spec_min = self.spinBox_specmin.value()
 
-	def get_devices_infos(self):
+	def set_devices_list(self):
 		#print "APIs list :"
 		#api_number = self.pa.get_host_api_count()
 		#for i in range(0, api_number):
@@ -178,21 +188,22 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 	
 		#print "Devices list (*: default input device, #: selected input device):"
 
-		default_dev_index = self.pa.get_default_input_device_info()['index']
-		dev_number = self.pa.get_device_count()
-		for i in range(0, dev_number):
+		default_device_index = self.get_default_input_device()
+		device_count = self.get_device_count()
+		
+		for i in range(0, device_count):
 			dev = self.pa.get_device_info_by_index(i)
 			api = self.pa.get_host_api_info_by_index(dev['hostApi'])['name']
 			desc = "%d: (%s) %s" %(dev['index'], api, dev['name'])
-			if i == default_dev_index:
-				desc += ' (system default)'
-			
+			if i == default_device_index:
+				desc += ' (system default)'			
 			self.comboBox_inputDevice.addItem(desc)
 
-			#if i == DEVICE_INDEX:
-			#	desc += ' #'
-			#print desc
-		self.comboBox_inputDevice.setCurrentIndex(DEVICE_INDEX)
+	def get_default_input_device(self):
+		return self.pa.get_default_input_device_info()['index']
+	
+	def get_device_count(self):
+		return self.pa.get_device_count()
 
 	def input_device_changed(self, index):
 		print index
