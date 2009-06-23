@@ -1,9 +1,16 @@
 TODO
 
-- Code : move code from friture.py to widget-specific class, for time and frequency plots
-- Code : continue profiling (why replot() calls are so long ?, try to profile acquisition and profiling threads)
-- Code/GUI : allow to choose input channel from a list of available channels, with description
+Improvements :
+- Code : continue profiling (why do python and Xorg take so much CPU while profiling shows that most of the time is pent being idle ?)
 - Code : comments in the code
-- Code/GUI : new widget for long run level measurements
-- Code : add option for overlapping fft windows for smoother spectrograms
+- Code/Maths : constant-Q-transform for efficient and precise logarithmic spectrogram
+
+Features :
+- Code/GUI : pointer and markers for the plots
 - GUI : option (checkbox ?, list ?) to enable widgets
+- Code : overlapping fft windows for smoother spectrograms
+- Code/GUI : new widget for long run level measurements
+
+Bugfixes :
+- code : unwanted delay between input and display
+
