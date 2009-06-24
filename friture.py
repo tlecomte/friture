@@ -206,7 +206,8 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		return self.pa.get_device_count()
 
 	def input_device_changed(self, index):
-		self.timer_toggle()
+		self.timer.stop()
+		self.pushButton_startstop.setChecked(False)
 		
 		# save current stream in case we need to restore it
 		previous_stream = self.stream
@@ -228,7 +229,8 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 			self.stream = previous_stream
 			self.comboBox_inputDevice.setCurrentIndex(self.device_index)
 			
-		self.timer_toggle()
+		self.timer.start()
+		self.pushButton_startstop.setChecked(True)
 
 if __name__ == "__main__":
 	app = QtGui.QApplication(sys.argv)
