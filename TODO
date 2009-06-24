@@ -10,6 +10,7 @@ Features :
 - GUI : option (checkbox ?, list ?) to enable widgets
 - Code : overlapping fft windows for smoother spectrograms
 - Code/GUI : new widget for long run level measurements
+- Code/GUI : peaks display in the spectrum widget
 
 Bugfixes :
 - code : unwanted delay between input and display
