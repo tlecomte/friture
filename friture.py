@@ -71,6 +71,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 			print "Opening the stream"
 			self.stream = self.pa.open(format=paInt16, channels=1, rate=SAMPLING_RATE, input=True,
 			frames_per_buffer=NUM_SAMPLES, input_device_index=index)
+			self.device_index = index
 
 			print "Trying to read from the specified input device"
 			n_try = 0
@@ -83,7 +84,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 				print "Success"
 				break
 
-		self.comboBox_inputDevice.setCurrentIndex(index)
+		self.comboBox_inputDevice.setCurrentIndex(self.device_index)
 
 		self.procclass = proc.ProcClass()
 		self.canvasscaledspectrogram = audiodata.CanvasScaledSpectrogram()
@@ -198,10 +199,11 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		return self.pa.get_device_count()
 
 	def input_device_changed(self, index):
-		print index
 		self.timer_toggle()
+		
+		# save current stream in case we need to restore it
+		previous_stream = self.stream
 
-		self.stream.close()
 		self.stream = self.pa.open(format=paInt16, channels=1, rate=SAMPLING_RATE, input=True,
                      frames_per_buffer=NUM_SAMPLES, input_device_index=index)
 
@@ -211,10 +213,14 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 			n_try +=1
 
 		if n_try == 1000000:
-			print "Fail : exiting"
-			sys.exit(0)
+			print "Fail"
+			self.stream.close()
+			self.stream = previous_stream
+			self.comboBox_inputDevice.setCurrentIndex(self.device_index)
 		else:
 			print "Success"
+			previous_stream.close()
+			self.device_index = index
 
 		self.timer_toggle()
 
