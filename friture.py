@@ -213,12 +213,13 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 			n_try +=1
 
 		if n_try == 1000000:
-			print "Fail"
+			error_message = QtGui.QErrorMessage(self)
+			error_message.setWindowTitle("Input device error")
+			error_message.showMessage("Impossible to use the selected device, reverting to the previous one")
 			self.stream.close()
 			self.stream = previous_stream
 			self.comboBox_inputDevice.setCurrentIndex(self.device_index)
 		else:
-			print "Success"
 			previous_stream.close()
 			self.device_index = index
 
