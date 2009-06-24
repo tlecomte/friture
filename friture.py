@@ -51,6 +51,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		self.setupUi(self)
 
 		self.i = 0
+		self.losts = 0
 		self.spec_min = -100.
 		self.spec_max = -20.
 		self.fft_size = 256
@@ -126,7 +127,10 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 			return
 		
 		while self.stream.get_read_available() >= NUM_SAMPLES:
+			self.losts += 1
 			rawdata = self.stream.read(NUM_SAMPLES)
+
+		self.losts -= 1
 
 		channels = 1
 		format = paInt16
@@ -141,7 +145,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		time = adata.floatdata
 		level_rms = 20*log10(sqrt((time**2).sum()/len(time)*2.) + 0*1e-80) #*2. to get 0dB for a sine wave
 		level_max = 20*log10(abs(time).max() + 0*1e-80)
-		level_label = "Chunk #%d\n%.01f dBFS RMS\n%.01f dBFS peak\n%.03f max" % (self.i, level_rms, level_max, time.max())
+		level_label = "Chunk #%d (losts: %d = %.01f %%)\n%.01f dBFS RMS\n%.01f dBFS peak\n%.03f max" % (self.i, self.losts, self.losts*100./float(self.i), level_rms, level_max, time.max())
 		self.LabelLevel.setText(level_label)
 
 		self.meter.setValue(0, sqrt((time**2).sum()/len(time)*2.))
