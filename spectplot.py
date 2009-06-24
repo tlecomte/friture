@@ -52,6 +52,7 @@ class SpectPlot(classplot.ClassPlot):
 		classplot.ClassPlot.setdata(self,x,y)
 
 		if self.needfullreplot:
+			self.needfullreplot = False
 			self.replot()
 		else:
 			# self.replot() would call updateAxes() which is dead slow (probably because it
