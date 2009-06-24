@@ -180,14 +180,6 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		self.spec_min = self.spinBox_specmin.value()
 
 	def set_devices_list(self):
-		#print "APIs list :"
-		#api_number = self.pa.get_host_api_count()
-		#for i in range(0, api_number):
-		#	api = self.pa.get_host_api_info_by_index(i)
-		#	print api['index'], api['name']
-	
-		#print "Devices list (*: default input device, #: selected input device):"
-
 		default_device_index = self.get_default_input_device()
 		device_count = self.get_device_count()
 		
