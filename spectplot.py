@@ -33,21 +33,25 @@ class SpectPlot(classplot.ClassPlot):
 		self.setAxisTitle(Qwt.QwtPlot.yLeft, 'PSD (dB)')
 		#self.axisWidget(Qwt.QwtPlot.xBottom).setFont(self.font())
 
-		self.setlinfreqscale()
-
 		self.xmax = 0
+		self.needfullreplot = False
+
+		self.setlinfreqscale()
+		self.logfreqscale = False
 
 	def setdata(self,x,y):
-		needfullreplot = False
 		if self.xmax <> x.max():
 			print "changing x scale"
 			self.xmax = x.max()
-			self.setAxisScale(Qwt.QwtPlot.xBottom, 0., self.xmax)
-			needfullreplot = True
+			if self.logfreqscale:
+				self.setlogfreqscale()
+			else:
+				self.setlinfreqscale()
+			self.needfullreplot = True
 
 		classplot.ClassPlot.setdata(self,x,y)
 
-		if needfullreplot:
+		if self.needfullreplot:
 			self.replot()
 		else:
 			# self.replot() would call updateAxes() which is dead slow (probably because it
@@ -56,7 +60,13 @@ class SpectPlot(classplot.ClassPlot):
 			self.canvas().update()
 
 	def setlinfreqscale(self):
+		self.logfreqscale = False
 		self.setAxisScaleEngine(Qwt.QwtPlot.xBottom, Qwt.QwtLinearScaleEngine())
+		self.setAxisScale(Qwt.QwtPlot.xBottom, 0., self.xmax)
+		self.needfullreplot = True
 
 	def setlogfreqscale(self):
+		self.logfreqscale = True
 		self.setAxisScaleEngine(Qwt.QwtPlot.xBottom, Qwt.QwtLog10ScaleEngine())
+		self.setAxisScale(Qwt.QwtPlot.xBottom, 20., self.xmax)
+		self.needfullreplot = True
