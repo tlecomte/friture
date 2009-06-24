@@ -73,16 +73,12 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 			frames_per_buffer=NUM_SAMPLES, input_device_index=index)
 			self.device_index = index
 
-			print "Trying to read from the specified input device"
-			n_try = 0
-			while self.stream.get_read_available() < NUM_SAMPLES and n_try < 1000000:
-				n_try +=1
-
-			if n_try == 1000000:
-				print "Fail"
-			else:
+			print "Trying to read from input device #%d" % (index)
+			if self.try_input_device():
 				print "Success"
 				break
+			else:
+				print "Fail"
 
 		self.comboBox_inputDevice.setCurrentIndex(self.device_index)
 
@@ -107,6 +103,17 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 
 		self.timer_toggle()
 		print "Done"
+
+	#return True on success
+	def try_input_device(self):
+		n_try = 0
+		while self.stream.get_read_available() < NUM_SAMPLES and n_try < 1000000:
+			n_try +=1
+
+		if n_try == 1000000:
+			return False
+		else:
+			return True
 
 	def timer_toggle(self):
 		if self.timer.isActive():
@@ -207,22 +214,20 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		self.stream = self.pa.open(format=paInt16, channels=1, rate=SAMPLING_RATE, input=True,
                      frames_per_buffer=NUM_SAMPLES, input_device_index=index)
 
-		print "Trying to read from the specified input device"
-		n_try = 0
-		while self.stream.get_read_available() < NUM_SAMPLES and n_try < 1000000:
-			n_try +=1
-
-		if n_try == 1000000:
+		print "Trying to read from input device #%d" % (index)
+		if self.try_input_device():
+			print "Success"
+			previous_stream.close()
+			self.device_index = index
+		else:
+			print "Fail"
 			error_message = QtGui.QErrorMessage(self)
 			error_message.setWindowTitle("Input device error")
 			error_message.showMessage("Impossible to use the selected device, reverting to the previous one")
 			self.stream.close()
 			self.stream = previous_stream
 			self.comboBox_inputDevice.setCurrentIndex(self.device_index)
-		else:
-			previous_stream.close()
-			self.device_index = index
-
+			
 		self.timer_toggle()
 
 if __name__ == "__main__":
