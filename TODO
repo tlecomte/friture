@@ -14,4 +14,7 @@ Features :
 
 Bugfixes :
 - code : unwanted delay between input and display
+	Seems related to pulseaudio:
+		http://forum.skype.com/index.php?s=7609fb1fac9ee65573e0ceb92562c481&showtopic=237601&st=0&p=1059071&#entry1059071
+		https://bugzilla.redhat.com/show_bug.cgi?id=444388
 
