@@ -39,6 +39,7 @@ import proc
 
 SAMPLING_RATE = 44100
 NUM_SAMPLES = 1024
+FRAMES_PER_BUFFER = NUM_SAMPLES
 TIMER_PERIOD_MS = int(ceil(1000.*NUM_SAMPLES/float(SAMPLING_RATE)))
 DEVICE_INDEX = 0
 
@@ -52,6 +53,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 
 		self.i = 0
 		self.losts = 0
+		self.useless = 0
 		self.spec_min = -100.
 		self.spec_max = -20.
 		self.fft_size = 256
@@ -71,7 +73,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		for index in devices:
 			print "Opening the stream"
 			self.stream = self.pa.open(format=paInt16, channels=1, rate=SAMPLING_RATE, input=True,
-			frames_per_buffer=NUM_SAMPLES, input_device_index=index)
+			frames_per_buffer=FRAMES_PER_BUFFER, input_device_index=index)
 			self.device_index = index
 
 			print "Trying to read from input device #%d" % (index)
@@ -124,6 +126,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 
 	def timer_slot(self):
 		if self.stream.get_read_available() < NUM_SAMPLES:
+			self.useless += 1
 			return
 		
 		while self.stream.get_read_available() >= NUM_SAMPLES:
@@ -145,7 +148,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		time = adata.floatdata
 		level_rms = 20*log10(sqrt((time**2).sum()/len(time)*2.) + 0*1e-80) #*2. to get 0dB for a sine wave
 		level_max = 20*log10(abs(time).max() + 0*1e-80)
-		level_label = "Chunk #%d (losts: %d = %.01f %%)\n%.01f dBFS RMS\n%.01f dBFS peak\n%.03f max" % (self.i, self.losts, self.losts*100./float(self.i), level_rms, level_max, time.max())
+		level_label = "Chunk #%d\nlosts: %d = %.01f %%\nuseless: %d = %.01f %%\n%.01f dBFS RMS\n%.01f dBFS peak\n%.03f max" % (self.i, self.losts, self.losts*100./float(self.i), self.useless, self.useless*100./float(self.i), level_rms, level_max, time.max())
 		self.LabelLevel.setText(level_label)
 
 		self.meter.setValue(0, sqrt((time**2).sum()/len(time)*2.))
@@ -217,7 +220,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		previous_stream = self.stream
 
 		self.stream = self.pa.open(format=paInt16, channels=1, rate=SAMPLING_RATE, input=True,
-                     frames_per_buffer=NUM_SAMPLES, input_device_index=index)
+                     frames_per_buffer=FRAMES_PER_BUFFER, input_device_index=index)
 
 		print "Trying to read from input device #%d" % (index)
 		if self.try_input_device():
