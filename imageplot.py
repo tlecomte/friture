@@ -79,7 +79,7 @@ class ImagePlot(Qwt.QwtPlot):
 		
 		self.picker = Qwt.QwtPlotPicker(Qwt.QwtPlot.xBottom,
                                Qwt.QwtPlot.yLeft,
-                               Qwt.QwtPicker.PointSelection | Qwt.QwtPicker.DragSelection,
+                               Qwt.QwtPicker.PointSelection,
                                Qwt.QwtPlotPicker.CrossRubberBand,
                                Qwt.QwtPicker.AlwaysOff,
                                self.canvas())
