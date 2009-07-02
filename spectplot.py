@@ -21,6 +21,17 @@ import classplot
 import PyQt4.Qwt5 as Qwt
 from PyQt4 import QtCore
 
+class FreqScaleDraw(Qwt.QwtScaleDraw):
+	def __init__(self, *args):
+		Qwt.QwtScaleDraw.__init__(self, *args)
+
+	def label(self, value):
+		if value >= 1e3:
+			label = "%.1fk" %(value/1e3)
+		else:
+			label = "%.1f" %(value)
+		return Qwt.QwtText(label)
+
 class SpectPlot(classplot.ClassPlot):
 	def __init__(self, *args):
 		classplot.ClassPlot.__init__(self, *args)
@@ -39,6 +50,8 @@ class SpectPlot(classplot.ClassPlot):
 
 		self.setlinfreqscale()
 		self.logfreqscale = False
+		
+		self.setAxisScaleDraw(Qwt.QwtPlot.xBottom, FreqScaleDraw())
 		
 		self.connect(self.picker, QtCore.SIGNAL('moved(const QPoint &)'), self.moved)
 

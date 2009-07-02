@@ -52,9 +52,6 @@ class ClassPlot(Qwt.QwtPlot):
                                Qwt.QwtPicker.AlwaysOff,
                                self.canvas())
 
-		# replot
-		self.replot()
-
 	def setdata(self,x,y):
 		# we don't need so many points
 		while len(y) > 2*self.canvas().width():

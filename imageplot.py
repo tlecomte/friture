@@ -21,6 +21,17 @@ import PyQt4.Qwt5 as Qwt
 from PyQt4 import QtCore
 from audiodata import *
 
+class FreqScaleDraw(Qwt.QwtScaleDraw):
+	def __init__(self, *args):
+		Qwt.QwtScaleDraw.__init__(self, *args)
+
+	def label(self, value):
+		if value >= 1e3:
+			label = "%.1fk" %(value/1e3)
+		else:
+			label = "%.1f" %(value)
+		return Qwt.QwtText(label)
+
 class PlotImage(Qwt.QwtPlotItem):
 
 	def __init__(self):
@@ -68,6 +79,9 @@ class ImagePlot(Qwt.QwtPlot):
 		self.plotLayout().setMargin(0)
 		self.plotLayout().setCanvasMargin(0)
 		self.plotLayout().setAlignCanvasToScales(True)
+		# use custom labelling for frequencies
+		self.setAxisScaleDraw(Qwt.QwtPlot.yLeft, FreqScaleDraw())
+		self.setAxisScaleDraw(Qwt.QwtPlot.yRight, FreqScaleDraw())
 		# set axis titles
 		self.setAxisTitle(Qwt.QwtPlot.xBottom, 'Time (s)')
 		self.setAxisTitle(Qwt.QwtPlot.yLeft, 'Frequency (Hz)')
