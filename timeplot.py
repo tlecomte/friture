@@ -30,7 +30,7 @@ class TimePlot(classplot.ClassPlot):
 		self.canvas().setPaintAttribute(Qwt.QwtPlotCanvas.PaintCached, False)
 		self.canvas().setPaintAttribute(Qwt.QwtPlotCanvas.PaintPacked, False)
 
-		self.setAxisTitle(Qwt.QwtPlot.xBottom, 'Time (s)')
+		self.setAxisTitle(Qwt.QwtPlot.xBottom, 'Time (ms)')
 		self.setAxisTitle(Qwt.QwtPlot.yLeft, 'Signal')
 		self.setAxisScale(Qwt.QwtPlot.yLeft, -1., 1.)
 		self.setAxisScaleEngine(Qwt.QwtPlot.xBottom, Qwt.QwtLinearScaleEngine())
@@ -39,20 +39,21 @@ class TimePlot(classplot.ClassPlot):
 		self.connect(self.picker, QtCore.SIGNAL('moved(const QPoint &)'), self.moved)
 
 	def moved(self, point):
-		info = "Time=%.3g s, Signal=%.3g" % (
+		info = "Time=%.3g ms, Signal=%.3g" % (
 			self.invTransform(Qwt.QwtPlot.xBottom, point.x()),
 			self.invTransform(Qwt.QwtPlot.yLeft, point.y()))
 		self.emit(QtCore.SIGNAL("pointerMoved"), info)
 
 	def setdata(self,x,y):
+		x_ms =  1e3*x
 		needfullreplot = False
-		if self.xmax <> x.max():
+		if self.xmax <> x_ms.max():
 			print "changing x scale"
-			self.xmax = x.max()
+			self.xmax = x_ms.max()
 			self.setAxisScale(Qwt.QwtPlot.xBottom, 0., self.xmax)
 			needfullreplot = True
 
-		classplot.ClassPlot.setdata(self,x,y)
+		classplot.ClassPlot.setdata(self,x_ms,y)
 
 		if needfullreplot:
 			self.replot()
