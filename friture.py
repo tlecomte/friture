@@ -104,6 +104,8 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		self.connect(self.comboBox_inputDevice, QtCore.SIGNAL('currentIndexChanged(int)'), self.input_device_changed)
 		self.connect(self.timer, QtCore.SIGNAL('timeout()'), self.timer_slot)
 		self.connect(self.PlotZoneImage, QtCore.SIGNAL('pointerMoved'), self.pointer_moved)
+		self.connect(self.PlotZoneSpect, QtCore.SIGNAL('pointerMoved'), self.pointer_moved)
+		self.connect(self.PlotZoneUp, QtCore.SIGNAL('pointerMoved'), self.pointer_moved)
 
 		self.timer_toggle()
 		print "Done"

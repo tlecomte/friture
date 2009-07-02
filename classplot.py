@@ -44,6 +44,14 @@ class ClassPlot(Qwt.QwtPlot):
 		x = linspace(0.0, 10.0, 11)
 		self.curve.setData(x, sin(x))
 
+		# picker used to display coordinates in the status bar when clicking on the canvas
+		self.picker = Qwt.QwtPlotPicker(Qwt.QwtPlot.xBottom,
+                               Qwt.QwtPlot.yLeft,
+                               Qwt.QwtPicker.PointSelection,
+                               Qwt.QwtPlotPicker.CrossRubberBand,
+                               Qwt.QwtPicker.AlwaysOff,
+                               self.canvas())
+
 		# replot
 		self.replot()
 

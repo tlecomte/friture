@@ -6,7 +6,6 @@ Improvements :
 - Code/Maths : constant-Q-transform for efficient and precise logarithmic spectrogram
 
 Features :
-- Code/GUI : pointer and markers for the plots
 - GUI : option (checkbox ?, list ?) to enable widgets
 - Code : overlapping fft windows for smoother spectrograms
 - Code/GUI : new widget for long run level measurements

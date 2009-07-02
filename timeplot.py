@@ -19,6 +19,7 @@
 
 import classplot
 import PyQt4.Qwt5 as Qwt
+from PyQt4 import QtCore
 from numpy import log10
 
 class TimePlot(classplot.ClassPlot):
@@ -34,6 +35,14 @@ class TimePlot(classplot.ClassPlot):
 		self.setAxisScale(Qwt.QwtPlot.yLeft, -1., 1.)
 		self.setAxisScaleEngine(Qwt.QwtPlot.xBottom, Qwt.QwtLinearScaleEngine())
 		self.xmax = 0
+		
+		self.connect(self.picker, QtCore.SIGNAL('moved(const QPoint &)'), self.moved)
+
+	def moved(self, point):
+		info = "Time=%.3g s, Signal=%.3g" % (
+			self.invTransform(Qwt.QwtPlot.xBottom, point.x()),
+			self.invTransform(Qwt.QwtPlot.yLeft, point.y()))
+		self.emit(QtCore.SIGNAL("pointerMoved"), info)
 
 	def setdata(self,x,y):
 		needfullreplot = False

@@ -19,6 +19,7 @@
 
 import classplot
 import PyQt4.Qwt5 as Qwt
+from PyQt4 import QtCore
 
 class SpectPlot(classplot.ClassPlot):
 	def __init__(self, *args):
@@ -38,6 +39,14 @@ class SpectPlot(classplot.ClassPlot):
 
 		self.setlinfreqscale()
 		self.logfreqscale = False
+		
+		self.connect(self.picker, QtCore.SIGNAL('moved(const QPoint &)'), self.moved)
+
+	def moved(self, point):
+		info = "Frequency=%d Hz, PSD=%d dB" % (
+			self.invTransform(Qwt.QwtPlot.xBottom, point.x()),
+			self.invTransform(Qwt.QwtPlot.yLeft, point.y()))
+		self.emit(QtCore.SIGNAL("pointerMoved"), info)
 
 	def setdata(self,x,y):
 		if self.xmax <> x.max():
