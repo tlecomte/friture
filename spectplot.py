@@ -27,9 +27,9 @@ class FreqScaleDraw(Qwt.QwtScaleDraw):
 
 	def label(self, value):
 		if value >= 1e3:
-			label = "%.1fk" %(value/1e3)
+			label = "%dk" %(value/1e3)
 		else:
-			label = "%.1f" %(value)
+			label = "%d" %(value)
 		return Qwt.QwtText(label)
 
 class SpectPlot(classplot.ClassPlot):
