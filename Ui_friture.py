@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'friture.ui'
 #
-# Created: Thu Jul  2 15:43:19 2009
+# Created: Thu Jul  2 16:16:20 2009
 #      by: PyQt4 UI code generator 4.4.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -28,6 +28,8 @@ class Ui_MainWindow(object):
         self.comboBox_inputDevice = QtGui.QComboBox(self.centralwidget)
         self.comboBox_inputDevice.setObjectName("comboBox_inputDevice")
         self.horizontalLayout_2.addWidget(self.comboBox_inputDevice)
+        spacerItem = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
+        self.horizontalLayout_2.addItem(spacerItem)
         self.verticalLayout_2.addLayout(self.horizontalLayout_2)
         self.horizontalLayout = QtGui.QHBoxLayout()
         self.horizontalLayout.setObjectName("horizontalLayout")
