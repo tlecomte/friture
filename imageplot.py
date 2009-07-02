@@ -18,6 +18,7 @@
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
 import PyQt4.Qwt5 as Qwt
+from PyQt4 import QtCore
 from audiodata import *
 
 class PlotImage(Qwt.QwtPlotItem):
@@ -76,7 +77,21 @@ class ImagePlot(Qwt.QwtPlot):
 		self.plotImage.attach(self)
 		self.setlinfreqscale()
 		
+		self.picker = Qwt.QwtPlotPicker(Qwt.QwtPlot.xBottom,
+                               Qwt.QwtPlot.yLeft,
+                               Qwt.QwtPicker.PointSelection | Qwt.QwtPicker.DragSelection,
+                               Qwt.QwtPlotPicker.CrossRubberBand,
+                               Qwt.QwtPicker.AlwaysOff,
+                               self.canvas())
+		self.connect(self.picker, QtCore.SIGNAL('moved(const QPoint &)'), self.moved)
+		
 		self.replot()
+
+	def moved(self, point):
+		info = "Time=%d s, Frequency=%d Hz" % (
+			self.invTransform(Qwt.QwtPlot.xBottom, point.x()),
+			self.invTransform(Qwt.QwtPlot.yLeft, point.y()))
+		self.emit(QtCore.SIGNAL("pointerMoved"), info)
 		
 	def setData(self, xyzs):
 		self.plotImage.setData(xyzs)

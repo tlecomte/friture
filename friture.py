@@ -103,9 +103,13 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		self.connect(self.spinBox_specmin, QtCore.SIGNAL('valueChanged(int)'), self.specrangechanged)
 		self.connect(self.comboBox_inputDevice, QtCore.SIGNAL('currentIndexChanged(int)'), self.input_device_changed)
 		self.connect(self.timer, QtCore.SIGNAL('timeout()'), self.timer_slot)
+		self.connect(self.PlotZoneImage, QtCore.SIGNAL('pointerMoved'), self.pointer_moved)
 
 		self.timer_toggle()
 		print "Done"
+
+	def pointer_moved(self, info):
+		self.statusBar().showMessage(info)
 
 	#return True on success
 	def try_input_device(self):
