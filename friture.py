@@ -107,6 +107,11 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		self.connect(self.PlotZoneSpect, QtCore.SIGNAL('pointerMoved'), self.pointer_moved)
 		self.connect(self.PlotZoneUp, QtCore.SIGNAL('pointerMoved'), self.pointer_moved)
 
+		self.label_rms.setText("%.01f" % (-60.))
+		self.label_peak.setText("%.01f" % (-60.))
+		self.label_rms.setMinimumWidth(self.label_rms.width())
+		self.label_peak.setMinimumWidth(self.label_peak.width())
+
 		self.timer_toggle()
 		print "Done"
 
@@ -156,8 +161,8 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		level_max = 20*log10(abs(time).max() + 0*1e-80)
 		level_label = "Chunk #%d\nlosts: %d = %.01f %%\nuseless: %d = %.01f %%" % (self.i, self.losts, self.losts*100./float(self.i), self.useless, self.useless*100./float(self.i))
 		self.LabelLevel.setText(level_label)
-		self.label_rms.setText("%.01f\ndBFS  \nRMS" % level_rms)
-		self.label_peak.setText("%.01f\ndBFS  \npeak" % level_max)
+		self.label_rms.setText("%.01f" % level_rms)
+		self.label_peak.setText("%.01f" % level_max)
 
 		self.meter.setValue(0, sqrt((time**2).sum()/len(time)*2.))
 		self.meter.setValue(1, abs(time).max())
