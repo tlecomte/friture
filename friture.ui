@@ -76,12 +76,6 @@
            </item>
            <item row="0" column="0">
             <widget class="QLabel" name="label_rms">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
              <property name="font">
               <font>
                <pointsize>14</pointsize>
@@ -97,7 +91,7 @@
            <item row="0" column="2">
             <widget class="QLabel" name="label_peak">
              <property name="sizePolicy">
-              <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                <horstretch>0</horstretch>
                <verstretch>0</verstretch>
               </sizepolicy>

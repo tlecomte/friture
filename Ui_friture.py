@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'friture.ui'
 #
-# Created: Mon Aug 17 10:50:22 2009
+# Created: Mon Aug 17 11:07:17 2009
 #      by: PyQt4 UI code generator 4.5.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -47,11 +47,6 @@ class Ui_MainWindow(object):
         self.meter.setObjectName("meter")
         self.gridLayout_2.addWidget(self.meter, 0, 1, 1, 1)
         self.label_rms = QtGui.QLabel(self.groupBox)
-        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Preferred)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.label_rms.sizePolicy().hasHeightForWidth())
-        self.label_rms.setSizePolicy(sizePolicy)
         font = QtGui.QFont()
         font.setPointSize(14)
         font.setWeight(75)
@@ -60,7 +55,7 @@ class Ui_MainWindow(object):
         self.label_rms.setObjectName("label_rms")
         self.gridLayout_2.addWidget(self.label_rms, 0, 0, 1, 1)
         self.label_peak = QtGui.QLabel(self.groupBox)
-        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Preferred)
+        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.label_peak.sizePolicy().hasHeightForWidth())
