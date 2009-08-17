@@ -19,7 +19,13 @@
 
 import classplot
 import PyQt4.Qwt5 as Qwt
-from PyQt4 import QtCore
+from PyQt4 import QtCore, Qt, QtGui
+from numpy import zeros, ones, log10
+
+# The peak decay rates (magic goes here :).
+PEAK_DECAY_RATE = 1.0 - 3E-6
+# Number of cycles the peak stays on hold before fall-off.
+PEAK_FALLOFF_COUNT = 32 # default : 16
 
 class FreqScaleDraw(Qwt.QwtScaleDraw):
 	def __init__(self, *args):
@@ -54,7 +60,16 @@ class SpectPlot(classplot.ClassPlot):
 		self.setAxisScaleDraw(Qwt.QwtPlot.xBottom, FreqScaleDraw())
 		
 		self.connect(self.picker, QtCore.SIGNAL('moved(const QPoint &)'), self.moved)
-
+		
+		# insert an additional curve for the peak
+		self.curve_peak = Qwt.QwtPlotCurve()
+		self.curve_peak.setPen(QtGui.QPen(Qt.Qt.blue))
+		self.curve_peak.setRenderHint(Qwt.QwtPlotItem.RenderAntialiased)
+		self.curve_peak.attach(self)
+		self.peak = zeros((1,))
+		self.peakHold = 0
+		self.peakDecay = PEAK_DECAY_RATE
+	
 	def moved(self, point):
 		info = "Frequency=%d Hz, PSD=%d dB" % (
 			self.invTransform(Qwt.QwtPlot.xBottom, point.x()),
@@ -71,8 +86,34 @@ class SpectPlot(classplot.ClassPlot):
 				self.setlinfreqscale()
 			self.needfullreplot = True
 
-		classplot.ClassPlot.setdata(self,x,y)
+		if len(self.peak) <> len(y):
+			self.ones = ones(y.shape)
+			self.peak = self.ones*(-500.)
+			self.peakHold = zeros(y.shape)
+			self.peakDecay = self.ones * PEAK_DECAY_RATE
 
+		mask1 = (self.peak < y)
+		mask2 = (-mask1) * (self.peakHold > self.ones*(PEAK_FALLOFF_COUNT - 1.))
+		mask2_bis = mask2 * (self.peak + 20.*log10(self.peakDecay) < y)
+		mask2_ter = mask2 * (self.peak + 20.*log10(self.peakDecay) >= y)
+		mask3 = (-mask1) * (-mask2)
+
+		self.peak = mask1 * y \
+		+ mask2_bis * y \
+		+ mask2_ter * (self.peak + 20.*log10(self.peakDecay)) \
+		+ mask3 * self.peak
+		
+		self.peakDecay = mask1 * self.ones * PEAK_DECAY_RATE \
+		+ mask2_bis * self.peakDecay \
+		+ mask2_ter * (self.peakDecay ** 2) \
+		+ mask3 * self.peakDecay
+		
+		self.peakHold = (-mask1) * self.peakHold
+		self.peakHold += self.ones
+		
+		classplot.ClassPlot.setdata(self,x,y)
+		self.curve_peak.setData(x, self.peak)
+		
 		if self.needfullreplot:
 			self.needfullreplot = False
 			self.replot()
