@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'friture.ui'
 #
-# Created: Mon Aug 17 11:07:17 2009
+# Created: Mon Aug 17 17:37:06 2009
 #      by: PyQt4 UI code generator 4.5.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -43,9 +43,6 @@ class Ui_MainWindow(object):
         self.groupBox.setObjectName("groupBox")
         self.gridLayout_2 = QtGui.QGridLayout(self.groupBox)
         self.gridLayout_2.setObjectName("gridLayout_2")
-        self.meter = qsynthMeter(self.groupBox)
-        self.meter.setObjectName("meter")
-        self.gridLayout_2.addWidget(self.meter, 0, 1, 1, 1)
         self.label_rms = QtGui.QLabel(self.groupBox)
         font = QtGui.QFont()
         font.setPointSize(14)
@@ -67,6 +64,11 @@ class Ui_MainWindow(object):
         self.label_peak.setFont(font)
         self.label_peak.setObjectName("label_peak")
         self.gridLayout_2.addWidget(self.label_peak, 0, 2, 1, 1)
+        self.meter = qsynthMeter(self.groupBox)
+        self.meter.setFrameShape(QtGui.QFrame.StyledPanel)
+        self.meter.setFrameShadow(QtGui.QFrame.Raised)
+        self.meter.setObjectName("meter")
+        self.gridLayout_2.addWidget(self.meter, 0, 1, 1, 1)
         self.verticalLayout.addWidget(self.groupBox)
         self.horizontalLayout.addLayout(self.verticalLayout)
         self.PlotZoneUp = TimePlot(self.centralwidget)
@@ -124,7 +126,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_2.addLayout(self.horizontalLayout_3)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtGui.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 719, 27))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 719, 26))
         self.menubar.setObjectName("menubar")
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QtGui.QStatusBar(MainWindow)

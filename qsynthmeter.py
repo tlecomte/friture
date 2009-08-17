@@ -202,10 +202,10 @@ class qsynthMeterValue(QtGui.QFrame):
 #----------------------------------------------------------------------------
 # qsynthMeter -- Meter bridge slot widget.
 
-class qsynthMeter(QtGui.QWidget):
+class qsynthMeter(QtGui.QFrame):
 	# Constructor.
 	def __init__(self, pParent):
-		QtGui.QWidget.__init__(self, pParent)
+		QtGui.QFrame.__init__(self, pParent)
 		
 		# Local instance variables.
 		self.m_iPortCount   = 2	# FIXME: Default port count.

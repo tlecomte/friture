@@ -71,9 +71,6 @@
            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
           </property>
           <layout class="QGridLayout" name="gridLayout_2">
-           <item row="0" column="1">
-            <widget class="qsynthMeter" name="meter" native="true"/>
-           </item>
            <item row="0" column="0">
             <widget class="QLabel" name="label_rms">
              <property name="font">
@@ -105,6 +102,16 @@
              </property>
              <property name="text">
               <string>TextLabel</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="qsynthMeter" name="meter">
+             <property name="frameShape">
+              <enum>QFrame::StyledPanel</enum>
+             </property>
+             <property name="frameShadow">
+              <enum>QFrame::Raised</enum>
              </property>
             </widget>
            </item>
@@ -261,7 +268,7 @@
      <x>0</x>
      <y>0</y>
      <width>719</width>
-     <height>27</height>
+     <height>26</height>
     </rect>
    </property>
   </widget>
@@ -288,7 +295,7 @@
   </customwidget>
   <customwidget>
    <class>qsynthMeter</class>
-   <extends>QWidget</extends>
+   <extends>QFrame</extends>
    <header>qsynthmeter.h</header>
    <container>1</container>
   </customwidget>
