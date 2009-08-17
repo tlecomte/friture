@@ -76,7 +76,7 @@ class qsynthMeterScale(QtGui.QWidget):
 		p.setPen(self.palette().mid().color().dark(140))
 
 		for dB in [0, -3, -6, -10, -20, -30, -40, -50, -60]:
-			self.drawLineLabel(p, self.m_pMeter.iec_scale(dB), str(abs(int(dB))))
+			self.drawLineLabel(p, self.m_pMeter.iec_scale(dB), str(abs(dB)))
 
 
 #----------------------------------------------------------------------------
