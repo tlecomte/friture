@@ -154,7 +154,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		time = adata.floatdata
 		level_rms = 20*log10(sqrt((time**2).sum()/len(time)*2.) + 0*1e-80) #*2. to get 0dB for a sine wave
 		level_max = 20*log10(abs(time).max() + 0*1e-80)
-		level_label = "Chunk #%d\nlosts: %d = %.01f %%\nuseless: %d = %.01f %%\n%.01f dBFS RMS\n%.01f dBFS peak\n%.03f max" % (self.i, self.losts, self.losts*100./float(self.i), self.useless, self.useless*100./float(self.i), level_rms, level_max, time.max())
+		level_label = "Chunk #%d\nlosts: %d = %.01f %%\nuseless: %d = %.01f %%\n%.01f dBFS RMS\n%.01f dBFS peak" % (self.i, self.losts, self.losts*100./float(self.i), self.useless, self.useless*100./float(self.i), level_rms, level_max)
 		self.LabelLevel.setText(level_label)
 
 		self.meter.setValue(0, sqrt((time**2).sum()/len(time)*2.))
