@@ -2,8 +2,8 @@
 
 # Form implementation generated from reading ui file 'friture.ui'
 #
-# Created: Thu Jul  2 16:16:20 2009
-#      by: PyQt4 UI code generator 4.4.4
+# Created: Mon Aug 17 10:50:22 2009
+#      by: PyQt4 UI code generator 4.5.4
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -39,12 +39,39 @@ class Ui_MainWindow(object):
         self.LabelLevel.setObjectName("LabelLevel")
         self.verticalLayout.addWidget(self.LabelLevel)
         self.groupBox = QtGui.QGroupBox(self.centralwidget)
+        self.groupBox.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
         self.groupBox.setObjectName("groupBox")
         self.gridLayout_2 = QtGui.QGridLayout(self.groupBox)
         self.gridLayout_2.setObjectName("gridLayout_2")
         self.meter = qsynthMeter(self.groupBox)
         self.meter.setObjectName("meter")
-        self.gridLayout_2.addWidget(self.meter, 0, 0, 1, 1)
+        self.gridLayout_2.addWidget(self.meter, 0, 1, 1, 1)
+        self.label_rms = QtGui.QLabel(self.groupBox)
+        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Preferred)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.label_rms.sizePolicy().hasHeightForWidth())
+        self.label_rms.setSizePolicy(sizePolicy)
+        font = QtGui.QFont()
+        font.setPointSize(14)
+        font.setWeight(75)
+        font.setBold(True)
+        self.label_rms.setFont(font)
+        self.label_rms.setObjectName("label_rms")
+        self.gridLayout_2.addWidget(self.label_rms, 0, 0, 1, 1)
+        self.label_peak = QtGui.QLabel(self.groupBox)
+        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Preferred)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.label_peak.sizePolicy().hasHeightForWidth())
+        self.label_peak.setSizePolicy(sizePolicy)
+        font = QtGui.QFont()
+        font.setPointSize(14)
+        font.setWeight(75)
+        font.setBold(True)
+        self.label_peak.setFont(font)
+        self.label_peak.setObjectName("label_peak")
+        self.gridLayout_2.addWidget(self.label_peak, 0, 2, 1, 1)
         self.verticalLayout.addWidget(self.groupBox)
         self.horizontalLayout.addLayout(self.verticalLayout)
         self.PlotZoneUp = TimePlot(self.centralwidget)
@@ -102,7 +129,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_2.addLayout(self.horizontalLayout_3)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtGui.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 719, 24))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 719, 27))
         self.menubar.setObjectName("menubar")
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QtGui.QStatusBar(MainWindow)
@@ -118,6 +145,8 @@ class Ui_MainWindow(object):
         self.pushButton_startstop.setText(QtGui.QApplication.translate("MainWindow", "Start", None, QtGui.QApplication.UnicodeUTF8))
         self.LabelLevel.setText(QtGui.QApplication.translate("MainWindow", "TextLabel", None, QtGui.QApplication.UnicodeUTF8))
         self.groupBox.setTitle(QtGui.QApplication.translate("MainWindow", "Input levels", None, QtGui.QApplication.UnicodeUTF8))
+        self.label_rms.setText(QtGui.QApplication.translate("MainWindow", "TextLabel", None, QtGui.QApplication.UnicodeUTF8))
+        self.label_peak.setText(QtGui.QApplication.translate("MainWindow", "TextLabel", None, QtGui.QApplication.UnicodeUTF8))
         self.comboBox_freqscale.setItemText(0, QtGui.QApplication.translate("MainWindow", "Linear", None, QtGui.QApplication.UnicodeUTF8))
         self.comboBox_freqscale.setItemText(1, QtGui.QApplication.translate("MainWindow", "Logarithmic", None, QtGui.QApplication.UnicodeUTF8))
         self.comboBox_fftsize.setItemText(0, QtGui.QApplication.translate("MainWindow", "32", None, QtGui.QApplication.UnicodeUTF8))
