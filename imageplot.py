@@ -90,6 +90,8 @@ class ImagePlot(Qwt.QwtPlot):
 		self.plotImage = PlotImage()
 		self.plotImage.attach(self)
 		self.setlinfreqscale()
+
+		self.setAxisScale(Qwt.QwtPlot.xBottom, 0., 10.)
 		
 		self.picker = Qwt.QwtPlotPicker(Qwt.QwtPlot.xBottom,
                                Qwt.QwtPlot.yLeft,

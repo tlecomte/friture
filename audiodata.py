@@ -120,9 +120,10 @@ class CanvasScaledSpectrogram():
 		self.vsize = vsize
 		self.logfreqscale = False
 		if self.hsize == 0:
-			# arbitrairement, pour le moment, on choisit que T/Dt vaut 2**18/((self.vsize-1)*2)
-			# dans ces conditions, n = self.hsize/self.canvas_hsize
-			self.hsize = 2**18/((self.vsize-1)*2)
+			T = 10.
+			sampling_rate = 44100.
+			Dt = 2*2.*(self.vsize-1)/sampling_rate
+			self.hsize = T/Dt
 		self.canvas_vsize = canvas_vsize
 		self.canvas_hsize = canvas_hsize
 		self.n = float(self.hsize)/canvas_hsize
@@ -159,6 +160,14 @@ class CanvasScaledSpectrogram():
 		if self.vsize <> vsize:
 			print "vsize changed", vsize
 			self.vsize = vsize
+			
+			T = 10.
+			sampling_rate = 44100.
+			Dt = 2*2.*(self.vsize-1)/sampling_rate
+			self.hsize = T/Dt
+			self.n = float(self.hsize)/self.canvas_hsize
+			self.current_total = 0
+
 			self.erase()
 			self.x = numpy.linspace(0., 22050., vsize)
 
@@ -325,7 +334,3 @@ class CanvasScaledSpectrogram():
 # 2. use a cache of size M=2*N
 # 3. write in the cache at the position j and j+N
 # 4. the data part that is to be drawn can be read contiguously from j+1 to j+1+N
-
-# une précision sur le nombre de fft à sommer
-# la "vraie" restriction est donnée par la longueur de l'axe en secondes, notée T, éventuellement réglée par l'utilisateur, et le nombre de pixels correspondant W
-# n=(T/W)/Dt
