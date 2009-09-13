@@ -17,4 +17,5 @@ Bugfixes :
 		https://bugzilla.redhat.com/show_bug.cgi?id=444388
 - code : when there is no input, audio data goes to 0., and log spectrum goes to -Inf,
  which seems to slow down computations enormously.
+- code : the device info from portaudio reports a low input latency (max 46 ms), but after opening the stream, it is reported to be 139 ms. Why ?
  
