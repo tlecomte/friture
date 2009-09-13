@@ -95,7 +95,6 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		self.timer = QtCore.QTimer()
 		#timer that fires roughly every 20 ms
 		self.timer.setInterval(TIMER_PERIOD_MS)
-		print self.stream.get_input_latency()
 
 		self.connect(self.pushButton_startstop, QtCore.SIGNAL('clicked()'), self.timer_toggle)
 		self.connect(self.comboBox_freqscale, QtCore.SIGNAL('currentIndexChanged(int)'), self.freqscalechanged)
@@ -128,6 +127,8 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		if n_try == 1000000:
 			return False
 		else:
+			lat_ms = 1000*self.stream.get_input_latency()
+			print "Device claims %d ms latency" %(lat_ms)
 			return True
 
 	def timer_toggle(self):
@@ -145,12 +146,10 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		while self.stream.get_read_available() >= NUM_SAMPLES:
 			j += 1
 			rawdata = self.stream.read(NUM_SAMPLES)
-			if j < 4:
+			if j < 5:
 				self.process_data(rawdata)
 			else:
 				self.losts += 1
-
-		self.losts -= 1
 
 	def process_data(self, rawdata):
 		channels = 1
