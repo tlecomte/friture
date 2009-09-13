@@ -95,6 +95,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		self.timer = QtCore.QTimer()
 		#timer that fires roughly every 20 ms
 		self.timer.setInterval(TIMER_PERIOD_MS)
+		print self.stream.get_input_latency()
 
 		self.connect(self.pushButton_startstop, QtCore.SIGNAL('clicked()'), self.timer_toggle)
 		self.connect(self.comboBox_freqscale, QtCore.SIGNAL('currentIndexChanged(int)'), self.freqscalechanged)
