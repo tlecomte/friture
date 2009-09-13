@@ -91,7 +91,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		self.dest_pixmap.fill()
 		self.painter = QtGui.QPainter(self.dest_pixmap)
 
-		print "Setting up the timer"
+		print "Setting up the timer, will fire every %d ms" %(TIMER_PERIOD_MS)
 		self.timer = QtCore.QTimer()
 		#timer that fires roughly every 20 ms
 		self.timer.setInterval(TIMER_PERIOD_MS)
