@@ -136,16 +136,22 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 			self.timer.start()
 
 	def timer_slot(self):
+		j = 0
 		if self.stream.get_read_available() < NUM_SAMPLES:
 			self.useless += 1
 			return
 		
 		while self.stream.get_read_available() >= NUM_SAMPLES:
-			self.losts += 1
+			j += 1
 			rawdata = self.stream.read(NUM_SAMPLES)
+			if j < 4:
+				self.process_data(rawdata)
+			else:
+				self.losts += 1
 
 		self.losts -= 1
 
+	def process_data(self, rawdata):
 		channels = 1
 		format = paInt16
 		rate = SAMPLING_RATE
