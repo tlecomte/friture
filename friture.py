@@ -57,6 +57,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		self.spec_min = -100.
 		self.spec_max = -20.
 		self.fft_size = 256
+		self.max_in_a_row = 1
 
 		print "Initializing PyAudio"
 		self.pa = PyAudio()
@@ -79,6 +80,8 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 			print "Trying to read from input device #%d" % (index)
 			if self.try_input_device():
 				print "Success"
+				lat_ms = 1000*self.stream.get_input_latency()
+				self.max_in_a_row = int(ceil(lat_ms/TIMER_PERIOD_MS))
 				break
 			else:
 				print "Fail"
@@ -146,7 +149,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		while self.stream.get_read_available() >= NUM_SAMPLES:
 			j += 1
 			rawdata = self.stream.read(NUM_SAMPLES)
-			if j < 5:
+			if j < self.max_in_a_row:
 				self.process_data(rawdata)
 			else:
 				self.losts += 1
@@ -254,7 +257,10 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 			self.stream.close()
 			self.stream = previous_stream
 			self.comboBox_inputDevice.setCurrentIndex(self.device_index)
-			
+		
+		lat_ms = 1000*self.stream.get_input_latency()
+		self.max_in_a_row = int(ceil(lat_ms/TIMER_PERIOD_MS))
+		
 		self.timer.start()
 		self.pushButton_startstop.setChecked(True)
 
