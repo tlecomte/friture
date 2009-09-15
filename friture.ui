@@ -14,165 +14,8 @@
    <string>Friture</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QVBoxLayout" name="verticalLayout_5">
-    <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_2">
-      <item>
-       <widget class="QPushButton" name="pushButton_startstop">
-        <property name="text">
-         <string>Start</string>
-        </property>
-        <property name="checkable">
-         <bool>true</bool>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
-        </property>
-        <property name="autoDefault">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QComboBox" name="comboBox_inputDevice"/>
-      </item>
-      <item>
-       <spacer name="horizontalSpacer">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-     </layout>
-    </item>
-    <item>
-     <layout class="QHBoxLayout" name="horizontalLayout">
-      <item>
-       <layout class="QVBoxLayout" name="verticalLayout">
-        <item>
-         <widget class="QLabel" name="LabelLevel">
-          <property name="text">
-           <string>TextLabel</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QGroupBox" name="groupBox">
-          <property name="title">
-           <string>Input levels</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-          </property>
-          <layout class="QGridLayout" name="gridLayout_2">
-           <item row="0" column="1">
-            <widget class="qsynthMeter" name="meter">
-             <property name="minimumSize">
-              <size>
-               <width>10</width>
-               <height>10</height>
-              </size>
-             </property>
-             <property name="frameShape">
-              <enum>QFrame::StyledPanel</enum>
-             </property>
-             <property name="frameShadow">
-              <enum>QFrame::Raised</enum>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="0">
-            <layout class="QVBoxLayout" name="verticalLayout_2">
-             <item>
-              <widget class="QLabel" name="label_rms">
-               <property name="font">
-                <font>
-                 <pointsize>14</pointsize>
-                 <weight>75</weight>
-                 <bold>true</bold>
-                </font>
-               </property>
-               <property name="text">
-                <string>TextLabel</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLabel" name="label_rms_legend">
-               <property name="text">
-                <string>dBFS
-RMS</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </item>
-           <item row="0" column="2">
-            <layout class="QVBoxLayout" name="verticalLayout_4">
-             <item>
-              <widget class="QLabel" name="label_peak">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="font">
-                <font>
-                 <pointsize>14</pointsize>
-                 <weight>75</weight>
-                 <bold>true</bold>
-                </font>
-               </property>
-               <property name="text">
-                <string>TextLabel</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLabel" name="label_peak_legend">
-               <property name="text">
-                <string>dBFS
-peak</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </item>
-          </layout>
-         </widget>
-        </item>
-       </layout>
-      </item>
-      <item>
-       <widget class="TimePlot" name="PlotZoneUp">
-        <property name="frameShape">
-         <enum>QFrame::StyledPanel</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Raised</enum>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="SpectPlot" name="PlotZoneSpect">
-        <property name="frameShape">
-         <enum>QFrame::StyledPanel</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Raised</enum>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </item>
-    <item>
+   <layout class="QGridLayout" name="gridLayout_3">
+    <item row="0" column="0" colspan="5">
      <widget class="ImagePlot" name="PlotZoneImage">
       <property name="frameShape">
        <enum>QFrame::StyledPanel</enum>
@@ -183,126 +26,268 @@ peak</string>
       <layout class="QGridLayout" name="gridLayout"/>
      </widget>
     </item>
-    <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_3">
+    <item row="1" column="1">
+     <widget class="QComboBox" name="comboBox_freqscale">
       <item>
-       <widget class="QComboBox" name="comboBox_freqscale">
-        <item>
-         <property name="text">
-          <string>Linear</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Logarithmic</string>
-         </property>
-        </item>
-       </widget>
+       <property name="text">
+        <string>Linear</string>
+       </property>
       </item>
       <item>
-       <widget class="QComboBox" name="comboBox_fftsize">
-        <property name="currentIndex">
-         <number>3</number>
-        </property>
-        <item>
-         <property name="text">
-          <string>32</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>64</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>128</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>256</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>512</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>1024</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>2048</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>4096</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>8192</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>16384</string>
-         </property>
-        </item>
-       </widget>
+       <property name="text">
+        <string>Logarithmic</string>
+       </property>
+      </item>
+     </widget>
+    </item>
+    <item row="1" column="2">
+     <widget class="QComboBox" name="comboBox_fftsize">
+      <property name="currentIndex">
+       <number>3</number>
+      </property>
+      <item>
+       <property name="text">
+        <string>32</string>
+       </property>
       </item>
       <item>
-       <widget class="QSpinBox" name="spinBox_specmin">
-        <property name="keyboardTracking">
-         <bool>false</bool>
-        </property>
-        <property name="minimum">
-         <number>-200</number>
-        </property>
-        <property name="maximum">
-         <number>200</number>
-        </property>
-        <property name="value">
-         <number>-100</number>
-        </property>
-       </widget>
+       <property name="text">
+        <string>64</string>
+       </property>
       </item>
       <item>
-       <widget class="QSpinBox" name="spinBox_specmax">
-        <property name="keyboardTracking">
-         <bool>false</bool>
-        </property>
-        <property name="minimum">
-         <number>-200</number>
-        </property>
-        <property name="maximum">
-         <number>200</number>
-        </property>
-        <property name="value">
-         <number>-20</number>
-        </property>
-       </widget>
+       <property name="text">
+        <string>128</string>
+       </property>
       </item>
-     </layout>
+      <item>
+       <property name="text">
+        <string>256</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>512</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>1024</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>2048</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>4096</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>8192</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>16384</string>
+       </property>
+      </item>
+     </widget>
+    </item>
+    <item row="1" column="3">
+     <widget class="QSpinBox" name="spinBox_specmin">
+      <property name="keyboardTracking">
+       <bool>false</bool>
+      </property>
+      <property name="minimum">
+       <number>-200</number>
+      </property>
+      <property name="maximum">
+       <number>200</number>
+      </property>
+      <property name="value">
+       <number>-100</number>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="4">
+     <widget class="QSpinBox" name="spinBox_specmax">
+      <property name="keyboardTracking">
+       <bool>false</bool>
+      </property>
+      <property name="minimum">
+       <number>-200</number>
+      </property>
+      <property name="maximum">
+       <number>200</number>
+      </property>
+      <property name="value">
+       <number>-20</number>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="0">
+     <widget class="QComboBox" name="comboBox_inputDevice"/>
     </item>
    </layout>
   </widget>
-  <widget class="QMenuBar" name="menubar">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>719</width>
-     <height>26</height>
-    </rect>
-   </property>
-  </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QDockWidget" name="dockWidget">
+   <property name="windowTitle">
+    <string>Input levels</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>8</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents">
+    <layout class="QGridLayout" name="gridLayout_4">
+     <item row="0" column="0">
+      <widget class="QLabel" name="label_rms">
+       <property name="font">
+        <font>
+         <pointsize>14</pointsize>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>0.00</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1" rowspan="2">
+      <widget class="qsynthMeter" name="meter">
+       <property name="minimumSize">
+        <size>
+         <width>10</width>
+         <height>10</height>
+        </size>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::StyledPanel</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="2">
+      <widget class="QLabel" name="label_peak">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>14</pointsize>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>0.00</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="label_rms_legend">
+       <property name="text">
+        <string>dBFS
+RMS</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="2">
+      <widget class="QLabel" name="label_peak_legend">
+       <property name="text">
+        <string>dBFS
+peak</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QDockWidget" name="dockWidget_2">
+   <property name="windowTitle">
+    <string>Statistics</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>8</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents_2">
+    <layout class="QGridLayout" name="gridLayout_2">
+     <item row="0" column="0">
+      <widget class="QLabel" name="LabelLevel">
+       <property name="text">
+        <string>TextLabel</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QDockWidget" name="dockWidget_4">
+   <property name="windowTitle">
+    <string>Scope</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>4</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents_4">
+    <layout class="QGridLayout" name="gridLayout_5">
+     <item row="0" column="0">
+      <widget class="TimePlot" name="PlotZoneUp"/>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QDockWidget" name="dockWidget_5">
+   <property name="windowTitle">
+    <string>Spectrum</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>4</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents_5">
+    <layout class="QGridLayout" name="gridLayout_6">
+     <item row="0" column="0">
+      <widget class="SpectPlot" name="PlotZoneSpect"/>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QToolBar" name="toolBar">
+   <property name="windowTitle">
+    <string>toolBar</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionStart"/>
+  </widget>
+  <action name="actionStart">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Start</string>
+   </property>
+   <property name="toolTip">
+    <string>Start/Stop</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>

@@ -99,7 +99,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		#timer that fires roughly every 20 ms
 		self.timer.setInterval(TIMER_PERIOD_MS)
 
-		self.connect(self.pushButton_startstop, QtCore.SIGNAL('clicked()'), self.timer_toggle)
+		self.connect(self.actionStart, QtCore.SIGNAL('triggered()'), self.timer_toggle)
 		self.connect(self.comboBox_freqscale, QtCore.SIGNAL('currentIndexChanged(int)'), self.freqscalechanged)
 		self.connect(self.comboBox_fftsize, QtCore.SIGNAL('currentIndexChanged(int)'), self.fftsizechanged)
 		self.connect(self.spinBox_specmax, QtCore.SIGNAL('valueChanged(int)'), self.specrangechanged)
@@ -236,7 +236,8 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 
 	def input_device_changed(self, index):
 		self.timer.stop()
-		self.pushButton_startstop.setChecked(False)
+		# FIXME update to toolbar action
+		# self.pushButton_startstop.setChecked(False)
 		
 		# save current stream in case we need to restore it
 		previous_stream = self.stream
@@ -262,7 +263,8 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		self.max_in_a_row = int(ceil(lat_ms/TIMER_PERIOD_MS))
 		
 		self.timer.start()
-		self.pushButton_startstop.setChecked(True)
+		# FIXME update to toolbar action
+		# self.pushButton_startstop.setChecked(True)
 
 if __name__ == "__main__":
 	app = QtGui.QApplication(sys.argv)
