@@ -17,12 +17,6 @@
    <layout class="QGridLayout" name="gridLayout_3">
     <item row="0" column="0" colspan="5">
      <widget class="ImagePlot" name="PlotZoneImage">
-      <property name="frameShape">
-       <enum>QFrame::StyledPanel</enum>
-      </property>
-      <property name="frameShadow">
-       <enum>QFrame::Raised</enum>
-      </property>
       <layout class="QGridLayout" name="gridLayout"/>
      </widget>
     </item>
@@ -134,7 +128,6 @@
     </item>
    </layout>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
   <widget class="QDockWidget" name="dockWidgetLevels">
    <property name="windowTitle">
     <string>Input levels</string>
@@ -278,6 +271,7 @@ peak</string>
    <addaction name="actionLevels"/>
    <addaction name="actionStatistics"/>
   </widget>
+  <widget class="QStatusBar" name="statusBar"/>
   <action name="actionStart">
    <property name="checkable">
     <bool>true</bool>

@@ -124,7 +124,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		print "Done"
 
 	def pointer_moved(self, info):
-		self.statusBar().showMessage(info)
+		self.statusBar.showMessage(info)
 
 	#return True on success
 	def try_input_device(self):

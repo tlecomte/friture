@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'friture.ui'
 #
-# Created: Wed Sep 16 14:11:07 2009
+# Created: Wed Sep 16 14:26:11 2009
 #      by: PyQt4 UI code generator 4.5.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -18,8 +18,6 @@ class Ui_MainWindow(object):
         self.gridLayout_3 = QtGui.QGridLayout(self.centralwidget)
         self.gridLayout_3.setObjectName("gridLayout_3")
         self.PlotZoneImage = ImagePlot(self.centralwidget)
-        self.PlotZoneImage.setFrameShape(QtGui.QFrame.StyledPanel)
-        self.PlotZoneImage.setFrameShadow(QtGui.QFrame.Raised)
         self.PlotZoneImage.setObjectName("PlotZoneImage")
         self.gridLayout = QtGui.QGridLayout(self.PlotZoneImage)
         self.gridLayout.setObjectName("gridLayout")
@@ -60,9 +58,6 @@ class Ui_MainWindow(object):
         self.comboBox_inputDevice.setObjectName("comboBox_inputDevice")
         self.gridLayout_3.addWidget(self.comboBox_inputDevice, 1, 0, 1, 1)
         MainWindow.setCentralWidget(self.centralwidget)
-        self.statusbar = QtGui.QStatusBar(MainWindow)
-        self.statusbar.setObjectName("statusbar")
-        MainWindow.setStatusBar(self.statusbar)
         self.dockWidgetLevels = QtGui.QDockWidget(MainWindow)
         self.dockWidgetLevels.setObjectName("dockWidgetLevels")
         self.dockWidgetContents = QtGui.QWidget()
@@ -140,6 +135,9 @@ class Ui_MainWindow(object):
         self.toolBar = QtGui.QToolBar(MainWindow)
         self.toolBar.setObjectName("toolBar")
         MainWindow.addToolBar(QtCore.Qt.TopToolBarArea, self.toolBar)
+        self.statusBar = QtGui.QStatusBar(MainWindow)
+        self.statusBar.setObjectName("statusBar")
+        MainWindow.setStatusBar(self.statusBar)
         self.actionStart = QtGui.QAction(MainWindow)
         self.actionStart.setCheckable(True)
         self.actionStart.setChecked(True)
