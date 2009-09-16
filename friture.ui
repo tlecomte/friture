@@ -147,7 +147,10 @@
         </font>
        </property>
        <property name="text">
-        <string>0.00</string>
+        <string>-100.0</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
        </property>
       </widget>
      </item>
@@ -164,7 +167,7 @@
         </font>
        </property>
        <property name="text">
-        <string>0.00</string>
+        <string>-100.0</string>
        </property>
       </widget>
      </item>
@@ -174,6 +177,9 @@
         <string>dBFS
 RMS</string>
        </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTop|Qt::AlignTrailing</set>
+       </property>
       </widget>
      </item>
      <item row="1" column="2">
@@ -182,7 +188,23 @@ RMS</string>
         <string>dBFS
 peak</string>
        </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+       </property>
       </widget>
+     </item>
+     <item row="2" column="0">
+      <spacer name="verticalSpacer">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>40</height>
+        </size>
+       </property>
+      </spacer>
      </item>
     </layout>
    </widget>

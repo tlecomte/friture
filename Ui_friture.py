@@ -2,8 +2,8 @@
 
 # Form implementation generated from reading ui file 'friture.ui'
 #
-# Created: Wed Sep 16 15:04:11 2009
-#      by: PyQt4 UI code generator 4.5.2
+# Created: Wed Sep 16 18:38:27 2009
+#      by: PyQt4 UI code generator 4.5.4
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -70,6 +70,7 @@ class Ui_MainWindow(object):
         font.setWeight(75)
         font.setBold(True)
         self.label_rms.setFont(font)
+        self.label_rms.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.label_rms.setObjectName("label_rms")
         self.gridLayout_4.addWidget(self.label_rms, 0, 0, 1, 1)
         self.meter = qsynthMeter(self.dockWidgetContents)
@@ -84,11 +85,15 @@ class Ui_MainWindow(object):
         self.label_peak.setObjectName("label_peak")
         self.gridLayout_4.addWidget(self.label_peak, 0, 2, 1, 1)
         self.label_rms_legend = QtGui.QLabel(self.dockWidgetContents)
+        self.label_rms_legend.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTop|QtCore.Qt.AlignTrailing)
         self.label_rms_legend.setObjectName("label_rms_legend")
         self.gridLayout_4.addWidget(self.label_rms_legend, 1, 0, 1, 1)
         self.label_peak_legend = QtGui.QLabel(self.dockWidgetContents)
+        self.label_peak_legend.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
         self.label_peak_legend.setObjectName("label_peak_legend")
         self.gridLayout_4.addWidget(self.label_peak_legend, 1, 2, 1, 1)
+        spacerItem = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
+        self.gridLayout_4.addItem(spacerItem, 2, 0, 1, 1)
         self.dockWidgetLevels.setWidget(self.dockWidgetContents)
         MainWindow.addDockWidget(QtCore.Qt.DockWidgetArea(8), self.dockWidgetLevels)
         self.dockWidgetStatistics = QtGui.QDockWidget(MainWindow)
@@ -175,8 +180,8 @@ class Ui_MainWindow(object):
         self.comboBox_fftsize.setItemText(8, QtGui.QApplication.translate("MainWindow", "8192", None, QtGui.QApplication.UnicodeUTF8))
         self.comboBox_fftsize.setItemText(9, QtGui.QApplication.translate("MainWindow", "16384", None, QtGui.QApplication.UnicodeUTF8))
         self.dockWidgetLevels.setWindowTitle(QtGui.QApplication.translate("MainWindow", "Input levels", None, QtGui.QApplication.UnicodeUTF8))
-        self.label_rms.setText(QtGui.QApplication.translate("MainWindow", "0.00", None, QtGui.QApplication.UnicodeUTF8))
-        self.label_peak.setText(QtGui.QApplication.translate("MainWindow", "0.00", None, QtGui.QApplication.UnicodeUTF8))
+        self.label_rms.setText(QtGui.QApplication.translate("MainWindow", "-100.0", None, QtGui.QApplication.UnicodeUTF8))
+        self.label_peak.setText(QtGui.QApplication.translate("MainWindow", "-100.0", None, QtGui.QApplication.UnicodeUTF8))
         self.label_rms_legend.setText(QtGui.QApplication.translate("MainWindow", "dBFS\n"
 "RMS", None, QtGui.QApplication.UnicodeUTF8))
         self.label_peak_legend.setText(QtGui.QApplication.translate("MainWindow", "dBFS\n"

@@ -115,11 +115,6 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		self.connect(self.PlotZoneSpect, QtCore.SIGNAL('pointerMoved'), self.pointer_moved)
 		self.connect(self.PlotZoneUp, QtCore.SIGNAL('pointerMoved'), self.pointer_moved)
 
-		self.label_rms.setText("%.01f" % (-60.))
-		self.label_peak.setText("%.01f" % (-60.))
-		self.label_rms.setMinimumWidth(self.label_rms.width())
-		self.label_peak.setMinimumWidth(self.label_peak.width())
-
 		self.timer_toggle()
 		print "Done"
 
