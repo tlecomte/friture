@@ -255,11 +255,8 @@ class qsynthMeter(QtGui.QFrame):
 				if iPort < self.m_iScaleCount:
 					self.m_ppScales += [qsynthMeterScale(self)]
 					self.m_pHBoxLayout.addWidget(self.m_ppScales[iPort])
-			iStripCount = 2 * self.m_iPortCount
-			if self.m_iPortCount > 1:
-				iStripCount -= 1
-			self.setMinimumSize(12 * iStripCount, 120)
-			self.setMaximumWidth(16 * iStripCount)
+			self.setMinimumSize(12 * self.m_iPortCount + 16 * (self.m_iPortCount-1), 120)
+			self.setMaximumWidth(16 * self.m_iPortCount + 16 * (self.m_iPortCount-1))
 		else:
 			self.setMinimumSize(2, 120)
 			self.setMaximumWidth(4)
