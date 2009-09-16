@@ -100,6 +100,11 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		self.timer.setInterval(TIMER_PERIOD_MS)
 
 		self.connect(self.actionStart, QtCore.SIGNAL('triggered()'), self.timer_toggle)
+		self.connect(self.actionScope, QtCore.SIGNAL('triggered()'), self.scope_toggle)
+		self.connect(self.actionSpectrum, QtCore.SIGNAL('triggered()'), self.spectrum_toggle)
+		self.connect(self.actionStatistics, QtCore.SIGNAL('triggered()'), self.statistics_toggle)
+		self.connect(self.actionLevels, QtCore.SIGNAL('triggered()'), self.levels_toggle)
+		
 		self.connect(self.comboBox_freqscale, QtCore.SIGNAL('currentIndexChanged(int)'), self.freqscalechanged)
 		self.connect(self.comboBox_fftsize, QtCore.SIGNAL('currentIndexChanged(int)'), self.fftsizechanged)
 		self.connect(self.spinBox_specmax, QtCore.SIGNAL('valueChanged(int)'), self.specrangechanged)
@@ -139,6 +144,30 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 			self.timer.stop()
 		else:
 			self.timer.start()
+			
+	def scope_toggle(self):
+		if self.dockWidgetScope.isVisible():
+			self.dockWidgetScope.hide()
+		else:
+			self.dockWidgetScope.show()
+
+	def spectrum_toggle(self):
+		if self.dockWidgetSpectrum.isVisible():
+			self.dockWidgetSpectrum.hide()
+		else:
+			self.dockWidgetSpectrum.show()
+
+	def statistics_toggle(self):
+		if self.dockWidgetStatistics.isVisible():
+			self.dockWidgetStatistics.hide()
+		else:
+			self.dockWidgetStatistics.show()
+
+	def levels_toggle(self):
+		if self.dockWidgetLevels.isVisible():
+			self.dockWidgetLevels.hide()
+		else:
+			self.dockWidgetLevels.show()
 
 	def timer_slot(self):
 		j = 0

@@ -135,7 +135,7 @@
    </layout>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
-  <widget class="QDockWidget" name="dockWidget">
+  <widget class="QDockWidget" name="dockWidgetLevels">
    <property name="windowTitle">
     <string>Input levels</string>
    </property>
@@ -213,7 +213,7 @@ peak</string>
     </layout>
    </widget>
   </widget>
-  <widget class="QDockWidget" name="dockWidget_2">
+  <widget class="QDockWidget" name="dockWidgetStatistics">
    <property name="windowTitle">
     <string>Statistics</string>
    </property>
@@ -232,7 +232,7 @@ peak</string>
     </layout>
    </widget>
   </widget>
-  <widget class="QDockWidget" name="dockWidget_4">
+  <widget class="QDockWidget" name="dockWidgetScope">
    <property name="windowTitle">
     <string>Scope</string>
    </property>
@@ -247,7 +247,7 @@ peak</string>
     </layout>
    </widget>
   </widget>
-  <widget class="QDockWidget" name="dockWidget_5">
+  <widget class="QDockWidget" name="dockWidgetSpectrum">
    <property name="windowTitle">
     <string>Spectrum</string>
    </property>
@@ -273,6 +273,10 @@ peak</string>
     <bool>false</bool>
    </attribute>
    <addaction name="actionStart"/>
+   <addaction name="actionScope"/>
+   <addaction name="actionSpectrum"/>
+   <addaction name="actionLevels"/>
+   <addaction name="actionStatistics"/>
   </widget>
   <action name="actionStart">
    <property name="checkable">
@@ -286,6 +290,62 @@ peak</string>
    </property>
    <property name="toolTip">
     <string>Start/Stop</string>
+   </property>
+  </action>
+  <action name="actionScope">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Scope</string>
+   </property>
+   <property name="toolTip">
+    <string>Toggle scope widget</string>
+   </property>
+  </action>
+  <action name="actionSpectrum">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Spectrum</string>
+   </property>
+   <property name="toolTip">
+    <string>Toggle spectrum widget</string>
+   </property>
+  </action>
+  <action name="actionLevels">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Level meters</string>
+   </property>
+   <property name="toolTip">
+    <string>Toggle levels widget</string>
+   </property>
+  </action>
+  <action name="actionStatistics">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Statistics</string>
+   </property>
+   <property name="toolTip">
+    <string>Toggle statistics widget</string>
    </property>
   </action>
  </widget>
