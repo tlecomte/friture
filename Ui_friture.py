@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'friture.ui'
 #
-# Created: Wed Sep 16 14:26:11 2009
+# Created: Wed Sep 16 15:04:11 2009
 #      by: PyQt4 UI code generator 4.5.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -73,17 +73,9 @@ class Ui_MainWindow(object):
         self.label_rms.setObjectName("label_rms")
         self.gridLayout_4.addWidget(self.label_rms, 0, 0, 1, 1)
         self.meter = qsynthMeter(self.dockWidgetContents)
-        self.meter.setMinimumSize(QtCore.QSize(10, 10))
-        self.meter.setFrameShape(QtGui.QFrame.StyledPanel)
-        self.meter.setFrameShadow(QtGui.QFrame.Raised)
         self.meter.setObjectName("meter")
         self.gridLayout_4.addWidget(self.meter, 0, 1, 2, 1)
         self.label_peak = QtGui.QLabel(self.dockWidgetContents)
-        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Preferred)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.label_peak.sizePolicy().hasHeightForWidth())
-        self.label_peak.setSizePolicy(sizePolicy)
         font = QtGui.QFont()
         font.setPointSize(14)
         font.setWeight(75)
