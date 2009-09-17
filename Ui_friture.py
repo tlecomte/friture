@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'friture.ui'
 #
-# Created: Thu Sep 17 11:41:15 2009
+# Created: Thu Sep 17 14:39:34 2009
 #      by: PyQt4 UI code generator 4.5.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -170,7 +170,7 @@ class Ui_MainWindow(object):
         self.toolBar.addAction(self.actionStatistics)
 
         self.retranslateUi(MainWindow)
-        self.comboBox_fftsize.setCurrentIndex(0)
+        self.comboBox_fftsize.setCurrentIndex(3)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):

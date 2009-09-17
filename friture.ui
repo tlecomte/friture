@@ -37,7 +37,7 @@
     <item row="1" column="5">
      <widget class="QComboBox" name="comboBox_fftsize">
       <property name="currentIndex">
-       <number>0</number>
+       <number>3</number>
       </property>
       <item>
        <property name="text">
