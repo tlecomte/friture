@@ -144,6 +144,11 @@ class CanvasScaledSpectrogram():
 		self.colorMap.addColorStop(0.6, Qt.Qt.yellow)
 		self.colorMap.addColorStop(0.8, Qt.Qt.red)
 		self.prepare_palette()
+		
+	def __del__(self):
+		# delete painter and the associated pixmap in the correct order
+		del self.painter
+		del self.pixmap
 
 	def erase(self):
 		self.fullspectrogram = numpy.zeros((self.canvas_vsize, self.hsize, 4), dtype = numpy.uint8)
