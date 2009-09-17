@@ -38,81 +38,81 @@ def concatenate(data1, data2):
         return data1
     return AudioData(data1.rawdata + data2.rawdata, data1.nchannels, data1.format, data1.samplesize, data1.samplerate)
 
-class RawSpectrogram():
-	def __init__(self, vsize = 0, hsize = 129):
-		self.vsize = vsize
-		self.hsize = hsize
-		if self.vsize == 0:
-			self.vsize = 2**18/((self.hsize-1)*2)
-		self.fullspectrogram = numpy.zeros((self.hsize, self.vsize))
-	def erase(self):
-		self.fullspectrogram = numpy.zeros((self.hsize, self.vsize))
-	def sethsize(self,hsize):
-		if self.hsize <> hsize:
-			self.hsize = hsize
-			self.erase()
-	def addData(self, xyzs):
-		if xyzs.ndim == 1:
-			hsize = xyzs.shape[0]
-			vsize = 1
-		else:
-			hsize = xyzs.shape[0]
-			vsize = xyzs.shape[1]
+#class RawSpectrogram():
+	#def __init__(self, vsize = 0, hsize = 129):
+		#self.vsize = vsize
+		#self.hsize = hsize
+		#if self.vsize == 0:
+			#self.vsize = 2**18/((self.hsize-1)*2)
+		#self.fullspectrogram = numpy.zeros((self.hsize, self.vsize))
+	#def erase(self):
+		#self.fullspectrogram = numpy.zeros((self.hsize, self.vsize))
+	#def sethsize(self,hsize):
+		#if self.hsize <> hsize:
+			#self.hsize = hsize
+			#self.erase()
+	#def addData(self, xyzs):
+		#if xyzs.ndim == 1:
+			#hsize = xyzs.shape[0]
+			#vsize = 1
+		#else:
+			#hsize = xyzs.shape[0]
+			#vsize = xyzs.shape[1]
 
-		if hsize<>self.hsize:
-			self.sethsize(hsize)
+		#if hsize<>self.hsize:
+			#self.sethsize(hsize)
 
-		self.fullspectrogram = numpy.hstack((self.fullspectrogram[vsize:,:],xyzs))
+		#self.fullspectrogram = numpy.hstack((self.fullspectrogram[vsize:,:],xyzs))
 
-	def data(self):
-		return self.fullspectrogram
+	#def data(self):
+		#return self.fullspectrogram
 
-class FreqScaledSpectrogram():
-	def __init__(self, vsize = 0, hsize = 129):
-		self.hsize = hsize
-		self.vsize = vsize
-		if self.vsize == 0:
-			self.vsize = 2**18/((self.hsize-1)*2)
-		self.fullspectrogram = numpy.zeros((self.hsize, self.vsize))
+#class FreqScaledSpectrogram():
+	#def __init__(self, vsize = 0, hsize = 129):
+		#self.hsize = hsize
+		#self.vsize = vsize
+		#if self.vsize == 0:
+			#self.vsize = 2**18/((self.hsize-1)*2)
+		#self.fullspectrogram = numpy.zeros((self.hsize, self.vsize))
 
-	def erase(self):
-		self.fullspectrogram = numpy.zeros((self.hsize, self.vsize))
+	#def erase(self):
+		#self.fullspectrogram = numpy.zeros((self.hsize, self.vsize))
 
-	def sethsize(self,hsize):
-		if self.hsize <> hsize:
-			self.hsize = hsize
-			self.erase()
+	#def sethsize(self,hsize):
+		#if self.hsize <> hsize:
+			#self.hsize = hsize
+			#self.erase()
 
-	def addData(self, xyzs, logfreqscale = 0):
-		if xyzs.ndim == 1:
-			hsize = xyzs.shape[0]
-			vsize = 1
-		else:
-			hsize = xyzs.shape[0]
-			vsize = xyzs.shape[1]
+	#def addData(self, xyzs, logfreqscale = 0):
+		#if xyzs.ndim == 1:
+			#hsize = xyzs.shape[0]
+			#vsize = 1
+		#else:
+			#hsize = xyzs.shape[0]
+			#vsize = xyzs.shape[1]
 
-		if hsize<>self.hsize:
-			self.sethsize(hsize)
+		#if hsize<>self.hsize:
+			#self.sethsize(hsize)
 
-		if logfreqscale == 0:
-			freqscaled_xyzs = xyzs #NOP
-		else:
-			# ideally, we should directly interpolate to the canvas vsize
-			x = numpy.arange(0, hsize)*22050./hsize
-			xlog = numpy.logspace(numpy.log10(20),numpy.log10(22050),hsize)
+		#if logfreqscale == 0:
+			#freqscaled_xyzs = xyzs #NOP
+		#else:
+			## ideally, we should directly interpolate to the canvas vsize
+			#x = numpy.arange(0, hsize)*22050./hsize
+			#xlog = numpy.logspace(numpy.log10(20),numpy.log10(22050),hsize)
 
-		if hsize == 1:
-			freqscaled_xyzs = numpy.interp(xlog,x,xyzs)
-		else:
-			freqscaled_xyzs = numpy.interp(xlog,x,xyzs[0,:])
+		#if hsize == 1:
+			#freqscaled_xyzs = numpy.interp(xlog,x,xyzs)
+		#else:
+			#freqscaled_xyzs = numpy.interp(xlog,x,xyzs[0,:])
 
-		for i in range(1,vsize):
-		    freqscaled_xyzs = numpy.hstack((freqscaled_xyzs,numpy.interp(xlog,x,xyzs[i,:])))
+		#for i in range(1,vsize):
+		    #freqscaled_xyzs = numpy.hstack((freqscaled_xyzs,numpy.interp(xlog,x,xyzs[i,:])))
 
-		self.fullspectrogram = numpy.hstack((self.fullspectrogram[vsize:,:],freqscaled_xyzs))
+		#self.fullspectrogram = numpy.hstack((self.fullspectrogram[vsize:,:],freqscaled_xyzs))
 
-	def data(self):
-		return self.fullspectrogram
+	#def data(self):
+		#return self.fullspectrogram
 
 class CanvasScaledSpectrogram():
 	def __init__(self, vsize = 129, hsize = 0, canvas_vsize = 2,  canvas_hsize = 2):
