@@ -23,12 +23,12 @@ from numpy import transpose, log10, sqrt, ceil, linspace, arange
 from PyQt4 import QtGui, QtCore, Qt
 import PyQt4.Qwt5 as Qwt
 from Ui_friture import Ui_MainWindow
-import resource
+import resource_rc
 import audiodata
 import proc
 
 #pyuic4 friture.ui > Ui_friture.py
-#pyrcc4 resource.qrc > resource.py
+#pyrcc4 resource.qrc > resource_rc.py
 
 #had to install pyqwt from source
 #first : sudo ln -s libqwt-qt4.so libqwt.so

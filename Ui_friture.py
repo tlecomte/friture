@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'friture.ui'
 #
-# Created: Wed Sep 23 13:53:36 2009
+# Created: Wed Sep 23 14:00:29 2009
 #      by: PyQt4 UI code generator 4.5.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -146,6 +146,9 @@ class Ui_MainWindow(object):
         self.actionStart = QtGui.QAction(MainWindow)
         self.actionStart.setCheckable(True)
         self.actionStart.setChecked(True)
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap(":/start.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.actionStart.setIcon(icon)
         self.actionStart.setObjectName("actionStart")
         self.toolBar.addAction(self.actionStart)
 
@@ -191,3 +194,4 @@ from timeplot import TimePlot
 from qsynthmeter import qsynthMeter
 from imageplot import ImagePlot
 from spectplot import SpectPlot
+import resource_rc
