@@ -1,5 +1,7 @@
 <RCC>
   <qresource>
+    <file>scope.svg</file>
+    <file>levels.svg</file>
     <file>stop.svg</file>
     <file>start.svg</file>
     <file>splash.png</file>

@@ -51,10 +51,18 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		# Configure l'interface utilisateur.
 		self.setupUi(self)
 		
-		self.toolBar.addAction(self.dockWidgetLevels.toggleViewAction())
-		self.toolBar.addAction(self.dockWidgetScope.toggleViewAction())
+		levelsAction = self.dockWidgetLevels.toggleViewAction()
+		scopeAction = self.dockWidgetScope.toggleViewAction()
+		
+		levelsAction.setIcon(QtGui.QIcon(":/levels.svg"))
+		scopeAction.setIcon(QtGui.QIcon(":/scope.svg"))
+		
+		self.toolBar.addAction(levelsAction)
+		self.toolBar.addAction(scopeAction)
 		self.toolBar.addAction(self.dockWidgetSpectrum.toggleViewAction())
 		self.toolBar.addAction(self.dockWidgetStatistics.toggleViewAction())
+		
+		
 
 		self.i = 0
 		self.losts = 0
