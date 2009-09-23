@@ -50,6 +50,11 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 
 		# Configure l'interface utilisateur.
 		self.setupUi(self)
+		
+		self.toolBar.addAction(self.dockWidgetLevels.toggleViewAction())
+		self.toolBar.addAction(self.dockWidgetScope.toggleViewAction())
+		self.toolBar.addAction(self.dockWidgetSpectrum.toggleViewAction())
+		self.toolBar.addAction(self.dockWidgetStatistics.toggleViewAction())
 
 		self.i = 0
 		self.losts = 0
@@ -100,10 +105,6 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		self.timer.setInterval(TIMER_PERIOD_MS)
 
 		self.connect(self.actionStart, QtCore.SIGNAL('triggered()'), self.timer_toggle)
-		self.connect(self.actionScope, QtCore.SIGNAL('triggered()'), self.scope_toggle)
-		self.connect(self.actionSpectrum, QtCore.SIGNAL('triggered()'), self.spectrum_toggle)
-		self.connect(self.actionStatistics, QtCore.SIGNAL('triggered()'), self.statistics_toggle)
-		self.connect(self.actionLevels, QtCore.SIGNAL('triggered()'), self.levels_toggle)
 		
 		self.connect(self.comboBox_freqscale, QtCore.SIGNAL('currentIndexChanged(int)'), self.freqscalechanged)
 		self.connect(self.comboBox_fftsize, QtCore.SIGNAL('currentIndexChanged(int)'), self.fftsizechanged)

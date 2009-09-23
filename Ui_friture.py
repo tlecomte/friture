@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'friture.ui'
 #
-# Created: Thu Sep 17 14:39:34 2009
+# Created: Wed Sep 23 13:53:36 2009
 #      by: PyQt4 UI code generator 4.5.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -12,7 +12,7 @@ from PyQt4 import QtCore, QtGui
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(719, 573)
+        MainWindow.resize(869, 573)
         self.centralwidget = QtGui.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.gridLayout_3 = QtGui.QGridLayout(self.centralwidget)
@@ -147,27 +147,7 @@ class Ui_MainWindow(object):
         self.actionStart.setCheckable(True)
         self.actionStart.setChecked(True)
         self.actionStart.setObjectName("actionStart")
-        self.actionScope = QtGui.QAction(MainWindow)
-        self.actionScope.setCheckable(True)
-        self.actionScope.setChecked(True)
-        self.actionScope.setObjectName("actionScope")
-        self.actionSpectrum = QtGui.QAction(MainWindow)
-        self.actionSpectrum.setCheckable(True)
-        self.actionSpectrum.setChecked(True)
-        self.actionSpectrum.setObjectName("actionSpectrum")
-        self.actionLevels = QtGui.QAction(MainWindow)
-        self.actionLevels.setCheckable(True)
-        self.actionLevels.setChecked(True)
-        self.actionLevels.setObjectName("actionLevels")
-        self.actionStatistics = QtGui.QAction(MainWindow)
-        self.actionStatistics.setCheckable(True)
-        self.actionStatistics.setChecked(True)
-        self.actionStatistics.setObjectName("actionStatistics")
         self.toolBar.addAction(self.actionStart)
-        self.toolBar.addAction(self.actionScope)
-        self.toolBar.addAction(self.actionSpectrum)
-        self.toolBar.addAction(self.actionLevels)
-        self.toolBar.addAction(self.actionStatistics)
 
         self.retranslateUi(MainWindow)
         self.comboBox_fftsize.setCurrentIndex(3)
@@ -206,14 +186,6 @@ class Ui_MainWindow(object):
         self.toolBar.setWindowTitle(QtGui.QApplication.translate("MainWindow", "toolBar", None, QtGui.QApplication.UnicodeUTF8))
         self.actionStart.setText(QtGui.QApplication.translate("MainWindow", "Start", None, QtGui.QApplication.UnicodeUTF8))
         self.actionStart.setToolTip(QtGui.QApplication.translate("MainWindow", "Start/Stop", None, QtGui.QApplication.UnicodeUTF8))
-        self.actionScope.setText(QtGui.QApplication.translate("MainWindow", "Scope", None, QtGui.QApplication.UnicodeUTF8))
-        self.actionScope.setToolTip(QtGui.QApplication.translate("MainWindow", "Toggle scope widget", None, QtGui.QApplication.UnicodeUTF8))
-        self.actionSpectrum.setText(QtGui.QApplication.translate("MainWindow", "Spectrum", None, QtGui.QApplication.UnicodeUTF8))
-        self.actionSpectrum.setToolTip(QtGui.QApplication.translate("MainWindow", "Toggle spectrum widget", None, QtGui.QApplication.UnicodeUTF8))
-        self.actionLevels.setText(QtGui.QApplication.translate("MainWindow", "Level meters", None, QtGui.QApplication.UnicodeUTF8))
-        self.actionLevels.setToolTip(QtGui.QApplication.translate("MainWindow", "Toggle levels widget", None, QtGui.QApplication.UnicodeUTF8))
-        self.actionStatistics.setText(QtGui.QApplication.translate("MainWindow", "Statistics", None, QtGui.QApplication.UnicodeUTF8))
-        self.actionStatistics.setToolTip(QtGui.QApplication.translate("MainWindow", "Toggle statistics widget", None, QtGui.QApplication.UnicodeUTF8))
 
 from timeplot import TimePlot
 from qsynthmeter import qsynthMeter

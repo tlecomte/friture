@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>719</width>
+    <width>869</width>
     <height>573</height>
    </rect>
   </property>
@@ -286,10 +286,6 @@ peak</string>
     <bool>false</bool>
    </attribute>
    <addaction name="actionStart"/>
-   <addaction name="actionScope"/>
-   <addaction name="actionSpectrum"/>
-   <addaction name="actionLevels"/>
-   <addaction name="actionStatistics"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionStart">
@@ -304,62 +300,6 @@ peak</string>
    </property>
    <property name="toolTip">
     <string>Start/Stop</string>
-   </property>
-  </action>
-  <action name="actionScope">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="checked">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Scope</string>
-   </property>
-   <property name="toolTip">
-    <string>Toggle scope widget</string>
-   </property>
-  </action>
-  <action name="actionSpectrum">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="checked">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Spectrum</string>
-   </property>
-   <property name="toolTip">
-    <string>Toggle spectrum widget</string>
-   </property>
-  </action>
-  <action name="actionLevels">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="checked">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Level meters</string>
-   </property>
-   <property name="toolTip">
-    <string>Toggle levels widget</string>
-   </property>
-  </action>
-  <action name="actionStatistics">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="checked">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Statistics</string>
-   </property>
-   <property name="toolTip">
-    <string>Toggle statistics widget</string>
    </property>
   </action>
  </widget>
