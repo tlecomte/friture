@@ -140,30 +140,6 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 			self.timer.stop()
 		else:
 			self.timer.start()
-			
-	def scope_toggle(self):
-		if self.dockWidgetScope.isVisible():
-			self.dockWidgetScope.hide()
-		else:
-			self.dockWidgetScope.show()
-
-	def spectrum_toggle(self):
-		if self.dockWidgetSpectrum.isVisible():
-			self.dockWidgetSpectrum.hide()
-		else:
-			self.dockWidgetSpectrum.show()
-
-	def statistics_toggle(self):
-		if self.dockWidgetStatistics.isVisible():
-			self.dockWidgetStatistics.hide()
-		else:
-			self.dockWidgetStatistics.show()
-
-	def levels_toggle(self):
-		if self.dockWidgetLevels.isVisible():
-			self.dockWidgetLevels.hide()
-		else:
-			self.dockWidgetLevels.show()
 
 	def timer_slot(self):
 		j = 0
