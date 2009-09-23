@@ -297,7 +297,11 @@ peak</string>
    </property>
    <property name="icon">
     <iconset resource="resource.qrc">
-     <normaloff>:/start.svg</normaloff>:/start.svg</iconset>
+     <normaloff>:/stop.svg</normaloff>
+     <normalon>:/start.svg</normalon>
+     <disabledon>:/start.svg</disabledon>
+     <activeon>:/start.svg</activeon>
+     <selectedon>:/start.svg</selectedon>:/stop.svg</iconset>
    </property>
    <property name="text">
     <string>Start</string>

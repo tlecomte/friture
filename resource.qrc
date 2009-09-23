@@ -1,5 +1,6 @@
 <RCC>
   <qresource>
+    <file>stop.svg</file>
     <file>start.svg</file>
     <file>splash.png</file>
   </qresource>
