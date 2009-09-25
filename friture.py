@@ -63,7 +63,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		self.toolBar.addAction(self.dockWidgetStatistics.toggleViewAction())
 		
 		self.scopeIsVisible = True
-		
+		self.statisticsIsVisible = True
 
 		self.i = 0
 		self.losts = 0
@@ -126,12 +126,16 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		self.connect(self.PlotZoneUp, QtCore.SIGNAL('pointerMoved'), self.pointer_moved)
 		
 		self.connect(self.dockWidgetScope, QtCore.SIGNAL('visibilityChanged(bool)'), self.scopeVisibility)
+		self.connect(self.dockWidgetStatistics, QtCore.SIGNAL('visibilityChanged(bool)'), self.statisticsVisibility)
 
 		self.timer_toggle()
 		print "Done"
 
 	def scopeVisibility(self, visible):
 		self.scopeIsVisible = visible
+	
+	def statisticsVisibility(self, visible):
+		self.statisticsIsVisible = visible
 
 	def pointer_moved(self, info):
 		self.statusBar.showMessage(info)
@@ -180,14 +184,16 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 					samplerate = rate)
 
 		self.i += 1
+		
+		if self.statisticsIsVisible:
+			level_label = "Chunk #%d\nLost chunks: %d = %.01f %%\nUseless timer wakeups: %d = %.01f %%" % (self.i, self.losts, self.losts*100./float(self.i), self.useless, self.useless*100./float(self.i))
+			self.LabelLevel.setText(level_label)
+		
 		time = adata.floatdata
 		level_rms = 20*log10(sqrt((time**2).sum()/len(time)*2.) + 0*1e-80) #*2. to get 0dB for a sine wave
 		level_max = 20*log10(abs(time).max() + 0*1e-80)
-		level_label = "Chunk #%d\nLost chunks: %d = %.01f %%\nUseless timer wakeups: %d = %.01f %%" % (self.i, self.losts, self.losts*100./float(self.i), self.useless, self.useless*100./float(self.i))
-		self.LabelLevel.setText(level_label)
 		self.label_rms.setText("%.01f" % level_rms)
 		self.label_peak.setText("%.01f" % level_max)
-
 		self.meter.setValue(0, sqrt((time**2).sum()/len(time)*2.))
 		self.meter.setValue(1, abs(time).max())
 
