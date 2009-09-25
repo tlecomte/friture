@@ -64,6 +64,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		
 		self.scopeIsVisible = True
 		self.statisticsIsVisible = True
+		self.levelsIsVisible = True
 
 		self.i = 0
 		self.losts = 0
@@ -127,6 +128,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		
 		self.connect(self.dockWidgetScope, QtCore.SIGNAL('visibilityChanged(bool)'), self.scopeVisibility)
 		self.connect(self.dockWidgetStatistics, QtCore.SIGNAL('visibilityChanged(bool)'), self.statisticsVisibility)
+		self.connect(self.dockWidgetLevels, QtCore.SIGNAL('visibilityChanged(bool)'), self.levelsVisibility)
 
 		self.timer_toggle()
 		print "Done"
@@ -136,6 +138,9 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 	
 	def statisticsVisibility(self, visible):
 		self.statisticsIsVisible = visible
+
+	def levelsVisibility(self, visible):
+		self.levelsIsVisible = visible
 
 	def pointer_moved(self, info):
 		self.statusBar.showMessage(info)
@@ -189,13 +194,14 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 			level_label = "Chunk #%d\nLost chunks: %d = %.01f %%\nUseless timer wakeups: %d = %.01f %%" % (self.i, self.losts, self.losts*100./float(self.i), self.useless, self.useless*100./float(self.i))
 			self.LabelLevel.setText(level_label)
 		
-		time = adata.floatdata
-		level_rms = 20*log10(sqrt((time**2).sum()/len(time)*2.) + 0*1e-80) #*2. to get 0dB for a sine wave
-		level_max = 20*log10(abs(time).max() + 0*1e-80)
-		self.label_rms.setText("%.01f" % level_rms)
-		self.label_peak.setText("%.01f" % level_max)
-		self.meter.setValue(0, sqrt((time**2).sum()/len(time)*2.))
-		self.meter.setValue(1, abs(time).max())
+		if self.levelsIsVisible:
+			time = adata.floatdata
+			level_rms = 20*log10(sqrt((time**2).sum()/len(time)*2.) + 0*1e-80) #*2. to get 0dB for a sine wave
+			level_max = 20*log10(abs(time).max() + 0*1e-80)
+			self.label_rms.setText("%.01f" % level_rms)
+			self.label_peak.setText("%.01f" % level_max)
+			self.meter.setValue(0, sqrt((time**2).sum()/len(time)*2.))
+			self.meter.setValue(1, abs(time).max())
 
 		if self.scopeIsVisible:
 			signal = adata.floatdata
