@@ -62,6 +62,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		self.toolBar.addAction(self.dockWidgetSpectrum.toggleViewAction())
 		self.toolBar.addAction(self.dockWidgetStatistics.toggleViewAction())
 		
+		self.scopeIsVisible = True
 		
 
 		self.i = 0
@@ -123,9 +124,14 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		self.connect(self.PlotZoneImage, QtCore.SIGNAL('pointerMoved'), self.pointer_moved)
 		self.connect(self.PlotZoneSpect, QtCore.SIGNAL('pointerMoved'), self.pointer_moved)
 		self.connect(self.PlotZoneUp, QtCore.SIGNAL('pointerMoved'), self.pointer_moved)
+		
+		self.connect(self.dockWidgetScope, QtCore.SIGNAL('visibilityChanged(bool)'), self.scopeVisibility)
 
 		self.timer_toggle()
 		print "Done"
+
+	def scopeVisibility(self, visible):
+		self.scopeIsVisible = visible
 
 	def pointer_moved(self, info):
 		self.statusBar.showMessage(info)
@@ -185,10 +191,10 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		self.meter.setValue(0, sqrt((time**2).sum()/len(time)*2.))
 		self.meter.setValue(1, abs(time).max())
 
-		signal = adata.floatdata
-		time = linspace(0., len(signal)/float(rate), len(signal))
-		
-		self.PlotZoneUp.setdata(time, signal)
+		if self.scopeIsVisible:
+			signal = adata.floatdata
+			time = linspace(0., len(signal)/float(rate), len(signal))
+			self.PlotZoneUp.setdata(time, signal)
 
 		sp = self.procclass.process(adata, self.fft_size)
 		if sp == None:
