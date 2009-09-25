@@ -65,6 +65,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		self.scopeIsVisible = True
 		self.statisticsIsVisible = True
 		self.levelsIsVisible = True
+		self.spectrumIsVisible = True
 
 		self.i = 0
 		self.losts = 0
@@ -129,6 +130,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		self.connect(self.dockWidgetScope, QtCore.SIGNAL('visibilityChanged(bool)'), self.scopeVisibility)
 		self.connect(self.dockWidgetStatistics, QtCore.SIGNAL('visibilityChanged(bool)'), self.statisticsVisibility)
 		self.connect(self.dockWidgetLevels, QtCore.SIGNAL('visibilityChanged(bool)'), self.levelsVisibility)
+		self.connect(self.dockWidgetSpectrum, QtCore.SIGNAL('visibilityChanged(bool)'), self.spectrumVisibility)
 
 		self.timer_toggle()
 		print "Done"
@@ -141,6 +143,9 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 
 	def levelsVisibility(self, visible):
 		self.levelsIsVisible = visible
+
+	def spectrumVisibility(self, visible):
+		self.spectrumIsVisible = visible
 
 	def pointer_moved(self, info):
 		self.statusBar.showMessage(info)
@@ -217,13 +222,15 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		epsilon = 1e-30
 		db_spectrogram = (20*log10(sp + epsilon))
 		norm_spectrogram = (db_spectrogram.clip(self.spec_min, self.spec_max) - self.spec_min)/(self.spec_max - self.spec_min)
-
-		if db_spectrogram.ndim == 1:
-			y = db_spectrogram.transpose()
-		else:
-			y = db_spectrogram[0,:].transpose()
-		freq = linspace(0., 22050., len(y))
-		self.PlotZoneSpect.setdata(freq, y)
+		
+		if self.spectrumIsVisible:
+			if db_spectrogram.ndim == 1:
+				y = db_spectrogram.transpose()
+			else:
+				y = db_spectrogram[0,:].transpose()
+			freq = linspace(0., 22050., len(y))
+			self.PlotZoneSpect.setdata(freq, y)
+		
 		self.PlotZoneImage.addData(norm_spectrogram.transpose())
 
 	def fftsizechanged(self, index):
