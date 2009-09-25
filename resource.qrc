@@ -1,5 +1,6 @@
 <RCC>
   <qresource>
+    <file>spectrum.svg</file>
     <file>scope.svg</file>
     <file>levels.svg</file>
     <file>stop.svg</file>

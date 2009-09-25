@@ -53,13 +53,15 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		
 		levelsAction = self.dockWidgetLevels.toggleViewAction()
 		scopeAction = self.dockWidgetScope.toggleViewAction()
+		spectrumAction = self.dockWidgetSpectrum.toggleViewAction()
 		
 		levelsAction.setIcon(QtGui.QIcon(":/levels.svg"))
 		scopeAction.setIcon(QtGui.QIcon(":/scope.svg"))
+		spectrumAction.setIcon(QtGui.QIcon(":/spectrum.svg"))
 		
 		self.toolBar.addAction(levelsAction)
 		self.toolBar.addAction(scopeAction)
-		self.toolBar.addAction(self.dockWidgetSpectrum.toggleViewAction())
+		self.toolBar.addAction(spectrumAction)
 		self.toolBar.addAction(self.dockWidgetStatistics.toggleViewAction())
 		
 		self.scopeIsVisible = True
