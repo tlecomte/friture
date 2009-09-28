@@ -314,7 +314,7 @@ if __name__ == "__main__":
 	window.show()
 	splash.finish(window)
 	
-	profile = "python" # or "kcachegrind"
+	profile = "kcachegrind" # "python" or "kcachegrind"
 	
 	if profile == "python":
 		import cProfile
@@ -331,16 +331,11 @@ if __name__ == "__main__":
 		import lsprofcalltree
 
 		p = cProfile.Profile()
-		cProfile.run('app.exec_()',filename="friture.cprof")
-		print p
+		p.run('app.exec_()')
 		k = lsprofcalltree.KCacheGrind(p)
-		data = open('prof.kgrind.out.00000', 'w+')
+		data = open('cachegrind.out.00000', 'w+')
 		k.output(data)
 		data.close()
-		import pstats
-		stats = pstats.Stats("friture.cprof")
-		stats.strip_dirs().sort_stats('time').print_stats(20)
-		stats.print_stats()
 		
 		sys.exit(0)
 	else:
