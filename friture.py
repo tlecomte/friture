@@ -78,6 +78,9 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		self.spec_max = -20.
 		self.fft_size = 256
 		self.max_in_a_row = 1
+		self.time = QtCore.QTime()
+		self.time.start()
+		self.latency = 0.
 
 		print "Initializing PyAudio"
 		self.pa = PyAudio()
@@ -179,6 +182,8 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 			self.useless += 1
 			return
 		
+		self.latency = self.time.restart()
+		
 		while self.stream.get_read_available() >= NUM_SAMPLES:
 			j += 1
 			rawdata = self.stream.read(NUM_SAMPLES)
@@ -200,7 +205,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		self.i += 1
 		
 		if self.statisticsIsVisible:
-			level_label = "Chunk #%d\nLost chunks: %d = %.01f %%\nUseless timer wakeups: %d = %.01f %%" % (self.i, self.losts, self.losts*100./float(self.i), self.useless, self.useless*100./float(self.i))
+			level_label = "Chunk #%d\nLost chunks: %d = %.01f %%\nUseless timer wakeups: %d = %.01f %%\nLatency: %d ms" % (self.i, self.losts, self.losts*100./float(self.i), self.useless, self.useless*100./float(self.i), self.latency)
 			self.LabelLevel.setText(level_label)
 		
 		if self.levelsIsVisible:
