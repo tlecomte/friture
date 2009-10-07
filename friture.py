@@ -217,7 +217,16 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		self.i += 1
 		
 		if self.statisticsIsVisible and self.last:
-			level_label = "Chunk #%d\nLost chunks: %d = %.01f %%\nUseless timer wakeups: %d = %.01f %%\nLatency: %d ms\nMean number of chunks per timer fire: %.01f" % (self.i, self.losts, self.losts*100./float(self.i), self.useless, self.useless*100./float(self.i), self.latency, self.mean_chunks_per_fire)
+			level_label = "Chunk #%d\n"\
+			"Lost chunks: %d = %.01f %%\n"\
+			"Useless timer wakeups: %d = %.01f %%\n"\
+			"Latency: %d ms\nMean number of chunks per timer fire: %.01f"\
+			% (self.i,
+			self.losts,
+			self.losts*100./float(self.i),
+			self.useless, self.useless*100./float(self.i),
+			self.latency,
+			self.mean_chunks_per_fire)
 			self.LabelLevel.setText(level_label)
 		
 		if self.levelsIsVisible and self.last:
