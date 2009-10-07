@@ -116,8 +116,10 @@ class ImagePlot(Qwt.QwtPlot):
 	def addData(self, xyzs):
 		self.plotImage.addData(xyzs, self.logfreqscale)
 		# self.replot() would call updateAxes() which is dead slow (probably because it
-		# computes label sizes); instead, let's just ask Qt to repaint the canvas next time
+		# computes label sizes); instead, let's ask Qt to repaint the canvas only next time
 		# This works because we disable the cache
+		# TODO what happens when the cache is enabled ?
+		# Could that solve the perceived "unsmoothness" ?
 		self.canvas().update()
 
 	def setlogfreqscale(self):
