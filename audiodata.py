@@ -273,7 +273,7 @@ class CanvasScaledSpectrogram():
 		# reinitialize current_total
 		self.current_total = 0.
 		# reinitialize the data buffer
-		self.xyzs_buffer = numpy.zeros((self.canvas_vsize))
+		self.xyzs_buffer = numpy.zeros_like(self.xyzs_buffer)
 
 	def floats_to_bytes(self, data):
 		#dat1 = (255. * data).astype(numpy.uint8)
