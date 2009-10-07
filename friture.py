@@ -187,13 +187,12 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		
 		self.latency = self.time.restart()
 		
-		for j in range(0, available):
+		jmax = min(available, self.max_in_a_row)
+		self.losts += available - jmax
+		
+		for j in range(0, jmax):
 			rawdata = self.stream.read(NUM_SAMPLES)
-			
-			if j < self.max_in_a_row:
-				self.process_data(rawdata)
-			else:
-				self.losts += 1
+			self.process_data(rawdata)
 		
 		if self.mean_chunks_per_fire == 0:
 			self.mean_chunks_per_fire = j
