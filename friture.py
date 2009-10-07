@@ -19,7 +19,7 @@
 
 import sys
 from pyaudio import PyAudio, paInt16
-from numpy import transpose, log10, sqrt, ceil, linspace, arange
+from numpy import transpose, log10, sqrt, ceil, linspace, arange, floor
 from PyQt4 import QtGui, QtCore, Qt
 import PyQt4.Qwt5 as Qwt
 from Ui_friture import Ui_MainWindow
@@ -178,20 +178,17 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 			self.timer.start()
 
 	def timer_slot(self):
-		j = 0
-		
 		available = self.stream.get_read_available()
-		if available < NUM_SAMPLES:
+		available = int(floor(available/NUM_SAMPLES))
+		
+		if available == 0:
 			self.useless += 1
 			return
 		
 		self.latency = self.time.restart()
 		
-		while available >= NUM_SAMPLES:
+		for j in range(0, available):
 			rawdata = self.stream.read(NUM_SAMPLES)
-			available -= NUM_SAMPLES
-			
-			j += 1
 			
 			if j < self.max_in_a_row:
 				self.process_data(rawdata)
