@@ -115,15 +115,13 @@ def concatenate(data1, data2):
 		#return self.fullspectrogram
 
 class CanvasScaledSpectrogram():
-	def __init__(self, vsize = 129, hsize = 0, canvas_vsize = 2,  canvas_hsize = 2):
-		self.hsize = hsize
+	def __init__(self, vsize = 129, canvas_vsize = 2,  canvas_hsize = 2):
 		self.vsize = vsize
 		self.logfreqscale = False
-		if self.hsize == 0:
-			T = 10.
-			sampling_rate = 44100.
-			Dt = 2*2.*(self.vsize-1)/sampling_rate
-			self.hsize = T/Dt
+		T = 10.
+		sampling_rate = 44100.
+		Dt = 2*2.*(self.vsize-1)/sampling_rate
+		self.hsize = T/Dt
 		self.canvas_vsize = canvas_vsize
 		self.canvas_hsize = canvas_hsize
 		self.n = float(self.hsize)/canvas_hsize
