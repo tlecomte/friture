@@ -199,10 +199,10 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 			self.process_data(rawdata)
 		
 		if self.mean_chunks_per_fire == 0:
-			self.mean_chunks_per_fire = j
+			self.mean_chunks_per_fire = jmax
 		else:
 			mean_number = min(self.i, 1000.)
-			self.mean_chunks_per_fire = (self.mean_chunks_per_fire*mean_number + j)/(mean_number + 1.)
+			self.mean_chunks_per_fire = (self.mean_chunks_per_fire*mean_number + jmax)/(mean_number + 1.)
 
 	def process_data(self, rawdata):
 		channels = 1
