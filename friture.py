@@ -81,6 +81,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		self.time = QtCore.QTime()
 		self.time.start()
 		self.latency = 0.
+		self.mean_chunks_per_fire = 0.
 
 		print "Initializing PyAudio"
 		self.pa = PyAudio()
@@ -191,6 +192,12 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 				self.process_data(rawdata)
 			else:
 				self.losts += 1
+		
+		if self.mean_chunks_per_fire == 0:
+			self.mean_chunks_per_fire = j
+		else:
+			mean_number = min(self.i, 1000.)
+			self.mean_chunks_per_fire = (self.mean_chunks_per_fire*mean_number + j)/(mean_number + 1.)
 
 	def process_data(self, rawdata):
 		channels = 1
@@ -205,7 +212,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		self.i += 1
 		
 		if self.statisticsIsVisible:
-			level_label = "Chunk #%d\nLost chunks: %d = %.01f %%\nUseless timer wakeups: %d = %.01f %%\nLatency: %d ms" % (self.i, self.losts, self.losts*100./float(self.i), self.useless, self.useless*100./float(self.i), self.latency)
+			level_label = "Chunk #%d\nLost chunks: %d = %.01f %%\nUseless timer wakeups: %d = %.01f %%\nLatency: %d ms\nMean number of chunks per timer fire: %.01f" % (self.i, self.losts, self.losts*100./float(self.i), self.useless, self.useless*100./float(self.i), self.latency, self.mean_chunks_per_fire)
 			self.LabelLevel.setText(level_label)
 		
 		if self.levelsIsVisible:
