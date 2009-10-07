@@ -163,7 +163,7 @@ class CanvasScaledSpectrogram():
 
 	def setvsize(self, vsize):
 		if self.vsize <> vsize:
-			print "vsize changed", vsize
+			print "vsize changed, now:", vsize
 			self.vsize = vsize
 			
 			T = 10.
@@ -178,7 +178,7 @@ class CanvasScaledSpectrogram():
 
 	def setcanvas_vsize(self, canvas_vsize):
 		if self.canvas_vsize <> canvas_vsize:
-			print "canvas_vsize changed",  canvas_vsize
+			print "canvas_vsize changed, now:",  canvas_vsize
 			self.canvas_vsize = canvas_vsize
 			self.update_xscale()
 			self.erase()
@@ -189,7 +189,7 @@ class CanvasScaledSpectrogram():
 			self.n = float(self.hsize)/canvas_hsize
 			self.current_total = 0
 			self.erase()
-			print "canvas_hsize changed",  canvas_hsize,  self.n
+			print "canvas_hsize changed, now: %d, number of frames per line is: %.03f" %(canvas_hsize, self.n)
 
 	def update_xscale(self):
 		if self.logfreqscale == False:
