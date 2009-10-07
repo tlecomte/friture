@@ -190,8 +190,12 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		jmax = min(available, self.max_in_a_row)
 		self.losts += available - jmax
 		
+		self.last = False
+		
 		for j in range(0, jmax):
 			rawdata = self.stream.read(NUM_SAMPLES)
+			if j == jmax-1:
+				self.last = True
 			self.process_data(rawdata)
 		
 		if self.mean_chunks_per_fire == 0:
@@ -212,11 +216,11 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 
 		self.i += 1
 		
-		if self.statisticsIsVisible:
+		if self.statisticsIsVisible and self.last:
 			level_label = "Chunk #%d\nLost chunks: %d = %.01f %%\nUseless timer wakeups: %d = %.01f %%\nLatency: %d ms\nMean number of chunks per timer fire: %.01f" % (self.i, self.losts, self.losts*100./float(self.i), self.useless, self.useless*100./float(self.i), self.latency, self.mean_chunks_per_fire)
 			self.LabelLevel.setText(level_label)
 		
-		if self.levelsIsVisible:
+		if self.levelsIsVisible and self.last:
 			time = adata.floatdata
 			level_rms = 20*log10(sqrt((time**2).sum()/len(time)*2.) + 0*1e-80) #*2. to get 0dB for a sine wave
 			level_max = 20*log10(abs(time).max() + 0*1e-80)
@@ -225,7 +229,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 			self.meter.setValue(0, sqrt((time**2).sum()/len(time)*2.))
 			self.meter.setValue(1, abs(time).max())
 
-		if self.scopeIsVisible:
+		if self.scopeIsVisible and self.last:
 			signal = adata.floatdata
 			time = linspace(0., len(signal)/float(rate), len(signal))
 			self.PlotZoneUp.setdata(time, signal)
@@ -240,7 +244,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		db_spectrogram = (20*log10(sp + epsilon))
 		norm_spectrogram = (db_spectrogram.clip(self.spec_min, self.spec_max) - self.spec_min)/(self.spec_max - self.spec_min)
 		
-		if self.spectrumIsVisible:
+		if self.spectrumIsVisible and self.last:
 			if db_spectrogram.ndim == 1:
 				y = db_spectrogram.transpose()
 			else:
