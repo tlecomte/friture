@@ -35,35 +35,27 @@ class FreqScaleDraw(Qwt.QwtScaleDraw):
 class PlotImage(Qwt.QwtPlotItem):
 
 	def __init__(self):
-		pass
 		Qwt.QwtPlotItem.__init__(self)
-
-		self.parent_plot = None
-
-		#self.rawspectrogram = RawSpectrogram()
-		#self.freqscaledspectrogram = FreqScaledSpectrogram()
 		self.canvasscaledspectrogram = CanvasScaledSpectrogram()
 
 	def addData(self, xyzs, logfreqscale):
-		#self.rawspectrogram.addData(xyzs)
-		#self.freqscaledspectrogram.addData(xyzs, logfreqscale)
 		self.canvasscaledspectrogram.setlogfreqscale(logfreqscale)
 		self.canvasscaledspectrogram.addData(xyzs)
 
 	def draw(self, painter, xMap, yMap, rect):
-		#pass
 		self.canvasscaledspectrogram.setcanvas_vsize(rect.height())
 		self.canvasscaledspectrogram.setcanvas_hsize(rect.width())
 
 		pixmap = self.canvasscaledspectrogram.getpixmap()
 		offset = self.canvasscaledspectrogram.getpixmapoffset()
 		painter.drawPixmap(rect.left(), rect.top(), pixmap,  offset,  0,  0,  0)
+		
+		#print painter
+		#print xMap.p1(), xMap.p2(), xMap.s1(), xMap.s2()
+		#print yMap.p1(), yMap.p2(), yMap.s1(), yMap.s2()
+		#print rect
 
 	def erase(self):
-		#pass
-		# set the data array to zero
-		#self.rawspectrogram.erase()
-		#self.freqscaledspectrogram.erase()
 		self.canvasscaledspectrogram.erase()
 
 class ImagePlot(Qwt.QwtPlot):
@@ -120,7 +112,11 @@ class ImagePlot(Qwt.QwtPlot):
 		# This works because we disable the cache
 		# TODO what happens when the cache is enabled ?
 		# Could that solve the perceived "unsmoothness" ?
+		
 		self.canvas().update()
+		
+		#print self.canvas().testPaintAttribute(Qwt.QwtPlotCanvas.PaintCached)
+		#print self.canvas().paintCache()
 
 	def setlogfreqscale(self):
 		self.plotImage.erase()
