@@ -179,15 +179,20 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 
 	def timer_slot(self):
 		j = 0
-		if self.stream.get_read_available() < NUM_SAMPLES:
+		
+		available = self.stream.get_read_available()
+		if available < NUM_SAMPLES:
 			self.useless += 1
 			return
 		
 		self.latency = self.time.restart()
 		
-		while self.stream.get_read_available() >= NUM_SAMPLES:
-			j += 1
+		while available >= NUM_SAMPLES:
 			rawdata = self.stream.read(NUM_SAMPLES)
+			available -= NUM_SAMPLES
+			
+			j += 1
+			
 			if j < self.max_in_a_row:
 				self.process_data(rawdata)
 			else:
