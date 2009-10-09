@@ -55,6 +55,9 @@ class PlotImage(Qwt.QwtPlotItem):
 		#print yMap.p1(), yMap.p2(), yMap.s1(), yMap.s2()
 		#print rect
 
+	def settimerange(self, timerange_seconds):
+		self.canvasscaledspectrogram.setT(timerange_seconds)
+
 	def erase(self):
 		self.canvasscaledspectrogram.erase()
 
@@ -135,4 +138,9 @@ class ImagePlot(Qwt.QwtPlot):
 		self.setAxisScale(Qwt.QwtPlot.yLeft, 0., 22050.)
 		self.setAxisScaleEngine(Qwt.QwtPlot.yRight, Qwt.QwtLinearScaleEngine())
 		self.setAxisScale(Qwt.QwtPlot.yRight, 0., 22050.)
+		self.replot()
+
+	def settimerange(self, timerange_seconds):
+		self.plotImage.settimerange(timerange_seconds)
+		self.setAxisScale(Qwt.QwtPlot.xBottom, 0., timerange_seconds)
 		self.replot()

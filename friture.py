@@ -129,6 +129,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		self.connect(self.comboBox_fftsize, QtCore.SIGNAL('currentIndexChanged(int)'), self.fftsizechanged)
 		self.connect(self.spinBox_specmax, QtCore.SIGNAL('valueChanged(int)'), self.specrangechanged)
 		self.connect(self.spinBox_specmin, QtCore.SIGNAL('valueChanged(int)'), self.specrangechanged)
+		self.connect(self.doubleSpinBox_timerange, QtCore.SIGNAL('valueChanged(double)'), self.timerangechanged)
 		self.connect(self.comboBox_inputDevice, QtCore.SIGNAL('currentIndexChanged(int)'), self.input_device_changed)
 		self.connect(self.timer, QtCore.SIGNAL('timeout()'), self.timer_slot)
 		self.connect(self.PlotZoneImage, QtCore.SIGNAL('pointerMoved'), self.pointer_moved)
@@ -283,6 +284,9 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 	def specrangechanged(self, value):
 		self.spec_max = self.spinBox_specmax.value()
 		self.spec_min = self.spinBox_specmin.value()
+		
+	def timerangechanged(self, value):
+		self.PlotZoneImage.settimerange(value)
 
 	def set_devices_list(self):
 		default_device_index = self.get_default_input_device()

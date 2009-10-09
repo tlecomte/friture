@@ -117,18 +117,14 @@ def concatenate(data1, data2):
 class CanvasScaledSpectrogram():
 	def __init__(self, vsize = 129, T = 10., canvas_vsize = 2,  canvas_hsize = 2):
 		self.vsize = vsize
-		self.logfreqscale = False
 		self.T = T
-		sampling_rate = 44100.
-		Dt = 2*2.*(self.vsize-1)/sampling_rate
-		self.hsize = self.T/Dt
 		self.canvas_vsize = canvas_vsize
 		self.canvas_hsize = canvas_hsize
-		self.n = float(self.hsize)/canvas_hsize
+		self.logfreqscale = False
 		self.current_total = 0
 		self.x = numpy.linspace(0., 22050., vsize)
 		self.update_xscale()
-		self.fullspectrogram = numpy.zeros((self.canvas_vsize, self.hsize, 4), dtype = numpy.uint8)
+		self.fullspectrogram = numpy.zeros((self.canvas_vsize, self.hsize(), 4), dtype = numpy.uint8)
 		self.xyzs_buffer = numpy.zeros((self.canvas_vsize))
 		self.pixmap = Qt.QPixmap(2*self.canvas_hsize,  self.canvas_vsize)
 		self.pixmap.fill(Qt.QColor("black"))
@@ -149,7 +145,7 @@ class CanvasScaledSpectrogram():
 		del self.pixmap
 
 	def erase(self):
-		self.fullspectrogram = numpy.zeros((self.canvas_vsize, self.hsize, 4), dtype = numpy.uint8)
+		self.fullspectrogram = numpy.zeros((self.canvas_vsize, self.hsize(), 4), dtype = numpy.uint8)
 		self.xyzs_buffer = numpy.zeros((self.canvas_vsize))
 		del self.painter
 		del self.pixmap
@@ -159,17 +155,26 @@ class CanvasScaledSpectrogram():
 		#self.spectrogramstr = ['\0']*self.canvas_vsize*self.vsize*4
 		self.offset = 0
 
+	def hsize(self):
+		sampling_rate = 44100.
+		Dt = 2*2.*(self.vsize-1)/sampling_rate
+		return self.T/Dt
+		
+	def n(self):
+		return float(self.hsize())/self.canvas_hsize
+
+	def setT(self, T):
+		if self.T <> T:
+			self.T = T
+			self.current_total = 0
+			self.erase()
+			print "T changed, now: %.02f, number of frames per line is: %.03f" %(T, self.n())
+
 	def setvsize(self, vsize):
 		if self.vsize <> vsize:
 			print "vsize changed, now:", vsize
 			self.vsize = vsize
-			
-			sampling_rate = 44100.
-			Dt = 2*2.*(self.vsize-1)/sampling_rate
-			self.hsize = self.T/Dt
-			self.n = float(self.hsize)/self.canvas_hsize
 			self.current_total = 0
-
 			self.erase()
 			self.x = numpy.linspace(0., 22050., vsize)
 
@@ -183,16 +188,9 @@ class CanvasScaledSpectrogram():
 	def setcanvas_hsize(self, canvas_hsize):
 		if self.canvas_hsize <> canvas_hsize:
 			self.canvas_hsize = canvas_hsize
-			self.n = float(self.hsize)/canvas_hsize
 			self.current_total = 0
 			self.erase()
-			print "canvas_hsize changed, now: %d, number of frames per line is: %.03f" %(canvas_hsize, self.n)
-
-	def update_xscale(self):
-		if self.logfreqscale == False:
-			self.xscaled = numpy.linspace(0., 22050., self.canvas_vsize)
-		else:
-			self.xscaled = numpy.logspace(numpy.log10(20.), numpy.log10(22050.), self.canvas_vsize)
+			print "canvas_hsize changed, now: %d, number of frames per line is: %.03f" %(canvas_hsize, self.n())
 
 	def setlogfreqscale(self, logfreqscale):
 		if logfreqscale <> self.logfreqscale:
@@ -200,6 +198,12 @@ class CanvasScaledSpectrogram():
 			self.logfreqscale = logfreqscale
 			self.update_xscale()
 			self.erase()
+
+	def update_xscale(self):
+		if self.logfreqscale == False:
+			self.xscaled = numpy.linspace(0., 22050., self.canvas_vsize)
+		else:
+			self.xscaled = numpy.logspace(numpy.log10(20.), numpy.log10(22050.), self.canvas_vsize)
 
 	def addData(self, xyzs):
 		if xyzs.ndim == 1:
@@ -232,7 +236,7 @@ class CanvasScaledSpectrogram():
 			if debug: print "available ",  available
 
 			# what is still needed before displaying : total number (n) minus what we have already got
-			needed =  self.n - self.current_total
+			needed =  self.n() - self.current_total
 			if debug: print "needed",  needed
 
 			# the current wavedata canot give more than what's not been used from it :
@@ -244,7 +248,7 @@ class CanvasScaledSpectrogram():
 			if debug: print "self.current_total",  self.current_total
 
 			# then we add the current data with the following weight (total weight will be one)
-			weight = current/self.n
+			weight = current/self.n()
 			if debug: print "weight",  weight
 			self.xyzs_buffer += int_xyzs*weight
 
@@ -252,7 +256,7 @@ class CanvasScaledSpectrogram():
 			available -= current
 
 			# if current_total is n, we have successfully added enough data
-			if self.current_total >= self.n:
+			if self.current_total >= self.n():
 				if debug: print "draw !"
 				self.finish_line()
 
