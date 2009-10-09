@@ -197,7 +197,8 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 			if j == jmax-1:
 				self.last = True
 			self.process_data(rawdata)
-			
+		
+		# discard the rest of the data that we cannot reasonably process
 		for j in range(jmax, available):
 			rawdata = self.stream.read(NUM_SAMPLES)
 		
