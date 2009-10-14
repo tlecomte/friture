@@ -18,7 +18,7 @@
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
 import numpy
-from PyQt4 import Qt
+from PyQt4 import Qt, QtCore
 import PyQt4.Qwt5 as Qwt
 
 class AudioData():
@@ -138,11 +138,16 @@ class CanvasScaledSpectrogram():
 		self.colorMap.addColorStop(0.6, Qt.Qt.yellow)
 		self.colorMap.addColorStop(0.8, Qt.Qt.red)
 		self.prepare_palette()
+		# performance timer
+		self.time = QtCore.QTime()
+		self.time.start()
+		self.logfile = open("latency_log.txt",'w')
 		
 	def __del__(self):
 		# delete painter and the associated pixmap in the correct order
 		del self.painter
 		del self.pixmap
+		self.logfile.close()
 
 	def erase(self):
 		self.fullspectrogram = numpy.zeros((self.canvas_vsize, self.hsize(), 4), dtype = numpy.uint8)
@@ -168,29 +173,29 @@ class CanvasScaledSpectrogram():
 			self.T = T
 			self.current_total = 0
 			self.erase()
-			print "T changed, now: %.02f, number of frames per line is: %.03f" %(T, self.n())
+			print "T changed, now: %.02f (%.03f of frames per line)" %(T, self.n())
 
 	def setvsize(self, vsize):
 		if self.vsize <> vsize:
-			print "vsize changed, now:", vsize
 			self.vsize = vsize
 			self.current_total = 0
 			self.erase()
 			self.x = numpy.linspace(0., 22050., vsize)
+			print "vsize changed, now: %d (%.03f of frames per line)" %(vsize, self.n())
 
 	def setcanvas_vsize(self, canvas_vsize):
 		if self.canvas_vsize <> canvas_vsize:
-			print "canvas_vsize changed, now:",  canvas_vsize
 			self.canvas_vsize = canvas_vsize
 			self.update_xscale()
 			self.erase()
+			print "canvas_vsize changed, now: %d (%.03f of frames per line)" %(canvas_vsize, self.n())
 
 	def setcanvas_hsize(self, canvas_hsize):
 		if self.canvas_hsize <> canvas_hsize:
 			self.canvas_hsize = canvas_hsize
 			self.current_total = 0
 			self.erase()
-			print "canvas_hsize changed, now: %d, number of frames per line is: %.03f" %(canvas_hsize, self.n())
+			print "canvas_hsize changed, now: %d (%.03f of frames per line)" %(canvas_hsize, self.n())
 
 	def setlogfreqscale(self, logfreqscale):
 		if logfreqscale <> self.logfreqscale:
@@ -275,6 +280,8 @@ class CanvasScaledSpectrogram():
 		self.current_total = 0.
 		# reinitialize the data buffer
 		self.xyzs_buffer = numpy.zeros_like(self.xyzs_buffer)
+		
+		self.logfile.write("%d\n"%self.time.restart())
 
 	def floats_to_bytes(self, data):
 		#dat1 = (255. * data).astype(numpy.uint8)
