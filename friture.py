@@ -238,13 +238,16 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 			level_label = "Chunk #%d\n"\
 			"Lost chunks: %d = %.01f %%\n"\
 			"Useless timer wakeups: %d = %.01f %%\n"\
-			"Latency: %d ms\nMean number of chunks per timer fire: %.01f"\
+			"Latency: %d ms\n"\
+			"Mean number of chunks per timer fire: %.01f\n"\
+			"FFT period : %.01f ms"\
 			% (self.i,
 			self.losts,
 			self.losts*100./float(self.i),
 			self.useless, self.useless*100./float(self.i),
 			self.latency,
-			self.mean_chunks_per_fire)
+			self.mean_chunks_per_fire,
+			self.fft_size*1000./SAMPLING_RATE)
 			self.LabelLevel.setText(level_label)
 		
 		if self.levelsIsVisible and self.last:
