@@ -141,8 +141,21 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		self.connect(self.dockWidgetLevels, QtCore.SIGNAL('visibilityChanged(bool)'), self.levelsVisibility)
 		self.connect(self.dockWidgetSpectrum, QtCore.SIGNAL('visibilityChanged(bool)'), self.spectrumVisibility)
 
+		settings = QtCore.QSettings("Friture", "Friture")
+		settings.beginGroup("MainWindow")
+		self.restoreState(settings.value("windowState").toByteArray())
+		settings.endGroup()
+
 		self.timer_toggle()
 		print "Done"
+
+	def closeEvent(self, event):
+		windowState = self.saveState()
+		settings = QtCore.QSettings("Friture", "Friture")
+		settings.beginGroup("MainWindow")
+		settings.setValue("windowState", windowState)
+		settings.endGroup()
+		event.accept()
 
 	def scopeVisibility(self, visible):
 		self.scopeIsVisible = visible
