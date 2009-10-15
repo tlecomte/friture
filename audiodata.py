@@ -39,97 +39,96 @@ def concatenate(data1, data2):
     return AudioData(data1.rawdata + data2.rawdata, data1.nchannels, data1.format, data1.samplesize, data1.samplerate)
 
 #class RawSpectrogram():
-	#def __init__(self, vsize = 0, hsize = 129):
-		#self.vsize = vsize
-		#self.hsize = hsize
-		#if self.vsize == 0:
-			#self.vsize = 2**18/((self.hsize-1)*2)
-		#self.fullspectrogram = numpy.zeros((self.hsize, self.vsize))
+	#def __init__(self, spectrum_length = 0, time_bin_number = 129):
+		#self.spectrum_length = spectrum_length
+		#self.time_bin_number = time_bin_number
+		#if self.spectrum_length == 0:
+			#self.spectrum_length = 2**18/((self.time_bin_number-1)*2)
+		#self.fullspectrogram = numpy.zeros((self.time_bin_number, self.spectrum_length))
 	#def erase(self):
-		#self.fullspectrogram = numpy.zeros((self.hsize, self.vsize))
-	#def sethsize(self,hsize):
-		#if self.hsize <> hsize:
-			#self.hsize = hsize
+		#self.fullspectrogram = numpy.zeros((self.time_bin_number, self.spectrum_length))
+	#def settime_bin_number(self,time_bin_number):
+		#if self.time_bin_number <> time_bin_number:
+			#self.time_bin_number = time_bin_number
 			#self.erase()
 	#def addData(self, xyzs):
 		#if xyzs.ndim == 1:
-			#hsize = xyzs.shape[0]
-			#vsize = 1
+			#time_bin_number = xyzs.shape[0]
+			#spectrum_length = 1
 		#else:
-			#hsize = xyzs.shape[0]
-			#vsize = xyzs.shape[1]
+			#time_bin_number = xyzs.shape[0]
+			#spectrum_length = xyzs.shape[1]
 
-		#if hsize<>self.hsize:
-			#self.sethsize(hsize)
+		#if time_bin_number<>self.time_bin_number:
+			#self.settime_bin_number(time_bin_number)
 
-		#self.fullspectrogram = numpy.hstack((self.fullspectrogram[vsize:,:],xyzs))
+		#self.fullspectrogram = numpy.hstack((self.fullspectrogram[spectrum_length:,:],xyzs))
 
 	#def data(self):
 		#return self.fullspectrogram
 
 #class FreqScaledSpectrogram():
-	#def __init__(self, vsize = 0, hsize = 129):
-		#self.hsize = hsize
-		#self.vsize = vsize
-		#if self.vsize == 0:
-			#self.vsize = 2**18/((self.hsize-1)*2)
-		#self.fullspectrogram = numpy.zeros((self.hsize, self.vsize))
+	#def __init__(self, spectrum_length = 0, time_bin_number = 129):
+		#self.time_bin_number = time_bin_number
+		#self.spectrum_length = spectrum_length
+		#if self.spectrum_length == 0:
+			#self.spectrum_length = 2**18/((self.time_bin_number-1)*2)
+		#self.fullspectrogram = numpy.zeros((self.time_bin_number, self.spectrum_length))
 
 	#def erase(self):
-		#self.fullspectrogram = numpy.zeros((self.hsize, self.vsize))
+		#self.fullspectrogram = numpy.zeros((self.time_bin_number, self.spectrum_length))
 
-	#def sethsize(self,hsize):
-		#if self.hsize <> hsize:
-			#self.hsize = hsize
+	#def settime_bin_number(self,time_bin_number):
+		#if self.time_bin_number <> time_bin_number:
+			#self.time_bin_number = time_bin_number
 			#self.erase()
 
 	#def addData(self, xyzs, logfreqscale = 0):
 		#if xyzs.ndim == 1:
-			#hsize = xyzs.shape[0]
-			#vsize = 1
+			#time_bin_number = xyzs.shape[0]
+			#spectrum_length = 1
 		#else:
-			#hsize = xyzs.shape[0]
-			#vsize = xyzs.shape[1]
+			#time_bin_number = xyzs.shape[0]
+			#spectrum_length = xyzs.shape[1]
 
-		#if hsize<>self.hsize:
-			#self.sethsize(hsize)
+		#if time_bin_number<>self.time_bin_number:
+			#self.settime_bin_number(time_bin_number)
 
 		#if logfreqscale == 0:
 			#freqscaled_xyzs = xyzs #NOP
 		#else:
-			## ideally, we should directly interpolate to the canvas vsize
-			#x = numpy.arange(0, hsize)*22050./hsize
-			#xlog = numpy.logspace(numpy.log10(20),numpy.log10(22050),hsize)
+			## ideally, we should directly interpolate to the canvas spectrum_length
+			#x = numpy.arange(0, time_bin_number)*22050./time_bin_number
+			#xlog = numpy.logspace(numpy.log10(20),numpy.log10(22050),time_bin_number)
 
-		#if hsize == 1:
+		#if time_bin_number == 1:
 			#freqscaled_xyzs = numpy.interp(xlog,x,xyzs)
 		#else:
 			#freqscaled_xyzs = numpy.interp(xlog,x,xyzs[0,:])
 
-		#for i in range(1,vsize):
+		#for i in range(1,spectrum_length):
 		    #freqscaled_xyzs = numpy.hstack((freqscaled_xyzs,numpy.interp(xlog,x,xyzs[i,:])))
 
-		#self.fullspectrogram = numpy.hstack((self.fullspectrogram[vsize:,:],freqscaled_xyzs))
+		#self.fullspectrogram = numpy.hstack((self.fullspectrogram[spectrum_length:,:],freqscaled_xyzs))
 
 	#def data(self):
 		#return self.fullspectrogram
 
 class CanvasScaledSpectrogram():
-	def __init__(self, vsize = 129, T = 10., canvas_vsize = 2,  canvas_hsize = 2):
-		self.vsize = vsize
+	def __init__(self, spectrum_length = 129, T = 10., canvas_height = 2,  canvas_width = 2):
+		self.spectrum_length = spectrum_length
 		self.T = T
-		self.canvas_vsize = canvas_vsize
-		self.canvas_hsize = canvas_hsize
+		self.canvas_height = canvas_height
+		self.canvas_width = canvas_width
 		self.logfreqscale = False
 		self.current_total = 0
-		self.x = numpy.linspace(0., 22050., vsize)
+		self.x = numpy.linspace(0., 22050., spectrum_length)
 		self.update_xscale()
-		self.fullspectrogram = numpy.zeros((self.canvas_vsize, self.hsize(), 4), dtype = numpy.uint8)
-		self.xyzs_buffer = numpy.zeros((self.canvas_vsize))
-		self.pixmap = Qt.QPixmap(2*self.canvas_hsize,  self.canvas_vsize)
+		#self.fullspectrogram = numpy.zeros((self.canvas_height, self.time_bin_number(), 4), dtype = numpy.uint8)
+		self.xyzs_buffer = numpy.zeros((self.canvas_height))
+		self.pixmap = Qt.QPixmap(2*self.canvas_width,  self.canvas_height)
 		self.pixmap.fill(Qt.QColor("black"))
 		self.painter = Qt.QPainter(self.pixmap)
-		#self.spectrogramstr = ['\0']*self.canvas_vsize*self.vsize*4
 		self.offset = 0
 		# prepare a custom colormap black->blue->green->yellow->red->white
 		self.colorMap = Qwt.QwtLinearColorMap(Qt.Qt.black, Qt.Qt.white)
@@ -150,52 +149,51 @@ class CanvasScaledSpectrogram():
 		self.logfile.close()
 
 	def erase(self):
-		self.fullspectrogram = numpy.zeros((self.canvas_vsize, self.hsize(), 4), dtype = numpy.uint8)
-		self.xyzs_buffer = numpy.zeros((self.canvas_vsize))
+		#self.fullspectrogram = numpy.zeros((self.canvas_height, self.time_bin_number(), 4), dtype = numpy.uint8)
+		self.xyzs_buffer = numpy.zeros((self.canvas_height))
 		del self.painter
 		del self.pixmap
-		self.pixmap = Qt.QPixmap(2*self.canvas_hsize,  self.canvas_vsize)
+		self.pixmap = Qt.QPixmap(2*self.canvas_width,  self.canvas_height)
 		self.pixmap.fill(Qt.QColor("black"))
 		self.painter = Qt.QPainter(self.pixmap)
-		#self.spectrogramstr = ['\0']*self.canvas_vsize*self.vsize*4
 		self.offset = 0
 
-	def hsize(self):
+	def time_bin_number(self):
 		sampling_rate = 44100.
-		Dt = 2*2.*(self.vsize-1)/sampling_rate
+		Dt = 2*2.*(self.spectrum_length-1)/sampling_rate
 		return self.T/Dt
 		
 	def n(self):
-		return float(self.hsize())/self.canvas_hsize
+		return float(self.time_bin_number())/self.canvas_width
 
 	def setT(self, T):
 		if self.T <> T:
 			self.T = T
 			self.current_total = 0
 			self.erase()
-			print "T changed, now: %.02f (%.03f of frames per line)" %(T, self.n())
+			print "T changed, now: %.02f (%.03f frames per line)" %(T, self.n())
 
-	def setvsize(self, vsize):
-		if self.vsize <> vsize:
-			self.vsize = vsize
+	def setspectrum_length(self, spectrum_length):
+		if self.spectrum_length <> spectrum_length:
+			self.spectrum_length = spectrum_length
 			self.current_total = 0
 			self.erase()
-			self.x = numpy.linspace(0., 22050., vsize)
-			print "vsize changed, now: %d (%.03f of frames per line)" %(vsize, self.n())
+			self.x = numpy.linspace(0., 22050., spectrum_length)
+			print "spectrum_length changed, now: %d (%.03f frames per line)" %(spectrum_length, self.n())
 
-	def setcanvas_vsize(self, canvas_vsize):
-		if self.canvas_vsize <> canvas_vsize:
-			self.canvas_vsize = canvas_vsize
+	def setcanvas_height(self, canvas_height):
+		if self.canvas_height <> canvas_height:
+			self.canvas_height = canvas_height
 			self.update_xscale()
 			self.erase()
-			print "canvas_vsize changed, now: %d (%.03f of frames per line)" %(canvas_vsize, self.n())
+			print "canvas_height changed, now: %d (%.03f frames per line)" %(canvas_height, self.n())
 
-	def setcanvas_hsize(self, canvas_hsize):
-		if self.canvas_hsize <> canvas_hsize:
-			self.canvas_hsize = canvas_hsize
+	def setcanvas_width(self, canvas_width):
+		if self.canvas_width <> canvas_width:
+			self.canvas_width = canvas_width
 			self.current_total = 0
 			self.erase()
-			print "canvas_hsize changed, now: %d (%.03f of frames per line)" %(canvas_hsize, self.n())
+			print "canvas_width changed, now: %d (%.03f frames per line)" %(canvas_width, self.n())
 
 	def setlogfreqscale(self, logfreqscale):
 		if logfreqscale <> self.logfreqscale:
@@ -206,22 +204,22 @@ class CanvasScaledSpectrogram():
 
 	def update_xscale(self):
 		if self.logfreqscale == False:
-			self.xscaled = numpy.linspace(0., 22050., self.canvas_vsize)
+			self.xscaled = numpy.linspace(0., 22050., self.canvas_height)
 		else:
-			self.xscaled = numpy.logspace(numpy.log10(20.), numpy.log10(22050.), self.canvas_vsize)
+			self.xscaled = numpy.logspace(numpy.log10(20.), numpy.log10(22050.), self.canvas_height)
 
 	def addData(self, xyzs):
 		if xyzs.ndim == 1:
-			vsize = xyzs.shape[0]
-			hsize = 1
+			spectrum_length = xyzs.shape[0]
+			time_bin_number = 1
 		else:
-			vsize = xyzs.shape[0]
-			hsize = xyzs.shape[1]
+			spectrum_length = xyzs.shape[0]
+			time_bin_number = xyzs.shape[1]
 
-		self.setvsize(vsize)
+		self.setspectrum_length(spectrum_length)
 
-		for i in range(0, hsize):
-			if hsize > 1:
+		for i in range(0, time_bin_number):
+			if time_bin_number > 1:
 				int_xyzs = self.interpolate(xyzs[:,-(i+1)])
 			else:
 				int_xyzs = self.interpolate(xyzs)
@@ -273,9 +271,9 @@ class CanvasScaledSpectrogram():
 
 		myimage = self.prepare_image(byteString, self.xyzs_buffer.shape[0])
 
-		self.offset = (self.offset + 1) % self.canvas_hsize
+		self.offset = (self.offset + 1) % self.canvas_width
 		self.painter.drawImage(self.offset, 0, myimage)
-		self.painter.drawImage(self.offset + self.canvas_hsize, 0, myimage)
+		self.painter.drawImage(self.offset + self.canvas_width, 0, myimage)
 		# reinitialize current_total
 		self.current_total = 0.
 		# reinitialize the data buffer

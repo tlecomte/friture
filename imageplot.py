@@ -43,8 +43,8 @@ class PlotImage(Qwt.QwtPlotItem):
 		self.canvasscaledspectrogram.addData(xyzs)
 
 	def draw(self, painter, xMap, yMap, rect):
-		self.canvasscaledspectrogram.setcanvas_vsize(rect.height())
-		self.canvasscaledspectrogram.setcanvas_hsize(rect.width())
+		self.canvasscaledspectrogram.setcanvas_height(rect.height())
+		self.canvasscaledspectrogram.setcanvas_width(rect.width())
 
 		pixmap = self.canvasscaledspectrogram.getpixmap()
 		offset = self.canvasscaledspectrogram.getpixmapoffset()
