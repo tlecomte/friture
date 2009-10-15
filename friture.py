@@ -41,6 +41,7 @@ SAMPLING_RATE = 44100
 NUM_SAMPLES = 1024
 FRAMES_PER_BUFFER = NUM_SAMPLES
 TIMER_PERIOD_MS = int(ceil(1000.*NUM_SAMPLES/float(SAMPLING_RATE)))
+SMOOTH_DISPLAY_TIMER_PERIOD_MS = 25
 DEVICE_INDEX = 0
 
 class Friture(QtGui.QMainWindow, Ui_MainWindow):
@@ -123,6 +124,19 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		#timer that fires roughly every 20 ms
 		self.timer.setInterval(TIMER_PERIOD_MS)
 
+		# this timer is used to update widgets that just need to display as fast as they can
+		self.display_timer = QtCore.QTimer()
+		self.display_timer.setInterval(SMOOTH_DISPLAY_TIMER_PERIOD_MS) # constant timing
+
+		# this timer is used to update the spectrogram widget, whose update period
+		# is fixed by the time scale and the width of the widget canvas
+		self.spectrogram_timer = QtCore.QTimer()
+		self.spectrogram_timer.setInterval(SMOOTH_DISPLAY_TIMER_PERIOD_MS) # variable timing
+
+		self.connect(self.timer, QtCore.SIGNAL('timeout()'), self.timer_slot)
+		self.connect(self.display_timer, QtCore.SIGNAL('timeout()'), self.display_timer_slot)
+		self.connect(self.spectrogram_timer, QtCore.SIGNAL('timeout()'), self.spectrogram_timer_slot)
+		
 		self.connect(self.actionStart, QtCore.SIGNAL('triggered()'), self.timer_toggle)
 		
 		self.connect(self.comboBox_freqscale, QtCore.SIGNAL('currentIndexChanged(int)'), self.freqscalechanged)
@@ -131,7 +145,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		self.connect(self.spinBox_specmin, QtCore.SIGNAL('valueChanged(int)'), self.specrangechanged)
 		self.connect(self.doubleSpinBox_timerange, QtCore.SIGNAL('valueChanged(double)'), self.timerangechanged)
 		self.connect(self.comboBox_inputDevice, QtCore.SIGNAL('currentIndexChanged(int)'), self.input_device_changed)
-		self.connect(self.timer, QtCore.SIGNAL('timeout()'), self.timer_slot)
+		
 		self.connect(self.PlotZoneImage, QtCore.SIGNAL('pointerMoved'), self.pointer_moved)
 		self.connect(self.PlotZoneSpect, QtCore.SIGNAL('pointerMoved'), self.pointer_moved)
 		self.connect(self.PlotZoneUp, QtCore.SIGNAL('pointerMoved'), self.pointer_moved)
@@ -146,7 +160,9 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		self.restoreState(settings.value("windowState").toByteArray())
 		settings.endGroup()
 
+		# start timers
 		self.timer_toggle()
+		
 		print "Done"
 
 	def closeEvent(self, event):
@@ -186,10 +202,33 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 			return True
 
 	def timer_toggle(self):
-		if self.timer.isActive():
+		if self.display_timer.isActive():
 			self.timer.stop()
+			self.display_timer.stop()
+			self.spectrogram_timer.stop()
 		else:
 			self.timer.start()
+			self.display_timer.start()
+			self.spectrogram_timer.start()
+
+	def display_timer_slot(self):
+		self.update_buffer()
+		return
+		
+		
+
+	def spectrogram_timer_slot(self):
+		self.update_buffer()
+		return
+
+	def update_buffer(self):
+		return
+		# ask for how much data is available
+		available = self.stream.get_read_available()
+		# read what is available
+		rawdata = self.stream.read(available)
+		# update the circular buffer
+		
 
 	def timer_slot(self):
 		available = self.stream.get_read_available()
@@ -235,34 +274,13 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		self.i += 1
 		
 		if self.statisticsIsVisible and self.last:
-			level_label = "Chunk #%d\n"\
-			"Lost chunks: %d = %.01f %%\n"\
-			"Useless timer wakeups: %d = %.01f %%\n"\
-			"Latency: %d ms\n"\
-			"Mean number of chunks per timer fire: %.01f\n"\
-			"FFT period : %.01f ms"\
-			% (self.i,
-			self.losts,
-			self.losts*100./float(self.i),
-			self.useless, self.useless*100./float(self.i),
-			self.latency,
-			self.mean_chunks_per_fire,
-			self.fft_size*1000./SAMPLING_RATE)
-			self.LabelLevel.setText(level_label)
+			self.statistics()
 		
 		if self.levelsIsVisible and self.last:
-			time = adata.floatdata
-			level_rms = 20*log10(sqrt((time**2).sum()/len(time)*2.) + 0*1e-80) #*2. to get 0dB for a sine wave
-			level_max = 20*log10(abs(time).max() + 0*1e-80)
-			self.label_rms.setText("%.01f" % level_rms)
-			self.label_peak.setText("%.01f" % level_max)
-			self.meter.setValue(0, sqrt((time**2).sum()/len(time)*2.))
-			self.meter.setValue(1, abs(time).max())
-
+			self.levels(adata)
+		
 		if self.scopeIsVisible and self.last:
-			signal = adata.floatdata
-			time = linspace(0., len(signal)/float(rate), len(signal))
-			self.PlotZoneUp.setdata(time, signal)
+			self.scope(adata)
 
 		sp = self.procclass.process(adata, self.fft_size)
 		if sp == None:
@@ -283,6 +301,37 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 			self.PlotZoneSpect.setdata(freq, y)
 		
 		self.PlotZoneImage.addData(norm_spectrogram.transpose())
+
+	def statistics(self):
+		level_label = "Chunk #%d\n"\
+		"Lost chunks: %d = %.01f %%\n"\
+		"Useless timer wakeups: %d = %.01f %%\n"\
+		"Latency: %d ms\n"\
+		"Mean number of chunks per timer fire: %.01f\n"\
+		"FFT period : %.01f ms"\
+		% (self.i,
+		self.losts,
+		self.losts*100./float(self.i),
+		self.useless, self.useless*100./float(self.i),
+		self.latency,
+		self.mean_chunks_per_fire,
+		self.fft_size*1000./SAMPLING_RATE)
+		self.LabelLevel.setText(level_label)
+
+	def levels(self, adata):
+		time = adata.floatdata
+		level_rms = 20*log10(sqrt((time**2).sum()/len(time)*2.) + 0*1e-80) #*2. to get 0dB for a sine wave
+		level_max = 20*log10(abs(time).max() + 0*1e-80)
+		self.label_rms.setText("%.01f" % level_rms)
+		self.label_peak.setText("%.01f" % level_max)
+		self.meter.setValue(0, sqrt((time**2).sum()/len(time)*2.))
+		self.meter.setValue(1, abs(time).max())
+
+	def scope(self, adata):
+		signal = adata.floatdata
+		rate = adata.samplerate
+		time = linspace(0., len(signal)/float(rate), len(signal))
+		self.PlotZoneUp.setdata(time, signal)
 
 	def fftsizechanged(self, index):
 		print "fft_size_changed slot", index, 2**index*32, 150000/self.fft_size
