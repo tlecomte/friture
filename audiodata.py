@@ -38,8 +38,9 @@ def concatenate(data1, data2):
         return data1
     return AudioData(data1.rawdata + data2.rawdata, data1.nchannels, data1.format, data1.samplesize, data1.samplerate)
 
-class CanvasScaledSpectrogram():
+class CanvasScaledSpectrogram(QtCore.QObject):
 	def __init__(self, spectrum_length = 129, T = 10., canvas_height = 2,  canvas_width = 2):
+		QtCore.QObject.__init__(self)
 		self.spectrum_length = spectrum_length
 		self.T = T
 		self.canvas_height = canvas_height
@@ -117,6 +118,7 @@ class CanvasScaledSpectrogram():
 			self.canvas_width = canvas_width
 			self.current_total = 0
 			self.erase()
+			self.emit(QtCore.SIGNAL("canvasWidthChanged"), canvas_width)
 			print "canvas_width changed, now: %d (%.03f frames per line)" %(canvas_width, self.n())
 
 	def setlogfreqscale(self, logfreqscale):
@@ -148,6 +150,14 @@ class CanvasScaledSpectrogram():
 			else:
 				int_xyzs = self.interpolate(xyzs)
 			self.addDataSingle(int_xyzs)
+
+	def addData2(self, xyzs):
+		spectrum_length = xyzs.shape[0]
+
+		self.setspectrum_length(spectrum_length)
+
+		int_xyzs = self.interpolate(xyzs)
+		self.addDataSingle2(int_xyzs)
 
 	def interpolate(self, xyzs):
 		return numpy.interp(self.xscaled, self.x, xyzs)
@@ -188,6 +198,10 @@ class CanvasScaledSpectrogram():
 				self.finish_line()
 
 			if debug: print "finished !"
+			
+	def addDataSingle2(self, int_xyzs):
+		self.xyzs_buffer += int_xyzs
+		self.finish_line()
 
 	def finish_line(self):
 		# draw !

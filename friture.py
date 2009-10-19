@@ -19,13 +19,14 @@
 
 import sys
 from pyaudio import PyAudio, paInt16
-from numpy import transpose, log10, sqrt, ceil, linspace, arange, floor
+from numpy import transpose, log10, sqrt, ceil, linspace, arange, floor, zeros, int32, fromstring
 from PyQt4 import QtGui, QtCore, Qt
 import PyQt4.Qwt5 as Qwt
 from Ui_friture import Ui_MainWindow
 import resource_rc
 import audiodata
 import proc
+import audioproc
 
 #pyuic4 friture.ui > Ui_friture.py
 #pyrcc4 resource.qrc > resource_rc.py
@@ -83,6 +84,12 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		self.time.start()
 		self.latency = 0.
 		self.mean_chunks_per_fire = 0.
+		self.timerange_s = 10.
+		self.canvas_width = 100.
+		
+		self.buffer_length = 100000.
+		self.audiobuffer = zeros(2*self.buffer_length)
+		self.offset = 0
 
 		print "Initializing PyAudio"
 		self.pa = PyAudio()
@@ -155,6 +162,8 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		self.connect(self.dockWidgetLevels, QtCore.SIGNAL('visibilityChanged(bool)'), self.levelsVisibility)
 		self.connect(self.dockWidgetSpectrum, QtCore.SIGNAL('visibilityChanged(bool)'), self.spectrumVisibility)
 
+		self.connect(self.PlotZoneImage.plotImage.canvasscaledspectrogram, QtCore.SIGNAL("canvasWidthChanged"), self.canvasWidthChanged)
+		
 		settings = QtCore.QSettings("Friture", "Friture")
 		settings.beginGroup("MainWindow")
 		self.restoreState(settings.value("windowState").toByteArray())
@@ -213,24 +222,84 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 
 	def display_timer_slot(self):
 		self.update_buffer()
-		return
+		#return
+
+		self.i += 1
 		
+		if self.statisticsIsVisible: # and self.last:
+			self.statistics()
 		
+		if self.levelsIsVisible: # and self.last:
+			time = SMOOTH_DISPLAY_TIMER_PERIOD_MS/1000.
+			start = self.offset + self.buffer_length - time*SAMPLING_RATE
+			stop = self.offset + self.buffer_length
+			self.levels(self.audiobuffer[start : stop])
+		
+		if self.scopeIsVisible: # and self.last:
+			time = SMOOTH_DISPLAY_TIMER_PERIOD_MS/1000.
+			start = self.offset + self.buffer_length - time*SAMPLING_RATE
+			stop = self.offset + self.buffer_length
+			self.scope(self.audiobuffer[start : stop], SAMPLING_RATE)
+		
+		if self.spectrumIsVisible: # and self.last:
+			sp = audioproc.analyzelive2(self.audiobuffer[self.offset + self.buffer_length - self.fft_size: self.offset + self.buffer_length], self.fft_size)
+			clip = lambda val, low, high: min(high, max(low, val))
+			# scale the db spectrum from [- spec_range db ... 0 db] > [0..1]
+			epsilon = 1e-30
+			db_spectrogram = (20*log10(sp + epsilon))
+			norm_spectrogram = (db_spectrogram.clip(self.spec_min, self.spec_max) - self.spec_min)/(self.spec_max - self.spec_min)
+			if db_spectrogram.ndim == 1:
+				y = db_spectrogram.transpose()
+			else:
+				y = db_spectrogram[0,:].transpose()
+			freq = linspace(0., 22050., len(y))
+			self.PlotZoneSpect.setdata(freq, y)
 
 	def spectrogram_timer_slot(self):
 		self.update_buffer()
-		return
+
+		sp = audioproc.analyzelive2(self.audiobuffer[self.offset + self.buffer_length - self.fft_size: self.offset + self.buffer_length], self.fft_size)
+		clip = lambda val, low, high: min(high, max(low, val))
+		# scale the db spectrum from [- spec_range db ... 0 db] > [0..1]
+		epsilon = 1e-30
+		db_spectrogram = (20*log10(sp + epsilon))
+		norm_spectrogram = (db_spectrogram.clip(self.spec_min, self.spec_max) - self.spec_min)/(self.spec_max - self.spec_min)
+		
+		self.PlotZoneImage.addData2(norm_spectrogram.transpose())
 
 	def update_buffer(self):
-		return
+		debug = False
+		if debug: print "update_buffer"
 		# ask for how much data is available
 		available = self.stream.get_read_available()
+		if debug: print "available", available
 		# read what is available
-		rawdata = self.stream.read(available)
-		# update the circular buffer
-		
+		if debug: print "about to read"
+		# we read by multiples of NUM_SAMPLES
+		available = int(floor(available/NUM_SAMPLES))
+		for j in range(0, available):
+			rawdata = self.stream.read(NUM_SAMPLES)
+			floatdata = fromstring(rawdata, int32)/2.**31
+			# update the circular buffer
+			if debug: print "available", available, "buffer length", self.buffer_length
+			if len(floatdata) > self.buffer_length:
+				print "buffer error"
+				exit(1)
+			
+			# first copy, always complete
+			self.audiobuffer[self.offset : self.offset + len(floatdata)] = floatdata[:]
+			# second copy, can be folded
+			direct = min(len(floatdata), self.buffer_length - self.offset)
+			folded = len(floatdata) - direct
+			if debug: print "direct", direct, "folded", folded
+			self.audiobuffer[self.offset + self.buffer_length: self.offset + self.buffer_length + direct] = floatdata[0 : direct]
+			self.audiobuffer[:folded] = floatdata[direct:]
+			
+			self.offset = int((self.offset + len(floatdata)) % self.buffer_length)
+			if debug: print "new offset", self.offset
 
 	def timer_slot(self):
+		return
 		available = self.stream.get_read_available()
 		available = int(floor(available/NUM_SAMPLES))
 		
@@ -277,10 +346,10 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 			self.statistics()
 		
 		if self.levelsIsVisible and self.last:
-			self.levels(adata)
+			self.levels(adata.floatdata)
 		
 		if self.scopeIsVisible and self.last:
-			self.scope(adata)
+			self.scope(adata.floatdata, adata.samplerate)
 
 		sp = self.procclass.process(adata, self.fft_size)
 		if sp == None:
@@ -318,20 +387,17 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		self.fft_size*1000./SAMPLING_RATE)
 		self.LabelLevel.setText(level_label)
 
-	def levels(self, adata):
-		time = adata.floatdata
-		level_rms = 20*log10(sqrt((time**2).sum()/len(time)*2.) + 0*1e-80) #*2. to get 0dB for a sine wave
-		level_max = 20*log10(abs(time).max() + 0*1e-80)
+	def levels(self, floatdata):
+		level_rms = 20*log10(sqrt((floatdata**2).sum()/len(floatdata)*2.) + 0*1e-80) #*2. to get 0dB for a sine wave
+		level_max = 20*log10(abs(floatdata).max() + 0*1e-80)
 		self.label_rms.setText("%.01f" % level_rms)
 		self.label_peak.setText("%.01f" % level_max)
-		self.meter.setValue(0, sqrt((time**2).sum()/len(time)*2.))
-		self.meter.setValue(1, abs(time).max())
+		self.meter.setValue(0, sqrt((floatdata**2).sum()/len(floatdata)*2.))
+		self.meter.setValue(1, abs(floatdata).max())
 
-	def scope(self, adata):
-		signal = adata.floatdata
-		rate = adata.samplerate
-		time = linspace(0., len(signal)/float(rate), len(signal))
-		self.PlotZoneUp.setdata(time, signal)
+	def scope(self, floatdata, rate):
+		time = linspace(0., len(floatdata)/float(rate), len(floatdata))
+		self.PlotZoneUp.setdata(time, floatdata)
 
 	def fftsizechanged(self, index):
 		print "fft_size_changed slot", index, 2**index*32, 150000/self.fft_size
@@ -351,8 +417,19 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		self.spec_min = self.spinBox_specmin.value()
 		
 	def timerangechanged(self, value):
+		self.timerange_s = value
 		self.PlotZoneImage.settimerange(value)
-
+		self.reset_timer()
+	
+	def canvasWidthChanged(self, width):
+		self.canvas_width = width
+		self.reset_timer()
+		
+	def reset_timer(self):
+		period_ms = 1000.*self.timerange_s/self.canvas_width
+		print "Resetting the timer, will fire every %d ms" %(period_ms)
+		self.spectrogram_timer.setInterval(period_ms)
+		
 	def set_devices_list(self):
 		default_device_index = self.get_default_input_device()
 		device_count = self.get_device_count()
