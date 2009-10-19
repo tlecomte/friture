@@ -159,7 +159,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		# start timers
 		self.timer_toggle()
 		
-		print "Done"
+		print "Init finished, entering the main loop"
 
 	def closeEvent(self, event):
 		windowState = self.saveState()
