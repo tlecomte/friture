@@ -371,6 +371,8 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 	def reset_timer(self):
 		# FIXME millisecond resolution is limiting !
 		# need to find a way to integrate this cleverly in the GUI
+		# When the period is smaller than 25 ms, we can reasonably
+		# try to draw as many columns at once as possible
 		period_ms = 1000.*self.timerange_s/self.canvas_width
 		print "Resetting the timer, will fire every %d ms" %(period_ms)
 		self.spectrogram_timer.setInterval(period_ms)
