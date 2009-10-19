@@ -214,9 +214,6 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 
 	def display_timer_slot(self):
 		self.update_buffer()
-		#return
-
-		self.i += 1
 		
 		if self.statisticsIsVisible: # and self.last:
 			self.statistics()
@@ -270,6 +267,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		# we read by multiples of NUM_SAMPLES
 		available = int(floor(available/NUM_SAMPLES))
 		for j in range(0, available):
+			self.i += 1
 			rawdata = self.stream.read(NUM_SAMPLES)
 			floatdata = fromstring(rawdata, int32)/2.**31
 			# update the circular buffer
