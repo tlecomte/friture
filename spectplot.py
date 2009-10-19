@@ -57,6 +57,8 @@ class SpectPlot(classplot.ClassPlot):
 		self.setlinfreqscale()
 		self.logfreqscale = False
 		
+		self.setfreqrange(20., 20000.)
+		
 		self.setAxisScaleDraw(Qwt.QwtPlot.xBottom, FreqScaleDraw())
 		
 		self.connect(self.picker, QtCore.SIGNAL('moved(const QPoint &)'), self.moved)
@@ -126,11 +128,15 @@ class SpectPlot(classplot.ClassPlot):
 	def setlinfreqscale(self):
 		self.logfreqscale = False
 		self.setAxisScaleEngine(Qwt.QwtPlot.xBottom, Qwt.QwtLinearScaleEngine())
-		self.setAxisScale(Qwt.QwtPlot.xBottom, 0., self.xmax)
 		self.needfullreplot = True
 
 	def setlogfreqscale(self):
 		self.logfreqscale = True
 		self.setAxisScaleEngine(Qwt.QwtPlot.xBottom, Qwt.QwtLog10ScaleEngine())
-		self.setAxisScale(Qwt.QwtPlot.xBottom, 20., self.xmax)
+		self.needfullreplot = True
+
+	def setfreqrange(self, minfreq, maxfreq):
+		self.minfreq = minfreq
+		self.maxfreq = maxfreq
+		self.setAxisScale(Qwt.QwtPlot.xBottom, self.minfreq, self.maxfreq)
 		self.needfullreplot = True

@@ -138,6 +138,8 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		self.connect(self.spinBox_specmax, QtCore.SIGNAL('valueChanged(int)'), self.specrangechanged)
 		self.connect(self.spinBox_specmin, QtCore.SIGNAL('valueChanged(int)'), self.specrangechanged)
 		self.connect(self.doubleSpinBox_timerange, QtCore.SIGNAL('valueChanged(double)'), self.timerangechanged)
+		self.connect(self.spinBox_minfreq, QtCore.SIGNAL('valueChanged(int)'), self.freqrangechanged)
+		self.connect(self.spinBox_maxfreq, QtCore.SIGNAL('valueChanged(int)'), self.freqrangechanged)
 		self.connect(self.comboBox_inputDevice, QtCore.SIGNAL('currentIndexChanged(int)'), self.input_device_changed)
 		
 		self.connect(self.PlotZoneImage, QtCore.SIGNAL('pointerMoved'), self.pointer_moved)
@@ -354,6 +356,11 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		else:
 			self.PlotZoneSpect.setlinfreqscale()
 			self.PlotZoneImage.setlinfreqscale()
+
+	def freqrangechanged(self, value):
+		minfreq = self.spinBox_minfreq.value()
+		maxfreq = self.spinBox_maxfreq.value()
+		self.PlotZoneSpect.setfreqrange(minfreq, maxfreq)
 
 	def specrangechanged(self, value):
 		self.spec_max = self.spinBox_specmax.value()
