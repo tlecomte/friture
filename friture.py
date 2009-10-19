@@ -25,7 +25,6 @@ import PyQt4.Qwt5 as Qwt
 from Ui_friture import Ui_MainWindow
 import resource_rc
 import audiodata
-import proc
 import audioproc
 
 #pyuic4 friture.ui > Ui_friture.py
@@ -119,12 +118,6 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 				print "Fail"
 
 		self.comboBox_inputDevice.setCurrentIndex(self.device_index)
-
-		self.procclass = proc.ProcClass()
-		self.canvasscaledspectrogram = audiodata.CanvasScaledSpectrogram()
-		self.dest_pixmap = QtGui.QPixmap(600, 300)
-		self.dest_pixmap.fill()
-		self.painter = QtGui.QPainter(self.dest_pixmap)
 
 		# this timer is used to update widgets that just need to display as fast as they can
 		self.display_timer = QtCore.QTimer()
