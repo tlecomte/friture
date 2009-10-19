@@ -215,22 +215,22 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 	def display_timer_slot(self):
 		self.update_buffer()
 		
-		if self.statisticsIsVisible: # and self.last:
+		if self.statisticsIsVisible:
 			self.statistics()
 		
-		if self.levelsIsVisible: # and self.last:
+		if self.levelsIsVisible:
 			time = SMOOTH_DISPLAY_TIMER_PERIOD_MS/1000.
 			start = self.offset + self.buffer_length - time*SAMPLING_RATE
 			stop = self.offset + self.buffer_length
 			self.levels(self.audiobuffer[start : stop])
 		
-		if self.scopeIsVisible: # and self.last:
+		if self.scopeIsVisible:
 			time = SMOOTH_DISPLAY_TIMER_PERIOD_MS/1000.
 			start = self.offset + self.buffer_length - time*SAMPLING_RATE
 			stop = self.offset + self.buffer_length
 			self.scope(self.audiobuffer[start : stop], SAMPLING_RATE)
 		
-		if self.spectrumIsVisible: # and self.last:
+		if self.spectrumIsVisible:
 			sp = audioproc.analyzelive2(self.audiobuffer[self.offset + self.buffer_length - self.fft_size: self.offset + self.buffer_length], self.fft_size)
 			clip = lambda val, low, high: min(high, max(low, val))
 			# scale the db spectrum from [- spec_range db ... 0 db] > [0..1]
