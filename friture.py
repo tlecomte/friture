@@ -198,6 +198,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 			return True
 
 	def timer_toggle(self):
+		print "toggle"
 		if self.display_timer.isActive():
 			self.display_timer.stop()
 			self.spectrogram_timer.stop()
@@ -395,8 +396,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 	def input_device_changed(self, index):
 		self.display_timer.stop()
 		self.spectrogram_timer.stop()
-		# FIXME update to toolbar action
-		# self.pushButton_startstop.setChecked(False)
+		self.actionStart.setChecked(False)
 		
 		# save current stream in case we need to restore it
 		previous_stream = self.stream
@@ -423,8 +423,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		
 		self.display_timer.start()
 		self.spectrogram_timer.start()
-		# FIXME update to toolbar action
-		# self.pushButton_startstop.setChecked(True)
+		self.actionStart.setChecked(True)
 
 if __name__ == "__main__":
 	app = QtGui.QApplication(sys.argv)
