@@ -126,11 +126,6 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		self.dest_pixmap.fill()
 		self.painter = QtGui.QPainter(self.dest_pixmap)
 
-		print "Setting up the timer, will fire every %d ms" %(TIMER_PERIOD_MS)
-		self.timer = QtCore.QTimer()
-		#timer that fires roughly every 20 ms
-		self.timer.setInterval(TIMER_PERIOD_MS)
-
 		# this timer is used to update widgets that just need to display as fast as they can
 		self.display_timer = QtCore.QTimer()
 		self.display_timer.setInterval(SMOOTH_DISPLAY_TIMER_PERIOD_MS) # constant timing
@@ -140,7 +135,6 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		self.spectrogram_timer = QtCore.QTimer()
 		self.spectrogram_timer.setInterval(SMOOTH_DISPLAY_TIMER_PERIOD_MS) # variable timing
 
-		self.connect(self.timer, QtCore.SIGNAL('timeout()'), self.timer_slot)
 		self.connect(self.display_timer, QtCore.SIGNAL('timeout()'), self.display_timer_slot)
 		self.connect(self.spectrogram_timer, QtCore.SIGNAL('timeout()'), self.spectrogram_timer_slot)
 		
@@ -212,11 +206,9 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 
 	def timer_toggle(self):
 		if self.display_timer.isActive():
-			self.timer.stop()
 			self.display_timer.stop()
 			self.spectrogram_timer.stop()
 		else:
-			self.timer.start()
 			self.display_timer.start()
 			self.spectrogram_timer.start()
 
@@ -298,78 +290,37 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 			self.offset = int((self.offset + len(floatdata)) % self.buffer_length)
 			if debug: print "new offset", self.offset
 
-	def timer_slot(self):
-		return
-		available = self.stream.get_read_available()
-		available = int(floor(available/NUM_SAMPLES))
+	#def timer_slot(self):
+		#return
+		#available = self.stream.get_read_available()
+		#available = int(floor(available/NUM_SAMPLES))
 		
-		if available == 0:
-			self.useless += 1
-			return
+		#if available == 0:
+			#self.useless += 1
+			#return
 		
-		self.latency = self.time.restart()
+		#self.latency = self.time.restart()
 		
-		jmax = min(available, self.max_in_a_row)
-		self.losts += available - jmax
+		#jmax = min(available, self.max_in_a_row)
+		#self.losts += available - jmax
 		
-		self.last = False
+		#self.last = False
 		
-		for j in range(0, jmax):
-			rawdata = self.stream.read(NUM_SAMPLES)
-			if j == jmax-1:
-				self.last = True
-			self.process_data(rawdata)
+		#for j in range(0, jmax):
+			#rawdata = self.stream.read(NUM_SAMPLES)
+			#if j == jmax-1:
+				#self.last = True
+			#self.process_data(rawdata)
 		
-		# discard the rest of the data that we cannot reasonably process
-		for j in range(jmax, available):
-			rawdata = self.stream.read(NUM_SAMPLES)
+		## discard the rest of the data that we cannot reasonably process
+		#for j in range(jmax, available):
+			#rawdata = self.stream.read(NUM_SAMPLES)
 		
-		if self.mean_chunks_per_fire == 0:
-			self.mean_chunks_per_fire = jmax
-		else:
-			mean_number = min(self.i, 1000.)
-			self.mean_chunks_per_fire = (self.mean_chunks_per_fire*mean_number + jmax)/(mean_number + 1.)
-
-	def process_data(self, rawdata):
-		channels = 1
-		format = paInt16
-		rate = SAMPLING_RATE
-		adata = audiodata.AudioData(rawdata = rawdata,
-					nchannels = channels,
-					format = format,
-					samplesize = self.pa.get_sample_size(format),
-					samplerate = rate)
-
-		self.i += 1
-		
-		if self.statisticsIsVisible and self.last:
-			self.statistics()
-		
-		if self.levelsIsVisible and self.last:
-			self.levels(adata.floatdata)
-		
-		if self.scopeIsVisible and self.last:
-			self.scope(adata.floatdata, adata.samplerate)
-
-		sp = self.procclass.process(adata, self.fft_size)
-		if sp == None:
-			return
-
-		clip = lambda val, low, high: min(high, max(low, val))
-		# scale the db spectrum from [- spec_range db ... 0 db] > [0..1]
-		epsilon = 1e-30
-		db_spectrogram = (20*log10(sp + epsilon))
-		norm_spectrogram = (db_spectrogram.clip(self.spec_min, self.spec_max) - self.spec_min)/(self.spec_max - self.spec_min)
-		
-		if self.spectrumIsVisible and self.last:
-			if db_spectrogram.ndim == 1:
-				y = db_spectrogram.transpose()
-			else:
-				y = db_spectrogram[0,:].transpose()
-			freq = linspace(0., 22050., len(y))
-			self.PlotZoneSpect.setdata(freq, y)
-		
-		self.PlotZoneImage.addData(norm_spectrogram.transpose())
+		#if self.mean_chunks_per_fire == 0:
+			#self.mean_chunks_per_fire = jmax
+		#else:
+			#mean_number = min(self.i, 1000.)
+			#self.mean_chunks_per_fire = (self.mean_chunks_per_fire*mean_number + jmax)/(mean_number + 1.)
 
 	def statistics(self):
 		level_label = "Chunk #%d\n"\
@@ -451,7 +402,8 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		return self.pa.get_device_count()
 
 	def input_device_changed(self, index):
-		self.timer.stop()
+		self.display_timer.stop()
+		self.spectrogram_timer.stop()
 		# FIXME update to toolbar action
 		# self.pushButton_startstop.setChecked(False)
 		
@@ -478,7 +430,8 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		lat_ms = 1000*self.stream.get_input_latency()
 		self.max_in_a_row = int(ceil(lat_ms/TIMER_PERIOD_MS))
 		
-		self.timer.start()
+		self.display_timer.start()
+		self.spectrogram_timer.start()
 		# FIXME update to toolbar action
 		# self.pushButton_startstop.setChecked(True)
 
