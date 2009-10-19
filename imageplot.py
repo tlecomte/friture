@@ -41,10 +41,6 @@ class PlotImage(Qwt.QwtPlotItem):
 		self.canvasscaledspectrogram.setlogfreqscale(logfreqscale)
 		self.canvasscaledspectrogram.addData(xyzs)
 
-	def addData2(self, xyzs, logfreqscale):
-		self.canvasscaledspectrogram.setlogfreqscale(logfreqscale)
-		self.canvasscaledspectrogram.addData2(xyzs)
-
 	def draw(self, painter, xMap, yMap, rect):
 		self.canvasscaledspectrogram.setcanvas_height(rect.height())
 		self.canvasscaledspectrogram.setcanvas_width(rect.width())
@@ -113,19 +109,6 @@ class ImagePlot(Qwt.QwtPlot):
 
 	def addData(self, xyzs):
 		self.plotImage.addData(xyzs, self.logfreqscale)
-		# self.replot() would call updateAxes() which is dead slow (probably because it
-		# computes label sizes); instead, let's ask Qt to repaint the canvas only next time
-		# This works because we disable the cache
-		# TODO what happens when the cache is enabled ?
-		# Could that solve the perceived "unsmoothness" ?
-		
-		self.canvas().update()
-		
-		#print self.canvas().testPaintAttribute(Qwt.QwtPlotCanvas.PaintCached)
-		#print self.canvas().paintCache()
-
-	def addData2(self, xyzs):
-		self.plotImage.addData2(xyzs, self.logfreqscale)
 		# self.replot() would call updateAxes() which is dead slow (probably because it
 		# computes label sizes); instead, let's ask Qt to repaint the canvas only next time
 		# This works because we disable the cache

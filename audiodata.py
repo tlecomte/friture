@@ -135,71 +135,17 @@ class CanvasScaledSpectrogram(QtCore.QObject):
 			self.xscaled = numpy.logspace(numpy.log10(20.), numpy.log10(22050.), self.canvas_height)
 
 	def addData(self, xyzs):
-		if xyzs.ndim == 1:
-			spectrum_length = xyzs.shape[0]
-			time_bin_number = 1
-		else:
-			spectrum_length = xyzs.shape[0]
-			time_bin_number = xyzs.shape[1]
-
-		self.setspectrum_length(spectrum_length)
-
-		for i in range(0, time_bin_number):
-			if time_bin_number > 1:
-				int_xyzs = self.interpolate(xyzs[:,-(i+1)])
-			else:
-				int_xyzs = self.interpolate(xyzs)
-			self.addDataSingle(int_xyzs)
-
-	def addData2(self, xyzs):
 		spectrum_length = xyzs.shape[0]
 
 		self.setspectrum_length(spectrum_length)
 
 		int_xyzs = self.interpolate(xyzs)
-		self.addDataSingle2(int_xyzs)
+		self.addDataSingle(int_xyzs)
 
 	def interpolate(self, xyzs):
 		return numpy.interp(self.xscaled, self.x, xyzs)
 
 	def addDataSingle(self, int_xyzs):
-		debug = False
-
-		# we start with fresh data, which will be consumed progressively
-		available = 1.
-
-		# until available gets zeroed, we have data to use
-		while available > 0.: # FIXME why the following and i <10: # FIXME float comparison
-			if debug: print "available ",  available
-
-			# what is still needed before displaying : total number (n) minus what we have already got
-			needed =  self.n() - self.current_total
-			if debug: print "needed",  needed
-
-			# the current wavedata canot give more than what's not been used from it :
-			current = min(needed,  available)
-			if debug: print "current",  current
-
-			# current_total will increase from 0 to n
-			self.current_total += current
-			if debug: print "self.current_total",  self.current_total
-
-			# then we add the current data with the following weight (total weight will be one)
-			weight = current/self.n()
-			if debug: print "weight",  weight
-			self.xyzs_buffer += int_xyzs*weight
-
-			# available is updated with what has just been used, (note that it should never go negative)
-			available -= current
-
-			# if current_total is n, we have successfully added enough data
-			if self.current_total >= self.n():
-				if debug: print "draw !"
-				self.finish_line()
-
-			if debug: print "finished !"
-			
-	def addDataSingle2(self, int_xyzs):
 		self.xyzs_buffer += int_xyzs
 		self.finish_line()
 

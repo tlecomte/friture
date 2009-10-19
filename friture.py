@@ -254,7 +254,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		db_spectrogram = (20*log10(sp + epsilon))
 		norm_spectrogram = (db_spectrogram.clip(self.spec_min, self.spec_max) - self.spec_min)/(self.spec_max - self.spec_min)
 		
-		self.PlotZoneImage.addData2(norm_spectrogram.transpose())
+		self.PlotZoneImage.addData(norm_spectrogram.transpose())
 
 	def update_buffer(self):
 		debug = False
