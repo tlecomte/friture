@@ -231,7 +231,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 			self.scope(self.audiobuffer[start : stop], SAMPLING_RATE)
 		
 		if self.spectrumIsVisible:
-			sp = audioproc.analyzelive2(self.audiobuffer[self.offset + self.buffer_length - self.fft_size: self.offset + self.buffer_length], self.fft_size)
+			sp = audioproc.analyzelive(self.audiobuffer[self.offset + self.buffer_length - self.fft_size: self.offset + self.buffer_length], self.fft_size)
 			clip = lambda val, low, high: min(high, max(low, val))
 			# scale the db spectrum from [- spec_range db ... 0 db] > [0..1]
 			epsilon = 1e-30
@@ -247,7 +247,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 	def spectrogram_timer_slot(self):
 		self.update_buffer()
 
-		sp = audioproc.analyzelive2(self.audiobuffer[self.offset + self.buffer_length - self.fft_size: self.offset + self.buffer_length], self.fft_size)
+		sp = audioproc.analyzelive(self.audiobuffer[self.offset + self.buffer_length - self.fft_size: self.offset + self.buffer_length], self.fft_size)
 		clip = lambda val, low, high: min(high, max(low, val))
 		# scale the db spectrum from [- spec_range db ... 0 db] > [0..1]
 		epsilon = 1e-30
