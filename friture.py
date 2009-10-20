@@ -361,6 +361,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		minfreq = self.spinBox_minfreq.value()
 		maxfreq = self.spinBox_maxfreq.value()
 		self.PlotZoneSpect.setfreqrange(minfreq, maxfreq)
+		self.PlotZoneImage.setfreqrange(minfreq, maxfreq)
 
 	def specrangechanged(self, value):
 		self.spec_max = self.spinBox_specmax.value()

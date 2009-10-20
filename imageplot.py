@@ -57,6 +57,9 @@ class PlotImage(Qwt.QwtPlotItem):
 	def settimerange(self, timerange_seconds):
 		self.canvasscaledspectrogram.setT(timerange_seconds)
 
+	def setfreqrange(self, minfreq, maxfreq):
+		self.canvasscaledspectrogram.setfreqrange(minfreq, maxfreq)
+
 	def erase(self):
 		self.canvasscaledspectrogram.erase()
 
@@ -84,6 +87,7 @@ class ImagePlot(Qwt.QwtPlot):
 		self.plotImage = PlotImage()
 		self.plotImage.attach(self)
 		self.setlinfreqscale()
+		self.setfreqrange(20., 20000.)
 
 		self.setAxisScale(Qwt.QwtPlot.xBottom, 0., 10.)
 		
@@ -124,9 +128,7 @@ class ImagePlot(Qwt.QwtPlot):
 		self.plotImage.erase()
 		self.logfreqscale = 1
 		self.setAxisScaleEngine(Qwt.QwtPlot.yLeft, Qwt.QwtLog10ScaleEngine())
-		self.setAxisScale(Qwt.QwtPlot.yLeft, 20., 22050.)
 		self.setAxisScaleEngine(Qwt.QwtPlot.yRight, Qwt.QwtLog10ScaleEngine())
-		self.setAxisScale(Qwt.QwtPlot.yRight, 20., 22050.)
 		self.replot()
 
 	def setlinfreqscale(self):
@@ -134,12 +136,16 @@ class ImagePlot(Qwt.QwtPlot):
 		self.plotImage.erase()
 		self.logfreqscale = 0
 		self.setAxisScaleEngine(Qwt.QwtPlot.yLeft, Qwt.QwtLinearScaleEngine())
-		self.setAxisScale(Qwt.QwtPlot.yLeft, 0., 22050.)
 		self.setAxisScaleEngine(Qwt.QwtPlot.yRight, Qwt.QwtLinearScaleEngine())
-		self.setAxisScale(Qwt.QwtPlot.yRight, 0., 22050.)
 		self.replot()
 
 	def settimerange(self, timerange_seconds):
 		self.plotImage.settimerange(timerange_seconds)
 		self.setAxisScale(Qwt.QwtPlot.xBottom, 0., timerange_seconds)
+		self.replot()
+
+	def setfreqrange(self, minfreq, maxfreq):
+		self.plotImage.setfreqrange(minfreq, maxfreq)
+		self.setAxisScale(Qwt.QwtPlot.yLeft, minfreq, maxfreq)
+		self.setAxisScale(Qwt.QwtPlot.yRight, minfreq, maxfreq)
 		self.replot()

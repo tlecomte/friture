@@ -47,6 +47,8 @@ class CanvasScaledSpectrogram(QtCore.QObject):
 		self.canvas_width = canvas_width
 		self.logfreqscale = False
 		self.current_total = 0
+		self.minfreq = 20.
+		self.maxfreq = 20000.
 		self.x = numpy.linspace(0., 22050., spectrum_length)
 		self.update_xscale()
 		#self.fullspectrogram = numpy.zeros((self.canvas_height, self.time_bin_number(), 4), dtype = numpy.uint8)
@@ -128,11 +130,18 @@ class CanvasScaledSpectrogram(QtCore.QObject):
 			self.update_xscale()
 			self.erase()
 
+	def setfreqrange(self, minfreq, maxfreq):
+		print "freq range changed", minfreq, maxfreq
+		self.minfreq = minfreq
+		self.maxfreq = maxfreq
+		self.update_xscale()
+		self.erase()
+
 	def update_xscale(self):
 		if self.logfreqscale == False:
-			self.xscaled = numpy.linspace(0., 22050., self.canvas_height)
+			self.xscaled = numpy.linspace(self.minfreq, self.maxfreq, self.canvas_height)
 		else:
-			self.xscaled = numpy.logspace(numpy.log10(20.), numpy.log10(22050.), self.canvas_height)
+			self.xscaled = numpy.logspace(numpy.log10(self.minfreq), numpy.log10(self.maxfreq), self.canvas_height)
 
 	def addData(self, xyzs):
 		spectrum_length = xyzs.shape[0]
