@@ -124,19 +124,26 @@ class ImagePlot(Qwt.QwtPlot):
 		#print self.canvas().testPaintAttribute(Qwt.QwtPlotCanvas.PaintCached)
 		#print self.canvas().paintCache()
 
-	def setlogfreqscale(self):
+	def setlinfreqscale(self):
+		self.plotImage.erase()
+		self.logfreqscale = 0
+		self.setAxisScaleEngine(Qwt.QwtPlot.yLeft, Qwt.QwtLinearScaleEngine())
+		self.setAxisScaleEngine(Qwt.QwtPlot.yRight, Qwt.QwtLinearScaleEngine())
+		self.replot()
+
+	def setlog10freqscale(self):
 		self.plotImage.erase()
 		self.logfreqscale = 1
 		self.setAxisScaleEngine(Qwt.QwtPlot.yLeft, Qwt.QwtLog10ScaleEngine())
 		self.setAxisScaleEngine(Qwt.QwtPlot.yRight, Qwt.QwtLog10ScaleEngine())
 		self.replot()
-
-	def setlinfreqscale(self):
-		#pass
+		
+	def setlog2freqscale(self):
 		self.plotImage.erase()
-		self.logfreqscale = 0
-		self.setAxisScaleEngine(Qwt.QwtPlot.yLeft, Qwt.QwtLinearScaleEngine())
-		self.setAxisScaleEngine(Qwt.QwtPlot.yRight, Qwt.QwtLinearScaleEngine())
+		self.logfreqscale = 2
+		print "Warning: Frequency scales are not implemented in the spectrogram"
+		self.setAxisScaleEngine(Qwt.QwtPlot.yLeft, Qwt.QwtLog10ScaleEngine())
+		self.setAxisScaleEngine(Qwt.QwtPlot.yRight, Qwt.QwtLog10ScaleEngine())
 		self.replot()
 
 	def settimerange(self, timerange_seconds):

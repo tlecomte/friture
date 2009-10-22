@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'friture.ui'
 #
-# Created: Mon Oct 19 18:43:29 2009
+# Created: Wed Oct 21 12:02:10 2009
 #      by: PyQt4 UI code generator 4.5.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -66,6 +66,7 @@ class Ui_MainWindow(object):
         self.gridLayout_3.addWidget(self.spinBox_specmin, 2, 1, 1, 1)
         self.comboBox_freqscale = QtGui.QComboBox(self.centralwidget)
         self.comboBox_freqscale.setObjectName("comboBox_freqscale")
+        self.comboBox_freqscale.addItem(QtCore.QString())
         self.comboBox_freqscale.addItem(QtCore.QString())
         self.comboBox_freqscale.addItem(QtCore.QString())
         self.gridLayout_3.addWidget(self.comboBox_freqscale, 1, 3, 1, 1)
@@ -215,6 +216,7 @@ class Ui_MainWindow(object):
         self.spinBox_specmin.setSuffix(QtGui.QApplication.translate("MainWindow", " dB", None, QtGui.QApplication.UnicodeUTF8))
         self.comboBox_freqscale.setItemText(0, QtGui.QApplication.translate("MainWindow", "Linear", None, QtGui.QApplication.UnicodeUTF8))
         self.comboBox_freqscale.setItemText(1, QtGui.QApplication.translate("MainWindow", "Logarithmic", None, QtGui.QApplication.UnicodeUTF8))
+        self.comboBox_freqscale.setItemText(2, QtGui.QApplication.translate("MainWindow", "Logarithmic base 2", None, QtGui.QApplication.UnicodeUTF8))
         self.label.setText(QtGui.QApplication.translate("MainWindow", "FFT Size:", None, QtGui.QApplication.UnicodeUTF8))
         self.label_6.setText(QtGui.QApplication.translate("MainWindow", "Max color", None, QtGui.QApplication.UnicodeUTF8))
         self.label_4.setText(QtGui.QApplication.translate("MainWindow", "Time range", None, QtGui.QApplication.UnicodeUTF8))
