@@ -153,23 +153,29 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 
 		self.connect(self.PlotZoneImage.plotImage.canvasscaledspectrogram, QtCore.SIGNAL("canvasWidthChanged"), self.canvasWidthChanged)
 		
-		settings = QtCore.QSettings("Friture", "Friture")
-		settings.beginGroup("MainWindow")
-		self.restoreState(settings.value("windowState").toByteArray())
-		settings.endGroup()
+		self.restoreAppState()
 
 		# start timers
 		self.timer_toggle()
 		
 		print "Init finished, entering the main loop"
-
+	
 	def closeEvent(self, event):
+		self.saveAppState()
+		event.accept()
+	
+	def saveAppState(self):
 		windowState = self.saveState()
 		settings = QtCore.QSettings("Friture", "Friture")
 		settings.beginGroup("MainWindow")
 		settings.setValue("windowState", windowState)
 		settings.endGroup()
-		event.accept()
+	
+	def restoreAppState(self):
+		settings = QtCore.QSettings("Friture", "Friture")
+		settings.beginGroup("MainWindow")
+		self.restoreState(settings.value("windowState").toByteArray())
+		settings.endGroup()
 
 	def scopeVisibility(self, visible):
 		self.scopeIsVisible = visible
