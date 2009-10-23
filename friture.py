@@ -20,6 +20,7 @@
 import sys
 from pyaudio import PyAudio, paInt16
 from numpy import transpose, log10, sqrt, ceil, linspace, arange, floor, zeros, int32, fromstring
+import math
 from PyQt4 import QtGui, QtCore, Qt
 import PyQt4.Qwt5 as Qwt
 from Ui_friture import Ui_MainWindow
@@ -167,14 +168,25 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 	def saveAppState(self):
 		windowState = self.saveState()
 		settings = QtCore.QSettings("Friture", "Friture")
+		
 		settings.beginGroup("MainWindow")
 		settings.setValue("windowState", windowState)
+		
+		settings.beginGroup("Audio")
+		settings.setValue("fftSize", self.fft_size)
+		
 		settings.endGroup()
 	
 	def restoreAppState(self):
 		settings = QtCore.QSettings("Friture", "Friture")
+		
 		settings.beginGroup("MainWindow")
 		self.restoreState(settings.value("windowState").toByteArray())
+		
+		settings.beginGroup("Audio")
+		(self.fft_size, ok) = settings.value("fftSize", 256).toInt()
+		self.comboBox_fftsize.setCurrentIndex(math.log(self.fft_size/32,2))
+		
 		settings.endGroup()
 
 	def scopeVisibility(self, visible):
