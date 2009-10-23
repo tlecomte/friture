@@ -174,6 +174,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		
 		settings.beginGroup("Audio")
 		settings.setValue("fftSize", self.fft_size)
+		settings.setValue("freqScale", self.freqscale)
 		
 		settings.endGroup()
 	
@@ -184,8 +185,10 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		self.restoreState(settings.value("windowState").toByteArray())
 		
 		settings.beginGroup("Audio")
-		(self.fft_size, ok) = settings.value("fftSize", 256).toInt()
-		self.comboBox_fftsize.setCurrentIndex(math.log(self.fft_size/32,2))
+		(fft_size, ok) = settings.value("fftSize", 256).toInt()
+		self.comboBox_fftsize.setCurrentIndex(math.log(fft_size/32,2))
+		(freqscale, ok) = settings.value("freqScale", 0).toInt()
+		self.comboBox_freqscale.setCurrentIndex(freqscale)
 		
 		settings.endGroup()
 
@@ -368,7 +371,8 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 
 	def freqscalechanged(self, index):
 		print "freq_scale slot", index
-		if index == 2:
+		self.freqscale = index
+		if self.freqscale == 2:
 			self.PlotZoneSpect.setlogfreqscale()
 			print "Warning: Spectrum widget still in base 10 logarithmic"
 			self.PlotZoneImage.setlog2freqscale()
