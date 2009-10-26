@@ -173,7 +173,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		settings.setValue("windowState", windowState)
 		
 		settings.beginGroup("Audio")
-		settings.setValue("fftSize", self.fft_size)
+		settings.setValue("fftSize", self.comboBox_fftsize.currentIndex())
 		settings.setValue("freqScale", self.comboBox_freqscale.currentIndex())
 		settings.setValue("freqMin", self.spinBox_minfreq.value())
 		settings.setValue("freqMax", self.spinBox_maxfreq.value())
@@ -190,8 +190,8 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		self.restoreState(settings.value("windowState").toByteArray())
 		
 		settings.beginGroup("Audio")
-		(fft_size, ok) = settings.value("fftSize", 256).toInt()
-		self.comboBox_fftsize.setCurrentIndex(math.log(fft_size/32,2))
+		(fft_size, ok) = settings.value("fftSize", 7).toInt() # 7th index is 1024 points
+		self.comboBox_fftsize.setCurrentIndex(fft_size)
 		(freqscale, ok) = settings.value("freqScale", 0).toInt()
 		self.comboBox_freqscale.setCurrentIndex(freqscale)
 		(freqMin, ok) = settings.value("freqMin", 20).toInt()
