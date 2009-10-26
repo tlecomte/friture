@@ -188,7 +188,7 @@ class qsynthMeterValue(QtGui.QFrame):
 		self.m_iPeakHold += 1
 
 		painter.setPen(self.m_pMeter.color(self.m_iPeakColor))
-		painter.drawLine(0, h -self. m_iPeak, w, h - self.m_iPeak)
+		painter.drawLine(0, h - self.m_iPeak, w, h - self.m_iPeak)
 
 
 	# Resize event handler.
