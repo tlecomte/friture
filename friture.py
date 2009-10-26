@@ -178,6 +178,8 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		settings.setValue("freqMin", self.spinBox_minfreq.value())
 		settings.setValue("freqMax", self.spinBox_maxfreq.value())
 		settings.setValue("timeRange", self.doubleSpinBox_timerange.value())
+		settings.setValue("colorMin", self.spinBox_specmin.value())
+		settings.setValue("colorMax", self.spinBox_specmax.value())
 		
 		settings.endGroup()
 	
@@ -198,6 +200,10 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		self.spinBox_maxfreq.setValue(freqMax)
 		(timeRange, ok) = settings.value("timeRange", 10.).toDouble()
 		self.doubleSpinBox_timerange.setValue(timeRange)
+		(colorMin, ok) = settings.value("colorMin", -100).toInt()
+		self.spinBox_specmin.setValue(colorMin)
+		(colorMax, ok) = settings.value("colorMax", -20).toInt()
+		self.spinBox_specmax.setValue(colorMax)
 		
 		settings.endGroup()
 
