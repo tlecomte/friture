@@ -20,7 +20,6 @@
 import sys
 from pyaudio import PyAudio, paInt16
 from numpy import transpose, log10, sqrt, ceil, linspace, arange, floor, zeros, int32, fromstring
-import math
 from PyQt4 import QtGui, QtCore, Qt
 import PyQt4.Qwt5 as Qwt
 from Ui_friture import Ui_MainWindow
