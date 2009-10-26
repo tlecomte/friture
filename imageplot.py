@@ -27,7 +27,7 @@ class FreqScaleDraw(Qwt.QwtScaleDraw):
 
 	def label(self, value):
 		if value >= 1e3:
-			label = "%dk" %(value/1e3)
+			label = "%gk" %(value/1e3)
 		else:
 			label = "%d" %(value)
 		return Qwt.QwtText(label)
