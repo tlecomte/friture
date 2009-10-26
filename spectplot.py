@@ -21,6 +21,7 @@ import classplot
 import PyQt4.Qwt5 as Qwt
 from PyQt4 import QtCore, Qt, QtGui
 from numpy import zeros, ones, log10
+from log2_scale_engine import QwtLog10ScaleEngine
 
 # The peak decay rates (magic goes here :).
 PEAK_DECAY_RATE = 1.0 - 3E-6
@@ -33,7 +34,7 @@ class FreqScaleDraw(Qwt.QwtScaleDraw):
 
 	def label(self, value):
 		if value >= 1e3:
-			label = "%dk" %(value/1e3)
+			label = "%gk" %(value/1e3)
 		else:
 			label = "%d" %(value)
 		return Qwt.QwtText(label)
