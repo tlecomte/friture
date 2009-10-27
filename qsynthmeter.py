@@ -177,27 +177,31 @@ class qsynthMeterValue(QtGui.QFrame):
 		else:
 			painter.fillRect(0, 0, w, h, self.palette().dark().color())
 
-		y = self.m_iValue
+		if 1: #CONFIG_GRADIENT
+			painter.drawPixmap(0, h - self.m_iValue,
+				self.m_pMeter.pixmap(), 0, h - self.m_iValue, w, self.m_iValue)
+	  	else:
+			y = self.m_iValue
 
-		y_over = 0
-		y_curr = 0
+			y_over = 0
+			y_curr = 0
 
-		i = self.m_pMeter.Color10dB
-		while i > self.m_pMeter.ColorOver and y >= y_over:
-			y_curr = self.m_pMeter.iec_level(i)
+			i = self.m_pMeter.Color10dB
+			while i > self.m_pMeter.ColorOver and y >= y_over:
+				y_curr = self.m_pMeter.iec_level(i)
 
-			if y < y_curr:
+				if y < y_curr:
+					painter.fillRect(0, h - y, w, y - y_over,
+						self.m_pMeter.color(i))
+				else:
+					painter.fillRect(0, h - y_curr, w, y_curr - y_over,
+						self.m_pMeter.color(i))
+				y_over = y_curr
+				i -= 1
+
+			if y > y_over:
 				painter.fillRect(0, h - y, w, y - y_over,
-					self.m_pMeter.color(i))
-			else:
-				painter.fillRect(0, h - y_curr, w, y_curr - y_over,
-					self.m_pMeter.color(i))
-			y_over = y_curr
-			i -= 1
-
-		if y > y_over:
-			painter.fillRect(0, h - y, w, y - y_over,
-				self.m_pMeter.color(self.m_pMeter.ColorOver))
+					self.m_pMeter.color(self.m_pMeter.ColorOver))
 
 		painter.setPen(self.m_pMeter.color(self.m_iPeakColor))
 		painter.drawLine(0, h - self.m_iPeak, w, h - self.m_iPeak)
@@ -224,6 +228,9 @@ class qsynthMeter(QtGui.QFrame):
 		self.m_iScaleCount  = self.m_iPortCount
 
 		self.m_fScale = 0.
+
+		if 1: #CONFIG_GRADIENT
+			self.m_pPixmap = QtGui.QPixmap()
 
 		# Peak falloff mode setting (0=no peak falloff).
 		self.m_iPeakFalloff = QSYNTH_METER_PEAK_FALLOFF
@@ -320,6 +327,24 @@ class qsynthMeter(QtGui.QFrame):
 		for iPort in range (0, self.m_iPortCount):
 			self.m_ppValues[iPort].peakReset()
 
+	def pixmap (self):
+	  	return self.m_pPixmap
+
+	def updatePixmap (self):
+		w = self.width()
+		h = self.height()
+		print w, h
+
+		grad = QtGui.QLinearGradient(0, 0, 0, h)
+		grad.setColorAt(0.2, self.color(self.ColorOver))
+		grad.setColorAt(0.3, self.color(self.Color0dB))
+		grad.setColorAt(0.4, self.color(self.Color3dB))
+		grad.setColorAt(0.6, self.color(self.Color6dB))
+		grad.setColorAt(0.8, self.color(self.Color10dB))
+
+		self.m_pPixmap = QtGui.QPixmap(w, h)
+
+		QtGui.QPainter(self.m_pPixmap).fillRect(0, 0, w, h, grad);
 
 	# Slot refreshment.
 	def refresh (self):
@@ -336,6 +361,8 @@ class qsynthMeter(QtGui.QFrame):
 		self.m_levels[self.Color6dB]  = self.iec_scale( -6.0)
 		self.m_levels[self.Color10dB] = self.iec_scale(-10.0)
 
+		if 1: #CONFIG_GRADIENT
+			self.updatePixmap()
 
 	# Meter value proxy.
 	def setValue ( self, iPort, fValue ):
