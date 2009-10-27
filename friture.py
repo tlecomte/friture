@@ -86,6 +86,10 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		self.timerange_s = 10.
 		self.canvas_width = 100.
 		
+		self.display_timer_time = 0.
+		self.spectrogram_timer_time = 0.
+		self.buffer_timer_time = 0.
+		
 		self.buffer_length = 100000.
 		self.audiobuffer = zeros(2*self.buffer_length)
 		self.offset = 0
@@ -246,6 +250,9 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 	def display_timer_slot(self):
 		self.update_buffer()
 		
+		t = QtCore.QTime()
+		t.start()
+		
 		if self.statisticsIsVisible:
 			self.statistics()
 		
@@ -274,9 +281,14 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 				y = db_spectrogram[0,:].transpose()
 			freq = linspace(0., 22050., len(y))
 			self.PlotZoneSpect.setdata(freq, y)
+		
+		self.display_timer_time = (95.*self.display_timer_time + 5.*t.elapsed())/100.
 
 	def spectrogram_timer_slot(self):
 		self.update_buffer()
+
+		t = QtCore.QTime()
+		t.start()
 
 		sp = audioproc.analyzelive(self.audiobuffer[self.offset + self.buffer_length - self.fft_size: self.offset + self.buffer_length], self.fft_size)
 		clip = lambda val, low, high: min(high, max(low, val))
@@ -286,8 +298,13 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		norm_spectrogram = (db_spectrogram.clip(self.spec_min, self.spec_max) - self.spec_min)/(self.spec_max - self.spec_min)
 		
 		self.PlotZoneImage.addData(norm_spectrogram.transpose())
+		
+		self.spectrogram_timer_time = (95.*self.spectrogram_timer_time + 5.*t.elapsed())/100.
 
 	def update_buffer(self):
+		t = QtCore.QTime()
+		t.start()
+		
 		debug = False
 		if debug: print "update_buffer"
 		# ask for how much data is available
@@ -318,6 +335,8 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 			
 			self.offset = int((self.offset + len(floatdata)) % self.buffer_length)
 			if debug: print "new offset", self.offset
+
+		self.buffer_timer_time = (95.*self.buffer_timer_time + 5.*t.elapsed())/100.
 
 	#def timer_slot(self):
 		#return
@@ -357,14 +376,20 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		"Useless timer wakeups: %d = %.01f %%\n"\
 		"Latency: %d ms\n"\
 		"Mean number of chunks per timer fire: %.01f\n"\
-		"FFT period : %.01f ms"\
+		"FFT period : %.01f ms\n"\
+		"Display timer time: %.01f ms\n"\
+		"Spectrogram timer time: %.01f ms\n"\
+		"Audio buffer retrieval timer time: %.01f ms"\
 		% (self.i,
 		self.losts,
 		self.losts*100./float(self.i),
 		self.useless, self.useless*100./float(self.i),
 		self.latency,
 		self.mean_chunks_per_fire,
-		self.fft_size*1000./SAMPLING_RATE)
+		self.fft_size*1000./SAMPLING_RATE,
+		self.display_timer_time,
+		self.spectrogram_timer_time,
+		self.buffer_timer_time)
 		self.LabelLevel.setText(level_label)
 
 	def levels(self, floatdata):
