@@ -83,10 +83,6 @@ class SpectPlot(classplot.ClassPlot):
 		if self.xmax <> x.max():
 			print "changing x scale"
 			self.xmax = x.max()
-			if self.logfreqscale:
-				self.setlogfreqscale()
-			else:
-				self.setlinfreqscale()
 			self.needfullreplot = True
 
 		if len(self.peak) <> len(y):
