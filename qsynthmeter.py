@@ -333,7 +333,6 @@ class qsynthMeter(QtGui.QFrame):
 	def updatePixmap (self):
 		w = self.width()
 		h = self.height()
-		print w, h
 
 		grad = QtGui.QLinearGradient(0, 0, 0, h)
 		grad.setColorAt(0.2, self.color(self.ColorOver))
