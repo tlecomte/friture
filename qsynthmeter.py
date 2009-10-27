@@ -89,7 +89,7 @@ class qsynthMeterValue(QtGui.QFrame):
 		# Local instance variables.
 		self.m_pMeter      = pMeter
 		self.m_fValue      = 0.0
-		self.m_iValueHold  = 0
+		self.m_iValue  = 0
 		self.m_fValueDecay = QSYNTH_METER_DECAY_RATE1
 		self.m_iPeak       = 0
 		self.m_iPeakHold   = 0
@@ -115,8 +115,51 @@ class qsynthMeterValue(QtGui.QFrame):
 
 	# Value refreshment.
 	def refresh(self):
-		if self.m_fValue > 0.001 or self.m_iPeak > 0:
-			self.update()
+		if self.m_fValue < 0.001 and self.m_iPeak < 1:
+			return
+		
+		dB = QSYNTH_METER_MINDB
+		if self.m_fValue > 0.:
+			dB = 20. * log10(self.m_fValue)
+			self.m_fValue = 0.
+		
+		if dB < QSYNTH_METER_MINDB:
+			dB = QSYNTH_METER_MINDB
+		elif dB > QSYNTH_METER_MAXDB:
+			dB = QSYNTH_METER_MAXDB
+
+		iValue = self.m_pMeter.iec_scale(dB)
+		if iValue < self.m_iValue:
+			iValue = int(self.m_fValueDecay * float(self.m_iValue))
+			self.m_fValueDecay *= self.m_fValueDecay
+		else:
+			self.m_fValueDecay = QSYNTH_METER_DECAY_RATE1
+
+		iPeak = self.m_iPeak
+		if iPeak < iValue:
+			iPeak = iValue
+			self.m_iPeakHold = 0
+			self.m_fPeakDecay = QSYNTH_METER_DECAY_RATE2
+			self.m_iPeakColor = self.m_pMeter.Color10dB #iLevel
+			while self.m_iPeakColor > self.m_pMeter.ColorOver and iPeak >= self.m_pMeter.iec_level(self.m_iPeakColor):
+				self.m_iPeakColor -= 1
+		elif self.m_iPeakHold + 1 > self.m_pMeter.peakFalloff():
+			iPeak = int(self.m_fPeakDecay * float(iPeak))
+			if self.m_iPeak < iValue:
+				iPeak = iValue
+			else:
+				if iPeak < self.m_pMeter.iec_level(self.m_pMeter.Color10dB):
+					self.m_iPeakColor = self.m_pMeter.Color6dB
+				self.m_fPeakDecay *= self.m_fPeakDecay
+		self.m_iPeakHold += 1
+
+		if iValue == self.m_iValue and iPeak == self.m_iPeak:
+			return
+
+		self.m_iValue = iValue
+		self.m_iPeak  = iPeak
+
+		self.update()
 
 	# Paint event handler.
 	def paintEvent(self, event):
@@ -134,58 +177,27 @@ class qsynthMeterValue(QtGui.QFrame):
 		else:
 			painter.fillRect(0, 0, w, h, self.palette().dark().color())
 
-		dB = QSYNTH_METER_MINDB
-		if self.m_fValue > 0.:
-			dB = 20. * log10(self.m_fValue)
-			self.m_fValue = 0.
-
-		if dB < QSYNTH_METER_MINDB:
-			dB = QSYNTH_METER_MINDB
-		elif dB > QSYNTH_METER_MAXDB:
-			dB = QSYNTH_METER_MAXDB
+		y = self.m_iValue
 
 		y_over = 0
 		y_curr = 0
 
-		y = self.m_pMeter.iec_scale(dB)
-		if self.m_iValueHold > y:
-			self.m_iValueHold = int(float(self.m_iValueHold * self.m_fValueDecay))
-			self.m_fValueDecay *= self.m_fValueDecay
-			y = self.m_iValueHold
-		else:
-			self.m_iValueHold = y
-			self.m_fValueDecay = QSYNTH_METER_DECAY_RATE1
+		i = self.m_pMeter.Color10dB
+		while i > self.m_pMeter.ColorOver and y >= y_over:
+			y_curr = self.m_pMeter.iec_level(i)
 
-		iLevel = self.m_pMeter.Color10dB
-		while iLevel > self.m_pMeter.ColorOver and y >= y_over:
-			y_curr = self.m_pMeter.iec_level(iLevel)
 			if y < y_curr:
 				painter.fillRect(0, h - y, w, y - y_over,
-					self.m_pMeter.color(iLevel))
+					self.m_pMeter.color(i))
 			else:
 				painter.fillRect(0, h - y_curr, w, y_curr - y_over,
-					self.m_pMeter.color(iLevel))
+					self.m_pMeter.color(i))
 			y_over = y_curr
-			iLevel -= 1
+			i -= 1
 
 		if y > y_over:
 			painter.fillRect(0, h - y, w, y - y_over,
 				self.m_pMeter.color(self.m_pMeter.ColorOver))
-
-		if self.m_iPeak < y:
-			self.m_iPeak = y
-			self.m_iPeakHold = 0
-			self.m_fPeakDecay = QSYNTH_METER_DECAY_RATE2
-			self.m_iPeakColor = iLevel
-		elif self.m_iPeakHold + 1 > self.m_pMeter.peakFalloff():
-			self.m_iPeak = int(float(self.m_iPeak * self.m_fPeakDecay))
-			if self.m_iPeak < y:
-				self.m_iPeak = y
-			else:
-				if self.m_iPeak < self.m_pMeter.iec_level(self.m_pMeter.Color10dB):
-					self.m_iPeakColor = self.m_pMeter.Color6dB
-				self.m_fPeakDecay *= self.m_fPeakDecay
-		self.m_iPeakHold += 1
 
 		painter.setPen(self.m_pMeter.color(self.m_iPeakColor))
 		painter.drawLine(0, h - self.m_iPeak, w, h - self.m_iPeak)
