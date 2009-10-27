@@ -7,7 +7,6 @@ Improvements :
 - Code : replace QwtColorMap with QLinearGradient to remove a dependancy on Qwt
 
 Features :
-- GUI : option (checkbox ?, list ?) to enable widgets
 - Code : overlapping fft windows for smoother spectrograms
 - Code/GUI : new widget for long run level measurements
 
