@@ -53,8 +53,9 @@ class ClassPlot(Qwt.QwtPlot):
                                self.canvas())
 
 	def setdata(self,x,y):
+		# FIXME the following raises issues with the peaks display in the spectrum
 		# we don't need so many points
-		while len(y) > 2*self.canvas().width():
-			x = (x[:-1:2] + x[1::2])/2.
-			y = (y[:-1:2] + y[1::2])/2.
+		#while len(y) > 2*self.canvas().width():
+			#x = (x[:-1:2] + x[1::2])/2.
+			#y = (y[:-1:2] + y[1::2])/2.
 		self.curve.setData(x,y)
