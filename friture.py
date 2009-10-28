@@ -73,16 +73,10 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		self.spectrumIsVisible = True
 
 		self.i = 0
-		self.losts = 0
-		self.useless = 0
 		self.spec_min = -100.
 		self.spec_max = -20.
 		self.fft_size = 256
 		self.max_in_a_row = 1
-		self.time = QtCore.QTime()
-		self.time.start()
-		self.latency = 0.
-		self.mean_chunks_per_fire = 0.
 		self.timerange_s = 10.
 		self.canvas_width = 100.
 		
@@ -338,54 +332,13 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 
 		self.buffer_timer_time = (95.*self.buffer_timer_time + 5.*t.elapsed())/100.
 
-	#def timer_slot(self):
-		#return
-		#available = self.stream.get_read_available()
-		#available = int(floor(available/NUM_SAMPLES))
-		
-		#if available == 0:
-			#self.useless += 1
-			#return
-		
-		#self.latency = self.time.restart()
-		
-		#jmax = min(available, self.max_in_a_row)
-		#self.losts += available - jmax
-		
-		#self.last = False
-		
-		#for j in range(0, jmax):
-			#rawdata = self.stream.read(NUM_SAMPLES)
-			#if j == jmax-1:
-				#self.last = True
-			#self.process_data(rawdata)
-		
-		## discard the rest of the data that we cannot reasonably process
-		#for j in range(jmax, available):
-			#rawdata = self.stream.read(NUM_SAMPLES)
-		
-		#if self.mean_chunks_per_fire == 0:
-			#self.mean_chunks_per_fire = jmax
-		#else:
-			#mean_number = min(self.i, 1000.)
-			#self.mean_chunks_per_fire = (self.mean_chunks_per_fire*mean_number + jmax)/(mean_number + 1.)
-
 	def statistics(self):
 		level_label = "Chunk #%d\n"\
-		"Lost chunks: %d = %.01f %%\n"\
-		"Useless timer wakeups: %d = %.01f %%\n"\
-		"Latency: %d ms\n"\
-		"Mean number of chunks per timer fire: %.01f\n"\
 		"FFT period : %.01f ms\n"\
 		"Display timer time: %.01f ms\n"\
 		"Spectrogram timer time: %.01f ms\n"\
 		"Audio buffer retrieval timer time: %.01f ms"\
 		% (self.i,
-		self.losts,
-		self.losts*100./float(self.i),
-		self.useless, self.useless*100./float(self.i),
-		self.latency,
-		self.mean_chunks_per_fire,
 		self.fft_size*1000./SAMPLING_RATE,
 		self.display_timer_time,
 		self.spectrogram_timer_time,
