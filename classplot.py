@@ -20,9 +20,8 @@
 from numpy import linspace, sin
 from PyQt4 import Qt, QtGui
 import PyQt4.Qwt5 as Qwt
-	
-class ClassPlot(Qwt.QwtPlot):
 
+class ClassPlot(Qwt.QwtPlot):
 	def __init__(self, *args):
 		Qwt.QwtPlot.__init__(self, *args)
 
@@ -38,7 +37,6 @@ class ClassPlot(Qwt.QwtPlot):
 		self.curve.setPen(QtGui.QPen(Qt.Qt.red))
 		self.curve.setRenderHint(Qwt.QwtPlotItem.RenderAntialiased)
 		self.curve.attach(self)
-		
 
 		# temporarly initialize some data
 		x = linspace(0.0, 10.0, 11)

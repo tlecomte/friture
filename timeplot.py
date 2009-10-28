@@ -36,6 +36,8 @@ class TimePlot(classplot.ClassPlot):
 		self.setAxisScaleEngine(Qwt.QwtPlot.xBottom, Qwt.QwtLinearScaleEngine())
 		self.xmax = 0
 		
+		self.paint_time = 0.
+		
 		self.connect(self.picker, QtCore.SIGNAL('moved(const QPoint &)'), self.moved)
 
 	def moved(self, point):
@@ -62,3 +64,9 @@ class TimePlot(classplot.ClassPlot):
 			# computes label sizes); instead, let's just ask Qt to repaint the canvas next time
 			# This works because we disable the cache
 			self.canvas().update()
+			
+	def drawCanvas(self, painter):
+		t = QtCore.QTime()
+		t.start()
+		Qwt.QwtPlot.drawCanvas(self, painter)
+		self.paint_time = (95.*self.paint_time + 5.*t.elapsed())/100.

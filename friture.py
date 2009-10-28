@@ -335,14 +335,23 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 	def statistics(self):
 		level_label = "Chunk #%d\n"\
 		"FFT period : %.01f ms\n"\
-		"Display timer time: %.01f ms\n"\
-		"Spectrogram timer time: %.01f ms\n"\
-		"Audio buffer retrieval timer time: %.01f ms"\
+		"Display timer time: %.02f ms\n"\
+		"Spectrogram timer time: %.02f ms\n"\
+		"Audio buffer retrieval timer time: %.02f ms\n"\
+		"Levels painting time: %.02f ms and %.02f ms\n"\
+		"Scope painting time: %.02f ms\n"\
+		"Spectrum painting time: %.02f ms\n"\
+		"Spectrogram painting time: %.02f ms"\
 		% (self.i,
 		self.fft_size*1000./SAMPLING_RATE,
 		self.display_timer_time,
 		self.spectrogram_timer_time,
-		self.buffer_timer_time)
+		self.buffer_timer_time,
+		self.meter.m_ppValues[0].paint_time,
+		self.meter.m_ppValues[1].paint_time,
+		self.PlotZoneUp.paint_time,
+		self.PlotZoneSpect.paint_time,
+		self.PlotZoneImage.paint_time)
 		self.LabelLevel.setText(level_label)
 
 	def levels(self, floatdata):

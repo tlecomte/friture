@@ -96,6 +96,8 @@ class qsynthMeterValue(QtGui.QFrame):
 		self.m_fPeakDecay  = QSYNTH_METER_DECAY_RATE2
 		self.m_iPeakColor  = self.m_pMeter.Color6dB
 
+		self.paint_time = 0.
+
 		self.setMinimumWidth(12)
 		self.setBackgroundRole(QtGui.QPalette.NoRole)
 
@@ -163,6 +165,9 @@ class qsynthMeterValue(QtGui.QFrame):
 
 	# Paint event handler.
 	def paintEvent(self, event):
+		t = QtCore.QTime()
+		t.start()
+		
 		painter = QtGui.QPainter(self)
 
 		w = self.width()
@@ -205,7 +210,8 @@ class qsynthMeterValue(QtGui.QFrame):
 
 		painter.setPen(self.m_pMeter.color(self.m_iPeakColor))
 		painter.drawLine(0, h - self.m_iPeak, w, h - self.m_iPeak)
-
+		
+		self.paint_time = (95.*self.paint_time + 5.*t.elapsed())/100.
 
 	# Resize event handler.
 	def resizeEvent(self, pResizeEvent):

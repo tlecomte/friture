@@ -91,6 +91,8 @@ class ImagePlot(Qwt.QwtPlot):
 
 		self.setAxisScale(Qwt.QwtPlot.xBottom, 0., 10.)
 		
+		self.paint_time = 0.
+		
 		self.picker = Qwt.QwtPlotPicker(Qwt.QwtPlot.xBottom,
                                Qwt.QwtPlot.yLeft,
                                Qwt.QwtPicker.PointSelection,
@@ -156,3 +158,9 @@ class ImagePlot(Qwt.QwtPlot):
 		self.setAxisScale(Qwt.QwtPlot.yLeft, minfreq, maxfreq)
 		self.setAxisScale(Qwt.QwtPlot.yRight, minfreq, maxfreq)
 		self.replot()
+
+	def drawCanvas(self, painter):
+		t = QtCore.QTime()
+		t.start()
+		Qwt.QwtPlot.drawCanvas(self, painter)
+		self.paint_time = (95.*self.paint_time + 5.*t.elapsed())/100.

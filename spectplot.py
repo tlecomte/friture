@@ -62,6 +62,8 @@ class SpectPlot(classplot.ClassPlot):
 		
 		self.setAxisScaleDraw(Qwt.QwtPlot.xBottom, FreqScaleDraw())
 		
+		self.paint_time = 0.
+		
 		self.connect(self.picker, QtCore.SIGNAL('moved(const QPoint &)'), self.moved)
 		
 		# insert an additional curve for the peak
@@ -139,3 +141,9 @@ class SpectPlot(classplot.ClassPlot):
 		self.maxfreq = maxfreq
 		self.setAxisScale(Qwt.QwtPlot.xBottom, self.minfreq, self.maxfreq)
 		self.needfullreplot = True
+	
+	def drawCanvas(self, painter):
+		t = QtCore.QTime()
+		t.start()
+		Qwt.QwtPlot.drawCanvas(self, painter)
+		self.paint_time = (95.*self.paint_time + 5.*t.elapsed())/100.
