@@ -335,13 +335,13 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 	def statistics(self):
 		level_label = "Chunk #%d\n"\
 		"FFT period : %.01f ms\n"\
-		"Display timer time: %.02f ms\n"\
-		"Spectrogram timer time: %.02f ms\n"\
-		"Audio buffer retrieval timer time: %.02f ms\n"\
-		"Levels painting time: %.02f ms and %.02f ms\n"\
-		"Scope painting time: %.02f ms\n"\
-		"Spectrum painting time: %.02f ms\n"\
-		"Spectrogram painting time: %.02f ms"\
+		"Levels, scope and spectrum computation: %.02f ms\n"\
+		"Spectrogram computation: %.02f ms\n"\
+		"Audio buffer retrieval: %.02f ms\n"\
+		"Levels painting: %.02f ms and %.02f ms\n"\
+		"Scope painting: %.02f ms\n"\
+		"Spectrum painting: %.02f ms\n"\
+		"Spectrogram painting: %.02f ms"\
 		% (self.i,
 		self.fft_size*1000./SAMPLING_RATE,
 		self.display_timer_time,
