@@ -69,7 +69,7 @@ class SpectPlot(classplot.ClassPlot):
 		# insert an additional curve for the peak
 		self.curve_peak = Qwt.QwtPlotCurve()
 		self.curve_peak.setPen(QtGui.QPen(Qt.Qt.blue))
-		self.curve_peak.setRenderHint(Qwt.QwtPlotItem.RenderAntialiased)
+		#self.curve_peak.setRenderHint(Qwt.QwtPlotItem.RenderAntialiased)
 		self.curve_peak.attach(self)
 		self.peak = zeros((1,))
 		self.peakHold = 0

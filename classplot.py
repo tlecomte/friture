@@ -35,7 +35,7 @@ class ClassPlot(Qwt.QwtPlot):
 		# insert a few curves
 		self.curve = Qwt.QwtPlotCurve()
 		self.curve.setPen(QtGui.QPen(Qt.Qt.red))
-		self.curve.setRenderHint(Qwt.QwtPlotItem.RenderAntialiased)
+		#self.curve.setRenderHint(Qwt.QwtPlotItem.RenderAntialiased)
 		self.curve.attach(self)
 
 		# temporarly initialize some data
