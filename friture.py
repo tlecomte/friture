@@ -124,7 +124,8 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		# this timer is used to update the spectrogram widget, whose update period
 		# is fixed by the time scale and the width of the widget canvas
 		self.spectrogram_timer = QtCore.QTimer()
-		self.spectrogram_timer.setInterval(SMOOTH_DISPLAY_TIMER_PERIOD_MS) # variable timing
+		self.period_ms = SMOOTH_DISPLAY_TIMER_PERIOD_MS
+		self.spectrogram_timer.setInterval(self.period_ms) # variable timing
 
 		self.connect(self.display_timer, QtCore.SIGNAL('timeout()'), self.display_timer_slot)
 		self.connect(self.spectrogram_timer, QtCore.SIGNAL('timeout()'), self.spectrogram_timer_slot)
@@ -335,6 +336,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 	def statistics(self):
 		level_label = "Chunk #%d\n"\
 		"FFT period : %.01f ms\n"\
+		"Spectrogram timer period : %.01f ms\n"\
 		"Levels, scope and spectrum computation: %.02f ms\n"\
 		"Spectrogram computation: %.02f ms\n"\
 		"Audio buffer retrieval: %.02f ms\n"\
@@ -344,6 +346,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		"Spectrogram painting: %.02f ms"\
 		% (self.i,
 		self.fft_size*1000./SAMPLING_RATE,
+		self.period_ms,
 		self.display_timer_time,
 		self.spectrogram_timer_time,
 		self.buffer_timer_time,
@@ -407,9 +410,9 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		# need to find a way to integrate this cleverly in the GUI
 		# When the period is smaller than 25 ms, we can reasonably
 		# try to draw as many columns at once as possible
-		period_ms = 1000.*self.timerange_s/self.canvas_width
-		print "Resetting the timer, will fire every %d ms" %(period_ms)
-		self.spectrogram_timer.setInterval(period_ms)
+		self.period_ms = 1000.*self.timerange_s/self.canvas_width
+		print "Resetting the timer, will fire every %d ms" %(self.period_ms)
+		self.spectrogram_timer.setInterval(self.period_ms)
 		
 	def set_devices_list(self):
 		default_device_index = self.get_default_input_device()
