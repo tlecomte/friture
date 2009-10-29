@@ -20,7 +20,7 @@
 import classplot
 import PyQt4.Qwt5 as Qwt
 from PyQt4 import QtCore, Qt, QtGui
-from numpy import zeros, ones, log10
+from numpy import zeros, ones, log10, linspace, logspace, interp, log2
 from log2_scale_engine import QwtLog10ScaleEngine
 
 # The peak decay rates (magic goes here :).
@@ -55,10 +55,10 @@ class SpectPlot(classplot.ClassPlot):
 		self.xmax = 0
 		self.needfullreplot = False
 
-		self.setlinfreqscale()
+		self.canvas_width = 0
 		self.logfreqscale = False
-		
 		self.setfreqrange(20., 20000.)
+		self.setlinfreqscale()
 		
 		self.setAxisScaleDraw(Qwt.QwtPlot.xBottom, FreqScaleDraw())
 		
@@ -81,10 +81,16 @@ class SpectPlot(classplot.ClassPlot):
 			self.invTransform(Qwt.QwtPlot.yLeft, point.y()))
 		self.emit(QtCore.SIGNAL("pointerMoved"), info)
 
-	def setdata(self,x,y):
+	def setdata(self, x, y):
+		if self.canvas_width <> self.canvas().width():
+			print "changed canvas width"
+			self.canvas_width = self.canvas().width()
+			self.update_xscale()
+		
 		if self.xmax <> x.max():
 			print "changing x scale"
 			self.xmax = x.max()
+			self.update_xscale()
 			self.needfullreplot = True
 
 		if len(self.peak) <> len(y):
@@ -114,8 +120,10 @@ class SpectPlot(classplot.ClassPlot):
 		self.peakHold = (-mask1) * self.peakHold
 		self.peakHold += self.ones
 		
-		classplot.ClassPlot.setdata(self,x,y)
-		self.curve_peak.setData(x, self.peak)
+		y_interp = interp(self.xscaled, x, y)
+		classplot.ClassPlot.setdata(self, self.xscaled, y_interp)
+		y_interp = interp(self.xscaled, x, self.peak)
+		self.curve_peak.setData(self.xscaled, y_interp)
 		
 		if self.needfullreplot:
 			self.needfullreplot = False
@@ -126,20 +134,31 @@ class SpectPlot(classplot.ClassPlot):
 			# This works because we disable the cache
 			self.canvas().update()
 
+	def update_xscale(self):
+		#if self.logfreqscale == 2:
+			#self.xscaled = logspace(log2(self.minfreq), log2(self.maxfreq), self.canvas_width, base=2.0)
+		if self.logfreqscale:
+			self.xscaled = logspace(log10(self.minfreq), log10(self.maxfreq), self.canvas_width)
+		else:
+			self.xscaled = linspace(self.minfreq, self.maxfreq, self.canvas_width)
+
 	def setlinfreqscale(self):
 		self.logfreqscale = False
 		self.setAxisScaleEngine(Qwt.QwtPlot.xBottom, Qwt.QwtLinearScaleEngine())
+		self.update_xscale()
 		self.needfullreplot = True
 
 	def setlogfreqscale(self):
 		self.logfreqscale = True
 		self.setAxisScaleEngine(Qwt.QwtPlot.xBottom, Qwt.QwtLog10ScaleEngine())
+		self.update_xscale()
 		self.needfullreplot = True
 
 	def setfreqrange(self, minfreq, maxfreq):
 		self.minfreq = minfreq
 		self.maxfreq = maxfreq
 		self.setAxisScale(Qwt.QwtPlot.xBottom, self.minfreq, self.maxfreq)
+		self.update_xscale()
 		self.needfullreplot = True
 	
 	def drawCanvas(self, painter):

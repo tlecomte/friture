@@ -20,7 +20,7 @@
 import classplot
 import PyQt4.Qwt5 as Qwt
 from PyQt4 import QtCore
-from numpy import log10
+from numpy import log10, interp, linspace
 
 class TimePlot(classplot.ClassPlot):
 	def __init__(self, *args):
@@ -38,6 +38,8 @@ class TimePlot(classplot.ClassPlot):
 		
 		self.paint_time = 0.
 		
+		self.canvas_width = 0
+		
 		self.connect(self.picker, QtCore.SIGNAL('moved(const QPoint &)'), self.moved)
 
 	def moved(self, point):
@@ -46,16 +48,23 @@ class TimePlot(classplot.ClassPlot):
 			self.invTransform(Qwt.QwtPlot.yLeft, point.y()))
 		self.emit(QtCore.SIGNAL("pointerMoved"), info)
 
-	def setdata(self,x,y):
+	def setdata(self, x, y):
+		if self.canvas_width <> self.canvas().width():
+			print "changed canvas width"
+			self.canvas_width = self.canvas().width()
+			self.update_xscale()
+		
 		x_ms =  1e3*x
 		needfullreplot = False
 		if self.xmax <> x_ms.max():
 			print "changing x scale"
 			self.xmax = x_ms.max()
 			self.setAxisScale(Qwt.QwtPlot.xBottom, 0., self.xmax)
+			self.update_xscale()
 			needfullreplot = True
 
-		classplot.ClassPlot.setdata(self,x_ms,y)
+		y_interp = interp(self.xscaled, x_ms, y)
+		classplot.ClassPlot.setdata(self, self.xscaled, y_interp)
 
 		if needfullreplot:
 			self.replot()
@@ -64,7 +73,10 @@ class TimePlot(classplot.ClassPlot):
 			# computes label sizes); instead, let's just ask Qt to repaint the canvas next time
 			# This works because we disable the cache
 			self.canvas().update()
-			
+
+	def update_xscale(self):
+		self.xscaled = linspace(0., self.xmax, self.canvas_width)
+
 	def drawCanvas(self, painter):
 		t = QtCore.QTime()
 		t.start()
