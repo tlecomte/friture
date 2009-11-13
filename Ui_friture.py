@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'friture.ui'
 #
-# Created: Fri Nov 13 15:16:38 2009
+# Created: Fri Nov 13 15:18:13 2009
 #      by: PyQt4 UI code generator 4.6
 #
 # WARNING! All changes made in this file will be lost!
@@ -70,7 +70,7 @@ class Ui_MainWindow(object):
         self.LabelLevel.setObjectName("LabelLevel")
         self.gridLayout_2.addWidget(self.LabelLevel, 0, 0, 1, 1)
         self.dockWidgetStatistics.setWidget(self.dockWidgetContents_2)
-        MainWindow.addDockWidget(QtCore.Qt.DockWidgetArea(8), self.dockWidgetStatistics)
+        MainWindow.addDockWidget(QtCore.Qt.DockWidgetArea(1), self.dockWidgetStatistics)
         self.dockWidgetScope = QtGui.QDockWidget(MainWindow)
         self.dockWidgetScope.setObjectName("dockWidgetScope")
         self.dockWidgetContents_4 = QtGui.QWidget()
