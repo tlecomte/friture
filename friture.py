@@ -19,7 +19,7 @@
 
 import sys
 from pyaudio import PyAudio, paInt16
-from numpy import transpose, log10, sqrt, ceil, linspace, arange, floor, zeros, int32, fromstring
+from numpy import transpose, log10, sqrt, ceil, linspace, arange, floor, zeros, int32, fromstring, where
 from PyQt4 import QtGui, QtCore, Qt
 import PyQt4.Qwt5 as Qwt
 from Ui_friture import Ui_MainWindow
@@ -276,6 +276,15 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 			time = SMOOTH_DISPLAY_TIMER_PERIOD_MS/1000.
 			start = self.offset + self.buffer_length - time*SAMPLING_RATE
 			stop = self.offset + self.buffer_length
+			#basic trigger capability on leading edge
+			max = self.audiobuffer[start : stop].max()
+			trigger_level = max*2./3.
+			trigger_pos = where((self.audiobuffer[start-1 : stop-1] < trigger_level)*(self.audiobuffer[start : stop] >= trigger_level))[0]
+			if len(trigger_pos) > 0:
+				pos = trigger_pos[-1]
+				shift = time*SAMPLING_RATE - pos
+				start = start - shift
+				stop = stop - shift
 			self.scope(self.audiobuffer[start : stop], SAMPLING_RATE)
 		
 		if self.spectrumIsVisible:
