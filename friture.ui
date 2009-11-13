@@ -20,13 +20,6 @@
       <layout class="QGridLayout" name="gridLayout"/>
      </widget>
     </item>
-    <item row="1" column="0" colspan="2">
-     <widget class="QPushButton" name="pushButton_settings">
-      <property name="text">
-       <string>Settings</string>
-      </property>
-     </widget>
-    </item>
    </layout>
   </widget>
   <widget class="QDockWidget" name="dockWidgetLevels">
@@ -160,6 +153,7 @@ peak</string>
     <bool>false</bool>
    </attribute>
    <addaction name="actionStart"/>
+   <addaction name="actionSettings"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionStart">
@@ -182,6 +176,14 @@ peak</string>
    </property>
    <property name="toolTip">
     <string>Start/Stop</string>
+   </property>
+  </action>
+  <action name="actionSettings">
+   <property name="text">
+    <string>Settings</string>
+   </property>
+   <property name="toolTip">
+    <string>Display settings dialog</string>
    </property>
   </action>
  </widget>

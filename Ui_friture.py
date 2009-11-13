@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'friture.ui'
 #
-# Created: Fri Nov 13 14:59:53 2009
+# Created: Fri Nov 13 15:16:38 2009
 #      by: PyQt4 UI code generator 4.6
 #
 # WARNING! All changes made in this file will be lost!
@@ -22,9 +22,6 @@ class Ui_MainWindow(object):
         self.gridLayout = QtGui.QGridLayout(self.PlotZoneImage)
         self.gridLayout.setObjectName("gridLayout")
         self.gridLayout_3.addWidget(self.PlotZoneImage, 0, 0, 1, 2)
-        self.pushButton_settings = QtGui.QPushButton(self.centralwidget)
-        self.pushButton_settings.setObjectName("pushButton_settings")
-        self.gridLayout_3.addWidget(self.pushButton_settings, 1, 0, 1, 2)
         MainWindow.setCentralWidget(self.centralwidget)
         self.dockWidgetLevels = QtGui.QDockWidget(MainWindow)
         self.dockWidgetLevels.setObjectName("dockWidgetLevels")
@@ -113,14 +110,16 @@ class Ui_MainWindow(object):
         icon.addPixmap(QtGui.QPixmap(":/start.svg"), QtGui.QIcon.Disabled, QtGui.QIcon.On)
         self.actionStart.setIcon(icon)
         self.actionStart.setObjectName("actionStart")
+        self.actionSettings = QtGui.QAction(MainWindow)
+        self.actionSettings.setObjectName("actionSettings")
         self.toolBar.addAction(self.actionStart)
+        self.toolBar.addAction(self.actionSettings)
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QtGui.QApplication.translate("MainWindow", "Friture", None, QtGui.QApplication.UnicodeUTF8))
-        self.pushButton_settings.setText(QtGui.QApplication.translate("MainWindow", "Settings", None, QtGui.QApplication.UnicodeUTF8))
         self.dockWidgetLevels.setWindowTitle(QtGui.QApplication.translate("MainWindow", "Input levels", None, QtGui.QApplication.UnicodeUTF8))
         self.label_rms.setText(QtGui.QApplication.translate("MainWindow", "-100.0", None, QtGui.QApplication.UnicodeUTF8))
         self.label_peak.setText(QtGui.QApplication.translate("MainWindow", "-100.0", None, QtGui.QApplication.UnicodeUTF8))
@@ -135,6 +134,8 @@ class Ui_MainWindow(object):
         self.toolBar.setWindowTitle(QtGui.QApplication.translate("MainWindow", "toolBar", None, QtGui.QApplication.UnicodeUTF8))
         self.actionStart.setText(QtGui.QApplication.translate("MainWindow", "Start", None, QtGui.QApplication.UnicodeUTF8))
         self.actionStart.setToolTip(QtGui.QApplication.translate("MainWindow", "Start/Stop", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionSettings.setText(QtGui.QApplication.translate("MainWindow", "Settings", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionSettings.setToolTip(QtGui.QApplication.translate("MainWindow", "Display settings dialog", None, QtGui.QApplication.UnicodeUTF8))
 
 from timeplot import TimePlot
 from qsynthmeter import qsynthMeter

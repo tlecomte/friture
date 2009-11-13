@@ -142,6 +142,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		self.connect(self.spectrogram_timer, QtCore.SIGNAL('timeout()'), self.spectrogram_timer_slot)
 		
 		self.connect(self.actionStart, QtCore.SIGNAL('triggered()'), self.timer_toggle)
+		self.connect(self.actionSettings, QtCore.SIGNAL('triggered()'), self.settings_called)
 		
 		self.connect(self.settings_dialog.comboBox_freqscale, QtCore.SIGNAL('currentIndexChanged(int)'), self.freqscalechanged)
 		self.connect(self.settings_dialog.comboBox_fftsize, QtCore.SIGNAL('currentIndexChanged(int)'), self.fftsizechanged)
@@ -151,8 +152,6 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		self.connect(self.settings_dialog.spinBox_minfreq, QtCore.SIGNAL('valueChanged(int)'), self.freqrangechanged)
 		self.connect(self.settings_dialog.spinBox_maxfreq, QtCore.SIGNAL('valueChanged(int)'), self.freqrangechanged)
 		self.connect(self.settings_dialog.comboBox_inputDevice, QtCore.SIGNAL('currentIndexChanged(int)'), self.input_device_changed)
-		
-		self.connect(self.pushButton_settings, QtCore.SIGNAL('clicked()'), self.settings_called)
 		
 		self.connect(self.PlotZoneImage, QtCore.SIGNAL('pointerMoved'), self.pointer_moved)
 		self.connect(self.PlotZoneSpect, QtCore.SIGNAL('pointerMoved'), self.pointer_moved)
