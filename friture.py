@@ -23,6 +23,7 @@ from numpy import transpose, log10, sqrt, ceil, linspace, arange, floor, zeros, 
 from PyQt4 import QtGui, QtCore, Qt
 import PyQt4.Qwt5 as Qwt
 from Ui_friture import Ui_MainWindow
+from Ui_settings import Ui_Settings_Dialog
 import resource_rc
 import audiodata
 import audioproc
@@ -44,6 +45,14 @@ TIMER_PERIOD_MS = int(ceil(1000.*NUM_SAMPLES/float(SAMPLING_RATE)))
 SMOOTH_DISPLAY_TIMER_PERIOD_MS = 25
 DEVICE_INDEX = 0
 
+class Settings_Dialog(QtGui.QDialog, Ui_Settings_Dialog):
+	def __init__(self):
+		QtGui.QDialog.__init__(self)
+		Ui_Settings_Dialog.__init__(self)
+		
+		# Configure l'interface utilisateur.
+		self.setupUi(self)
+
 class Friture(QtGui.QMainWindow, Ui_MainWindow):
 	def __init__(self):
 		QtGui.QMainWindow.__init__(self)
@@ -51,6 +60,8 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 
 		# Configure l'interface utilisateur.
 		self.setupUi(self)
+		
+		self.settings_dialog = Settings_Dialog()
 		
 		levelsAction = self.dockWidgetLevels.toggleViewAction()
 		scopeAction = self.dockWidgetScope.toggleViewAction()
@@ -115,7 +126,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 			else:
 				print "Fail"
 
-		self.comboBox_inputDevice.setCurrentIndex(self.device_index)
+		self.settings_dialog.comboBox_inputDevice.setCurrentIndex(self.device_index)
 
 		# this timer is used to update widgets that just need to display as fast as they can
 		self.display_timer = QtCore.QTimer()
@@ -132,14 +143,16 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		
 		self.connect(self.actionStart, QtCore.SIGNAL('triggered()'), self.timer_toggle)
 		
-		self.connect(self.comboBox_freqscale, QtCore.SIGNAL('currentIndexChanged(int)'), self.freqscalechanged)
-		self.connect(self.comboBox_fftsize, QtCore.SIGNAL('currentIndexChanged(int)'), self.fftsizechanged)
-		self.connect(self.spinBox_specmax, QtCore.SIGNAL('valueChanged(int)'), self.specrangechanged)
-		self.connect(self.spinBox_specmin, QtCore.SIGNAL('valueChanged(int)'), self.specrangechanged)
-		self.connect(self.doubleSpinBox_timerange, QtCore.SIGNAL('valueChanged(double)'), self.timerangechanged)
-		self.connect(self.spinBox_minfreq, QtCore.SIGNAL('valueChanged(int)'), self.freqrangechanged)
-		self.connect(self.spinBox_maxfreq, QtCore.SIGNAL('valueChanged(int)'), self.freqrangechanged)
-		self.connect(self.comboBox_inputDevice, QtCore.SIGNAL('currentIndexChanged(int)'), self.input_device_changed)
+		self.connect(self.settings_dialog.comboBox_freqscale, QtCore.SIGNAL('currentIndexChanged(int)'), self.freqscalechanged)
+		self.connect(self.settings_dialog.comboBox_fftsize, QtCore.SIGNAL('currentIndexChanged(int)'), self.fftsizechanged)
+		self.connect(self.settings_dialog.spinBox_specmax, QtCore.SIGNAL('valueChanged(int)'), self.specrangechanged)
+		self.connect(self.settings_dialog.spinBox_specmin, QtCore.SIGNAL('valueChanged(int)'), self.specrangechanged)
+		self.connect(self.settings_dialog.doubleSpinBox_timerange, QtCore.SIGNAL('valueChanged(double)'), self.timerangechanged)
+		self.connect(self.settings_dialog.spinBox_minfreq, QtCore.SIGNAL('valueChanged(int)'), self.freqrangechanged)
+		self.connect(self.settings_dialog.spinBox_maxfreq, QtCore.SIGNAL('valueChanged(int)'), self.freqrangechanged)
+		self.connect(self.settings_dialog.comboBox_inputDevice, QtCore.SIGNAL('currentIndexChanged(int)'), self.input_device_changed)
+		
+		self.connect(self.pushButton_settings, QtCore.SIGNAL('clicked()'), self.settings_called)
 		
 		self.connect(self.PlotZoneImage, QtCore.SIGNAL('pointerMoved'), self.pointer_moved)
 		self.connect(self.PlotZoneSpect, QtCore.SIGNAL('pointerMoved'), self.pointer_moved)
@@ -159,6 +172,9 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		
 		print "Init finished, entering the main loop"
 	
+	def settings_called(self):
+		self.settings_dialog.show()
+	
 	def closeEvent(self, event):
 		self.saveAppState()
 		event.accept()
@@ -171,13 +187,13 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		settings.setValue("windowState", windowState)
 		
 		settings.beginGroup("Audio")
-		settings.setValue("fftSize", self.comboBox_fftsize.currentIndex())
-		settings.setValue("freqScale", self.comboBox_freqscale.currentIndex())
-		settings.setValue("freqMin", self.spinBox_minfreq.value())
-		settings.setValue("freqMax", self.spinBox_maxfreq.value())
-		settings.setValue("timeRange", self.doubleSpinBox_timerange.value())
-		settings.setValue("colorMin", self.spinBox_specmin.value())
-		settings.setValue("colorMax", self.spinBox_specmax.value())
+		settings.setValue("fftSize", self.settings_dialog.comboBox_fftsize.currentIndex())
+		settings.setValue("freqScale", self.settings_dialog.comboBox_freqscale.currentIndex())
+		settings.setValue("freqMin", self.settings_dialog.spinBox_minfreq.value())
+		settings.setValue("freqMax", self.settings_dialog.spinBox_maxfreq.value())
+		settings.setValue("timeRange", self.settings_dialog.doubleSpinBox_timerange.value())
+		settings.setValue("colorMin", self.settings_dialog.spinBox_specmin.value())
+		settings.setValue("colorMax", self.settings_dialog.spinBox_specmax.value())
 		
 		settings.endGroup()
 	
@@ -189,19 +205,19 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		
 		settings.beginGroup("Audio")
 		(fft_size, ok) = settings.value("fftSize", 7).toInt() # 7th index is 1024 points
-		self.comboBox_fftsize.setCurrentIndex(fft_size)
+		self.settings_dialog.comboBox_fftsize.setCurrentIndex(fft_size)
 		(freqscale, ok) = settings.value("freqScale", 0).toInt()
-		self.comboBox_freqscale.setCurrentIndex(freqscale)
+		self.settings_dialog.comboBox_freqscale.setCurrentIndex(freqscale)
 		(freqMin, ok) = settings.value("freqMin", 20).toInt()
-		self.spinBox_minfreq.setValue(freqMin)
+		self.settings_dialog.spinBox_minfreq.setValue(freqMin)
 		(freqMax, ok) = settings.value("freqMax", 20000).toInt()
-		self.spinBox_maxfreq.setValue(freqMax)
+		self.settings_dialog.spinBox_maxfreq.setValue(freqMax)
 		(timeRange, ok) = settings.value("timeRange", 10.).toDouble()
-		self.doubleSpinBox_timerange.setValue(timeRange)
+		self.settings_dialog.doubleSpinBox_timerange.setValue(timeRange)
 		(colorMin, ok) = settings.value("colorMin", -100).toInt()
-		self.spinBox_specmin.setValue(colorMin)
+		self.settings_dialog.spinBox_specmin.setValue(colorMin)
 		(colorMax, ok) = settings.value("colorMax", -20).toInt()
-		self.spinBox_specmax.setValue(colorMax)
+		self.settings_dialog.spinBox_specmax.setValue(colorMax)
 		
 		settings.endGroup()
 
@@ -387,14 +403,14 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 			self.PlotZoneImage.setlinfreqscale()
 
 	def freqrangechanged(self, value):
-		minfreq = self.spinBox_minfreq.value()
-		maxfreq = self.spinBox_maxfreq.value()
+		minfreq = self.settings_dialog.spinBox_minfreq.value()
+		maxfreq = self.settings_dialog.spinBox_maxfreq.value()
 		self.PlotZoneSpect.setfreqrange(minfreq, maxfreq)
 		self.PlotZoneImage.setfreqrange(minfreq, maxfreq)
 
 	def specrangechanged(self, value):
-		self.spec_max = self.spinBox_specmax.value()
-		self.spec_min = self.spinBox_specmin.value()
+		self.spec_max = self.settings_dialog.spinBox_specmax.value()
+		self.spec_min = self.settings_dialog.spinBox_specmin.value()
 		
 	def timerangechanged(self, value):
 		self.timerange_s = value
@@ -424,7 +440,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 			desc = "%d: (%s) %s" %(dev['index'], api, dev['name'])
 			if i == default_device_index:
 				desc += ' (system default)'			
-			self.comboBox_inputDevice.addItem(desc)
+			self.settings_dialog.comboBox_inputDevice.addItem(desc)
 
 	def get_default_input_device(self):
 		return self.pa.get_default_input_device_info()['index']
@@ -455,7 +471,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 			error_message.showMessage("Impossible to use the selected device, reverting to the previous one")
 			self.stream.close()
 			self.stream = previous_stream
-			self.comboBox_inputDevice.setCurrentIndex(self.device_index)
+			self.settings_dialog.comboBox_inputDevice.setCurrentIndex(self.device_index)
 		
 		lat_ms = 1000*self.stream.get_input_latency()
 		self.max_in_a_row = int(ceil(lat_ms/TIMER_PERIOD_MS))
