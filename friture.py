@@ -289,17 +289,11 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		
 		if self.spectrumIsVisible:
 			sp = audioproc.analyzelive(self.audiobuffer[self.offset + self.buffer_length - self.fft_size: self.offset + self.buffer_length], self.fft_size)
-			clip = lambda val, low, high: min(high, max(low, val))
 			# scale the db spectrum from [- spec_range db ... 0 db] > [0..1]
 			epsilon = 1e-30
-			db_spectrogram = (20*log10(sp + epsilon))
-			norm_spectrogram = (db_spectrogram.clip(self.spec_min, self.spec_max) - self.spec_min)/(self.spec_max - self.spec_min)
-			if db_spectrogram.ndim == 1:
-				y = db_spectrogram.transpose()
-			else:
-				y = db_spectrogram[0,:].transpose()
-			freq = linspace(0., 22050., len(y))
-			self.PlotZoneSpect.setdata(freq, y)
+			db_spectrogram = 20*log10(sp + epsilon)
+			freq = linspace(0., 22050., len(db_spectrogram))
+			self.PlotZoneSpect.setdata(freq, db_spectrogram)
 		
 		self.display_timer_time = (95.*self.display_timer_time + 5.*t.elapsed())/100.
 
@@ -313,7 +307,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		clip = lambda val, low, high: min(high, max(low, val))
 		# scale the db spectrum from [- spec_range db ... 0 db] > [0..1]
 		epsilon = 1e-30
-		db_spectrogram = (20*log10(sp + epsilon))
+		db_spectrogram = 20*log10(sp + epsilon)
 		norm_spectrogram = (db_spectrogram.clip(self.spec_min, self.spec_max) - self.spec_min)/(self.spec_max - self.spec_min)
 		
 		self.PlotZoneImage.addData(norm_spectrogram.transpose())
