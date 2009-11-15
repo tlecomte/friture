@@ -18,12 +18,14 @@
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
 import numpy
+SAMPLING_RATE = 44100
 
 def analyzelive(samples, fft_size):
 #	samples *= window
 	fft = numpy.fft.rfft(samples)
 	spectrum = numpy.abs(fft) / float(fft_size)
-	return spectrum
+	freq = numpy.linspace(0, SAMPLING_RATE/2, len(spectrum))
+	return spectrum, freq
 
 # above is done a FFT of the signal. This is ok for linear frequency scale, but
 # not satisfying for logarithmic scale, which is much more adapted to voice or music
