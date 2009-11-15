@@ -92,13 +92,12 @@ class SpectPlot(classplot.ClassPlot):
 			self.xmax = x.max()
 			self.update_xscale()
 			self.needfullreplot = True
-
-                self.compute_peaks(y)
 		
 		y_interp = interp(self.xscaled, x, y)
 		classplot.ClassPlot.setdata(self, self.xscaled, y_interp)
-		y_interp = interp(self.xscaled, x, self.peak)
-		self.curve_peak.setData(self.xscaled, y_interp)
+
+                self.compute_peaks(y_interp)
+		self.curve_peak.setData(self.xscaled, self.peak)
 		
 		if self.needfullreplot:
 			self.needfullreplot = False
