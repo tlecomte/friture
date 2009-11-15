@@ -93,7 +93,24 @@ class SpectPlot(classplot.ClassPlot):
 			self.update_xscale()
 			self.needfullreplot = True
 
-		if len(self.peak) <> len(y):
+                self.compute_peaks(y)
+		
+		y_interp = interp(self.xscaled, x, y)
+		classplot.ClassPlot.setdata(self, self.xscaled, y_interp)
+		y_interp = interp(self.xscaled, x, self.peak)
+		self.curve_peak.setData(self.xscaled, y_interp)
+		
+		if self.needfullreplot:
+			self.needfullreplot = False
+			self.replot()
+		else:
+			# self.replot() would call updateAxes() which is dead slow (probably because it
+			# computes label sizes); instead, let's just ask Qt to repaint the canvas next time
+			# This works because we disable the cache
+			self.canvas().update()
+
+        def compute_peaks(self, y):
+                if len(self.peak) <> len(y):
 			self.ones = ones(y.shape)
 			self.peak = self.ones*(-500.)
 			self.peakHold = zeros(y.shape)
@@ -119,20 +136,6 @@ class SpectPlot(classplot.ClassPlot):
 		
 		self.peakHold = (-mask1) * self.peakHold
 		self.peakHold += self.ones
-		
-		y_interp = interp(self.xscaled, x, y)
-		classplot.ClassPlot.setdata(self, self.xscaled, y_interp)
-		y_interp = interp(self.xscaled, x, self.peak)
-		self.curve_peak.setData(self.xscaled, y_interp)
-		
-		if self.needfullreplot:
-			self.needfullreplot = False
-			self.replot()
-		else:
-			# self.replot() would call updateAxes() which is dead slow (probably because it
-			# computes label sizes); instead, let's just ask Qt to repaint the canvas next time
-			# This works because we disable the cache
-			self.canvas().update()
 
 	def update_xscale(self):
 		#if self.logfreqscale == 2:
