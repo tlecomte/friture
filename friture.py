@@ -495,6 +495,16 @@ if __name__ == "__main__":
 	splash.finish(window)
 	
 	profile = "no" # "python" or "kcachegrind" or anything else to disable
+
+	if len(sys.argv) > 1:
+                if sys.argv[1] == "--python":
+                        profile = "python"
+                elif sys.argv[1] == "--kcachegrind":
+                        profile = "kcachegrind"
+                elif sys.argv[1] == "--no":
+                        profile = "no"
+                else:
+                        print "command-line arguments (%s) not recognized" %sys.argv[1:]
 	
 	if profile == "python":
 		import cProfile
