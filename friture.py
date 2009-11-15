@@ -292,7 +292,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 			# scale the db spectrum from [- spec_range db ... 0 db] > [0..1]
 			epsilon = 1e-30
 			db_spectrogram = 20*log10(sp + epsilon)
-			freq = linspace(0., 22050., len(db_spectrogram))
+			freq = linspace(0., SAMPLING_RATE/2, len(db_spectrogram))
 			self.PlotZoneSpect.setdata(freq, db_spectrogram)
 		
 		self.display_timer_time = (95.*self.display_timer_time + 5.*t.elapsed())/100.
