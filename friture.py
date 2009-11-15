@@ -19,7 +19,7 @@
 
 import sys
 from pyaudio import PyAudio, paInt16
-from numpy import transpose, log10, sqrt, ceil, linspace, arange, floor, zeros, int32, fromstring, where
+from numpy import transpose, log10, sqrt, ceil, linspace, arange, floor, zeros, int16, fromstring, where
 from PyQt4 import QtGui, QtCore, Qt
 import PyQt4.Qwt5 as Qwt
 from Ui_friture import Ui_MainWindow
@@ -330,7 +330,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		for j in range(0, available):
 			self.i += 1
 			rawdata = self.stream.read(NUM_SAMPLES)
-			floatdata = fromstring(rawdata, int32)/2.**31
+			floatdata = fromstring(rawdata, int16)/(2.**(16-1))
 			# update the circular buffer
 			if debug: print "available", available, "buffer length", self.buffer_length
 			if len(floatdata) > self.buffer_length:
