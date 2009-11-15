@@ -21,8 +21,8 @@ import numpy
 
 def analyzelive(samples, fft_size):
 #	samples *= window
-	fft = numpy.fft.fft(samples)
-	spectrum = numpy.abs(fft[:fft.shape[0] / 2 + 1]) / float(fft_size)
+	fft = numpy.fft.rfft(samples)
+	spectrum = numpy.abs(fft) / float(fft_size)
 	return spectrum
 
 # above is done a FFT of the signal. This is ok for linear frequency scale, but
