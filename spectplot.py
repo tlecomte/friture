@@ -121,25 +121,23 @@ class SpectPlot(classplot.ClassPlot):
 			self.ones = ones(y.shape)
 			self.peak = self.ones*(-500.)
 			self.peakHold = zeros(y.shape)
-			self.peakDecay = self.ones * PEAK_DECAY_RATE
-
-		dBdecay = 20.*log10(self.peakDecay)
+			self.dBdecay = self.ones * 20. * log10(PEAK_DECAY_RATE)
 
 		mask1 = (self.peak < y)
 		mask2 = (-mask1) * (self.peakHold > self.ones*(PEAK_FALLOFF_COUNT - 1.))
-		mask2_bis = mask2 * (self.peak + dBdecay < y)
-		mask2_ter = mask2 * (self.peak + dBdecay >= y)
+		mask2_bis = mask2 * (self.peak + self.dBdecay < y)
+		mask2_ter = mask2 * (self.peak + self.dBdecay >= y)
 		mask3 = (-mask1) * (-mask2)
 
 		self.peak = mask1 * y \
 		+ mask2_bis * y \
-		+ mask2_ter * (self.peak + dBdecay) \
+		+ mask2_ter * (self.peak + self.dBdecay) \
 		+ mask3 * self.peak
 		
-		self.peakDecay = mask1 * self.ones * PEAK_DECAY_RATE \
-		+ mask2_bis * self.peakDecay \
-		+ mask2_ter * (self.peakDecay ** 2) \
-		+ mask3 * self.peakDecay
+		self.dBdecay = mask1 * self.ones * 20. * log10(PEAK_DECAY_RATE) \
+		+ mask2_bis * self.dBdecay \
+		+ mask2_ter * 2 * self.dBdecay \
+		+ mask3 * self.dBdecay
 		
 		self.peakHold = (-mask1) * self.peakHold
 		self.peakHold += self.ones
