@@ -285,7 +285,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		db_spectrogram = 20*log10(sp + epsilon)
 		norm_spectrogram = (db_spectrogram.clip(self.spec_min, self.spec_max) - self.spec_min)/(self.spec_max - self.spec_min)
 		
-		self.PlotZoneImage.addData(norm_spectrogram)
+		self.PlotZoneImage.addData(freq, norm_spectrogram)
 		
 		self.spectrogram_timer_time = (95.*self.spectrogram_timer_time + 5.*t.elapsed())/100.
 

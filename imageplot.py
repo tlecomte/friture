@@ -45,9 +45,9 @@ class PlotImage(Qwt.QwtPlotItem):
 		Qwt.QwtPlotItem.__init__(self)
 		self.canvasscaledspectrogram = CanvasScaledSpectrogram()
 
-	def addData(self, xyzs, logfreqscale):
+	def addData(self, freq, xyzs, logfreqscale):
 		self.canvasscaledspectrogram.setlogfreqscale(logfreqscale)
-		self.canvasscaledspectrogram.addData(xyzs)
+		self.canvasscaledspectrogram.addData(freq, xyzs)
 
 	def draw(self, painter, xMap, yMap, rect):
 		self.canvasscaledspectrogram.setcanvas_height(rect.height())
@@ -111,8 +111,8 @@ class ImagePlot(Qwt.QwtPlot):
 		
 		self.replot()
 
-	def addData(self, xyzs):
-		self.plotImage.addData(xyzs, self.logfreqscale)
+	def addData(self, freq, xyzs):
+		self.plotImage.addData(freq, xyzs, self.logfreqscale)
 		# self.replot() would call updateAxes() which is dead slow (probably because it
 		# computes label sizes); instead, let's ask Qt to repaint the canvas only next time
 		# This works because we disable the cache

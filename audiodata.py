@@ -49,10 +49,8 @@ class CanvasScaledSpectrogram(QtCore.QObject):
 		self.current_total = 0
 		self.minfreq = 20.
 		self.maxfreq = 20000.
-		self.x = numpy.linspace(0., 22050., spectrum_length)
 		self.update_xscale()
 		#self.fullspectrogram = numpy.zeros((self.canvas_height, self.time_bin_number(), 4), dtype = numpy.uint8)
-		self.xyzs_buffer = numpy.zeros((self.canvas_height))
 		self.pixmap = Qt.QPixmap(2*self.canvas_width,  self.canvas_height)
 		self.pixmap.fill(Qt.QColor("black"))
 		self.painter = Qt.QPainter(self.pixmap)
@@ -77,7 +75,6 @@ class CanvasScaledSpectrogram(QtCore.QObject):
 
 	def erase(self):
 		#self.fullspectrogram = numpy.zeros((self.canvas_height, self.time_bin_number(), 4), dtype = numpy.uint8)
-		self.xyzs_buffer = numpy.zeros((self.canvas_height))
 		del self.painter
 		del self.pixmap
 		self.pixmap = Qt.QPixmap(2*self.canvas_width,  self.canvas_height)
@@ -105,7 +102,6 @@ class CanvasScaledSpectrogram(QtCore.QObject):
 			self.spectrum_length = spectrum_length
 			self.current_total = 0
 			self.erase()
-			self.x = numpy.linspace(0., 22050., spectrum_length)
 			print "spectrum_length changed, now: %d (%.03f frames per line)" %(spectrum_length, self.n())
 
 	def setcanvas_height(self, canvas_height):
@@ -145,34 +141,23 @@ class CanvasScaledSpectrogram(QtCore.QObject):
 		else:
 			self.xscaled = numpy.linspace(self.minfreq, self.maxfreq, self.canvas_height)
 
-	def addData(self, xyzs):
+	def addData(self, freq, xyzs):
 		spectrum_length = xyzs.shape[0]
 
 		self.setspectrum_length(spectrum_length)
 
-		int_xyzs = self.interpolate(xyzs)
-		self.addDataSingle(int_xyzs)
+		xyzs_buffer = numpy.interp(self.xscaled, freq, xyzs)
 
-	def interpolate(self, xyzs):
-		return numpy.interp(self.xscaled, self.x, xyzs)
-
-	def addDataSingle(self, int_xyzs):
-		self.xyzs_buffer += int_xyzs
-		self.finish_line()
-
-	def finish_line(self):
 		# draw !
-		byteString = self.floats_to_bytes(self.xyzs_buffer[::-1])
+		byteString = self.floats_to_bytes(xyzs_buffer[::-1])
 
-		myimage = self.prepare_image(byteString, self.xyzs_buffer.shape[0])
+		myimage = self.prepare_image(byteString, xyzs_buffer.shape[0])
 
 		self.offset = (self.offset + 1) % self.canvas_width
 		self.painter.drawImage(self.offset, 0, myimage)
 		self.painter.drawImage(self.offset + self.canvas_width, 0, myimage)
 		# reinitialize current_total
 		self.current_total = 0.
-		# reinitialize the data buffer
-		self.xyzs_buffer = numpy.zeros_like(self.xyzs_buffer)
 		
 		self.logfile.write("%d\n"%self.time.restart())
 
