@@ -266,11 +266,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 			self.scope()
 		
 		if self.spectrumIsVisible:
-			sp, freq = audioproc.analyzelive(self.audiobuffer[self.offset + self.buffer_length - self.fft_size: self.offset + self.buffer_length], self.fft_size)
-			# scale the db spectrum from [- spec_range db ... 0 db] > [0..1]
-			epsilon = 1e-30
-			db_spectrogram = 20*log10(sp + epsilon)
-			self.PlotZoneSpect.setdata(freq, db_spectrogram)
+			self.spectrum()
 		
 		self.display_timer_time = (95.*self.display_timer_time + 5.*t.elapsed())/100.
 
@@ -382,6 +378,13 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 	
 		time = linspace(0., len(floatdata)/float(SAMPLING_RATE), len(floatdata))
 		self.PlotZoneUp.setdata(time, floatdata)
+
+	def spectrum(self):
+		sp, freq = audioproc.analyzelive(self.audiobuffer[self.offset + self.buffer_length - self.fft_size: self.offset + self.buffer_length], self.fft_size)
+		# scale the db spectrum from [- spec_range db ... 0 db] > [0..1]
+		epsilon = 1e-30
+		db_spectrogram = 20*log10(sp + epsilon)
+		self.PlotZoneSpect.setdata(freq, db_spectrogram)
 
 	def fftsizechanged(self, index):
 		print "fft_size_changed slot", index, 2**index*32, 150000/self.fft_size
