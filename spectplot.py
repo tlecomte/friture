@@ -124,7 +124,7 @@ class SpectPlot(classplot.ClassPlot):
 			self.dBdecay = self.ones * 20. * log10(PEAK_DECAY_RATE)
 
 		mask1 = (self.peak < y)
-		mask2 = (-mask1) * (self.peakHold > self.ones*(PEAK_FALLOFF_COUNT - 1.))
+		mask2 = (-mask1) * (self.peakHold > (PEAK_FALLOFF_COUNT - 1.))
 		mask2_bis = mask2 * (self.peak + self.dBdecay < y)
 		mask2_ter = mask2 * (self.peak + self.dBdecay >= y)
 		mask3 = (-mask1) * (-mask2)
