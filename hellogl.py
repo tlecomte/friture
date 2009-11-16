@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 """PyQt4 port of the opengl/hellogl example from Qt v4.x"""
 
@@ -104,20 +105,33 @@ class GLWidget(QtOpenGL.QGLWidget):
             self.updateGL()
 
     def initializeGL(self):
-        self.qglClearColor(self.trolltechPurple.dark())
+        #self.qglClearColor(self.trolltechPurple.dark())
+	#self.qglClearColor(QtCore.Qt.blue)
         self.object = self.makeObject()
         GL.glShadeModel(GL.GL_FLAT)
         GL.glEnable(GL.GL_DEPTH_TEST)
-        GL.glEnable(GL.GL_CULL_FACE)
+        #GL.glEnable(GL.GL_CULL_FACE)
 
     def paintGL(self):
+        # Clear The Screen And The Depth Buffer
         GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT)
+        # Reset The View
         GL.glLoadIdentity()
+        # Move Into The Screen 10.0 Units
         GL.glTranslated(0.0, 0.0, -10.0)
-        GL.glRotated(self.xRot / 16.0, 1.0, 0.0, 0.0)
-        GL.glRotated(self.yRot / 16.0, 0.0, 1.0, 0.0)
-        GL.glRotated(self.zRot / 16.0, 0.0, 0.0, 1.0)
-        GL.glCallList(self.object)
+        #GL.glRotated(self.xRot / 16.0, 1.0, 0.0, 0.0)
+        #GL.glRotated(self.yRot / 16.0, 0.0, 1.0, 0.0)
+        #GL.glRotated(self.zRot / 16.0, 0.0, 0.0, 1.0)
+        #GL.glCallList(self.object)
+	self.qglColor( QtCore.Qt.white )
+        GL.glBegin(GL.GL_TRIANGLES) # Drawing Using Triangles
+        GL.glVertex3f( 0.0, 1.0, 0.0) # Top
+        GL.glVertex3f(-1.0,-1.0, 0.0) # Bottom Left
+        GL.glVertex3f( 1.0,-1.0, 0.0) # Bottom Right
+        GL.glEnd() # Finished Drawing The Triangle
+
+	pbuffer = QtOpenGL.QGLPixelBuffer(QtCore.QSize(512, 512), self.format())
+
 
     def resizeGL(self, width, height):
         side = min(width, height)

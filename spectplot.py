@@ -118,10 +118,10 @@ class SpectPlot(classplot.ClassPlot):
 
         def compute_peaks(self, y):
                 if len(self.peak) <> len(y):
-			self.ones = ones(y.shape)
-			self.peak = self.ones*(-500.)
+			y_ones = ones(y.shape)
+			self.peak = y_ones*(-500.)
 			self.peakHold = zeros(y.shape)
-			self.dBdecay = self.ones * 20. * log10(PEAK_DECAY_RATE)
+			self.dBdecay = y_ones * 20. * log10(PEAK_DECAY_RATE)
 
 		mask1 = (self.peak < y)
 		mask2 = (-mask1) * (self.peakHold > (PEAK_FALLOFF_COUNT - 1.))
