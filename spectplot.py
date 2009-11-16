@@ -141,7 +141,7 @@ class SpectPlot(classplot.ClassPlot):
 		+ mask3 * self.dBdecay
 		
 		self.peakHold = (-mask1) * self.peakHold
-		self.peakHold += self.ones
+		self.peakHold += 1
 
 	def update_xscale(self):
 		#if self.logfreqscale == 2:
