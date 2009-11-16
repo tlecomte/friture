@@ -111,10 +111,6 @@ class ImagePlot(Qwt.QwtPlot):
 		
 		self.replot()
 
-	def setData(self, xyzs):
-		self.plotImage.setData(xyzs)
-		self.replot()
-
 	def addData(self, xyzs):
 		self.plotImage.addData(xyzs, self.logfreqscale)
 		# self.replot() would call updateAxes() which is dead slow (probably because it
