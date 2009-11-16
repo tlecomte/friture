@@ -44,6 +44,7 @@ class audioproc():
 		spectrum = abs(fft) / float(fft_size/decimation)
 
 		if len(self.freq) <> fft_size/2/decimation + 1 :
+			print "audioproc: updating self.freq cache"
 			self.freq = linspace(0, SAMPLING_RATE/2/decimation, fft_size/2/decimation + 1)
 		return spectrum, self.freq
 
