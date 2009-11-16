@@ -263,19 +263,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 			self.levels()
 		
 		if self.scopeIsVisible:
-			time = SMOOTH_DISPLAY_TIMER_PERIOD_MS/1000.
-			start = self.offset + self.buffer_length - time*SAMPLING_RATE
-			stop = self.offset + self.buffer_length
-			#basic trigger capability on leading edge
-			max = self.audiobuffer[start : stop].max()
-			trigger_level = max*2./3.
-			trigger_pos = where((self.audiobuffer[start-1 : stop-1] < trigger_level)*(self.audiobuffer[start : stop] >= trigger_level))[0]
-			if len(trigger_pos) > 0:
-				pos = trigger_pos[-1]
-				shift = time*SAMPLING_RATE - pos
-				start = start - shift
-				stop = stop - shift
-			self.scope(self.audiobuffer[start : stop], SAMPLING_RATE)
+			self.scope()
 		
 		if self.spectrumIsVisible:
 			sp, freq = audioproc.analyzelive(self.audiobuffer[self.offset + self.buffer_length - self.fft_size: self.offset + self.buffer_length], self.fft_size)
@@ -377,8 +365,22 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		self.meter.setValue(0, sqrt((floatdata**2).sum()/len(floatdata)*2.))
 		self.meter.setValue(1, abs(floatdata).max())
 
-	def scope(self, floatdata, rate):
-		time = linspace(0., len(floatdata)/float(rate), len(floatdata))
+	def scope(self):
+		time = SMOOTH_DISPLAY_TIMER_PERIOD_MS/1000.
+		start = self.offset + self.buffer_length - time*SAMPLING_RATE
+		stop = self.offset + self.buffer_length
+		#basic trigger capability on leading edge
+		max = self.audiobuffer[start : stop].max()
+		trigger_level = max*2./3.
+		trigger_pos = where((self.audiobuffer[start-1 : stop-1] < trigger_level)*(self.audiobuffer[start : stop] >= trigger_level))[0]
+		if len(trigger_pos) > 0:
+			pos = trigger_pos[-1]
+			shift = time*SAMPLING_RATE - pos
+			start = start - shift
+			stop = stop - shift
+		floatdata = self.audiobuffer[start : stop]
+	
+		time = linspace(0., len(floatdata)/float(SAMPLING_RATE), len(floatdata))
 		self.PlotZoneUp.setdata(time, floatdata)
 
 	def fftsizechanged(self, index):
