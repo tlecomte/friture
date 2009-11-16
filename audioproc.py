@@ -20,12 +20,17 @@
 import numpy
 SAMPLING_RATE = 44100
 
-def analyzelive(samples, fft_size):
-#	samples *= window
-	fft = numpy.fft.rfft(samples)
-	spectrum = numpy.abs(fft) / float(fft_size)
-	freq = numpy.linspace(0, SAMPLING_RATE/2, len(spectrum))
-	return spectrum, freq
+class audioproc():
+	def __init__(self):
+		self.freq = numpy.linspace(0, SAMPLING_RATE/2, 10)
+
+	def analyzelive(self, samples, fft_size):
+		#samples *= window
+		fft = numpy.fft.rfft(samples)
+		spectrum = numpy.abs(fft) / float(fft_size)
+		if len(self.freq) <> len(spectrum):
+			self.freq = numpy.linspace(0, SAMPLING_RATE/2, len(spectrum))
+		return spectrum, self.freq
 
 # above is done a FFT of the signal. This is ok for linear frequency scale, but
 # not satisfying for logarithmic scale, which is much more adapted to voice or music
