@@ -260,10 +260,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 			self.statistics()
 		
 		if self.levelsIsVisible:
-			time = SMOOTH_DISPLAY_TIMER_PERIOD_MS/1000.
-			start = self.offset + self.buffer_length - time*SAMPLING_RATE
-			stop = self.offset + self.buffer_length
-			self.levels(self.audiobuffer[start : stop])
+			self.levels()
 		
 		if self.scopeIsVisible:
 			time = SMOOTH_DISPLAY_TIMER_PERIOD_MS/1000.
@@ -367,7 +364,12 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		self.PlotZoneImage.paint_time)
 		self.LabelLevel.setText(level_label)
 
-	def levels(self, floatdata):
+	def levels(self):
+		time = SMOOTH_DISPLAY_TIMER_PERIOD_MS/1000.
+		start = self.offset + self.buffer_length - time*SAMPLING_RATE
+		stop = self.offset + self.buffer_length
+		floatdata = self.audiobuffer[start : stop]
+		
 		level_rms = 20*log10(sqrt((floatdata**2).sum()/len(floatdata)*2.) + 0*1e-80) #*2. to get 0dB for a sine wave
 		level_max = 20*log10(abs(floatdata).max() + 0*1e-80)
 		self.label_rms.setText("%.01f" % level_rms)
