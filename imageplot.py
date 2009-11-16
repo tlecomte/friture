@@ -32,6 +32,14 @@ class FreqScaleDraw(Qwt.QwtScaleDraw):
 			label = "%d" %(value)
 		return Qwt.QwtText(label)
 
+class picker(Qwt.QwtPlotPicker):
+	def __init__(self, *args):
+		Qwt.QwtPlotPicker.__init__(self, *args)
+		
+	def trackerText(self, pos):
+		pos2 = self.invTransform(pos)
+		return Qwt.QwtText("%d s, %d Hz" %(pos2.x(), pos2.y()))
+
 class PlotImage(Qwt.QwtPlotItem):
 	def __init__(self):
 		Qwt.QwtPlotItem.__init__(self)
@@ -93,22 +101,16 @@ class ImagePlot(Qwt.QwtPlot):
 		
 		self.paint_time = 0.
 		
-		self.picker = Qwt.QwtPlotPicker(Qwt.QwtPlot.xBottom,
+		# picker used to display coordinates when clicking on the canvas
+		self.picker = picker(Qwt.QwtPlot.xBottom,
                                Qwt.QwtPlot.yLeft,
                                Qwt.QwtPicker.PointSelection,
                                Qwt.QwtPlotPicker.CrossRubberBand,
-                               Qwt.QwtPicker.AlwaysOff,
+                               Qwt.QwtPicker.ActiveOnly,
                                self.canvas())
-		self.connect(self.picker, QtCore.SIGNAL('moved(const QPoint &)'), self.moved)
 		
 		self.replot()
 
-	def moved(self, point):
-		info = "Time=%d s, Frequency=%d Hz" % (
-			self.invTransform(Qwt.QwtPlot.xBottom, point.x()),
-			self.invTransform(Qwt.QwtPlot.yLeft, point.y()))
-		self.emit(QtCore.SIGNAL("pointerMoved"), info)
-		
 	def setData(self, xyzs):
 		self.plotImage.setData(xyzs)
 		self.replot()

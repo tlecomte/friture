@@ -22,6 +22,14 @@ import PyQt4.Qwt5 as Qwt
 from PyQt4 import QtCore
 from numpy import log10, interp, linspace
 
+class picker(Qwt.QwtPlotPicker):
+	def __init__(self, *args):
+		Qwt.QwtPlotPicker.__init__(self, *args)
+		
+	def trackerText(self, pos):
+		pos2 = self.invTransform(pos)
+		return Qwt.QwtText("%.3g ms, %.3g" %(pos2.x(), pos2.y()))
+
 class TimePlot(classplot.ClassPlot):
 	def __init__(self, *args):
 		classplot.ClassPlot.__init__(self, *args)
@@ -40,13 +48,13 @@ class TimePlot(classplot.ClassPlot):
 		
 		self.canvas_width = 0
 		
-		self.connect(self.picker, QtCore.SIGNAL('moved(const QPoint &)'), self.moved)
-
-	def moved(self, point):
-		info = "Time=%.3g ms, Signal=%.3g" % (
-			self.invTransform(Qwt.QwtPlot.xBottom, point.x()),
-			self.invTransform(Qwt.QwtPlot.yLeft, point.y()))
-		self.emit(QtCore.SIGNAL("pointerMoved"), info)
+		# picker used to display coordinates when clicking on the canvas
+		self.picker = picker(Qwt.QwtPlot.xBottom,
+                               Qwt.QwtPlot.yLeft,
+                               Qwt.QwtPicker.PointSelection,
+                               Qwt.QwtPlotPicker.CrossRubberBand,
+                               Qwt.QwtPicker.ActiveOnly,
+                               self.canvas())
 
 	def setdata(self, x, y):
 		if self.canvas_width <> self.canvas().width():

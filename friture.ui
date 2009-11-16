@@ -155,7 +155,6 @@ peak</string>
    <addaction name="actionStart"/>
    <addaction name="actionSettings"/>
   </widget>
-  <widget class="QStatusBar" name="statusBar"/>
   <action name="actionStart">
    <property name="checkable">
     <bool>true</bool>

@@ -153,10 +153,6 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		self.connect(self.settings_dialog.spinBox_maxfreq, QtCore.SIGNAL('valueChanged(int)'), self.freqrangechanged)
 		self.connect(self.settings_dialog.comboBox_inputDevice, QtCore.SIGNAL('currentIndexChanged(int)'), self.input_device_changed)
 		
-		self.connect(self.PlotZoneImage, QtCore.SIGNAL('pointerMoved'), self.pointer_moved)
-		self.connect(self.PlotZoneSpect, QtCore.SIGNAL('pointerMoved'), self.pointer_moved)
-		self.connect(self.PlotZoneUp, QtCore.SIGNAL('pointerMoved'), self.pointer_moved)
-		
 		self.connect(self.dockWidgetScope, QtCore.SIGNAL('visibilityChanged(bool)'), self.scopeVisibility)
 		self.connect(self.dockWidgetStatistics, QtCore.SIGNAL('visibilityChanged(bool)'), self.statisticsVisibility)
 		self.connect(self.dockWidgetLevels, QtCore.SIGNAL('visibilityChanged(bool)'), self.levelsVisibility)
@@ -231,9 +227,6 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 
 	def spectrumVisibility(self, visible):
 		self.spectrumIsVisible = visible
-
-	def pointer_moved(self, info):
-		self.statusBar.showMessage(info)
 
 	#return True on success
 	def try_input_device(self):

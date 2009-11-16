@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'friture.ui'
 #
-# Created: Fri Nov 13 15:18:13 2009
+# Created: Mon Nov 16 11:32:23 2009
 #      by: PyQt4 UI code generator 4.6
 #
 # WARNING! All changes made in this file will be lost!
@@ -96,9 +96,6 @@ class Ui_MainWindow(object):
         self.toolBar = QtGui.QToolBar(MainWindow)
         self.toolBar.setObjectName("toolBar")
         MainWindow.addToolBar(QtCore.Qt.TopToolBarArea, self.toolBar)
-        self.statusBar = QtGui.QStatusBar(MainWindow)
-        self.statusBar.setObjectName("statusBar")
-        MainWindow.setStatusBar(self.statusBar)
         self.actionStart = QtGui.QAction(MainWindow)
         self.actionStart.setCheckable(True)
         self.actionStart.setChecked(True)

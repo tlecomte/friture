@@ -39,6 +39,14 @@ class FreqScaleDraw(Qwt.QwtScaleDraw):
 			label = "%d" %(value)
 		return Qwt.QwtText(label)
 
+class picker(Qwt.QwtPlotPicker):
+	def __init__(self, *args):
+		Qwt.QwtPlotPicker.__init__(self, *args)
+		
+	def trackerText(self, pos):
+		pos2 = self.invTransform(pos)
+		return Qwt.QwtText("%d Hz, %d dB" %(pos2.x(), pos2.y()))
+
 class SpectPlot(classplot.ClassPlot):
 	def __init__(self, *args):
 		classplot.ClassPlot.__init__(self, *args)
@@ -63,8 +71,14 @@ class SpectPlot(classplot.ClassPlot):
 		self.setAxisScaleDraw(Qwt.QwtPlot.xBottom, FreqScaleDraw())
 		
 		self.paint_time = 0.
-		
-		self.connect(self.picker, QtCore.SIGNAL('moved(const QPoint &)'), self.moved)
+
+		# picker used to display coordinates when clicking on the canvas
+		self.picker = picker(Qwt.QwtPlot.xBottom,
+                               Qwt.QwtPlot.yLeft,
+                               Qwt.QwtPicker.PointSelection,
+                               Qwt.QwtPlotPicker.CrossRubberBand,
+                               Qwt.QwtPicker.ActiveOnly,
+                               self.canvas())
 		
 		# insert an additional curve for the peak
 		self.curve_peak = Qwt.QwtPlotCurve()
@@ -74,12 +88,6 @@ class SpectPlot(classplot.ClassPlot):
 		self.peak = zeros((1,))
 		self.peakHold = 0
 		self.peakDecay = PEAK_DECAY_RATE
-	
-	def moved(self, point):
-		info = "Frequency=%d Hz, PSD=%d dB" % (
-			self.invTransform(Qwt.QwtPlot.xBottom, point.x()),
-			self.invTransform(Qwt.QwtPlot.yLeft, point.y()))
-		self.emit(QtCore.SIGNAL("pointerMoved"), info)
 
 	def setdata(self, x, y):
 		if self.canvas_width <> self.canvas().width():
