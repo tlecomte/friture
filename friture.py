@@ -38,6 +38,17 @@ import audioproc
 #make
 #sudo make install
 
+#profiling:
+#
+#First option:
+#python -m cProfile -o output.pstats ./friture.py
+#./gprof2dot.py -f pstats output.pstats -n 0.1 -e 0.02| dot -Tpng -o output2.png
+#
+#second option
+# ./friture.py --python
+# or
+# ./friture.py --kcachegrind
+
 SAMPLING_RATE = 44100
 NUM_SAMPLES = 1024
 FRAMES_PER_BUFFER = NUM_SAMPLES
@@ -516,7 +527,7 @@ if __name__ == "__main__":
 		cProfile.run('app.exec_()',filename="friture.cprof")
 		
 		stats = pstats.Stats("friture.cprof")
-		stats.strip_dirs().sort_stats('time').print_stats(20)
+		#stats.strip_dirs().sort_stats('time').print_stats(20)
 		
 		sys.exit(0)
 	elif profile == "kcachegrind":
