@@ -312,7 +312,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		if debug: print "available", available
 		# read what is available
 		if debug: print "about to read"
-		# we read by multiples of NUM_SAMPLES
+		# we read by multiples of NUM_SAMPLES, otherwise segfaults !
 		available = int(floor(available/NUM_SAMPLES))
 		for j in range(0, available):
 			self.i += 1
