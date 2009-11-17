@@ -55,11 +55,13 @@ class TimePlot(classplot.ClassPlot):
                                Qwt.QwtPlotPicker.CrossRubberBand,
                                Qwt.QwtPicker.ActiveOnly,
                                self.canvas())
+		
+		self.cached_canvas = self.canvas()
 
 	def setdata(self, x, y):
-		if self.canvas_width <> self.canvas().width():
+		if self.canvas_width <> self.cached_canvas.width():
 			print "changed canvas width"
-			self.canvas_width = self.canvas().width()
+			self.canvas_width = self.cached_canvas.width()
 			self.update_xscale()
 		
 		x_ms =  1e3*x
@@ -80,7 +82,7 @@ class TimePlot(classplot.ClassPlot):
 			# self.replot() would call updateAxes() which is dead slow (probably because it
 			# computes label sizes); instead, let's just ask Qt to repaint the canvas next time
 			# This works because we disable the cache
-			self.canvas().update()
+			self.cached_canvas.update()
 
 	def update_xscale(self):
 		self.xscaled = linspace(0., self.xmax, self.canvas_width)

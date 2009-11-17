@@ -88,11 +88,13 @@ class SpectPlot(classplot.ClassPlot):
 		self.peak = zeros((1,))
 		self.peakHold = 0
 		self.peakDecay = PEAK_DECAY_RATE
+		
+		self.cached_canvas = self.canvas()
 
 	def setdata(self, x, y):
-		if self.canvas_width <> self.canvas().width():
+		if self.canvas_width <> self.cached_canvas.width():
 			print "changed canvas width"
-			self.canvas_width = self.canvas().width()
+			self.canvas_width = self.cached_canvas.width()
 			self.update_xscale()
 		
 		if self.xmax <> x.max():
@@ -114,7 +116,7 @@ class SpectPlot(classplot.ClassPlot):
 			# self.replot() would call updateAxes() which is dead slow (probably because it
 			# computes label sizes); instead, let's just ask Qt to repaint the canvas next time
 			# This works because we disable the cache
-			self.canvas().update()
+			self.cached_canvas.update()
 
         def compute_peaks(self, y):
                 if len(self.peak) <> len(y):

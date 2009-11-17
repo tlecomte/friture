@@ -110,6 +110,8 @@ class ImagePlot(Qwt.QwtPlot):
                                self.canvas())
 		
 		self.replot()
+		
+		self.cached_canvas = self.canvas()
 
 	def addData(self, freq, xyzs):
 		self.plotImage.addData(freq, xyzs, self.logfreqscale)
@@ -119,7 +121,7 @@ class ImagePlot(Qwt.QwtPlot):
 		# TODO what happens when the cache is enabled ?
 		# Could that solve the perceived "unsmoothness" ?
 		
-		self.canvas().update()
+		self.cached_canvas.update()
 		
 		#print self.canvas().testPaintAttribute(Qwt.QwtPlotCanvas.PaintCached)
 		#print self.canvas().paintCache()
