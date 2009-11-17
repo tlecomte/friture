@@ -24,14 +24,18 @@ SAMPLING_RATE = 44100
 class audioproc():
 	def __init__(self):
 		self.freq = linspace(0, SAMPLING_RATE/2, 10)
+		self.maxfreq = 0
+		self.decimation = 0
 
 	def analyzelive(self, samples, fft_size, maxfreq):
 		#samples *= window
 		# first we remove as much points as possible
-		decimation = SAMPLING_RATE/2 / (2*maxfreq)
-		decimation = 2**(floor(log2(decimation)))
+		if maxfreq <> self.maxfreq:
+			self.maxfreq = maxfreq
+			decimation = SAMPLING_RATE/2 / (2*maxfreq)
+			self.decimation = 2**(floor(log2(decimation)))
 		
-		samples.shape = len(samples)/decimation, decimation
+		samples.shape = len(samples)/self.decimation, self.decimation
 		#the full way
 		#samples = samples.mean(axis=1)
 		#the simplest way
@@ -41,11 +45,11 @@ class audioproc():
 		#decimation = 1
 		
 		fft = rfft(samples)
-		spectrum = abs(fft) / float(fft_size/decimation)
+		spectrum = abs(fft) / float(fft_size/self.decimation)
 
-		if len(self.freq) <> fft_size/2/decimation + 1 :
+		if len(self.freq) <> fft_size/2/self.decimation + 1 :
 			print "audioproc: updating self.freq cache"
-			self.freq = linspace(0, SAMPLING_RATE/2/decimation, fft_size/2/decimation + 1)
+			self.freq = linspace(0, SAMPLING_RATE/2/self.decimation, fft_size/2/self.decimation + 1)
 		return spectrum, self.freq
 
 # above is done a FFT of the signal. This is ok for linear frequency scale, but
