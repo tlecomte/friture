@@ -66,9 +66,9 @@ class TimePlot(classplot.ClassPlot):
 		
 		x_ms =  1e3*x
 		needfullreplot = False
-		if self.xmax <> x_ms.max():
+		if self.xmax <> x_ms[-1]:
 			print "changing x scale"
-			self.xmax = x_ms.max()
+			self.xmax = x_ms[-1]
 			self.setAxisScale(Qwt.QwtPlot.xBottom, 0., self.xmax)
 			self.update_xscale()
 			needfullreplot = True

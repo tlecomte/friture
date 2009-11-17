@@ -97,9 +97,9 @@ class SpectPlot(classplot.ClassPlot):
 			self.canvas_width = self.cached_canvas.width()
 			self.update_xscale()
 		
-		if self.xmax <> x.max():
+		if self.xmax <> x[-1]:
 			print "changing x scale"
-			self.xmax = x.max()
+			self.xmax = x[-1]
 			self.update_xscale()
 			self.needfullreplot = True
 		
