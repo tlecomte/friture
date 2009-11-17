@@ -357,7 +357,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		stop = self.offset + self.buffer_length
 		floatdata = self.audiobuffer[start : stop]
 		
-		level_rms = 20*log10(sqrt((floatdata**2).sum()/len(floatdata)*2.) + 0*1e-80) #*2. to get 0dB for a sine wave
+		level_rms = 10*log10((floatdata**2).sum()/len(floatdata)*2. + 0*1e-80) #*2. to get 0dB for a sine wave
 		level_max = 20*log10(abs(floatdata).max() + 0*1e-80)
 		self.label_rms.setText("%.01f" % level_rms)
 		self.label_peak.setText("%.01f" % level_max)
