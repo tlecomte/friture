@@ -314,30 +314,27 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		if debug: print "about to read"
 		# we read by multiples of NUM_SAMPLES
 		available = int(floor(available/NUM_SAMPLES))
-		
-		self.i += available
-		
-		rawdata = self.stream.read(available*NUM_SAMPLES)
-		floatdata = fromstring(rawdata, int16)/(2.**(16-1))
-		
-		# update the circular buffer
-		if debug: print "available", available, "buffer length", self.buffer_length
-		if len(floatdata) > self.buffer_length:
-			print "buffer error"
-			exit(1)
-		
-		# first copy, always complete
-		self.audiobuffer[self.offset : self.offset + len(floatdata)] = floatdata[:]
-		
-		# second copy, can be folded
-		direct = min(len(floatdata), self.buffer_length - self.offset)
-		folded = len(floatdata) - direct
-		if debug: print "direct", direct, "folded", folded
-		self.audiobuffer[self.offset + self.buffer_length: self.offset + self.buffer_length + direct] = floatdata[0 : direct]
-		self.audiobuffer[:folded] = floatdata[direct:]
-		
-		self.offset = int((self.offset + len(floatdata)) % self.buffer_length)
-		if debug: print "new offset", self.offset
+		for j in range(0, available):
+			self.i += 1
+			rawdata = self.stream.read(NUM_SAMPLES)
+			floatdata = fromstring(rawdata, int16)/(2.**(16-1))
+			# update the circular buffer
+			if debug: print "available", available, "buffer length", self.buffer_length
+			if len(floatdata) > self.buffer_length:
+				print "buffer error"
+				exit(1)
+			
+			# first copy, always complete
+			self.audiobuffer[self.offset : self.offset + len(floatdata)] = floatdata[:]
+			# second copy, can be folded
+			direct = min(len(floatdata), self.buffer_length - self.offset)
+			folded = len(floatdata) - direct
+			if debug: print "direct", direct, "folded", folded
+			self.audiobuffer[self.offset + self.buffer_length: self.offset + self.buffer_length + direct] = floatdata[0 : direct]
+			self.audiobuffer[:folded] = floatdata[direct:]
+			
+			self.offset = int((self.offset + len(floatdata)) % self.buffer_length)
+			if debug: print "new offset", self.offset
 
 		self.buffer_timer_time = (95.*self.buffer_timer_time + 5.*t.elapsed())/100.
 
