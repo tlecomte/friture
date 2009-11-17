@@ -361,8 +361,8 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		level_max = 20*log10(abs(floatdata).max() + 0*1e-80)
 		self.label_rms.setText("%.01f" % level_rms)
 		self.label_peak.setText("%.01f" % level_max)
-		self.meter.setValue(0, sqrt((floatdata**2).sum()/len(floatdata)*2.))
-		self.meter.setValue(1, abs(floatdata).max())
+		self.meter.setValue(0, level_rms)
+		self.meter.setValue(1, level_max)
 
 	def scope(self):
 		time = SMOOTH_DISPLAY_TIMER_PERIOD_MS/1000.

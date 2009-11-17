@@ -104,26 +104,18 @@ class qsynthMeterValue(QtGui.QFrame):
 		self.setFrameShape(QtGui.QFrame.StyledPanel)
 		self.setFrameShadow(QtGui.QFrame.Sunken)
 
-	# Frame value one-way accessors.
-	def setValue(self, fValue):
-		if self.m_fValue < fValue:
-			self.m_fValue = fValue
-			
-		self.refresh()
-
 	# Reset peak holder.
 	def peakReset(self):
 		self.m_iPeak = 0
 
+	# Frame value one-way accessors.
+	def setValue(self, fValue):
+		self.m_fValue = fValue
+		self.refresh()
+
 	# Value refreshment.
 	def refresh(self):
-		if self.m_fValue < 0.001 and self.m_iPeak < 1:
-			return
-		
-		dB = QSYNTH_METER_MINDB
-		if self.m_fValue > 0.:
-			dB = 20. * log10(self.m_fValue)
-			self.m_fValue = 0.
+		dB = self.m_fValue
 		
 		if dB < QSYNTH_METER_MINDB:
 			dB = QSYNTH_METER_MINDB
