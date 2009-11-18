@@ -305,12 +305,10 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		t.start()
 		
 		debug = False
-		if debug: print "update_buffer"
 		# ask for how much data is available
 		available = self.stream.get_read_available()
 		if debug: print "available", available
 		# read what is available
-		if debug: print "about to read"
 		# we read by multiples of NUM_SAMPLES, otherwise segfaults !
 		available = int(floor(available/NUM_SAMPLES))
 		for j in range(0, available):
@@ -318,7 +316,6 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 			rawdata = self.stream.read(NUM_SAMPLES)
 			floatdata = fromstring(rawdata, int16)/(2.**(16-1))
 			# update the circular buffer
-			if debug: print "available", available, "buffer length", self.buffer_length
 			if len(floatdata) > self.buffer_length:
 				print "buffer error"
 				exit(1)
