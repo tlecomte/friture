@@ -291,11 +291,10 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 
 		maxfreq = self.settings_dialog.spinBox_maxfreq.value()
 		sp, freq = self.proc.analyzelive(self.audiobuffer[self.offset + self.buffer_length - self.fft_size: self.offset + self.buffer_length], self.fft_size, maxfreq)
-		clip = lambda val, low, high: min(high, max(low, val))
 		# scale the db spectrum from [- spec_range db ... 0 db] > [0..1]
 		epsilon = 1e-30
 		db_spectrogram = 20*log10(sp + epsilon)
-		norm_spectrogram = (db_spectrogram.clip(self.spec_min, self.spec_max) - self.spec_min)/(self.spec_max - self.spec_min)
+		norm_spectrogram = (db_spectrogram.clip(min = self.spec_min, max = self.spec_max) - self.spec_min)/(self.spec_max - self.spec_min)
 		
 		self.PlotZoneImage.addData(freq, norm_spectrogram)
 		
