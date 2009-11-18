@@ -304,10 +304,8 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		t = QtCore.QTime()
 		t.start()
 		
-		debug = False
 		# ask for how much data is available
 		available = self.stream.get_read_available()
-		if debug: print "available", available
 		# read what is available
 		# we read by multiples of NUM_SAMPLES, otherwise segfaults !
 		available = int(floor(available/NUM_SAMPLES))
@@ -325,12 +323,10 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 			# second copy, can be folded
 			direct = min(len(floatdata), self.buffer_length - self.offset)
 			folded = len(floatdata) - direct
-			if debug: print "direct", direct, "folded", folded
 			self.audiobuffer[self.offset + self.buffer_length: self.offset + self.buffer_length + direct] = floatdata[0 : direct]
 			self.audiobuffer[:folded] = floatdata[direct:]
 			
 			self.offset = int((self.offset + len(floatdata)) % self.buffer_length)
-			if debug: print "new offset", self.offset
 
 		self.buffer_timer_time = (95.*self.buffer_timer_time + 5.*t.elapsed())/100.
 
