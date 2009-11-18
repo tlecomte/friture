@@ -527,7 +527,7 @@ if __name__ == "__main__":
 		cProfile.run('app.exec_()',filename="friture.cprof")
 		
 		stats = pstats.Stats("friture.cprof")
-		#stats.strip_dirs().sort_stats('time').print_stats(20)
+		stats.strip_dirs().sort_stats('time').print_stats(20)
 		
 		sys.exit(0)
 	elif profile == "kcachegrind":
