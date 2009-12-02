@@ -53,12 +53,15 @@ texture = 0
 
 def LoadTextures():
     #global texture
-    array = np.random.rand(640,480)
-    image = array.tostring()
-    ix = array.shape[0]
-    iy = array.shape[1]
+    array_red = (np.random.rand(640,480)*255).astype(np.uint8)
+    array_blue = (np.random.rand(640,480)*255).astype(np.uint8)
+    array_green =  (np.random.rand(640,480)*255).astype(np.uint8)
+    array_alpha = np.ones((640,480),dtype=np.uint8)*255
+    array = np.dstack((array_red, array_blue, array_green, array_alpha))
     
-    #qimage = QtGui.QImage(
+    image = array.tostring()
+    ix = array_red.shape[0]
+    iy = array_red.shape[1]
 	
     # Create Texture	
     # There does not seem to be support for this call or the version of PyOGL I have is broken.
@@ -66,7 +69,7 @@ def LoadTextures():
     glBindTexture(GL_TEXTURE_2D, texture)   # 2d texture (x and y size)
 	
     glPixelStorei(GL_UNPACK_ALIGNMENT,1)
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, ix, iy, 0, GL_BGRA, GL_UNSIGNED_BYTE, image)
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, ix, iy, 0, GL_RGBA, GL_UNSIGNED_BYTE, image)
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP)
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP)
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT)
@@ -88,7 +91,7 @@ def InitGL(Width, Height):				# We call this right after our OpenGL window is cr
     glMatrixMode(GL_PROJECTION)
     glLoadIdentity()					# Reset The Projection Matrix
 
-    #glOrtho (0, XSize, YSize, 0, 0, 1) # use this to have coordinates in window pixels
+    glOrtho (0, Width, Height, 0, 0, 1) # use this to have coordinates in window pixels
 
     glMatrixMode(GL_MODELVIEW)
 
@@ -100,27 +103,33 @@ def ReSizeGLScene(Width, Height):
     glViewport(0, 0, Width, Height)		# Reset The Current Viewport And Perspective Transformation
     glMatrixMode(GL_PROJECTION)
     glLoadIdentity()
-    #glOrtho (0, XSize, YSize, 0, 0, 1) # use this to have coordinates in window pixels
+    glOrtho (0, Width, Height, 0, 0, 1) # use this to have coordinates in window pixels
     glMatrixMode(GL_MODELVIEW)
 
 # The main drawing function. 
 def DrawGLScene():
 	global texture, yrot
 
-	array = np.random.rand(1,480)
+	#array = np.random.rand(1, 480)
+	#image = array.tostring()
+	array_red = (np.random.rand(1,480)*255).astype(np.uint8)
+	array_blue = (np.random.rand(1,480)*255).astype(np.uint8)
+	array_green =  (np.random.rand(1,480)*255).astype(np.uint8)
+	array_alpha = np.ones((1,480),dtype=np.uint8)*255
+	array = np.dstack((array_red, array_blue, array_green, array_alpha))
 	image = array.tostring()
 	
-	glTexSubImage2D(GL_TEXTURE_2D, 0, yrot, 0, 1, 480, GL_BGRA, GL_UNSIGNED_BYTE, image)
+	glTexSubImage2D(GL_TEXTURE_2D, 0, yrot, 0, 1, 480, GL_RGBA, GL_UNSIGNED_BYTE, image)
 
 	glLoadIdentity() # Reset The View
 
 	glBegin(GL_QUADS) # Start Drawing The Cube
 	
 	# note that the texture's corners have to match the quad's corners
-	glTexCoord2f(0.0, 0.0); glVertex2f(-1.0, -1.0) # Bottom Left Of The Texture and Quad
-	glTexCoord2f(1.0, 0.0); glVertex2f( 1.0, -1.0) # Bottom Right Of The Texture and Quad
-	glTexCoord2f(1.0, 1.0); glVertex2f( 1.0,  1.0) # Top Right Of The Texture and Quad
-	glTexCoord2f(0.0, 1.0); glVertex2f(-1.0,  1.0) # Top Left Of The Texture and Quad
+	glTexCoord2f(0.0, 0.0); glVertex2f(0, 0) # Bottom Left Of The Texture and Quad
+	glTexCoord2f(1.0, 0.0); glVertex2f(640, 0) # Bottom Right Of The Texture and Quad
+	glTexCoord2f(1.0, 1.0); glVertex2f(640,  480) # Top Right Of The Texture and Quad
+	glTexCoord2f(0.0, 1.0); glVertex2f(0,  480) # Top Left Of The Texture and Quad
 
 	glEnd() # Done Drawing The Rectangle
 	
