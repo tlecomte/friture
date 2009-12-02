@@ -63,12 +63,10 @@ def LoadTextures():
     ix = array_red.shape[0]
     iy = array_red.shape[1]
 	
-    # Create Texture	
-    # There does not seem to be support for this call or the version of PyOGL I have is broken.
-    glGenTextures(1, texture)
-    glBindTexture(GL_TEXTURE_2D, texture)   # 2d texture (x and y size)
-	
-    glPixelStorei(GL_UNPACK_ALIGNMENT,1)
+    # Create Texture
+    glGenTextures(1, texture) # generate one texture name
+    glBindTexture(GL_TEXTURE_2D, texture) # bind a 2d texture to the generated name
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1)
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, ix, iy, 0, GL_RGBA, GL_UNSIGNED_BYTE, image)
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP)
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP)
@@ -79,17 +77,17 @@ def LoadTextures():
     glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL)
 
 # A general OpenGL initialization function.  Sets all of the initial parameters. 
-def InitGL(Width, Height):				# We call this right after our OpenGL window is created.
+def InitGL(Width, Height): # We call this right after our OpenGL window is created.
     LoadTextures()
     glEnable(GL_TEXTURE_2D)
-    glClearColor(0.0, 0.0, 0.0, 0.0)	# This Will Clear The Background Color To Black
-    #glClearDepth(1.0)					# Enables Clearing Of The Depth Buffer
-    #glDepthFunc(GL_LESS)				# The Type Of Depth Test To Do
-    glDisable(GL_DEPTH_TEST)				# 2D means no depth !
-    glShadeModel(GL_SMOOTH)				# Enables Smooth Color Shading
+    glClearColor(0.0, 0.0, 0.0, 0.0) # This Will Clear The Background Color To Black
+    #glClearDepth(1.0) # Enables Clearing Of The Depth Buffer
+    #glDepthFunc(GL_LESS) # The Type Of Depth Test To Do
+    glDisable(GL_DEPTH_TEST) # 2D means no depth !
+    glShadeModel(GL_SMOOTH) # Enables Smooth Color Shading
 	
     glMatrixMode(GL_PROJECTION)
-    glLoadIdentity()					# Reset The Projection Matrix
+    glLoadIdentity() # Reset The Projection Matrix
 
     glOrtho (0, Width, Height, 0, 0, 1) # use this to have coordinates in window pixels
 
@@ -97,10 +95,10 @@ def InitGL(Width, Height):				# We call this right after our OpenGL window is cr
 
 # The function called when our window is resized (which shouldn't happen if you enable fullscreen, below)
 def ReSizeGLScene(Width, Height):
-    if Height == 0:						# Prevent A Divide By Zero If The Window Is Too Small 
+    if Height == 0: # Prevent A Divide By Zero If The Window Is Too Small 
 	    Height = 1
 
-    glViewport(0, 0, Width, Height)		# Reset The Current Viewport And Perspective Transformation
+    glViewport(0, 0, Width, Height) # Reset The Current Viewport And Perspective Transformation
     glMatrixMode(GL_PROJECTION)
     glLoadIdentity()
     glOrtho (0, Width, Height, 0, 0, 1) # use this to have coordinates in window pixels
@@ -143,7 +141,7 @@ def keyPressed(*args):
 	# If escape is pressed, kill everything.
     if args[0] == ESCAPE:
 	    glutDestroyWindow(window)
-	    sys.exit()
+	    sys.exit(0)
 
 def main():
 	global window
