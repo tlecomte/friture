@@ -18,7 +18,7 @@
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
 import numpy
-from PyQt4 import Qt, QtCore
+from PyQt4 import Qt, QtCore, QtGui
 import PyQt4.Qwt5 as Qwt
 
 class AudioData():
@@ -51,9 +51,9 @@ class CanvasScaledSpectrogram(QtCore.QObject):
 		self.maxfreq = 20000.
 		self.update_xscale()
 		#self.fullspectrogram = numpy.zeros((self.canvas_height, self.time_bin_number(), 4), dtype = numpy.uint8)
-		self.pixmap = Qt.QPixmap(2*self.canvas_width,  self.canvas_height)
-		self.pixmap.fill(Qt.QColor("black"))
-		self.painter = Qt.QPainter(self.pixmap)
+		self.pixmap = QtGui.QPixmap(2*self.canvas_width,  self.canvas_height)
+		self.pixmap.fill(QtGui.QColor("black"))
+		self.painter = QtGui.QPainter(self.pixmap)
 		self.offset = 0
 		# prepare a custom colormap black->blue->green->yellow->red->white
 		self.colorMap = Qwt.QwtLinearColorMap(Qt.Qt.black, Qt.Qt.white)
@@ -77,9 +77,9 @@ class CanvasScaledSpectrogram(QtCore.QObject):
 		#self.fullspectrogram = numpy.zeros((self.canvas_height, self.time_bin_number(), 4), dtype = numpy.uint8)
 		del self.painter
 		del self.pixmap
-		self.pixmap = Qt.QPixmap(2*self.canvas_width,  self.canvas_height)
-		self.pixmap.fill(Qt.QColor("black"))
-		self.painter = Qt.QPainter(self.pixmap)
+		self.pixmap = QtGui.QPixmap(2*self.canvas_width,  self.canvas_height)
+		self.pixmap.fill(QtGui.QColor("black"))
+		self.painter = QtGui.QPainter(self.pixmap)
 		self.offset = 0
 
 	def time_bin_number(self):
@@ -168,7 +168,7 @@ class CanvasScaledSpectrogram(QtCore.QObject):
 		return dat4.tostring()
 
 	def prepare_image(self, byteString, length):
-		myimage = Qt.QImage(byteString, 1, length, Qt.QImage.Format_RGB32)
+		myimage = QtGui.QImage(byteString, 1, length, QtGui.QImage.Format_RGB32)
 		return myimage
 
 	def prepare_palette(self):
