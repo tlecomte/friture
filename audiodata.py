@@ -173,15 +173,13 @@ class CanvasScaledSpectrogram(QtCore.QObject):
 
 	def prepare_palette(self):
 		self.colors = numpy.zeros((256))
-		self.colorscale = numpy.linspace(0., 1., 256)
 		for i in range(0, 256):
 			self.colors[i] = self.colorMap.rgb(Qwt.QwtDoubleInterval(0,255), i)
 
 	def color_from_float(self, v):
-		d = numpy.digitize(v, self.colorscale)
-		d = d -1 # + (d==len(self.colorscale))*(-1)
+		d = (v*256).astype(numpy.uint8)
+		d = d -1
 		return self.colors[d]
-		#return numpy.interp(v, self.colorscale, self.colors)
 
 	#def interpolate_colors(colors, flat=False, num_colors=256):
 		#colors = 
