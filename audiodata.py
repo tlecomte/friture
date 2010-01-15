@@ -52,6 +52,7 @@ class CanvasScaledSpectrogram(QtCore.QObject):
 		self.update_xscale()
 		#self.fullspectrogram = numpy.zeros((self.canvas_height, self.time_bin_number(), 4), dtype = numpy.uint8)
 		self.pixmap = QtGui.QPixmap(2*self.canvas_width,  self.canvas_height)
+		print "pixmap info : hasAlpha =", self.pixmap.hasAlpha(), ", depth =", self.pixmap.depth(), ", default depth =", self.pixmap.defaultDepth()
 		self.pixmap.fill(QtGui.QColor("black"))
 		self.painter = QtGui.QPainter(self.pixmap)
 		self.offset = 0
