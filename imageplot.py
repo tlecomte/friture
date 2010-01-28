@@ -18,7 +18,7 @@
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
 import PyQt4.Qwt5 as Qwt
-from PyQt4 import QtCore, QtGui
+from PyQt4 import QtCore, QtGui, Qt
 from audiodata import *
 
 class FreqScaleDraw(Qwt.QwtScaleDraw):
@@ -55,7 +55,12 @@ class PlotImage(Qwt.QwtPlotItem):
 
 		pixmap = self.canvasscaledspectrogram.getpixmap()
 		offset = self.canvasscaledspectrogram.getpixmapoffset()
-		painter.drawPixmap(rect.left(), rect.top(), pixmap,  offset,  0,  0,  0)
+		
+		rolling = True
+		if rolling:
+			painter.drawPixmap(rect.left(), rect.top(), pixmap,  offset,  0,  0,  0)
+		else:
+			painter.drawPixmap(rect.left() + offset, rect.top(), pixmap,  offset-1,  0,  1,  0)
 		
 		#print painter
 		#print xMap.p1(), xMap.p2(), xMap.s1(), xMap.s2()
