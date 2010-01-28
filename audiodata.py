@@ -179,7 +179,6 @@ class CanvasScaledSpectrogram(QtCore.QObject):
 
 	def color_from_float(self, v):
 		d = (v*256).astype(numpy.uint8)
-		d = d -1
 		return self.colors[d]
 
 	#def interpolate_colors(colors, flat=False, num_colors=256):
