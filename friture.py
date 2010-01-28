@@ -60,7 +60,7 @@ class Settings_Dialog(QtGui.QDialog, Ui_Settings_Dialog):
 		QtGui.QDialog.__init__(self)
 		Ui_Settings_Dialog.__init__(self)
 		
-		# Configure l'interface utilisateur.
+		# Setup the user interface
 		self.setupUi(self)
 
 class Friture(QtGui.QMainWindow, Ui_MainWindow):
@@ -68,7 +68,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		QtGui.QMainWindow.__init__(self)
 		Ui_MainWindow.__init__(self)
 
-		# Configure l'interface utilisateur.
+		# Setup the user interface
 		self.setupUi(self)
 		
 		self.settings_dialog = Settings_Dialog()
