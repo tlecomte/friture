@@ -84,6 +84,7 @@ class ImagePlot(Qwt.QwtPlot):
 		# we do not need caching
 		self.canvas().setPaintAttribute(Qwt.QwtPlotCanvas.PaintCached, False)
 		self.canvas().setPaintAttribute(Qwt.QwtPlotCanvas.PaintPacked, False)
+		self.canvas().setAttribute(Qt.Qt.WA_NoSystemBackground)
 
 		# set plot layout
 		self.plotLayout().setMargin(0)
