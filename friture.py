@@ -54,7 +54,6 @@ NUM_SAMPLES = 1024
 FRAMES_PER_BUFFER = NUM_SAMPLES
 TIMER_PERIOD_MS = int(ceil(1000.*NUM_SAMPLES/float(SAMPLING_RATE)))
 SMOOTH_DISPLAY_TIMER_PERIOD_MS = 25
-DEVICE_INDEX = 0
 
 class Settings_Dialog(QtGui.QDialog, Ui_Settings_Dialog):
 	def __init__(self):
