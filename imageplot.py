@@ -50,6 +50,7 @@ class PlotImage(Qwt.QwtPlotItem):
 		self.canvasscaledspectrogram.addData(freq, xyzs)
 
 	def draw(self, painter, xMap, yMap, rect):
+		# update the spectrogram according to possibly new canvas dimensions
 		self.canvasscaledspectrogram.setcanvas_height(rect.height())
 		self.canvasscaledspectrogram.setcanvas_width(rect.width())
 
@@ -58,8 +59,10 @@ class PlotImage(Qwt.QwtPlotItem):
 		
 		rolling = True
 		if rolling:
+			# draw the whole canvas with a selected portion of the pixmap
 			painter.drawPixmap(rect.left(), rect.top(), pixmap,  offset,  0,  0,  0)
 		else:
+			# draw one single line of the pixmap at a moving position
 			painter.drawPixmap(rect.left() + offset, rect.top(), pixmap,  offset-1,  0,  1,  0)
 		
 		#print painter
@@ -84,6 +87,7 @@ class ImagePlot(Qwt.QwtPlot):
 		# we do not need caching
 		self.canvas().setPaintAttribute(Qwt.QwtPlotCanvas.PaintCached, False)
 		self.canvas().setPaintAttribute(Qwt.QwtPlotCanvas.PaintPacked, False)
+		# we do not need to have the background erased on each repaint
 		self.canvas().setAttribute(Qt.Qt.WA_NoSystemBackground)
 
 		# set plot layout
