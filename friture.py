@@ -289,6 +289,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		t.start()
 
 		maxfreq = self.settings_dialog.spinBox_maxfreq.value()
+		# FIXME We should allow here for more intelligent transforms, especially when the log freq scale is selected
 		sp, freq = self.proc.analyzelive(self.audiobuffer[self.offset + self.buffer_length - self.fft_size: self.offset + self.buffer_length], self.fft_size, maxfreq)
 		# scale the db spectrum from [- spec_range db ... 0 db] > [0..1]
 		epsilon = 1e-30
