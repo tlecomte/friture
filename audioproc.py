@@ -58,4 +58,4 @@ class audioproc():
 # analysis
 # Instead a constant Q transform should be used
 
-# More agressively, we shall use a ear/cochlear model : logarithmic frequency scale, 4000 logarithmic-spaced bins, quality factors determined from mechanical model, and 50 ms smoothing afterwards for the sensor cell response time
+# More agressively, we shall use a ear/cochlear model : logarithmic frequency scale, 4000 logarithmic-spaced bins, quality factors determined from mechanical model, and 50 ms smoothing afterwards for the sensor cell response time. The problem here comes from the implementation: how to do it cleverly ?
