@@ -19,6 +19,7 @@
 
 from numpy import linspace, abs, log2, floor
 from numpy.fft import rfft
+# the sample rate below should be dynamic, taken from PyAudio/PortAudio
 SAMPLING_RATE = 44100
 
 class audioproc():
