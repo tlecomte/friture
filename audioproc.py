@@ -59,3 +59,5 @@ class audioproc():
 # Instead a constant Q transform should be used
 
 # More agressively, we shall use a ear/cochlear model : logarithmic frequency scale, 4000 logarithmic-spaced bins, quality factors determined from mechanical model, and 50 ms smoothing afterwards for the sensor cell response time. The problem here comes from the implementation: how to do it cleverly ?
+
+# on top of that, we could add the reponse of the middle ear, which is a roughly band-pass filter centered around 1 kHz (see psychoacoustic models)
