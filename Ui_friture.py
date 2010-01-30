@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'friture.ui'
 #
-# Created: Mon Nov 16 18:12:59 2009
+# Created: Fri Nov 20 14:40:09 2009
 #      by: PyQt4 UI code generator 4.6
 #
 # WARNING! All changes made in this file will be lost!
@@ -22,8 +22,6 @@ class Ui_MainWindow(object):
         self.gridLayout_3.setObjectName("gridLayout_3")
         self.PlotZoneImage = ImagePlot(self.centralwidget)
         self.PlotZoneImage.setObjectName("PlotZoneImage")
-        self.gridLayout = QtGui.QGridLayout(self.PlotZoneImage)
-        self.gridLayout.setObjectName("gridLayout")
         self.gridLayout_3.addWidget(self.PlotZoneImage, 0, 0, 1, 2)
         MainWindow.setCentralWidget(self.centralwidget)
         self.dockWidgetLevels = QtGui.QDockWidget(MainWindow)

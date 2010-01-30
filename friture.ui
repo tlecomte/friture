@@ -20,9 +20,7 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout_3">
     <item row="0" column="0" colspan="2">
-     <widget class="ImagePlot" name="PlotZoneImage">
-      <layout class="QGridLayout" name="gridLayout"/>
-     </widget>
+     <widget class="ImagePlot" name="PlotZoneImage"/>
     </item>
    </layout>
   </widget>

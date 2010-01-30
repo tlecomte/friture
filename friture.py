@@ -49,6 +49,7 @@ import audioproc
 # or
 # ./friture.py --kcachegrind
 
+# the sample rate below should be dynamic, taken from PyAudio/PortAudio
 SAMPLING_RATE = 44100
 NUM_SAMPLES = 1024
 FRAMES_PER_BUFFER = NUM_SAMPLES
