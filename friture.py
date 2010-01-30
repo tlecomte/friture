@@ -19,7 +19,7 @@
 
 import sys
 from pyaudio import PyAudio, paInt16
-from numpy import transpose, log10, sqrt, ceil, linspace, arange, floor, zeros, int16, fromstring, where
+from numpy import transpose, log10, sqrt, ceil, linspace, arange, floor, zeros, int16, fromstring, where, sign
 from PyQt4 import QtGui, QtCore, Qt
 import PyQt4.Qwt5 as Qwt
 from Ui_friture import Ui_MainWindow
@@ -382,9 +382,15 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 			start = start - shift
 			stop = stop - shift
 		floatdata = self.audiobuffer[start : stop]
+		y = floatdata - floatdata.mean()
+		
+		dBscope = False
+		if dBscope:
+		    dBmin = -40.
+		    y = sign(y)*(20*log10(abs(y))).clip(dBmin, 0.)/(-dBmin) + sign(y)*1.
 	
 		time = linspace(0., len(floatdata)/float(SAMPLING_RATE), len(floatdata))
-		self.PlotZoneUp.setdata(time, floatdata)
+		self.PlotZoneUp.setdata(time, y)
 
 	def spectrum(self):
 		maxfreq = self.settings_dialog.spinBox_maxfreq.value()
