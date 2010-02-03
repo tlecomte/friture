@@ -44,10 +44,18 @@ import audioproc
 #python -m cProfile -o output.pstats ./friture.py
 #./gprof2dot.py -f pstats output.pstats -n 0.1 -e 0.02| dot -Tpng -o output2.png
 #
-#second option
+#second option:
 # ./friture.py --python
 # or
 # ./friture.py --kcachegrind
+
+#third option:
+# use a system-wide profiler
+# such as sysprof on Linux
+# For sysprof, either use "sudo m-a a-i sysprof-module" to build the module for your current kernel,
+# on Debian-like distributions, or use a development version of sysprof (>=1.11) and a recent
+# kernel (>=2.6.31) that has built-in support, with in-kernel tracing as an addition
+# ./gprof2dot.py -f sysprof sysprof_profile_kernel| dot -Tpng -o output_sysprof_kernel.png
 
 # the sample rate below should be dynamic, taken from PyAudio/PortAudio
 SAMPLING_RATE = 44100
