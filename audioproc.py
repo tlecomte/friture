@@ -45,8 +45,20 @@ class audioproc():
 		#uncomment the following to disable the decimation altogether
 		#decimation = 1
 		
+		# FFT for a linear transformation in frequency scale
 		fft = rfft(samples)
 		spectrum = abs(fft) / float(fft_size/self.decimation)
+		# bank of filters for any other kind of frequency scale
+		# http://cobweb.ecn.purdue.edu/~malcolm/apple/tr35/PattersonsEar.pdf
+		# bandwidth of a cochlear channel as a function of center frequency
+		#def ERB (f, EarQ, minBW, order):
+		#	return ((f/EarQ)**order + minBW**order)**(1./order)
+		# Glassberg recommendations
+		#EarQ = 9.26449
+		#minBW = 24.7
+		#order = 1.
+		
+		
 
 		if len(self.freq) <> fft_size/2/self.decimation + 1 :
 			print "audioproc: updating self.freq cache"
