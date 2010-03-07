@@ -36,7 +36,10 @@ class audioproc():
 			decimation = SAMPLING_RATE/2 / (2*maxfreq)
 			self.decimation = 2**(floor(log2(decimation)))
 		
-		samples.shape = len(samples)/self.decimation, self.decimation
+		if self.decimation < 1:
+			self.decimation = 1
+		
+		samples.shape = len(samples)/self.decimation, self.decimation			
 		#the full way
 		#samples = samples.mean(axis=1)
 		#the simplest way
