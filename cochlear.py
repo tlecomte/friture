@@ -1,7 +1,6 @@
 from numpy import pi, exp, arange, cos, sin, sqrt, zeros, ones, log
 from scipy.signal import lfilter
 
-
 def MakeERBFilters(fs, numChannels, lowFreq):
 	# [forward, feedback] = MakeERBFilters(fs, numChannels) computes the
 	# filter coefficients for a bank of Gammatone filters. These
@@ -76,28 +75,33 @@ def ERBFilterBank(forward, feedback, x):
 		y[i,:] = lfilter(forward[i,:], feedback[i,:], x)
 	return y
 
-from matplotlib.pyplot import semilogx, plot, show, xlim, ylim
-from numpy.fft import fft, fftfreq
-from numpy import log10, linspace
+# main() is a test function
+def main():
+    from matplotlib.pyplot import semilogx, plot, show, xlim, ylim
+    from numpy.fft import fft, fftfreq
+    from numpy import log10, linspace
 
-N = 2048
-fs = 16000.
-Nchannels = 64
-low_freq = 20.
+    N = 2048
+    fs = 16000.
+    Nchannels = 20
+    low_freq = 20.
 
-impulse = zeros(N)
-impulse[0] = 1
-#impulse = sin(linspace(0, 600*pi, N))
+    impulse = zeros(N)
+    impulse[0] = 1
+    #impulse = sin(linspace(0, 600*pi, N))
 
-[ERBforward, ERBfeedback] = MakeERBFilters(fs, Nchannels, low_freq)
-y = ERBFilterBank(ERBforward, ERBfeedback, impulse)
+    [ERBforward, ERBfeedback] = MakeERBFilters(fs, Nchannels, low_freq)
+    y = ERBFilterBank(ERBforward, ERBfeedback, impulse)
 
-response = 20.*log10(abs(fft(y)))
-freqScale = fftfreq(N, 1./fs)
+    response = 20.*log10(abs(fft(y)))
+    freqScale = fftfreq(N, 1./fs)
 
-for i in range(0, response.shape[0]):
-	semilogx(freqScale[0:N/2],response[i, 0:N/2])
-xlim(1e2, 1e4)
-#ylim(-70, 10)
+    for i in range(0, response.shape[0]):
+            semilogx(freqScale[0:N/2],response[i, 0:N/2])
+    xlim(1e2, 1e4)
+    ylim(-70, 10)
 
-show()
+    show()
+    
+if __name__ == "__main__":
+    main()
