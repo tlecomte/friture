@@ -78,7 +78,7 @@ def ERBFilterBank(forward, feedback, x):
 
 from matplotlib.pyplot import semilogx, plot, show, xlim, ylim
 from numpy.fft import fft, fftfreq
-from numpy import log10
+from numpy import log10, linspace
 
 N = 2048
 fs = 16000.
@@ -87,6 +87,8 @@ low_freq = 20.
 
 impulse = zeros(N)
 impulse[0] = 1
+#impulse = sin(linspace(0, 600*pi, N))
+
 [ERBforward, ERBfeedback] = MakeERBFilters(fs, Nchannels, low_freq)
 y = ERBFilterBank(ERBforward, ERBfeedback, impulse)
 
@@ -96,6 +98,6 @@ freqScale = fftfreq(N, 1./fs)
 for i in range(0, response.shape[0]):
 	semilogx(freqScale[0:N/2],response[i, 0:N/2])
 xlim(1e2, 1e4)
-ylim(-70, 10)
+#ylim(-70, 10)
 
 show()
