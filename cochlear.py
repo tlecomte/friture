@@ -1,6 +1,23 @@
 from numpy import pi, exp, arange, cos, sin, sqrt, zeros, ones, log
 from scipy.signal import lfilter
 
+# bank of filters for any other kind of frequency scale
+# http://cobweb.ecn.purdue.edu/~malcolm/apple/tr35/PattersonsEar.pdf
+# bandwidth of a cochlear channel as a function of center frequency
+
+# Change the following parameters if you wish to use a different
+# ERB scale.
+EarQ = 9.26449 # Glasberg and Moore Parameters
+minBW = 24.7
+order = 1.
+
+def frequencies(fs, numChannels, lowFreq):
+	channels = arange(0, numChannels)
+	cf = -(EarQ*minBW) + exp(channels*(-log(fs/2 + EarQ*minBW) + \
+		log(lowFreq + EarQ*minBW))/numChannels) \
+		*(fs/2 + EarQ*minBW)
+	return cf
+
 def MakeERBFilters(fs, numChannels, lowFreq):
 	# [forward, feedback] = MakeERBFilters(fs, numChannels) computes the
 	# filter coefficients for a bank of Gammatone filters. These
@@ -13,18 +30,10 @@ def MakeERBFilters(fs, numChannels, lowFreq):
 	# The filter bank contains "numChannels" channels that extend from
 	# half the sampling rate (fs) to "lowFreq".
 	T = 1./fs
-	# Change the following parameters if you wish to use a different
-	# ERB scale.
-	EarQ = 9.26449 # Glasberg and Moore Parameters
-	minBW = 24.7
-	order = 1.
 	# All of the following expressions are derived in Apple TR #35, "An
 	# Efficient Implementation of the Patterson-Holdsworth Cochlear
 	# Filter Bank."
-	channels = arange(0, numChannels)
-	cf = -(EarQ*minBW) + exp(channels*(-log(fs/2 + EarQ*minBW) + \
-	     log(lowFreq + EarQ*minBW))/numChannels) \
-	     *(fs/2 + EarQ*minBW)
+	cf = frequencies(fs, numChannels, lowFreq)
 	ERB = ((cf/EarQ)**order + minBW**order)**(1./order)
 	B = 1.019*2*pi*ERB
 	gain = abs((-2*exp(4*1j*cf*pi*T)*T + \
