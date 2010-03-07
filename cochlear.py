@@ -1,7 +1,6 @@
-from numpy import pi, exp, arange, cos, sin, sqrt, zeros, ones, log, log10, linspace
-from numpy.fft import fft, fftfreq
+from numpy import pi, exp, arange, cos, sin, sqrt, zeros, ones, log
 from scipy.signal import lfilter
-from matplotlib.pyplot import semilogx, plot, show, xlim, ylim
+
 
 def MakeERBFilters(fs, numChannels, lowFreq):
 	# [forward, feedback] = MakeERBFilters(fs, numChannels) computes the
@@ -77,6 +76,10 @@ def ERBFilterBank(forward, feedback, x):
 		y[i,:] = lfilter(forward[i,:], feedback[i,:], x)
 	return y
 
+from matplotlib.pyplot import semilogx, plot, show, xlim, ylim
+from numpy.fft import fft, fftfreq
+from numpy import log10
+
 N = 2048
 fs = 16000.
 Nchannels = 64
@@ -87,7 +90,7 @@ impulse[0] = 1
 [ERBforward, ERBfeedback] = MakeERBFilters(fs, Nchannels, low_freq)
 y = ERBFilterBank(ERBforward, ERBfeedback, impulse)
 
-response = 20.*log10(abs(fft(y[::5])))
+response = 20.*log10(abs(fft(y)))
 freqScale = fftfreq(N, 1./fs)
 
 for i in range(0, response.shape[0]):
