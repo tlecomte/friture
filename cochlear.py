@@ -1,7 +1,10 @@
-from numpy import pi, exp, arange, cos, sin, sqrt
+from numpy import pi, exp, arange, cos, sin, sqrt, zeros, ones, log, log10, linspace
+from numpy.fft import fft, fftfreq
+from scipy.signal import lfilter
+from matplotlib.pyplot import semilogx, plot, show, xlim, ylim
 
-def MakeERBFilters(fs,numChannels,lowFreq):
-	# [forward, feedback]=MakeERBFilters(fs,numChannels) computes the
+def MakeERBFilters(fs, numChannels, lowFreq):
+	# [forward, feedback] = MakeERBFilters(fs, numChannels) computes the
 	# filter coefficients for a bank of Gammatone filters. These
 	# filters were defined by Patterson and Holdworth for simulating
 	# the cochlea. The results are returned as arrays of filter
@@ -20,7 +23,7 @@ def MakeERBFilters(fs,numChannels,lowFreq):
 	# All of the following expressions are derived in Apple TR #35, "An
 	# Efficient Implementation of the Patterson-Holdsworth Cochlear
 	# Filter Bank."
-	channels = arange(1, numChannels)
+	channels = arange(0, numChannels)
 	cf = -(EarQ*minBW) + exp(channels*(-log(fs/2 + EarQ*minBW) + \
 	     log(lowFreq + EarQ*minBW))/numChannels) \
 	     *(fs/2 + EarQ*minBW)
@@ -31,7 +34,7 @@ def MakeERBFilters(fs,numChannels,lowFreq):
 	       (cos(2*cf*pi*T) - sqrt(3. - 2.**(3./2.))* \
 	       sin(2*cf*pi*T))) * \
 	       (-2*exp(4*1j*cf*pi*T)*T + \
-	       2*exp(-(B*T) + 2*1j*cf*pi*T)*T.* \
+	       2*exp(-(B*T) + 2*1j*cf*pi*T)*T* \
 	       (cos(2*cf*pi*T) + sqrt(3. - 2.**(3./2.)) * \
 	       sin(2*cf*pi*T)))* \
 	       (-2*exp(4*1j*cf*pi*T)*T + \
@@ -39,26 +42,26 @@ def MakeERBFilters(fs,numChannels,lowFreq):
 	       (cos(2*cf*pi*T) - \
 	       sqrt(3. + 2.**(3./2.))*sin(2*cf*pi*T))) * \
 	       (-2*exp(4*1j*cf*pi*T)*T + 2*exp(-(B*T) + 2*1j*cf*pi*T)*T* \
-	       (cos(2*cf*pi*T) + sqrt(3. + 2.**(3./2).)*sin(2*cf*pi*T))) / \
+	       (cos(2*cf*pi*T) + sqrt(3. + 2.**(3./2.))*sin(2*cf*pi*T))) / \
 	       (-2 / exp(2*B*T) - 2*exp(4*1j*cf*pi*T) + \
 	       2*(1 + exp(4*1j*cf*pi*T))/exp(B*T))**4)
 	
-	feedback = zeros(length(cf), 9)
-	forward = zeros(length(cf), 5)
-	forward(:,1) = T**4 ./ gain
-	forward(:,2) = -4*T**4*cos(2*cf*pi*T)./exp(B*T)./gain
-	forward(:,3) = 6*T**4*cos(4*cf*pi*T)./exp(2*B*T)./gain
-	forward(:,4) = -4*T**4*cos(6*cf*pi*T)./exp(3*B*T)./gain
-	forward(:,5) = T**4*cos(8*cf*pi*T)./exp(4*B*T)./gain
-	feedback(:,1) = ones(length(cf),1)
-	feedback(:,2) = -8*cos(2*cf*pi*T)./exp(B*T)
-	feedback(:,3) = 4*(4 + 3*cos(4*cf*pi*T))./exp(2*B*T)
-	feedback(:,4) = -8*(6*cos(2*cf*pi*T) + cos(6*cf*pi*T))./exp(3*B*T)
-	feedback(:,5) = 2*(18 + 16*cos(4*cf*pi*T) + cos(8*cf*pi*T))./exp(4*B*T)
-	feedback(:,6) = -8*(6*cos(2*cf*pi*T) + cos(6*cf*pi*T))./exp(5*B*T)
-	feedback(:,7) = 4*(4 + 3*cos(4*cf*pi*T))./exp(6*B*T)
-	feedback(:,8) = -8*cos(2*cf*pi*T)./exp(7*B*T)
-	feedback(:,9) = exp(-8*B*T)
+	feedback = zeros((len(cf), 9))
+	forward = zeros((len(cf), 5))
+	forward[:,0] = T**4 / gain
+	forward[:,1] = -4*T**4*cos(2*cf*pi*T)/exp(B*T)/gain
+	forward[:,2] = 6*T**4*cos(4*cf*pi*T)/exp(2*B*T)/gain
+	forward[:,3] = -4*T**4*cos(6*cf*pi*T)/exp(3*B*T)/gain
+	forward[:,4] = T**4*cos(8*cf*pi*T)/exp(4*B*T)/gain
+	feedback[:,0] = ones(len(cf))
+	feedback[:,1] = -8*cos(2*cf*pi*T)/exp(B*T)
+	feedback[:,2] = 4*(4 + 3*cos(4*cf*pi*T))/exp(2*B*T)
+	feedback[:,3] = -8*(6*cos(2*cf*pi*T) + cos(6*cf*pi*T))/exp(3*B*T)
+	feedback[:,4] = 2*(18 + 16*cos(4*cf*pi*T) + cos(8*cf*pi*T))/exp(4*B*T)
+	feedback[:,5] = -8*(6*cos(2*cf*pi*T) + cos(6*cf*pi*T))/exp(5*B*T)
+	feedback[:,6] = 4*(4 + 3*cos(4*cf*pi*T))/exp(6*B*T)
+	feedback[:,7] = -8*cos(2*cf*pi*T)/exp(7*B*T)
+	feedback[:,8] = exp(-8*B*T)
 
 	return [forward, feedback]
 
@@ -68,18 +71,28 @@ def ERBFilterBank(forward, feedback, x):
 	# specified by the forward and feedback parameters. Each row
 	# of the forward and feedback parameters are the parameters
 	# to the Matlab builtin function "filter".
-	[rows, cols] = size(feedback)
-	y = zeros(rows,length(x))
-	for i in range(1,rows):
-		y(i,:) = filter(forward(i,:),feedback(i,:),x)
+	(rows, cols) = feedback.shape
+	y = zeros((rows, len(x)))
+	for i in range(0, rows):
+		y[i,:] = lfilter(forward[i,:], feedback[i,:], x)
 	return y
 
-impulse = [1 zeros(1,1023)]
-[ERBforward, ERBfeedback] = MakeERBFilters(16000, 64, 20)
+N = 2048
+fs = 16000.
+Nchannels = 64
+low_freq = 20.
+
+impulse = zeros(N)
+impulse[0] = 1
+[ERBforward, ERBfeedback] = MakeERBFilters(fs, Nchannels, low_freq)
 y = ERBFilterBank(ERBforward, ERBfeedback, impulse)
 
-response = 20*log10(abs(fft(y[1:64:5,:])))
-channels_ind = arange(0, 1023)
-freqScale = channels_ind/1024*16000
-axis([2 4 -70 10])
-semilogx(freqScale(1:512),response(1:512,:))
+response = 20.*log10(abs(fft(y[::5])))
+freqScale = fftfreq(N, 1./fs)
+
+for i in range(0, response.shape[0]):
+	semilogx(freqScale[0:N/2],response[i, 0:N/2])
+xlim(1e2, 1e4)
+ylim(-70, 10)
+
+show()
