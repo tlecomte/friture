@@ -33,7 +33,7 @@ class audioproc():
 		# first we remove as much points as possible
 		if maxfreq <> self.maxfreq:
 			self.maxfreq = maxfreq
-			decimation = SAMPLING_RATE/2 / (2*maxfreq)
+			decimation = SAMPLING_RATE / (2*maxfreq)
 			self.decimation = 2**(floor(log2(decimation)))
 		
 		if self.decimation < 1:
