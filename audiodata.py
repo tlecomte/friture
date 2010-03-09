@@ -147,6 +147,10 @@ class CanvasScaledSpectrogram(QtCore.QObject):
 
 		self.setspectrum_length(spectrum_length)
 
+		# FIXME interpolation is only appropriate when the FFT frequency hop is larger
+		# than the display frequency hop.
+		# When the opposite is true, frequency bins should be summed up inside the display
+		# frequency hop.
 		xyzs_buffer = numpy.interp(self.xscaled, freq, xyzs)
 
 		# draw !
