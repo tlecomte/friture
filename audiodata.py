@@ -151,6 +151,8 @@ class CanvasScaledSpectrogram(QtCore.QObject):
 		# than the display frequency hop.
 		# When the opposite is true, frequency bins should be summed up inside the display
 		# frequency hop.
+		# Use digitize or something to find what display bin a fft bin belongs to.
+		
 		xyzs_buffer = numpy.interp(self.xscaled, freq, xyzs)
 
 		# draw !
