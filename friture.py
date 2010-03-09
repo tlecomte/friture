@@ -403,6 +403,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 	def spectrum(self):
 		maxfreq = self.settings_dialog.spinBox_maxfreq.value()
 		sp, freq = self.proc.analyzelive(self.audiobuffer[self.offset + self.buffer_length - self.fft_size: self.offset + self.buffer_length], self.fft_size, maxfreq)
+		#sp, freq = self.proc.analyzelive_cochlear(self.audiobuffer[self.offset + self.buffer_length - self.fft_size: self.offset + self.buffer_length], 50, minfreq, maxfreq)
 		# scale the db spectrum from [- spec_range db ... 0 db] > [0..1]
 		epsilon = 1e-30
 		db_spectrogram = 20*log10(sp + epsilon)
