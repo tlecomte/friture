@@ -1,4 +1,9 @@
 from numpy import pi, exp, arange, cos, sin, sqrt, zeros, ones, log
+# the three following lines are a workaround for a bug with scipy and py2exe
+# together. See http://www.pyinstaller.org/ticket/83 for reference.
+import scipy.misc 
+import scipy
+scipy.factorial = scipy.misc.factorial
 from scipy.signal import lfilter
 
 # bank of filters for any other kind of frequency scale
