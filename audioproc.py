@@ -22,7 +22,7 @@ from numpy.fft import rfft
 # the sample rate below should be dynamic, taken from PyAudio/PortAudio
 SAMPLING_RATE = 44100
 
-from cochlear import MakeERBFilters, ERBFilterBank, frequencies
+#from cochlear import MakeERBFilters, ERBFilterBank, frequencies
 
 class audioproc():
 	def __init__(self):
@@ -73,15 +73,15 @@ class audioproc():
 	# a roughly band-pass filter centered around 1 kHz (see psychoacoustic
 	# models)
 
-	def analyzelive_cochlear(self, samples, num_channels, lowfreq, maxfreq):
-		samples -= samples.mean()
-		
-		fs = 16000.
+	#def analyzelive_cochlear(self, samples, num_channels, lowfreq, maxfreq):
+	#	samples -= samples.mean()
+	#	
+	#	fs = 16000.
 
-		[ERBforward, ERBfeedback] = MakeERBFilters(SAMPLING_RATE, num_channels, lowfreq)
-		filtered_samples = ERBFilterBank(ERBforward, ERBfeedback, samples)
+	#	[ERBforward, ERBfeedback] = MakeERBFilters(SAMPLING_RATE, num_channels, lowfreq)
+	#	filtered_samples = ERBFilterBank(ERBforward, ERBfeedback, samples)
 
-		spectrum = (abs(filtered_samples)**2).mean(axis=1)
-		self.freq = frequencies(SAMPLING_RATE, num_channels, lowfreq)
-		
-		return spectrum[::-1], self.freq[::-1]
+	#	spectrum = (abs(filtered_samples)**2).mean(axis=1)
+	#	self.freq = frequencies(SAMPLING_RATE, num_channels, lowfreq)
+	#	
+	#	return spectrum[::-1], self.freq[::-1]
