@@ -11,7 +11,11 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Settings</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="resource.qrc">
+    <normaloff>:/tools.svg</normaloff>:/tools.svg</iconset>
   </property>
   <layout class="QFormLayout" name="formLayout">
    <property name="fieldGrowthPolicy">
@@ -246,6 +250,8 @@
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="resource.qrc"/>
+ </resources>
  <connections/>
 </ui>
