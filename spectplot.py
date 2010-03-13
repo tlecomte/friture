@@ -20,7 +20,7 @@
 import classplot
 import PyQt4.Qwt5 as Qwt
 from PyQt4 import QtCore, Qt, QtGui
-from numpy import zeros, ones, log10, linspace, logspace, interp, log2
+from numpy import zeros, ones, log10, linspace, logspace, interp, log2, histogram
 from log2_scale_engine import QwtLog10ScaleEngine
 
 # The peak decay rates (magic goes here :).
@@ -104,6 +104,13 @@ class SpectPlot(classplot.ClassPlot):
 			self.needfullreplot = True
 		
 		y_interp = interp(self.xscaled, x, y)
+                
+                #upsampling = 10.
+		#upsampled_freq = linspace(x.min(), x.max(), len(x)*upsampling)
+		#upsampled_xyzs = y.repeat(upsampling)
+		#y_interp = histogram(upsampled_freq, bins=self.xscaled, normed=False, weights=upsampled_xyzs, new=None)[0]
+		#y_interp /= upsampling
+                
 		classplot.ClassPlot.setdata(self, self.xscaled, y_interp)
 
                 self.compute_peaks(y_interp)
