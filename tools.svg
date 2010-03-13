@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- made by Andy, It's public domain,  yeah why not-->
+<svg xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.0" width="128" height="128" id="svg4895">
+	<defs>
+		<linearGradient id="WhiteTransparent">
+			<stop style="stop-color:white;stop-opacity:1" offset="0"/>
+			<stop style="stop-color:white;stop-opacity:0" offset="1"/>
+		</linearGradient>
+		<linearGradient id="BlackTransparent">
+			<stop style="stop-color:black;stop-opacity:1" offset="0"/>
+			<stop style="stop-color:black;stop-opacity:0" offset="1"/>
+		</linearGradient>
+		<linearGradient xlink:href="#WhiteTransparent" id="lg1999" x1="637.03" y1="69.99" x2="638.3" y2="118.3" gradientUnits="userSpaceOnUse" gradientTransform="matrix(0.1,0.1,-0.22,0.2,75.6,-33.53)"/>
+		<linearGradient xlink:href="#WhiteTransparent" id="lg02" x1="512.7" y1="254.36" x2="615.59" y2="254.83"  gradientUnits="userSpaceOnUse" gradientTransform="matrix(8.07e-2,7.75e-2,-0.35,0.36,77.14,-45.89)"/>
+		<linearGradient xlink:href="#BlackTransparent" id="lg05" x1="543.1" y1="286.56" x2="419.88" y2="286.56" gradientUnits="userSpaceOnUse" gradientTransform="matrix(9.98e-2,9.98e-2,-0.28,0.28,78.84,-44.8)" spreadMethod="pad"/>
+		<linearGradient xlink:href="#WhiteTransparent" id="lg09" x1="258.96" y1="62.74" x2="258.96" y2="-1.72" gradientUnits="userSpaceOnUse" gradientTransform="matrix(0.33,0.33,-9.44e-2,9.44e-2,9.03,-48.1)"/>
+		<linearGradient xlink:href="#WhiteTransparent" id="lg12" x1="146.15" y1="288.57" x2="146.15" y2="368.27" gradientUnits="userSpaceOnUse" gradientTransform="matrix(0.3,0.3,-9e-2,9e-2,78.84,-44.8)"/>
+		<linearGradient xlink:href="#WhiteTransparent" id="lg16" x1="577.03" y1="124" x2="626.1" y2="124" gradientUnits="userSpaceOnUse" gradientTransform="matrix(7.75e-2,7.75e-2,-0.36,0.36,78.84,-44.8)" spreadMethod="pad"/>
+		<linearGradient xlink:href="#BlackTransparent" id="lg19" x1="75.1" y1="189.14" x2="71.77" y2="185.8" gradientTransform="matrix(1.05,0,0,1.05,0.13,-140.54)"/>
+		<linearGradient xlink:href="#WhiteTransparent" id="lg51" x1="646.24" y1="-252.6" x2="607.66" y2="-186.26" gradientUnits="userSpaceOnUse" gradientTransform="matrix(0.2,0,0,0.2,-80.94,88.3)"/>
+		<linearGradient xlink:href="#WhiteTransparent" id="lg55" x1="550.96" y1="-137.5" x2="655.42" y2="-241.2" gradientUnits="userSpaceOnUse" gradientTransform="matrix(0.26,0,0,0.26,-106.57,101.57)"/>
+		<linearGradient xlink:href="#BlackTransparent" id="lgdg" x1="73.88" y1="66.2" x2="84.3" y2="86.68" gradientTransform="translate(-0.30267,-3.20138)" gradientUnits="userSpaceOnUse"/>
+		<clipPath clipPathUnits="userSpaceOnUse" id="clipoutline1">
+			<path id="outline1" d="M 22.42,17.2 L 35.38,30.15 L 32.88,38.93 L 24.1,41.43 L 11.14,28.47 L 5.28,34.33 L 20.17,55.79 L 37.73,52.45 L 99.36,118.07 C 108.8,127.58 121.53,113.32 112.7,105.2 L 46.85,42.92 L 50.86,25.16 L 28.72,10.89 L 22.42,17.2 z M 103.48,109.17 C 105.16,107.49 107.88,107.49 109.56,109.17 C 111.24,110.85 111.24,113.57 109.56,115.25 C 107.88,116.92 105.16,116.92 103.48,115.25 C 101.8,113.57 101.8,110.85 103.48,109.17 z"/>
+		</clipPath>
+		<clipPath clipPathUnits="userSpaceOnUse" id="clipoutline2">
+			<path id="outline2" d="M 55.8,12 L 56.56,12.16 C 65.4,9.22 85.24,20.8 80.82,31.12 C 79.7,32.74 79.89,35.62 81.24,37.43 L 56.43,62.25 C 55.04,60.86 51.95,60.89 50.53,62.25 L 9.5,101.63 C 5.76,105.22 8.7,108.27 10.28,109.88 L 17.64,117.24 C 19.25,118.84 23.5,121 26.52,117.8 L 65.24,76.99 C 66.59,75.57 66.6,72.52 65.24,71.12 C 65.24,71.12 65.25,71.1 65.24,71.1 L 90.15,46.2 C 92.78,48.57 95.263827,48.774854 97.62,48.13 C 102.17057,46.884568 104.70725,51.336643 107.43,54.59 L 106.2,55.8 C 104.38,57.64 104.55,60.74 106.59,62.78 C 108.63,64.82 111.74,64.99 113.56,63.17 L 121.7,55.04 C 123.52,53.2 123.35,50.1 121.3,48.07 C 119.46,46.22 116.79,45.98 114.93,47.3 C 109.35,41.04 112.28,40.1 104.92,31.95 L 91.13,17.86 C 81.2,8.12 68.3,8.13 55.8,12 z"/>
+		</clipPath>
+		<!-- -->
+		<filter id="ShadowBlur" filterUnits="userSpaceOnUse" x="0" y="0"> <feGaussianBlur in="SourceGraphic" stdDeviation="2" id="feGaussianBlur6" /></filter>
+	</defs>
+	<style type="text/css">
+	<![CDATA[
+	/* Specular Highlighting */
+		.low-specularity	{opacity:0.25;}
+		.specularity		{opacity:0.5;}
+		.high-specularity	{opacity:0.75;}
+		.full-specularity	{opacity:1;}
+
+	/* Shading */
+		.low-shade	{opacity:0.25;}
+		.shade		{opacity:0.5;}
+		.high-shade	{opacity:0.75;}
+		.full-shade	{opacity:1;}
+
+	/* Tango palette fill/stroke */
+		.black		{fill:#000;}
+		.aluminium1	{fill:#eeeeec;}
+		.aluminium2	{fill:#d3d7cf;}
+		.aluminium6	{fill:#2e3436;}
+		.chocolate3	{fill:#8f5902;}
+		.chocolate2	{fill:#c17d11;}
+		.aluminium4	{fill:#888a85;}
+
+	/* Shadows: Back-Shadows & Base Shadows */
+		.base-shadow	{opacity:0.4;}
+		.outline-big	{stroke:black;stroke-width:8;opacity:0.25;stroke-linejoin:round;}
+		.outline-small	{stroke:black;stroke-width:4;opacity:0.5;stroke-linejoin:round;}
+		.stroke-highlight	{fill:none;stroke:white;stroke-opacity:0.2;stroke-width:4;stroke-linejoin:round;}
+	]]>
+	</style>
+	<g id="configuration">
+	<g id="spanner">
+		<use xlink:href="#outline1" class="outline-big"/>
+		<use xlink:href="#outline1" class="outline-small"/>
+		<use xlink:href="#outline1" class="aluminium4"/>
+		<use class="stroke-highlight" xlink:href="#outline1" clip-path="url(#clipoutline1)" style="stroke-linejoin:miter;"/>
+		<path class="high-specularity" style="fill:url(#lg55);" d="M 24.33,15.4 L 37.78,28.78 L 34.45,40.47 L 23.5,43.74 L 9.9319417,30 L 5.2,34.54 L 19.4,54.48 L 38.3,50.34 L 100.8,116.7 C 108.3,125 121,114.03 111.94,105.1 L 45.04,42 L 48.9,24.83 L 28.94,10.8 L 24.33,15.4 z M 104.3,108.7 C 105.97,107.03 108.93,106.7 110.6,108.4 C 112.3,110.07 113.66,113.03 111.25,116.24 C 109.25,118.24 106.05,118.16 104.05,116 C 102.37,114.32 102.6,110.4 104.3,108.7 z"/>
+		<path class="specularity" style="fill:url(#lg51);" d="M 24.2,15.42 L 47.67,39.07 L 50.89,25.2 L 28.79,10.8 L 24.2,15.42 z"/>
+	</g>
+	<path class="low-shade" style="fill:url(#lgdg)" d="M 70.739,65.52 L 75.37,69.8 C 75.75,74.12 74.64,75.42 67.54,81.44 L 58.94,72.22 L 70.73,65.52 L 70.73,65.52 L 70.739,65.52 z " />
+	<g id="hammer">
+		<use xlink:href="#outline2" class="outline-big"/>
+		<use xlink:href="#outline2" class="outline-small stroke-aluminium5"/>
+		<path class="aluminium2" d="M 82.92,35.75 L 53.47,65.2 L 62.3,74.03 L 91.75,44.59 L 82.92,35.75 z"/>
+		<path class="specularity" style="fill:url(#lg19);"  d="M 88.93,41.76 L 59.48,71.2 L 62.3,74.03 L 91.75,44.59 L 88.93,41.76 z"/>
+		<path style="fill:url(#lg16);" d="M 86.46,37.04 L 57.13,66.37 L 60.92,70.16 L 89.5,40.08 L 86.46,37.04 z"/>
+		<path class="aluminium6" d="M 55.8,12 L 56.56,12.16 C 65.4,9.22 85.24,20.8 80.82,31.12 C 79.7,32.74 79.89,35.62 81.24,37.43 L 90.15,46.2 C 92.78,48.57 95.26,48.77 97.62,48.13 C 102.17,46.9 104.7,51.33 107.43,54.59 L 106.2,55.8 C 104.38,57.64 104.55,60.74 106.59,62.78 C 108.63,64.82 111.74,64.99 113.56,63.17 L 121.7,55.04 C 123.52,53.2 123.35,50.1 121.3,48.07 C 119.46,46.22 116.79,45.98 114.93,47.3 C 109.35,41.04 112.28,40.1 104.92,31.95 L 91.13,17.86 C 81.2,8.12 68.3,8.13 55.8,12 z "/>
+		<path class="specularity" style="fill:url(#lg12);" d="M 114.93,47.3 C 109.35,41.04 112.28,40.1 104.92,31.95 L 91.13,17.86 C 85.44,12.28 78.77,9.9 71.77,9.6 L 112.9,51.13 L 115.87535,48.4 L 114.93,47.3 z "/>
+		<path class="low-specularity" style="fill:url(#lg09);" d="M 81.45,28 C 81.5,29 81.270657,30 80.8,31.12 C 79.7,32.74 79.89,35.62 81.24,37.43 L 90.15,46.2 C 92.78,48.57 95.26,48.77 97.62,48.13 C 98.7,47.8 99.68,47.86 100.6,48.13 C 103.4,48.9 81.44,27.58 81.45,27.9 L 81.45,28 z"/>
+		<path style="fill:#3465a4;"  d="M 56.43,62.25 C 55.04,60.86 51.95,60.89 50.53,62.25 L 9.5,101.63 C 5.76,105.22 8.68,108.27 10.28,109.88 L 17.64,117.24 C 19.25,118.84 23.5,121 26.52,117.8 L 65.24,76.99 C 66.59,75.57 66.6,72.52 65.24,71.12 C 65.24,71.12 65.25,71.1 65.24,71.1 L 56.43,62.25 z"/>
+		<path class="low-shade" style="fill:url(#lg05);"  d="M 10.27,109.87 L 17.63,117.24 C 19.24,118.84 23.36,121.13 26.38,117.95 L 65.25,76.98 C 66.6,75.55 66.64,72.48 65.25,71.1 L 56.42,62.26 L 10.27,109.87 z"/>
+		<path class="specularity" style="fill:url(#lg02);"  d="M 51.2,65.7 L 12.32,103.74 C 10.7,105.3 11.25,107.49 12.42,108.63 L 16.55,112.6 L 58.92,69 L 55,65.32 C 54.16,64.52 52.2,64.75 51.2,65.7 z"/>
+		<use class="stroke-highlight" xlink:href="#outline2" clip-path="url(#clipoutline2)"/>
+		<path style="fill:url(#lg1999);" d="M 120.45,49.26 C 121.96,50.7 122.25,52.7 120.17,54.62 L 116.3,58.25 C 114.22,60.2 108.78,55 110.85,53.06 L 114.73,49.43 C 116.8,47.48 118.94,47.82 120.45,49.26 z"/>
+	</g>
+	</g>
+</svg>

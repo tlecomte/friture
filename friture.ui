@@ -180,6 +180,10 @@ peak</string>
    </property>
   </action>
   <action name="actionSettings">
+   <property name="icon">
+    <iconset resource="resource.qrc">
+     <normaloff>:/tools.svg</normaloff>:/tools.svg</iconset>
+   </property>
    <property name="text">
     <string>Settings</string>
    </property>
