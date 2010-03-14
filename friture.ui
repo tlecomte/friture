@@ -29,7 +29,9 @@ stop: 0.9 #4c4c4c, stop: 1 #333333);
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout_3">
     <item row="0" column="0" colspan="2">
-     <widget class="ImagePlot" name="PlotZoneImage"/>
+     <widget class="ImagePlot" name="PlotZoneImage">
+      <zorder>frame</zorder>
+     </widget>
     </item>
    </layout>
   </widget>
@@ -42,63 +44,78 @@ stop: 0.9 #4c4c4c, stop: 1 #333333);
    </attribute>
    <widget class="QWidget" name="dockWidgetContents">
     <layout class="QGridLayout" name="gridLayout_4">
+     <property name="margin">
+      <number>0</number>
+     </property>
+     <property name="spacing">
+      <number>0</number>
+     </property>
      <item row="0" column="0">
-      <widget class="QLabel" name="label_rms">
-       <property name="font">
-        <font>
-         <pointsize>14</pointsize>
-         <weight>75</weight>
-         <bold>true</bold>
-        </font>
+      <widget class="QFrame" name="frame_3">
+       <property name="frameShape">
+        <enum>QFrame::StyledPanel</enum>
        </property>
-       <property name="text">
-        <string>-100.0</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignBottom|Qt::AlignRight|Qt::AlignTrailing</set>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="1" rowspan="2">
-      <widget class="qsynthMeter" name="meter"/>
-     </item>
-     <item row="0" column="2">
-      <widget class="QLabel" name="label_peak">
-       <property name="font">
-        <font>
-         <pointsize>14</pointsize>
-         <weight>75</weight>
-         <bold>true</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>-100.0</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="0">
-      <widget class="QLabel" name="label_rms_legend">
-       <property name="text">
-        <string>dBFS
+       <layout class="QGridLayout" name="gridLayout_8">
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_rms">
+          <property name="font">
+           <font>
+            <pointsize>14</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="text">
+           <string>-100.0</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignBottom|Qt::AlignRight|Qt::AlignTrailing</set>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1" rowspan="2">
+         <widget class="qsynthMeter" name="meter"/>
+        </item>
+        <item row="0" column="2">
+         <widget class="QLabel" name="label_peak">
+          <property name="font">
+           <font>
+            <pointsize>14</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="text">
+           <string>-100.0</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="label_rms_legend">
+          <property name="text">
+           <string>dBFS
 RMS</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignRight|Qt::AlignTop|Qt::AlignTrailing</set>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="2">
-      <widget class="QLabel" name="label_peak_legend">
-       <property name="text">
-        <string>dBFS
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTop|Qt::AlignTrailing</set>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="2">
+         <widget class="QLabel" name="label_peak_legend">
+          <property name="text">
+           <string>dBFS
 peak</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-       </property>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </widget>
      </item>
     </layout>
@@ -113,6 +130,12 @@ peak</string>
    </attribute>
    <widget class="QWidget" name="dockWidgetContents_2">
     <layout class="QGridLayout" name="gridLayout_2">
+     <property name="margin">
+      <number>0</number>
+     </property>
+     <property name="spacing">
+      <number>0</number>
+     </property>
      <item row="0" column="0">
       <widget class="QScrollArea" name="scrollArea">
        <property name="widgetResizable">
@@ -123,8 +146,8 @@ peak</string>
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>144</width>
-          <height>295</height>
+          <width>182</width>
+          <height>293</height>
          </rect>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout">
@@ -151,8 +174,23 @@ peak</string>
    </attribute>
    <widget class="QWidget" name="dockWidgetContents_4">
     <layout class="QGridLayout" name="gridLayout_5">
+     <property name="margin">
+      <number>0</number>
+     </property>
+     <property name="spacing">
+      <number>0</number>
+     </property>
      <item row="0" column="0">
-      <widget class="TimePlot" name="PlotZoneUp"/>
+      <widget class="QFrame" name="frame">
+       <property name="frameShape">
+        <enum>QFrame::StyledPanel</enum>
+       </property>
+       <layout class="QGridLayout" name="gridLayout">
+        <item row="0" column="0">
+         <widget class="TimePlot" name="PlotZoneUp"/>
+        </item>
+       </layout>
+      </widget>
      </item>
     </layout>
    </widget>
@@ -166,8 +204,23 @@ peak</string>
    </attribute>
    <widget class="QWidget" name="dockWidgetContents_5">
     <layout class="QGridLayout" name="gridLayout_6">
+     <property name="margin">
+      <number>0</number>
+     </property>
+     <property name="spacing">
+      <number>0</number>
+     </property>
      <item row="0" column="0">
-      <widget class="SpectPlot" name="PlotZoneSpect"/>
+      <widget class="QFrame" name="frame_2">
+       <property name="frameShape">
+        <enum>QFrame::StyledPanel</enum>
+       </property>
+       <layout class="QGridLayout" name="gridLayout_7">
+        <item row="0" column="0">
+         <widget class="SpectPlot" name="PlotZoneSpect"/>
+        </item>
+       </layout>
+      </widget>
      </item>
     </layout>
    </widget>
@@ -178,6 +231,7 @@ peak</string>
    </property>
    <property name="styleSheet">
     <string>QToolBar {
+border: none;
 background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
 stop: 0 #a6a6a6, stop: 0.08 #7f7f7f,
 stop: 0.39999 #717171, stop: 0.4 #626262,
