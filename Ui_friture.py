@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'friture.ui'
 #
-# Created: Sat Mar 13 17:35:21 2010
+# Created: Sun Mar 14 23:49:44 2010
 #      by: PyQt4 UI code generator 4.5.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -67,9 +67,19 @@ class Ui_MainWindow(object):
         self.dockWidgetContents_2.setObjectName("dockWidgetContents_2")
         self.gridLayout_2 = QtGui.QGridLayout(self.dockWidgetContents_2)
         self.gridLayout_2.setObjectName("gridLayout_2")
-        self.LabelLevel = QtGui.QLabel(self.dockWidgetContents_2)
+        self.scrollArea = QtGui.QScrollArea(self.dockWidgetContents_2)
+        self.scrollArea.setWidgetResizable(True)
+        self.scrollArea.setObjectName("scrollArea")
+        self.scrollAreaWidgetContents = QtGui.QWidget(self.scrollArea)
+        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 144, 293))
+        self.scrollAreaWidgetContents.setObjectName("scrollAreaWidgetContents")
+        self.verticalLayout = QtGui.QVBoxLayout(self.scrollAreaWidgetContents)
+        self.verticalLayout.setObjectName("verticalLayout")
+        self.LabelLevel = QtGui.QLabel(self.scrollAreaWidgetContents)
         self.LabelLevel.setObjectName("LabelLevel")
-        self.gridLayout_2.addWidget(self.LabelLevel, 0, 0, 1, 1)
+        self.verticalLayout.addWidget(self.LabelLevel)
+        self.scrollArea.setWidget(self.scrollAreaWidgetContents)
+        self.gridLayout_2.addWidget(self.scrollArea, 0, 0, 1, 1)
         self.dockWidgetStatistics.setWidget(self.dockWidgetContents_2)
         MainWindow.addDockWidget(QtCore.Qt.DockWidgetArea(1), self.dockWidgetStatistics)
         self.dockWidgetScope = QtGui.QDockWidget(MainWindow)
