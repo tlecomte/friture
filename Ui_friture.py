@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'friture.ui'
 #
-# Created: Sun Mar 14 23:49:44 2010
+# Created: Mon Mar 15 00:01:27 2010
 #      by: PyQt4 UI code generator 4.5.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -71,7 +71,7 @@ class Ui_MainWindow(object):
         self.scrollArea.setWidgetResizable(True)
         self.scrollArea.setObjectName("scrollArea")
         self.scrollAreaWidgetContents = QtGui.QWidget(self.scrollArea)
-        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 144, 293))
+        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 144, 295))
         self.scrollAreaWidgetContents.setObjectName("scrollAreaWidgetContents")
         self.verticalLayout = QtGui.QVBoxLayout(self.scrollAreaWidgetContents)
         self.verticalLayout.setObjectName("verticalLayout")
@@ -131,6 +131,13 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QtGui.QApplication.translate("MainWindow", "Friture", None, QtGui.QApplication.UnicodeUTF8))
+        MainWindow.setStyleSheet(QtGui.QApplication.translate("MainWindow", "QToolBar {\n"
+"border: none;\n"
+"background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,\n"
+"stop: 0 #a6a6a6, stop: 0.08 #7f7f7f,\n"
+"stop: 0.39999 #717171, stop: 0.4 #626262,\n"
+"stop: 0.9 #4c4c4c, stop: 1 #333333);\n"
+" }", None, QtGui.QApplication.UnicodeUTF8))
         self.dockWidgetLevels.setWindowTitle(QtGui.QApplication.translate("MainWindow", "Input levels", None, QtGui.QApplication.UnicodeUTF8))
         self.label_rms.setText(QtGui.QApplication.translate("MainWindow", "-100.0", None, QtGui.QApplication.UnicodeUTF8))
         self.label_peak.setText(QtGui.QApplication.translate("MainWindow", "-100.0", None, QtGui.QApplication.UnicodeUTF8))
@@ -143,6 +150,12 @@ class Ui_MainWindow(object):
         self.dockWidgetScope.setWindowTitle(QtGui.QApplication.translate("MainWindow", "Scope", None, QtGui.QApplication.UnicodeUTF8))
         self.dockWidgetSpectrum.setWindowTitle(QtGui.QApplication.translate("MainWindow", "Spectrum", None, QtGui.QApplication.UnicodeUTF8))
         self.toolBar.setWindowTitle(QtGui.QApplication.translate("MainWindow", "toolBar", None, QtGui.QApplication.UnicodeUTF8))
+        self.toolBar.setStyleSheet(QtGui.QApplication.translate("MainWindow", "QToolBar {\n"
+"background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,\n"
+"stop: 0 #a6a6a6, stop: 0.08 #7f7f7f,\n"
+"stop: 0.39999 #717171, stop: 0.4 #626262,\n"
+"stop: 0.9 #4c4c4c, stop: 1 #333333);\n"
+" }", None, QtGui.QApplication.UnicodeUTF8))
         self.actionStart.setText(QtGui.QApplication.translate("MainWindow", "Start", None, QtGui.QApplication.UnicodeUTF8))
         self.actionStart.setToolTip(QtGui.QApplication.translate("MainWindow", "Start/Stop", None, QtGui.QApplication.UnicodeUTF8))
         self.actionSettings.setText(QtGui.QApplication.translate("MainWindow", "Settings", None, QtGui.QApplication.UnicodeUTF8))

@@ -17,6 +17,15 @@
    <iconset resource="resource.qrc">
     <normaloff>:/window-icon.svg</normaloff>:/window-icon.svg</iconset>
   </property>
+  <property name="styleSheet">
+   <string>QToolBar {
+border: none;
+background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+stop: 0 #a6a6a6, stop: 0.08 #7f7f7f,
+stop: 0.39999 #717171, stop: 0.4 #626262,
+stop: 0.9 #4c4c4c, stop: 1 #333333);
+ }</string>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout_3">
     <item row="0" column="0" colspan="2">
@@ -115,7 +124,7 @@ peak</string>
           <x>0</x>
           <y>0</y>
           <width>144</width>
-          <height>293</height>
+          <height>295</height>
          </rect>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout">
@@ -166,6 +175,14 @@ peak</string>
   <widget class="QToolBar" name="toolBar">
    <property name="windowTitle">
     <string>toolBar</string>
+   </property>
+   <property name="styleSheet">
+    <string>QToolBar {
+background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+stop: 0 #a6a6a6, stop: 0.08 #7f7f7f,
+stop: 0.39999 #717171, stop: 0.4 #626262,
+stop: 0.9 #4c4c4c, stop: 1 #333333);
+ }</string>
    </property>
    <attribute name="toolBarArea">
     <enum>TopToolBarArea</enum>
