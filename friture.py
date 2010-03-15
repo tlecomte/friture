@@ -320,7 +320,12 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		available = int(floor(available/NUM_SAMPLES))
 		for j in range(0, available):
 			self.i += 1
-			rawdata = self.stream.read(NUM_SAMPLES)
+			try:
+				rawdata = self.stream.read(NUM_SAMPLES)
+			except IOError as inst:
+				print inst
+				print "Caught an IOError on stream read."
+				break
 			floatdata = fromstring(rawdata, int16)/(2.**(16-1))
 			# update the circular buffer
 			if len(floatdata) > self.buffer_length:
