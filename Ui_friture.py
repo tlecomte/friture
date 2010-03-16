@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'friture.ui'
 #
-# Created: Tue Mar 16 15:37:22 2010
+# Created: Tue Mar 16 16:37:49 2010
 #      by: PyQt4 UI code generator 4.7
 #
 # WARNING! All changes made in this file will be lost!
@@ -51,6 +51,7 @@ class Ui_MainWindow(object):
         self.meter = qsynthMeter(self.frame_3)
         self.meter.setStyleSheet("qsynthMeter {\n"
 "border: 1px solid gray;\n"
+"border-radius: 2px;\n"
 "padding: 1px;\n"
 "}")
         self.meter.setObjectName("meter")
@@ -101,6 +102,7 @@ class Ui_MainWindow(object):
         self.dockWidgetScope = QtGui.QDockWidget(MainWindow)
         self.dockWidgetScope.setStyleSheet("QwtPlotCanvas {\n"
 "  border: 1px solid gray;\n"
+" border-radius: 2px;\n"
 "  background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,\n"
 "stop: 0 #AAAAAA, stop: 0.3 #FFFFFF);\n"
 "}")
@@ -125,6 +127,7 @@ class Ui_MainWindow(object):
         self.dockWidgetSpectrum = QtGui.QDockWidget(MainWindow)
         self.dockWidgetSpectrum.setStyleSheet("QwtPlotCanvas {\n"
 "  border: 1px solid gray;\n"
+" border-radius: 2px;\n"
 "  background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,\n"
 "stop: 0 #AAAAAA, stop: 0.3 #FFFFFF);\n"
 "}")

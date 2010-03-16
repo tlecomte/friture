@@ -84,6 +84,7 @@ stop: 0.9 #4c4c4c, stop: 1 #333333);
           <property name="styleSheet">
            <string notr="true">qsynthMeter {
 border: 1px solid gray;
+border-radius: 2px;
 padding: 1px;
 }</string>
           </property>
@@ -182,6 +183,7 @@ peak</string>
    <property name="styleSheet">
     <string notr="true">QwtPlotCanvas {
   border: 1px solid gray;
+ border-radius: 2px;
   background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
 stop: 0 #AAAAAA, stop: 0.3 #FFFFFF);
 }</string>
@@ -219,6 +221,7 @@ stop: 0 #AAAAAA, stop: 0.3 #FFFFFF);
    <property name="styleSheet">
     <string notr="true">QwtPlotCanvas {
   border: 1px solid gray;
+ border-radius: 2px;
   background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
 stop: 0 #AAAAAA, stop: 0.3 #FFFFFF);
 }</string>
