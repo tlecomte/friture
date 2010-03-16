@@ -27,10 +27,16 @@ stop: 0.9 #4c4c4c, stop: 1 #333333);
  }</string>
   </property>
   <widget class="QWidget" name="centralwidget">
+   <property name="styleSheet">
+    <string notr="true"/>
+   </property>
    <layout class="QGridLayout" name="gridLayout_3">
     <item row="0" column="0" colspan="2">
      <widget class="ImagePlot" name="PlotZoneImage">
-      <zorder>frame</zorder>
+      <property name="styleSheet">
+       <string notr="true">QwtPlotCanvas {
+}</string>
+      </property>
      </widget>
     </item>
    </layout>
@@ -74,7 +80,14 @@ stop: 0.9 #4c4c4c, stop: 1 #333333);
          </widget>
         </item>
         <item row="0" column="1" rowspan="2">
-         <widget class="qsynthMeter" name="meter"/>
+         <widget class="qsynthMeter" name="meter">
+          <property name="styleSheet">
+           <string notr="true">qsynthMeter {
+border: 1px solid gray;
+padding: 1px;
+}</string>
+          </property>
+         </widget>
         </item>
         <item row="0" column="2">
          <widget class="QLabel" name="label_peak">
@@ -146,8 +159,8 @@ peak</string>
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>182</width>
-          <height>293</height>
+          <width>150</width>
+          <height>210</height>
          </rect>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout">
@@ -166,6 +179,13 @@ peak</string>
    </widget>
   </widget>
   <widget class="QDockWidget" name="dockWidgetScope">
+   <property name="styleSheet">
+    <string notr="true">QwtPlotCanvas {
+  border: 1px solid gray;
+  background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+stop: 0 #AAAAAA, stop: 0.3 #FFFFFF);
+}</string>
+   </property>
    <property name="windowTitle">
     <string>Scope</string>
    </property>
@@ -196,6 +216,13 @@ peak</string>
    </widget>
   </widget>
   <widget class="QDockWidget" name="dockWidgetSpectrum">
+   <property name="styleSheet">
+    <string notr="true">QwtPlotCanvas {
+  border: 1px solid gray;
+  background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+stop: 0 #AAAAAA, stop: 0.3 #FFFFFF);
+}</string>
+   </property>
    <property name="windowTitle">
     <string>Spectrum</string>
    </property>

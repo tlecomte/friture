@@ -2,8 +2,8 @@
 
 # Form implementation generated from reading ui file 'friture.ui'
 #
-# Created: Mon Mar 15 00:24:21 2010
-#      by: PyQt4 UI code generator 4.5.4
+# Created: Tue Mar 16 15:37:22 2010
+#      by: PyQt4 UI code generator 4.7
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -21,6 +21,8 @@ class Ui_MainWindow(object):
         self.gridLayout_3 = QtGui.QGridLayout(self.centralwidget)
         self.gridLayout_3.setObjectName("gridLayout_3")
         self.PlotZoneImage = ImagePlot(self.centralwidget)
+        self.PlotZoneImage.setStyleSheet("QwtPlotCanvas {\n"
+"}")
         self.PlotZoneImage.setObjectName("PlotZoneImage")
         self.gridLayout_3.addWidget(self.PlotZoneImage, 0, 0, 1, 2)
         MainWindow.setCentralWidget(self.centralwidget)
@@ -47,6 +49,10 @@ class Ui_MainWindow(object):
         self.label_rms.setObjectName("label_rms")
         self.gridLayout_8.addWidget(self.label_rms, 0, 0, 1, 1)
         self.meter = qsynthMeter(self.frame_3)
+        self.meter.setStyleSheet("qsynthMeter {\n"
+"border: 1px solid gray;\n"
+"padding: 1px;\n"
+"}")
         self.meter.setObjectName("meter")
         self.gridLayout_8.addWidget(self.meter, 0, 1, 2, 1)
         self.label_peak = QtGui.QLabel(self.frame_3)
@@ -81,7 +87,7 @@ class Ui_MainWindow(object):
         self.scrollArea.setWidgetResizable(True)
         self.scrollArea.setObjectName("scrollArea")
         self.scrollAreaWidgetContents = QtGui.QWidget(self.scrollArea)
-        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 182, 293))
+        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 150, 210))
         self.scrollAreaWidgetContents.setObjectName("scrollAreaWidgetContents")
         self.verticalLayout = QtGui.QVBoxLayout(self.scrollAreaWidgetContents)
         self.verticalLayout.setObjectName("verticalLayout")
@@ -93,6 +99,11 @@ class Ui_MainWindow(object):
         self.dockWidgetStatistics.setWidget(self.dockWidgetContents_2)
         MainWindow.addDockWidget(QtCore.Qt.DockWidgetArea(1), self.dockWidgetStatistics)
         self.dockWidgetScope = QtGui.QDockWidget(MainWindow)
+        self.dockWidgetScope.setStyleSheet("QwtPlotCanvas {\n"
+"  border: 1px solid gray;\n"
+"  background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,\n"
+"stop: 0 #AAAAAA, stop: 0.3 #FFFFFF);\n"
+"}")
         self.dockWidgetScope.setObjectName("dockWidgetScope")
         self.dockWidgetContents_4 = QtGui.QWidget()
         self.dockWidgetContents_4.setObjectName("dockWidgetContents_4")
@@ -112,6 +123,11 @@ class Ui_MainWindow(object):
         self.dockWidgetScope.setWidget(self.dockWidgetContents_4)
         MainWindow.addDockWidget(QtCore.Qt.DockWidgetArea(4), self.dockWidgetScope)
         self.dockWidgetSpectrum = QtGui.QDockWidget(MainWindow)
+        self.dockWidgetSpectrum.setStyleSheet("QwtPlotCanvas {\n"
+"  border: 1px solid gray;\n"
+"  background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,\n"
+"stop: 0 #AAAAAA, stop: 0.3 #FFFFFF);\n"
+"}")
         self.dockWidgetSpectrum.setObjectName("dockWidgetSpectrum")
         self.dockWidgetContents_5 = QtGui.QWidget()
         self.dockWidgetContents_5.setObjectName("dockWidgetContents_5")
