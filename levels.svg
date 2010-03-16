@@ -1,22 +1,40 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
+
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="16px"
-   height="16px"
+   width="512"
+   height="512"
    id="svg2477"
    sodipodi:version="0.32"
-   inkscape:version="0.46"
+   inkscape:version="0.47 r22583"
    sodipodi:docname="levels.svg"
-   inkscape:output_extension="org.inkscape.output.svg.inkscape">
+   inkscape:output_extension="org.inkscape.output.svg.inkscape"
+   version="1.1">
   <defs
      id="defs2479">
+    <linearGradient
+       id="linearGradient3600">
+      <stop
+         style="stop-color:#00ff00;stop-opacity:1;"
+         offset="0"
+         id="stop3602" />
+      <stop
+         id="stop3608"
+         offset="0.5"
+         style="stop-color:#ffff00;stop-opacity:1;" />
+      <stop
+         style="stop-color:#ff0000;stop-opacity:1;"
+         offset="1"
+         id="stop3604" />
+    </linearGradient>
     <inkscape:perspective
        sodipodi:type="inkscape:persp3d"
        inkscape:vp_x="0 : 8 : 1"
@@ -24,25 +42,65 @@
        inkscape:vp_z="16 : 8 : 1"
        inkscape:persp3d-origin="8 : 5.3333333 : 1"
        id="perspective2485" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3600"
+       id="linearGradient3606"
+       x1="130"
+       y1="422"
+       x2="130"
+       y2="52"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="translate(0,-496)" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3600"
+       id="linearGradient3618"
+       x1="390"
+       y1="412"
+       x2="390"
+       y2="82"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="translate(0,-496)" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3600"
+       id="linearGradient3637"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="translate(4.5332031e-7,-496)"
+       x1="390"
+       y1="422.1351"
+       x2="390"
+       y2="52" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3600"
+       id="linearGradient3639"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="translate(4.5332031e-7,-496)"
+       x1="130"
+       y1="422"
+       x2="130"
+       y2="52" />
   </defs>
   <sodipodi:namedview
      id="base"
-     pagecolor="#ffffff"
+     pagecolor="#909090"
      bordercolor="#666666"
      borderopacity="1.0"
-     inkscape:pageopacity="0.0"
+     inkscape:pageopacity="0.57254902"
      inkscape:pageshadow="2"
-     inkscape:zoom="22.197802"
-     inkscape:cx="10.574833"
-     inkscape:cy="8"
+     inkscape:zoom="1.0371094"
+     inkscape:cx="90.154426"
+     inkscape:cy="256"
      inkscape:current-layer="layer1"
      showgrid="true"
      inkscape:grid-bbox="true"
      inkscape:document-units="px"
-     inkscape:window-width="758"
-     inkscape:window-height="763"
-     inkscape:window-x="0"
-     inkscape:window-y="0"
+     inkscape:window-width="1280"
+     inkscape:window-height="778"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
      inkscape:object-paths="true"
      inkscape:object-nodes="true"
      inkscape:snap-bbox="true"
@@ -50,12 +108,15 @@
      inkscape:bbox-nodes="true"
      gridtolerance="11"
      objecttolerance="11"
-     guidetolerance="11">
+     guidetolerance="11"
+     inkscape:window-maximized="1">
     <inkscape:grid
        type="xygrid"
        id="grid3295"
        visible="true"
-       enabled="true" />
+       enabled="true"
+       empspacing="5"
+       snapvisiblegridlinesonly="true" />
   </sodipodi:namedview>
   <metadata
      id="metadata2482">
@@ -71,46 +132,42 @@
   <g
      id="layer1"
      inkscape:label="Layer 1"
-     inkscape:groupmode="layer">
-    <g
-       id="g2497"
-       transform="matrix(1.1866686,0,0,1.0866057,-1.3238603,-0.6724045)">
-      <rect
-         y="1.5391088"
-         x="2.8010013"
-         height="12.884158"
-         width="3.3707809"
-         id="rect2487"
-         style="opacity:1;fill:#ff0000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
-      <rect
-         style="opacity:1;fill:#00ff00;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
-         id="rect2489"
-         width="3.3707809"
-         height="7.3623753"
-         x="2.8010013"
-         y="7.0608912" />
-    </g>
-    <g
-       id="g2501"
-       transform="matrix(1.1683054,0,0,1.2788858,-1.8421057,-3.4457108)">
-      <rect
-         style="opacity:1;fill:#ff0000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
-         id="rect2491"
-         width="3.4237623"
-         height="9.3831682"
-         x="10.136139"
-         y="5.0400987" />
-      <rect
-         y="8.1678209"
-         x="10.136139"
-         height="6.255445"
-         width="3.4237623"
-         id="rect2493"
-         style="opacity:1;fill:#00ff00;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
-    </g>
-    <path
-       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="M 8,1.9871291 L 8,14.012871"
-       id="path2495" />
+     inkscape:groupmode="layer"
+     transform="translate(0,496)">
+    <rect
+       style="fill:#ffffff;fill-opacity:1;stroke:none"
+       id="rect3601"
+       width="450"
+       height="490"
+       x="31.038895"
+       y="-484" />
+    <rect
+       y="-451"
+       x="317.42859"
+       height="297"
+       width="122.57143"
+       id="rect2825"
+       style="fill:#3d3d3d;fill-opacity:1;stroke:none" />
+    <rect
+       style="fill:url(#linearGradient3639);fill-opacity:1;stroke:none"
+       id="rect2826"
+       width="128.22858"
+       height="429"
+       x="75.716217"
+       y="-453" />
+    <rect
+       style="fill:url(#linearGradient3637);fill-opacity:1;stroke:none"
+       id="rect3610"
+       width="122.57143"
+       height="297"
+       x="317.42859"
+       y="-321" />
+    <rect
+       style="fill:#000000;fill-opacity:1;stroke:none"
+       id="rect2824"
+       width="60.535275"
+       height="429"
+       x="229.00475"
+       y="-453" />
   </g>
 </svg>
