@@ -19,7 +19,7 @@
 
 import classplot
 import PyQt4.Qwt5 as Qwt
-from PyQt4 import QtCore
+from PyQt4 import QtCore, Qt
 from numpy import log10, interp, linspace
 
 class picker(Qwt.QwtPlotPicker):
@@ -37,6 +37,11 @@ class TimePlot(classplot.ClassPlot):
 		# we do not need caching
 		self.canvas().setPaintAttribute(Qwt.QwtPlotCanvas.PaintCached, False)
 		self.canvas().setPaintAttribute(Qwt.QwtPlotCanvas.PaintPacked, False)
+
+		# attach a grid
+		grid = Qwt.QwtPlotGrid()
+		grid.setMajPen(Qt.QPen(Qt.Qt.black, 0, Qt.Qt.DotLine))
+		grid.attach(self)
 
 		self.setAxisTitle(Qwt.QwtPlot.xBottom, 'Time (ms)')
 		self.setAxisTitle(Qwt.QwtPlot.yLeft, 'Signal')
