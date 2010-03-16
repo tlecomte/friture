@@ -2,7 +2,7 @@
 
 ; HM NIS Edit Wizard helper defines
 !define PRODUCT_NAME "Friture"
-!define PRODUCT_VERSION "20100315"
+!define PRODUCT_VERSION "20100316"
 !define PRODUCT_PUBLISHER "Timothée Lecomte"
 !define PRODUCT_WEB_SITE "http://wiki.github.com/tlecomte/friture/"
 !define PRODUCT_DIR_REGKEY "Software\Microsoft\Windows\CurrentVersion\App Paths\friture.exe"
@@ -27,7 +27,7 @@ SetCompressor lzma
 ; Welcome page
 !insertmacro MUI_PAGE_WELCOME
 ; License page
-!insertmacro MUI_PAGE_LICENSE "latency_log.txt"
+!insertmacro MUI_PAGE_LICENSE "COPYING"
 ; Directory page
 !insertmacro MUI_PAGE_DIRECTORY
 ; Instfiles page
@@ -49,7 +49,7 @@ SetCompressor lzma
 ; MUI end ------
 
 Name "${PRODUCT_NAME} ${PRODUCT_VERSION}"
-OutFile "friture-install.exe"
+OutFile "friture-setup-${PRODUCT_VERSION}.exe"
 InstallDir "$PROGRAMFILES\Friture"
 InstallDirRegKey HKLM "${PRODUCT_DIR_REGKEY}" ""
 ShowInstDetails show
