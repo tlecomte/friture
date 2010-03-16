@@ -60,6 +60,13 @@ class SpectPlot(classplot.ClassPlot):
 		self.setAxisTitle(Qwt.QwtPlot.yLeft, 'PSD (dB)')
 		#self.axisWidget(Qwt.QwtPlot.xBottom).setFont(self.font())
 
+		# attach a grid
+		grid = Qwt.QwtPlotGrid()
+		grid.enableXMin(True)
+		grid.setMajPen(Qt.QPen(Qt.Qt.black, 0, Qt.Qt.DotLine))
+		grid.setMinPen(Qt.QPen(Qt.Qt.gray, 0, Qt.Qt.DotLine))
+		grid.attach(self)
+
 		self.xmax = 0
 		self.needfullreplot = False
 
