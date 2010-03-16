@@ -171,7 +171,8 @@ class CanvasScaledSpectrogram(QtCore.QObject):
 		# reinitialize current_total
 		self.current_total = 0.
 		
-		self.logfile.write("%d\n"%self.time.restart())
+		if False:
+			self.logfile.write("%d\n"%self.time.restart())
 
 	def floats_to_bytes(self, data):
 		#dat1 = (255. * data).astype(numpy.uint8)
