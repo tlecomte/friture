@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'friture.ui'
 #
-# Created: Wed Mar 17 14:08:02 2010
+# Created: Wed Mar 17 17:03:58 2010
 #      by: PyQt4 UI code generator 4.7
 #
 # WARNING! All changes made in this file will be lost!
@@ -88,7 +88,7 @@ class Ui_MainWindow(object):
         self.scrollArea.setWidgetResizable(True)
         self.scrollArea.setObjectName("scrollArea")
         self.scrollAreaWidgetContents = QtGui.QWidget(self.scrollArea)
-        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 150, 210))
+        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 150, 128))
         self.scrollAreaWidgetContents.setObjectName("scrollAreaWidgetContents")
         self.verticalLayout = QtGui.QVBoxLayout(self.scrollAreaWidgetContents)
         self.verticalLayout.setObjectName("verticalLayout")
@@ -165,6 +165,27 @@ class Ui_MainWindow(object):
         self.toolBar.setToolButtonStyle(QtCore.Qt.ToolButtonTextBesideIcon)
         self.toolBar.setObjectName("toolBar")
         MainWindow.addToolBar(QtCore.Qt.TopToolBarArea, self.toolBar)
+        self.dockWidgetLog = QtGui.QDockWidget(MainWindow)
+        self.dockWidgetLog.setObjectName("dockWidgetLog")
+        self.dockWidgetContents_3 = QtGui.QWidget()
+        self.dockWidgetContents_3.setObjectName("dockWidgetContents_3")
+        self.gridLayout_9 = QtGui.QGridLayout(self.dockWidgetContents_3)
+        self.gridLayout_9.setObjectName("gridLayout_9")
+        self.scrollArea_2 = QtGui.QScrollArea(self.dockWidgetContents_3)
+        self.scrollArea_2.setWidgetResizable(True)
+        self.scrollArea_2.setObjectName("scrollArea_2")
+        self.scrollAreaWidgetContents_2 = QtGui.QWidget(self.scrollArea_2)
+        self.scrollAreaWidgetContents_2.setGeometry(QtCore.QRect(0, 0, 142, 64))
+        self.scrollAreaWidgetContents_2.setObjectName("scrollAreaWidgetContents_2")
+        self.gridLayout_10 = QtGui.QGridLayout(self.scrollAreaWidgetContents_2)
+        self.gridLayout_10.setObjectName("gridLayout_10")
+        self.LabelLog = QtGui.QLabel(self.scrollAreaWidgetContents_2)
+        self.LabelLog.setObjectName("LabelLog")
+        self.gridLayout_10.addWidget(self.LabelLog, 0, 0, 1, 1)
+        self.scrollArea_2.setWidget(self.scrollAreaWidgetContents_2)
+        self.gridLayout_9.addWidget(self.scrollArea_2, 0, 0, 1, 1)
+        self.dockWidgetLog.setWidget(self.dockWidgetContents_3)
+        MainWindow.addDockWidget(QtCore.Qt.DockWidgetArea(1), self.dockWidgetLog)
         self.actionStart = QtGui.QAction(MainWindow)
         self.actionStart.setCheckable(True)
         self.actionStart.setChecked(True)
@@ -204,10 +225,12 @@ class Ui_MainWindow(object):
         self.label_peak_legend.setText(QtGui.QApplication.translate("MainWindow", "dBFS\n"
 "peak", None, QtGui.QApplication.UnicodeUTF8))
         self.dockWidgetStatistics.setWindowTitle(QtGui.QApplication.translate("MainWindow", "Statistics", None, QtGui.QApplication.UnicodeUTF8))
-        self.LabelLevel.setText(QtGui.QApplication.translate("MainWindow", "TextLabel", None, QtGui.QApplication.UnicodeUTF8))
+        self.LabelLevel.setText(QtGui.QApplication.translate("MainWindow", "No statistics", None, QtGui.QApplication.UnicodeUTF8))
         self.dockWidgetScope.setWindowTitle(QtGui.QApplication.translate("MainWindow", "Scope", None, QtGui.QApplication.UnicodeUTF8))
         self.dockWidgetSpectrum.setWindowTitle(QtGui.QApplication.translate("MainWindow", "Spectrum", None, QtGui.QApplication.UnicodeUTF8))
         self.toolBar.setWindowTitle(QtGui.QApplication.translate("MainWindow", "toolBar", None, QtGui.QApplication.UnicodeUTF8))
+        self.dockWidgetLog.setWindowTitle(QtGui.QApplication.translate("MainWindow", "Log", None, QtGui.QApplication.UnicodeUTF8))
+        self.LabelLog.setText(QtGui.QApplication.translate("MainWindow", "No log", None, QtGui.QApplication.UnicodeUTF8))
         self.actionStart.setText(QtGui.QApplication.translate("MainWindow", "Start", None, QtGui.QApplication.UnicodeUTF8))
         self.actionStart.setToolTip(QtGui.QApplication.translate("MainWindow", "Start/Stop", None, QtGui.QApplication.UnicodeUTF8))
         self.actionSettings.setText(QtGui.QApplication.translate("MainWindow", "Settings", None, QtGui.QApplication.UnicodeUTF8))
