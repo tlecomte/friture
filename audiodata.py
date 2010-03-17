@@ -66,13 +66,13 @@ class CanvasScaledSpectrogram(QtCore.QObject):
 		# performance timer
 		self.time = QtCore.QTime()
 		self.time.start()
-		self.logfile = open("latency_log.txt",'w')
+		#self.logfile = open("latency_log.txt",'w')
 		
 	def __del__(self):
 		# delete painter and the associated pixmap in the correct order
 		del self.painter
 		del self.pixmap
-		self.logfile.close()
+		#self.logfile.close()
 
 	def erase(self):
 		#self.fullspectrogram = numpy.zeros((self.canvas_height, self.time_bin_number(), 4), dtype = numpy.uint8)
@@ -171,8 +171,7 @@ class CanvasScaledSpectrogram(QtCore.QObject):
 		# reinitialize current_total
 		self.current_total = 0.
 		
-		if False:
-			self.logfile.write("%d\n"%self.time.restart())
+		#self.logfile.write("%d\n"%self.time.restart())
 
 	def floats_to_bytes(self, data):
 		#dat1 = (255. * data).astype(numpy.uint8)
