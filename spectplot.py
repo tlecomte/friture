@@ -63,8 +63,8 @@ class SpectPlot(classplot.ClassPlot):
 		# attach a grid
 		grid = Qwt.QwtPlotGrid()
 		grid.enableXMin(True)
-		grid.setMajPen(Qt.QPen(Qt.Qt.black, 0, Qt.Qt.DotLine))
-		grid.setMinPen(Qt.QPen(Qt.Qt.gray, 0, Qt.Qt.DotLine))
+		grid.setMajPen(Qt.QPen(Qt.QPen(Qt.Qt.gray)))
+		grid.setMinPen(Qt.QPen(Qt.QPen(Qt.Qt.lightGray)))
 		grid.attach(self)
 
 		self.xmax = 0
