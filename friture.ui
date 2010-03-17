@@ -260,13 +260,28 @@ stop: 0 #AAAAAA, stop: 0.3 #FFFFFF);
     <string>toolBar</string>
    </property>
    <property name="styleSheet">
-    <string>QToolBar {
+    <string notr="true">QToolBar {
 border: none;
 background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
 stop: 0 #a6a6a6, stop: 0.08 #7f7f7f,
 stop: 0.39999 #717171, stop: 0.4 #626262,
 stop: 0.9 #4c4c4c, stop: 1 #333333);
- }</string>
+}
+
+QLabel {
+color: white;
+}
+
+QToolButton {
+color: white;
+}
+
+QAction {
+color: white;
+}</string>
+   </property>
+   <property name="toolButtonStyle">
+    <enum>Qt::ToolButtonTextBesideIcon</enum>
    </property>
    <attribute name="toolBarArea">
     <enum>TopToolBarArea</enum>
