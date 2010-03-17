@@ -121,7 +121,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		self.audiobuffer = zeros(2*self.buffer_length)
 		self.offset = 0
 
-		print "Initializing PyAudio"
+		self.LabelLog.setText(self.LabelLog.text() + "\nInitializing PyAudio")
 		self.pa = PyAudio()
 
 		self.set_devices_list()
@@ -134,19 +134,19 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		devices = [default_device_index] + devices
 
 		for index in devices:
-			print "Opening the stream"
+			self.LabelLog.setText(self.LabelLog.text() + "\nOpening the stream")
 			self.stream = self.pa.open(format=paInt16, channels=1, rate=SAMPLING_RATE, input=True,
 			frames_per_buffer=FRAMES_PER_BUFFER, input_device_index=index)
 			self.device_index = index
 
-			print "Trying to read from input device #%d" % (index)
+			self.LabelLog.setText(self.LabelLog.text() + "\nTrying to read from input device #%d" % (index))
 			if self.try_input_device():
-				print "Success"
+				self.LabelLog.setText(self.LabelLog.text() + "\nSuccess")
 				lat_ms = 1000*self.stream.get_input_latency()
 				self.max_in_a_row = int(ceil(lat_ms/TIMER_PERIOD_MS))
 				break
 			else:
-				print "Fail"
+				self.LabelLog.setText(self.LabelLog.text() + "\nFail")
 
 		self.settings_dialog.comboBox_inputDevice.setCurrentIndex(self.device_index)
 
@@ -262,11 +262,11 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 			return False
 		else:
 			lat_ms = 1000*self.stream.get_input_latency()
-			print "Device claims %d ms latency" %(lat_ms)
+			self.LabelLog.setText(self.LabelLog.text() + "\nDevice claims %d ms latency" %(lat_ms))
 			return True
 
 	def timer_toggle(self):
-		print "toggle"
+		self.LabelLog.setText(self.LabelLog.text() + "\ntoggle")
 		if self.display_timer.isActive():
 			self.display_timer.stop()
 			self.spectrogram_timer.stop()
@@ -418,14 +418,14 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		self.PlotZoneSpect.setdata(freq, db_spectrogram)
 
 	def fftsizechanged(self, index):
-		print "fft_size_changed slot", index, 2**index*32, 150000/self.fft_size
+		self.LabelLog.setText(self.LabelLog.text() + "\nfft_size_changed slot %d %d %f" %(index, 2**index*32, 150000/self.fft_size))
 		self.fft_size = 2**index*32
 
 	def freqscalechanged(self, index):
-		print "freq_scale slot", index
+		self.LabelLog.setText(self.LabelLog.text() + "\nfreq_scale slot %d" %index)
 		if index == 2:
 			self.PlotZoneSpect.setlogfreqscale()
-			print "Warning: Spectrum widget still in base 10 logarithmic"
+			self.LabelLog.setText(self.LabelLog.text() + "\nWarning: Spectrum widget still in base 10 logarithmic")
 			self.PlotZoneImage.setlog2freqscale()
 		elif index == 1:
 			self.PlotZoneSpect.setlogfreqscale()
@@ -459,7 +459,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		# When the period is smaller than 25 ms, we can reasonably
 		# try to draw as many columns at once as possible
 		self.period_ms = 1000.*self.timerange_s/self.canvas_width
-		print "Resetting the timer, will fire every %d ms" %(self.period_ms)
+		self.LabelLog.setText(self.LabelLog.text() + "\nResetting the timer, will fire every %d ms" %(self.period_ms))
 		self.spectrogram_timer.setInterval(self.period_ms)
 		
 	def set_devices_list(self):
@@ -491,13 +491,13 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		self.stream = self.pa.open(format=paInt16, channels=1, rate=SAMPLING_RATE, input=True,
                      frames_per_buffer=FRAMES_PER_BUFFER, input_device_index=index)
 
-		print "Trying to read from input device #%d" % (index)
+		self.LabelLog.setText(self.LabelLog.text() + "\nTrying to read from input device #%d" % (index))
 		if self.try_input_device():
-			print "Success"
+			self.LabelLog.setText(self.LabelLog.text() + "\nSuccess")
 			previous_stream.close()
 			self.device_index = index
 		else:
-			print "Fail"
+			self.LabelLog.setText(self.LabelLog.text() + "\nFail")
 			error_message = QtGui.QErrorMessage(self)
 			error_message.setWindowTitle("Input device error")
 			error_message.showMessage("Impossible to use the selected device, reverting to the previous one")
