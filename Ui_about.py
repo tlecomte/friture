@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'about.ui'
 #
-# Created: Wed Mar 17 18:36:24 2010
+# Created: Wed Mar 17 18:46:14 2010
 #      by: PyQt4 UI code generator 4.7
 #
 # WARNING! All changes made in this file will be lost!
@@ -19,10 +19,17 @@ class Ui_About_Dialog(object):
         self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
         self.buttonBox.setStandardButtons(QtGui.QDialogButtonBox.Close)
         self.buttonBox.setObjectName("buttonBox")
-        self.gridLayout.addWidget(self.buttonBox, 1, 0, 1, 1)
+        self.gridLayout.addWidget(self.buttonBox, 1, 1, 1, 1)
         self.label = QtGui.QLabel(About_Dialog)
         self.label.setObjectName("label")
-        self.gridLayout.addWidget(self.label, 0, 0, 1, 1)
+        self.gridLayout.addWidget(self.label, 0, 1, 1, 1)
+        self.label_2 = QtGui.QLabel(About_Dialog)
+        self.label_2.setMinimumSize(QtCore.QSize(128, 128))
+        self.label_2.setMaximumSize(QtCore.QSize(128, 128))
+        self.label_2.setPixmap(QtGui.QPixmap(":/window-icon.svg"))
+        self.label_2.setScaledContents(True)
+        self.label_2.setObjectName("label_2")
+        self.gridLayout.addWidget(self.label_2, 0, 0, 1, 1)
 
         self.retranslateUi(About_Dialog)
         QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL("accepted()"), About_Dialog.accept)
@@ -33,3 +40,4 @@ class Ui_About_Dialog(object):
         About_Dialog.setWindowTitle(QtGui.QApplication.translate("About_Dialog", "About Friture", None, QtGui.QApplication.UnicodeUTF8))
         self.label.setText(QtGui.QApplication.translate("About_Dialog", "About", None, QtGui.QApplication.UnicodeUTF8))
 
+import resource_rc
