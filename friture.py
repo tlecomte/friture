@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
-import sys
+import sys, os, platform
 from pyaudio import PyAudio, paInt16
 from numpy import transpose, log10, sqrt, ceil, linspace, arange, floor, zeros, int16, fromstring, where, sign
 from PyQt4 import QtGui, QtCore, Qt
@@ -510,7 +510,16 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		self.actionStart.setChecked(True)
 
 if __name__ == "__main__":
-	app = QtGui.QApplication(sys.argv)
+        # On Windows, redirect stderr to a file
+        if platform.system() == "Windows":
+            print "Running on Windows"
+            import imp
+            if (hasattr(sys, "frozen") or # new py2exe
+                hasattr(sys, "importers") or # old py2exe
+                imp.is_frozen("__main__")): # tools/freeze
+                    sys.stderr = open(os.path.expanduser("~/friture.exe.log"), "w")
+    
+        app = QtGui.QApplication(sys.argv)
 
 	pixmap = QtGui.QPixmap(":/splash.png")
 	splash = QtGui.QSplashScreen(pixmap)
@@ -532,7 +541,7 @@ if __name__ == "__main__":
                         profile = "no"
                 else:
                         print "command-line arguments (%s) not recognized" %sys.argv[1:]
-	
+
 	if profile == "python":
 		import cProfile
 		import pstats
