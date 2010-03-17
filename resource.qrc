@@ -1,5 +1,6 @@
 <RCC>
   <qresource>
+    <file>about.svg</file>
     <file>log.svg</file>
     <file>tools.svg</file>
     <file>window-icon.svg</file>

@@ -373,7 +373,7 @@ color: white;
   <action name="actionAbout">
    <property name="icon">
     <iconset resource="resource.qrc">
-     <normaloff>:/tools.svg</normaloff>:/tools.svg</iconset>
+     <normaloff>:/about.svg</normaloff>:/about.svg</iconset>
    </property>
    <property name="text">
     <string>About</string>

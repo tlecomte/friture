@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'friture.ui'
 #
-# Created: Wed Mar 17 18:37:17 2010
+# Created: Wed Mar 17 18:51:42 2010
 #      by: PyQt4 UI code generator 4.7
 #
 # WARNING! All changes made in this file will be lost!
@@ -208,7 +208,9 @@ class Ui_MainWindow(object):
         self.actionSettings.setIcon(icon2)
         self.actionSettings.setObjectName("actionSettings")
         self.actionAbout = QtGui.QAction(MainWindow)
-        self.actionAbout.setIcon(icon2)
+        icon3 = QtGui.QIcon()
+        icon3.addPixmap(QtGui.QPixmap(":/about.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.actionAbout.setIcon(icon3)
         self.actionAbout.setObjectName("actionAbout")
         self.toolBar.addAction(self.actionStart)
         self.toolBar.addAction(self.actionSettings)
