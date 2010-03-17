@@ -40,7 +40,7 @@ class TimePlot(classplot.ClassPlot):
 
 		# attach a grid
 		grid = Qwt.QwtPlotGrid()
-		grid.setMajPen(Qt.QPen(Qt.Qt.black, 0, Qt.Qt.DotLine))
+		grid.setMajPen(Qt.QPen(Qt.Qt.lightGray))
 		grid.attach(self)
 
 		self.setAxisTitle(Qwt.QwtPlot.xBottom, 'Time (ms)')

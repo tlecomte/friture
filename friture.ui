@@ -155,20 +155,29 @@ peak</string>
        <property name="widgetResizable">
         <bool>true</bool>
        </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+       </property>
        <widget class="QWidget" name="scrollAreaWidgetContents">
         <property name="geometry">
          <rect>
           <x>0</x>
           <y>0</y>
           <width>150</width>
-          <height>210</height>
+          <height>128</height>
          </rect>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout">
          <item>
           <widget class="QLabel" name="LabelLevel">
            <property name="text">
-            <string>TextLabel</string>
+            <string>No statistics</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+           </property>
+           <property name="textInteractionFlags">
+            <set>Qt::LinksAccessibleByKeyboard|Qt::LinksAccessibleByMouse|Qt::TextBrowserInteraction|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
            </property>
           </widget>
          </item>
@@ -260,13 +269,21 @@ stop: 0 #AAAAAA, stop: 0.3 #FFFFFF);
     <string>toolBar</string>
    </property>
    <property name="styleSheet">
-    <string>QToolBar {
+    <string notr="true">QToolBar {
 border: none;
 background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
 stop: 0 #a6a6a6, stop: 0.08 #7f7f7f,
 stop: 0.39999 #717171, stop: 0.4 #626262,
 stop: 0.9 #4c4c4c, stop: 1 #333333);
- }</string>
+}
+
+QToolButton {
+color: white;
+}
+</string>
+   </property>
+   <property name="toolButtonStyle">
+    <enum>Qt::ToolButtonTextBesideIcon</enum>
    </property>
    <attribute name="toolBarArea">
     <enum>TopToolBarArea</enum>
@@ -276,6 +293,48 @@ stop: 0.9 #4c4c4c, stop: 1 #333333);
    </attribute>
    <addaction name="actionStart"/>
    <addaction name="actionSettings"/>
+   <addaction name="actionAbout"/>
+  </widget>
+  <widget class="QDockWidget" name="dockWidgetLog">
+   <property name="windowTitle">
+    <string>Log</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>1</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents_3">
+    <layout class="QGridLayout" name="gridLayout_9">
+     <item row="0" column="0">
+      <widget class="QScrollArea" name="scrollArea_2">
+       <property name="widgetResizable">
+        <bool>true</bool>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+       </property>
+       <widget class="QWidget" name="scrollAreaWidgetContents_2">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>142</width>
+          <height>64</height>
+         </rect>
+        </property>
+        <layout class="QGridLayout" name="gridLayout_10">
+         <item row="0" column="0">
+          <widget class="QLabel" name="LabelLog">
+           <property name="alignment">
+            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </widget>
+     </item>
+    </layout>
+   </widget>
   </widget>
   <action name="actionStart">
    <property name="checkable">
@@ -309,6 +368,15 @@ stop: 0.9 #4c4c4c, stop: 1 #333333);
    </property>
    <property name="toolTip">
     <string>Display settings dialog</string>
+   </property>
+  </action>
+  <action name="actionAbout">
+   <property name="icon">
+    <iconset resource="resource.qrc">
+     <normaloff>:/about.svg</normaloff>:/about.svg</iconset>
+   </property>
+   <property name="text">
+    <string>About</string>
    </property>
   </action>
  </widget>

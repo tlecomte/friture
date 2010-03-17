@@ -24,6 +24,7 @@ from PyQt4 import QtGui, QtCore, Qt
 import PyQt4.Qwt5 as Qwt
 from Ui_friture import Ui_MainWindow
 from Ui_settings import Ui_Settings_Dialog
+from Ui_about import Ui_About_Dialog
 import resource_rc
 import audiodata
 import audioproc
@@ -72,6 +73,22 @@ class Settings_Dialog(QtGui.QDialog, Ui_Settings_Dialog):
 		# Setup the user interface
 		self.setupUi(self)
 
+class About_Dialog(QtGui.QDialog, Ui_About_Dialog):
+	def __init__(self):
+		QtGui.QDialog.__init__(self)
+		Ui_About_Dialog.__init__(self)
+		
+		# Setup the user interface
+		self.setupUi(self)
+		
+		aboutText = u"Friture is an application for real-time audio analysis.\n" \
+		"Written in Python\n" \
+		"License GPLv3\n" \
+		"By Timothee Lecomte\n" \
+		"Homepage: http://www.github.com/tlecomte/friture"
+		
+		self.label.setText(aboutText)
+
 class Friture(QtGui.QMainWindow, Ui_MainWindow):
 	def __init__(self):
 		QtGui.QMainWindow.__init__(self)
@@ -81,21 +98,25 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		self.setupUi(self)
 		
 		self.settings_dialog = Settings_Dialog()
+		self.about_dialog = About_Dialog()
 		
 		levelsAction = self.dockWidgetLevels.toggleViewAction()
 		scopeAction = self.dockWidgetScope.toggleViewAction()
 		spectrumAction = self.dockWidgetSpectrum.toggleViewAction()
 		statisticsAction = self.dockWidgetStatistics.toggleViewAction()
+		logAction = self.dockWidgetLog.toggleViewAction()
 		
 		levelsAction.setIcon(QtGui.QIcon(":/levels.svg"))
 		scopeAction.setIcon(QtGui.QIcon(":/scope.svg"))
 		spectrumAction.setIcon(QtGui.QIcon(":/spectrum.svg"))
 		statisticsAction.setIcon(QtGui.QIcon(":/statistics.svg"))
+		logAction.setIcon(QtGui.QIcon(":/log.svg"))
 		
 		self.toolBar.addAction(levelsAction)
 		self.toolBar.addAction(scopeAction)
 		self.toolBar.addAction(spectrumAction)
 		self.toolBar.addAction(statisticsAction)
+		self.toolBar.addAction(logAction)
 		
 		self.scopeIsVisible = True
 		self.statisticsIsVisible = True
@@ -118,7 +139,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		self.audiobuffer = zeros(2*self.buffer_length)
 		self.offset = 0
 
-		print "Initializing PyAudio"
+		self.LabelLog.setText(self.LabelLog.text() + "\nInitializing PyAudio")
 		self.pa = PyAudio()
 
 		self.set_devices_list()
@@ -131,19 +152,19 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		devices = [default_device_index] + devices
 
 		for index in devices:
-			print "Opening the stream"
+			self.LabelLog.setText(self.LabelLog.text() + "\nOpening the stream")
 			self.stream = self.pa.open(format=paInt16, channels=1, rate=SAMPLING_RATE, input=True,
 			frames_per_buffer=FRAMES_PER_BUFFER, input_device_index=index)
 			self.device_index = index
 
-			print "Trying to read from input device #%d" % (index)
+			self.LabelLog.setText(self.LabelLog.text() + "\nTrying to read from input device #%d" % (index))
 			if self.try_input_device():
-				print "Success"
+				self.LabelLog.setText(self.LabelLog.text() + "\nSuccess")
 				lat_ms = 1000*self.stream.get_input_latency()
 				self.max_in_a_row = int(ceil(lat_ms/TIMER_PERIOD_MS))
 				break
 			else:
-				print "Fail"
+				self.LabelLog.setText(self.LabelLog.text() + "\nFail")
 
 		self.settings_dialog.comboBox_inputDevice.setCurrentIndex(self.device_index)
 
@@ -162,6 +183,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		
 		self.connect(self.actionStart, QtCore.SIGNAL('triggered()'), self.timer_toggle)
 		self.connect(self.actionSettings, QtCore.SIGNAL('triggered()'), self.settings_called)
+		self.connect(self.actionAbout, QtCore.SIGNAL('triggered()'), self.about_called)
 		
 		self.connect(self.settings_dialog.comboBox_freqscale, QtCore.SIGNAL('currentIndexChanged(int)'), self.freqscalechanged)
 		self.connect(self.settings_dialog.comboBox_fftsize, QtCore.SIGNAL('currentIndexChanged(int)'), self.fftsizechanged)
@@ -190,6 +212,9 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 	
 	def settings_called(self):
 		self.settings_dialog.show()
+	
+	def about_called(self):
+		self.about_dialog.show()
 	
 	def closeEvent(self, event):
 		self.saveAppState()
@@ -259,11 +284,11 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 			return False
 		else:
 			lat_ms = 1000*self.stream.get_input_latency()
-			print "Device claims %d ms latency" %(lat_ms)
+			self.LabelLog.setText(self.LabelLog.text() + "\nDevice claims %d ms latency" %(lat_ms))
 			return True
 
 	def timer_toggle(self):
-		print "toggle"
+		self.LabelLog.setText(self.LabelLog.text() + "\ntoggle")
 		if self.display_timer.isActive():
 			self.display_timer.stop()
 			self.spectrogram_timer.stop()
@@ -415,14 +440,14 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		self.PlotZoneSpect.setdata(freq, db_spectrogram)
 
 	def fftsizechanged(self, index):
-		print "fft_size_changed slot", index, 2**index*32, 150000/self.fft_size
+		self.LabelLog.setText(self.LabelLog.text() + "\nfft_size_changed slot %d %d %f" %(index, 2**index*32, 150000/self.fft_size))
 		self.fft_size = 2**index*32
 
 	def freqscalechanged(self, index):
-		print "freq_scale slot", index
+		self.LabelLog.setText(self.LabelLog.text() + "\nfreq_scale slot %d" %index)
 		if index == 2:
 			self.PlotZoneSpect.setlogfreqscale()
-			print "Warning: Spectrum widget still in base 10 logarithmic"
+			self.LabelLog.setText(self.LabelLog.text() + "\nWarning: Spectrum widget still in base 10 logarithmic")
 			self.PlotZoneImage.setlog2freqscale()
 		elif index == 1:
 			self.PlotZoneSpect.setlogfreqscale()
@@ -456,7 +481,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		# When the period is smaller than 25 ms, we can reasonably
 		# try to draw as many columns at once as possible
 		self.period_ms = 1000.*self.timerange_s/self.canvas_width
-		print "Resetting the timer, will fire every %d ms" %(self.period_ms)
+		self.LabelLog.setText(self.LabelLog.text() + "\nResetting the timer, will fire every %d ms" %(self.period_ms))
 		self.spectrogram_timer.setInterval(self.period_ms)
 		
 	def set_devices_list(self):
@@ -488,13 +513,13 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		self.stream = self.pa.open(format=paInt16, channels=1, rate=SAMPLING_RATE, input=True,
                      frames_per_buffer=FRAMES_PER_BUFFER, input_device_index=index)
 
-		print "Trying to read from input device #%d" % (index)
+		self.LabelLog.setText(self.LabelLog.text() + "\nTrying to read from input device #%d" % (index))
 		if self.try_input_device():
-			print "Success"
+			self.LabelLog.setText(self.LabelLog.text() + "\nSuccess")
 			previous_stream.close()
 			self.device_index = index
 		else:
-			print "Fail"
+			self.LabelLog.setText(self.LabelLog.text() + "\nFail")
 			error_message = QtGui.QErrorMessage(self)
 			error_message.setWindowTitle("Input device error")
 			error_message.showMessage("Impossible to use the selected device, reverting to the previous one")
