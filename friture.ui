@@ -268,17 +268,10 @@ stop: 0.39999 #717171, stop: 0.4 #626262,
 stop: 0.9 #4c4c4c, stop: 1 #333333);
 }
 
-QLabel {
-color: white;
-}
-
 QToolButton {
 color: white;
 }
-
-QAction {
-color: white;
-}</string>
+</string>
    </property>
    <property name="toolButtonStyle">
     <enum>Qt::ToolButtonTextBesideIcon</enum>

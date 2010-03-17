@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'friture.ui'
 #
-# Created: Wed Mar 17 13:59:41 2010
+# Created: Wed Mar 17 14:08:02 2010
 #      by: PyQt4 UI code generator 4.7
 #
 # WARNING! All changes made in this file will be lost!
@@ -158,17 +158,10 @@ class Ui_MainWindow(object):
 "stop: 0.9 #4c4c4c, stop: 1 #333333);\n"
 "}\n"
 "\n"
-"QLabel {\n"
-"color: white;\n"
-"}\n"
-"\n"
 "QToolButton {\n"
 "color: white;\n"
 "}\n"
-"\n"
-"QAction {\n"
-"color: white;\n"
-"}")
+"")
         self.toolBar.setToolButtonStyle(QtCore.Qt.ToolButtonTextBesideIcon)
         self.toolBar.setObjectName("toolBar")
         MainWindow.addToolBar(QtCore.Qt.TopToolBarArea, self.toolBar)
