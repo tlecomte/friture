@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'friture.ui'
 #
-# Created: Wed Mar 17 17:31:17 2010
+# Created: Wed Mar 17 18:37:17 2010
 #      by: PyQt4 UI code generator 4.7
 #
 # WARNING! All changes made in this file will be lost!
@@ -207,8 +207,12 @@ class Ui_MainWindow(object):
         icon2.addPixmap(QtGui.QPixmap(":/tools.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.actionSettings.setIcon(icon2)
         self.actionSettings.setObjectName("actionSettings")
+        self.actionAbout = QtGui.QAction(MainWindow)
+        self.actionAbout.setIcon(icon2)
+        self.actionAbout.setObjectName("actionAbout")
         self.toolBar.addAction(self.actionStart)
         self.toolBar.addAction(self.actionSettings)
+        self.toolBar.addAction(self.actionAbout)
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
@@ -239,6 +243,7 @@ class Ui_MainWindow(object):
         self.actionStart.setToolTip(QtGui.QApplication.translate("MainWindow", "Start/Stop", None, QtGui.QApplication.UnicodeUTF8))
         self.actionSettings.setText(QtGui.QApplication.translate("MainWindow", "Settings", None, QtGui.QApplication.UnicodeUTF8))
         self.actionSettings.setToolTip(QtGui.QApplication.translate("MainWindow", "Display settings dialog", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionAbout.setText(QtGui.QApplication.translate("MainWindow", "About", None, QtGui.QApplication.UnicodeUTF8))
 
 from timeplot import TimePlot
 from qsynthmeter import qsynthMeter

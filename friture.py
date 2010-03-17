@@ -24,6 +24,7 @@ from PyQt4 import QtGui, QtCore, Qt
 import PyQt4.Qwt5 as Qwt
 from Ui_friture import Ui_MainWindow
 from Ui_settings import Ui_Settings_Dialog
+from Ui_about import Ui_About_Dialog
 import resource_rc
 import audiodata
 import audioproc
@@ -72,6 +73,22 @@ class Settings_Dialog(QtGui.QDialog, Ui_Settings_Dialog):
 		# Setup the user interface
 		self.setupUi(self)
 
+class About_Dialog(QtGui.QDialog, Ui_About_Dialog):
+	def __init__(self):
+		QtGui.QDialog.__init__(self)
+		Ui_About_Dialog.__init__(self)
+		
+		# Setup the user interface
+		self.setupUi(self)
+		
+		aboutText = u"Friture is an application for real-time audio analysis.\n" \
+		"Written in Python\n" \
+		"License GPLv3\n" \
+		"By Timothee Lecomte\n" \
+		"Homepage: http://www.github.com/tlecomte/friture"
+		
+		self.label.setText(aboutText)
+
 class Friture(QtGui.QMainWindow, Ui_MainWindow):
 	def __init__(self):
 		QtGui.QMainWindow.__init__(self)
@@ -81,6 +98,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		self.setupUi(self)
 		
 		self.settings_dialog = Settings_Dialog()
+		self.about_dialog = About_Dialog()
 		
 		levelsAction = self.dockWidgetLevels.toggleViewAction()
 		scopeAction = self.dockWidgetScope.toggleViewAction()
@@ -165,6 +183,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		
 		self.connect(self.actionStart, QtCore.SIGNAL('triggered()'), self.timer_toggle)
 		self.connect(self.actionSettings, QtCore.SIGNAL('triggered()'), self.settings_called)
+		self.connect(self.actionAbout, QtCore.SIGNAL('triggered()'), self.about_called)
 		
 		self.connect(self.settings_dialog.comboBox_freqscale, QtCore.SIGNAL('currentIndexChanged(int)'), self.freqscalechanged)
 		self.connect(self.settings_dialog.comboBox_fftsize, QtCore.SIGNAL('currentIndexChanged(int)'), self.fftsizechanged)
@@ -193,6 +212,9 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 	
 	def settings_called(self):
 		self.settings_dialog.show()
+	
+	def about_called(self):
+		self.about_dialog.show()
 	
 	def closeEvent(self, event):
 		self.saveAppState()

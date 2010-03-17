@@ -293,6 +293,7 @@ color: white;
    </attribute>
    <addaction name="actionStart"/>
    <addaction name="actionSettings"/>
+   <addaction name="actionAbout"/>
   </widget>
   <widget class="QDockWidget" name="dockWidgetLog">
    <property name="windowTitle">
@@ -367,6 +368,15 @@ color: white;
    </property>
    <property name="toolTip">
     <string>Display settings dialog</string>
+   </property>
+  </action>
+  <action name="actionAbout">
+   <property name="icon">
+    <iconset resource="resource.qrc">
+     <normaloff>:/tools.svg</normaloff>:/tools.svg</iconset>
+   </property>
+   <property name="text">
+    <string>About</string>
    </property>
   </action>
  </widget>
