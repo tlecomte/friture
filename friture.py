@@ -538,11 +538,14 @@ if __name__ == "__main__":
         # On Windows, redirect stderr to a file
         if platform.system() == "Windows":
             print "Running on Windows"
-            import imp
+            import imp, ctypes
             if (hasattr(sys, "frozen") or # new py2exe
                 hasattr(sys, "importers") or # old py2exe
                 imp.is_frozen("__main__")): # tools/freeze
                     sys.stderr = open(os.path.expanduser("~/friture.exe.log"), "w")
+            myappid = 'Friture.Friture.Friture.current' # arbitrary string
+            ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
+
     
         app = QtGui.QApplication(sys.argv)
 
