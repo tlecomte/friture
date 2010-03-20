@@ -2,7 +2,7 @@
 
 ; HM NIS Edit Wizard helper defines
 !define PRODUCT_NAME "Friture"
-!define PRODUCT_VERSION "20100316"
+!define PRODUCT_VERSION "20100317"
 !define PRODUCT_PUBLISHER "Timothée Lecomte"
 !define PRODUCT_WEB_SITE "http://wiki.github.com/tlecomte/friture/"
 !define PRODUCT_DIR_REGKEY "Software\Microsoft\Windows\CurrentVersion\App Paths\friture.exe"
@@ -109,6 +109,9 @@ Section "SectionPrincipale" SEC01
   File "dist\_multiprocessing.pyd"
   File "dist\_portaudio.pyd"
   File "dist\_socket.pyd"
+  File "COPYING"
+  File "README"
+  File "TODO"
 SectionEnd
 
 Section -AdditionalIcons
