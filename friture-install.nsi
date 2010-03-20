@@ -2,12 +2,14 @@
 
 ; HM NIS Edit Wizard helper defines
 !define PRODUCT_NAME "Friture"
-!define PRODUCT_VERSION "20100317"
+!define PRODUCT_VERSION "beta"
 !define PRODUCT_PUBLISHER "Timothée Lecomte"
 !define PRODUCT_WEB_SITE "http://wiki.github.com/tlecomte/friture/"
 !define PRODUCT_DIR_REGKEY "Software\Microsoft\Windows\CurrentVersion\App Paths\friture.exe"
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
 !define PRODUCT_UNINST_ROOT_KEY "HKLM"
+
+!define /date TIMESTAMP "%Y-%m-%d"
 
 SetCompressor lzma
 
@@ -49,7 +51,7 @@ SetCompressor lzma
 ; MUI end ------
 
 Name "${PRODUCT_NAME} ${PRODUCT_VERSION}"
-OutFile "friture-setup-${PRODUCT_VERSION}.exe"
+OutFile "friture-setup-${TIMESTAMP}.exe"
 InstallDir "$PROGRAMFILES\Friture"
 InstallDirRegKey HKLM "${PRODUCT_DIR_REGKEY}" ""
 ShowInstDetails show
