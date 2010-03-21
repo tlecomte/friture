@@ -23,11 +23,11 @@ from numpy import transpose, log10, sqrt, ceil, linspace, arange, floor, zeros, 
 from PyQt4 import QtGui, QtCore, Qt
 import PyQt4.Qwt5 as Qwt
 from Ui_friture import Ui_MainWindow
-from Ui_settings import Ui_Settings_Dialog
-from Ui_about import Ui_About_Dialog
 import resource_rc
 import audiodata
 import audioproc
+import about # About dialog
+import settings # Setting dialog
 
 #pyuic4 friture.ui > Ui_friture.py
 #pyrcc4 resource.qrc > resource_rc.py
@@ -65,30 +65,6 @@ FRAMES_PER_BUFFER = NUM_SAMPLES
 TIMER_PERIOD_MS = int(ceil(1000.*NUM_SAMPLES/float(SAMPLING_RATE)))
 SMOOTH_DISPLAY_TIMER_PERIOD_MS = 25
 
-class Settings_Dialog(QtGui.QDialog, Ui_Settings_Dialog):
-	def __init__(self):
-		QtGui.QDialog.__init__(self)
-		Ui_Settings_Dialog.__init__(self)
-		
-		# Setup the user interface
-		self.setupUi(self)
-
-class About_Dialog(QtGui.QDialog, Ui_About_Dialog):
-	def __init__(self):
-		QtGui.QDialog.__init__(self)
-		Ui_About_Dialog.__init__(self)
-		
-		# Setup the user interface
-		self.setupUi(self)
-		
-		aboutText = u"Friture is an application for real-time audio analysis.\n" \
-		"Written in Python\n" \
-		"License GPLv3\n" \
-		"By Timothee Lecomte\n" \
-		"Homepage: http://www.github.com/tlecomte/friture"
-		
-		self.label.setText(aboutText)
-
 class Friture(QtGui.QMainWindow, Ui_MainWindow):
 	def __init__(self):
 		QtGui.QMainWindow.__init__(self)
@@ -97,8 +73,8 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		# Setup the user interface
 		self.setupUi(self)
 		
-		self.settings_dialog = Settings_Dialog()
-		self.about_dialog = About_Dialog()
+		self.settings_dialog = settings.Settings_Dialog()
+		self.about_dialog = about.About_Dialog()
 		
 		levelsAction = self.dockWidgetLevels.toggleViewAction()
 		scopeAction = self.dockWidgetScope.toggleViewAction()
@@ -543,6 +519,8 @@ if __name__ == "__main__":
                 hasattr(sys, "importers") or # old py2exe
                 imp.is_frozen("__main__")): # tools/freeze
                     sys.stderr = open(os.path.expanduser("~/friture.exe.log"), "w")
+            # set the App ID for Windows 7 to properly display the icon in the
+            # taskbar.
             myappid = 'Friture.Friture.Friture.current' # arbitrary string
             ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
 
