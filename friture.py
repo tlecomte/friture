@@ -28,7 +28,7 @@ import audiodata
 import audioproc
 import about # About dialog
 import settings # Setting dialog
-import logger
+import logger # logger class
 
 #pyuic4 friture.ui > Ui_friture.py
 #pyrcc4 resource.qrc > resource_rc.py
