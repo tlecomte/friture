@@ -253,15 +253,19 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		
 		settings.endGroup()
 
+	# slot
 	def scopeVisibility(self, visible):
 		self.scopeIsVisible = visible
-	
+
+	# slot
 	def statisticsVisibility(self, visible):
 		self.statisticsIsVisible = visible
 
+	# slot
 	def levelsVisibility(self, visible):
 		self.levelsIsVisible = visible
 
+	# slot
 	def spectrumVisibility(self, visible):
 		self.spectrumIsVisible = visible
 
