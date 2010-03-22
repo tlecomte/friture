@@ -485,6 +485,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		return self.pa.get_default_input_device_info()['index']
 	
 	def get_device_count(self):
+		# FIXME only input devices should be chosen, not all of them !
 		return self.pa.get_device_count()
 
 	def input_device_changed(self, index):
