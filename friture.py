@@ -497,7 +497,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		previous_stream = self.stream
 
 		self.stream = self.pa.open(format=paInt16, channels=1, rate=SAMPLING_RATE, input=True,
-                     frames_per_buffer=FRAMES_PER_BUFFER, input_device_index=index)
+				frames_per_buffer=FRAMES_PER_BUFFER, input_device_index=index)
 
 		self.push_to_log("Trying to read from input device #%d" % (index))
 		if self.try_input_device():
