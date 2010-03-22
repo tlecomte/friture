@@ -192,19 +192,24 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		
 		self.logger.push("Init finished, entering the main loop")
 	
+	# slot
 	def log_changed(self):
 		self.LabelLog.setText(self.logger.text())
 	
+	# slot
 	def settings_called(self):
 		self.settings_dialog.show()
 	
+	# slot
 	def about_called(self):
 		self.about_dialog.show()
 	
+	# event handler
 	def closeEvent(self, event):
 		self.saveAppState()
 		event.accept()
 	
+	# method
 	def saveAppState(self):
 		windowState = self.saveState()
 		settings = QtCore.QSettings("Friture", "Friture")
@@ -223,6 +228,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		
 		settings.endGroup()
 	
+	# method
 	def restoreAppState(self):
 		settings = QtCore.QSettings("Friture", "Friture")
 		
@@ -272,6 +278,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 			self.logger.push("Device claims %d ms latency" %(lat_ms))
 			return True
 
+	# slot
 	def timer_toggle(self):
 		self.logger.push("toggle")
 		if self.display_timer.isActive():
@@ -281,6 +288,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 			self.display_timer.start()
 			self.spectrogram_timer.start()
 
+	# slot
 	def display_timer_slot(self):
 		self.update_buffer()
 		
@@ -301,6 +309,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		
 		self.display_timer_time = (95.*self.display_timer_time + 5.*t.elapsed())/100.
 
+	# slot
 	def spectrogram_timer_slot(self):
 		self.update_buffer()
 
@@ -319,6 +328,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		
 		self.spectrogram_timer_time = (95.*self.spectrogram_timer_time + 5.*t.elapsed())/100.
 
+	# method
 	def update_buffer(self):
 		t = QtCore.QTime()
 		t.start()
@@ -356,6 +366,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 
 		self.buffer_timer_time = (95.*self.buffer_timer_time + 5.*t.elapsed())/100.
 
+	# method
 	def statistics(self):
 		level_label = "Chunk #%d\n"\
 		"FFT period : %.01f ms\n"\
@@ -380,6 +391,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		self.PlotZoneImage.paint_time)
 		self.LabelLevel.setText(level_label)
 
+	# method
 	def levels(self):
 		time = SMOOTH_DISPLAY_TIMER_PERIOD_MS/1000.
 		start = self.offset + self.buffer_length - time*SAMPLING_RATE
@@ -393,6 +405,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		self.meter.setValue(0, level_rms)
 		self.meter.setValue(1, level_max)
 
+	# method
 	def scope(self):
 		time = SMOOTH_DISPLAY_TIMER_PERIOD_MS/1000.
 		start = self.offset + self.buffer_length - time*SAMPLING_RATE
@@ -417,6 +430,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		time = linspace(0., len(floatdata)/float(SAMPLING_RATE), len(floatdata))
 		self.PlotZoneUp.setdata(time, y)
 
+	# method
 	def spectrum(self):
 		maxfreq = self.settings_dialog.spinBox_maxfreq.value()
 		sp, freq = self.proc.analyzelive(self.audiobuffer[self.offset + self.buffer_length - self.fft_size: self.offset + self.buffer_length], self.fft_size, maxfreq)
@@ -426,10 +440,12 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		db_spectrogram = 20*log10(sp + epsilon)
 		self.PlotZoneSpect.setdata(freq, db_spectrogram)
 
+	# slot
 	def fftsizechanged(self, index):
 		self.logger.push("fft_size_changed slot %d %d %f" %(index, 2**index*32, 150000/self.fft_size))
 		self.fft_size = 2**index*32
 
+	# slot
 	def freqscalechanged(self, index):
 		self.logger.push("freq_scale slot %d" %index)
 		if index == 2:
@@ -443,25 +459,30 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 			self.PlotZoneSpect.setlinfreqscale()
 			self.PlotZoneImage.setlinfreqscale()
 
+	# slot
 	def freqrangechanged(self, value):
 		minfreq = self.settings_dialog.spinBox_minfreq.value()
 		maxfreq = self.settings_dialog.spinBox_maxfreq.value()
 		self.PlotZoneSpect.setfreqrange(minfreq, maxfreq)
 		self.PlotZoneImage.setfreqrange(minfreq, maxfreq)
 
+	# slot
 	def specrangechanged(self, value):
 		self.spec_max = self.settings_dialog.spinBox_specmax.value()
 		self.spec_min = self.settings_dialog.spinBox_specmin.value()
-		
+
+	# slot
 	def timerangechanged(self, value):
 		self.timerange_s = value
 		self.PlotZoneImage.settimerange(value)
 		self.reset_timer()
-	
+
+	# slot
 	def canvasWidthChanged(self, width):
 		self.canvas_width = width
 		self.reset_timer()
-		
+
+	# method
 	def reset_timer(self):
 		# FIXME millisecond resolution is limiting !
 		# need to find a way to integrate this cleverly in the GUI
@@ -470,7 +491,8 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		self.period_ms = 1000.*self.timerange_s/self.canvas_width
 		self.logger.push("Resetting the timer, will fire every %d ms" %(self.period_ms))
 		self.spectrogram_timer.setInterval(self.period_ms)
-		
+
+	# method
 	def set_devices_list(self):
 		default_device_index = self.get_default_input_device()
 		device_count = self.get_device_count()
@@ -483,13 +505,16 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 				desc += ' (system default)'			
 			self.settings_dialog.comboBox_inputDevice.addItem(desc)
 
+	# method
 	def get_default_input_device(self):
 		return self.pa.get_default_input_device_info()['index']
-	
+
+	# method
 	def get_device_count(self):
 		# FIXME only input devices should be chosen, not all of them !
 		return self.pa.get_device_count()
 
+	# slot
 	def input_device_changed(self, index):
 		self.display_timer.stop()
 		self.spectrogram_timer.stop()
