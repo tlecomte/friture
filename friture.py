@@ -521,21 +521,20 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		self.actionStart.setChecked(True)
 
 if __name__ == "__main__":
-        # On Windows, redirect stderr to a file
-        if platform.system() == "Windows":
-            print "Running on Windows"
-            import imp, ctypes
-            if (hasattr(sys, "frozen") or # new py2exe
-                hasattr(sys, "importers") or # old py2exe
-                imp.is_frozen("__main__")): # tools/freeze
-                    sys.stderr = open(os.path.expanduser("~/friture.exe.log"), "w")
-            # set the App ID for Windows 7 to properly display the icon in the
-            # taskbar.
-            myappid = 'Friture.Friture.Friture.current' # arbitrary string
-            ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
+	if platform.system() == "Windows":
+		print "Running on Windows"
+		# On Windows, redirect stderr to a file
+		import imp, ctypes
+		if (hasattr(sys, "frozen") or # new py2exe
+			hasattr(sys, "importers") or # old py2exe
+			imp.is_frozen("__main__")): # tools/freeze
+				sys.stderr = open(os.path.expanduser("~/friture.exe.log"), "w")
+		# set the App ID for Windows 7 to properly display the icon in the
+		# taskbar.
+		myappid = 'Friture.Friture.Friture.current' # arbitrary string
+		ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
 
-    
-        app = QtGui.QApplication(sys.argv)
+	app = QtGui.QApplication(sys.argv)
 
 	pixmap = QtGui.QPixmap(":/splash.png")
 	splash = QtGui.QSplashScreen(pixmap)
@@ -549,14 +548,14 @@ if __name__ == "__main__":
 	profile = "no" # "python" or "kcachegrind" or anything else to disable
 
 	if len(sys.argv) > 1:
-                if sys.argv[1] == "--python":
-                        profile = "python"
-                elif sys.argv[1] == "--kcachegrind":
-                        profile = "kcachegrind"
-                elif sys.argv[1] == "--no":
-                        profile = "no"
-                else:
-                        print "command-line arguments (%s) not recognized" %sys.argv[1:]
+		if sys.argv[1] == "--python":
+			profile = "python"
+		elif sys.argv[1] == "--kcachegrind":
+			profile = "kcachegrind"
+		elif sys.argv[1] == "--no":
+			profile = "no"
+		else:
+			print "command-line arguments (%s) not recognized" %sys.argv[1:]
 
 	if profile == "python":
 		import cProfile
