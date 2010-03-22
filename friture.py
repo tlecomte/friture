@@ -331,6 +331,8 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 			try:
 				rawdata = self.stream.read(NUM_SAMPLES)
 			except IOError as inst:
+				# FIXME specialize this exception handling code
+				# to treat overflow errors particularly
 				print inst
 				print "Caught an IOError on stream read."
 				break
