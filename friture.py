@@ -19,7 +19,7 @@
 
 import sys, os, platform
 from pyaudio import PyAudio, paInt16
-from numpy import transpose, log10, sqrt, ceil, linspace, arange, floor, zeros, int16, fromstring, where, sign
+from numpy import transpose, log10, sqrt, ceil, linspace, arange, where, sign
 from PyQt4 import QtGui, QtCore, Qt
 import PyQt4.Qwt5 as Qwt
 from Ui_friture import Ui_MainWindow
@@ -28,7 +28,8 @@ import audiodata
 import audioproc
 import about # About dialog
 import settings # Setting dialog
-import logger
+import logger # Logging class
+import audiobuffer # audio ring buffer class
 
 #pyuic4 friture.ui > Ui_friture.py
 #pyrcc4 resource.qrc > resource_rc.py
@@ -111,10 +112,9 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		self.display_timer_time = 0.
 		self.spectrogram_timer_time = 0.
 		self.buffer_timer_time = 0.
-		
-		self.buffer_length = 100000.
-		self.audiobuffer = zeros(2*self.buffer_length)
-		self.offset = 0
+
+		# Initialize the audio data ring buffer
+		self.audiobuffer = audiobuffer.AudioBuffer()
 
 		self.logger.push("Initializing PyAudio")
 		self.pa = PyAudio()
@@ -276,7 +276,9 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 			self.spectrogram_timer.start()
 
 	def display_timer_slot(self):
-		self.update_buffer()
+		(chunks, t) = self.audiobuffer.update(self.stream)
+		self.chunk_number += chunks
+		self.buffer_timer_time = (95.*self.buffer_timer_time + 5.*t)/100.
 		
 		t = QtCore.QTime()
 		t.start()
@@ -296,14 +298,17 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		self.display_timer_time = (95.*self.display_timer_time + 5.*t.elapsed())/100.
 
 	def spectrogram_timer_slot(self):
-		self.update_buffer()
+		(chunks, t) = self.audiobuffer.update(self.stream)
+		self.chunk_number += chunks
+		self.buffer_timer_time = (95.*self.buffer_timer_time + 5.*t)/100.
 
 		t = QtCore.QTime()
 		t.start()
 
 		maxfreq = self.settings_dialog.spinBox_maxfreq.value()
 		# FIXME We should allow here for more intelligent transforms, especially when the log freq scale is selected
-		sp, freq = self.proc.analyzelive(self.audiobuffer[self.offset + self.buffer_length - self.fft_size: self.offset + self.buffer_length], self.fft_size, maxfreq)
+		floatdata = self.audiobuffer.data(self.fft_size)
+		sp, freq = self.proc.analyzelive(floatdata, self.fft_size, maxfreq)
 		# scale the db spectrum from [- spec_range db ... 0 db] > [0..1]
 		epsilon = 1e-30
 		db_spectrogram = 20*log10(sp + epsilon)
@@ -312,43 +317,6 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		self.PlotZoneImage.addData(freq, norm_spectrogram)
 		
 		self.spectrogram_timer_time = (95.*self.spectrogram_timer_time + 5.*t.elapsed())/100.
-
-	def update_buffer(self):
-		t = QtCore.QTime()
-		t.start()
-		
-		# ask for how much data is available
-		available = self.stream.get_read_available()
-		# read what is available
-		# we read by multiples of FRAMES_PER_BUFFER, otherwise segfaults !
-		available = int(floor(available/FRAMES_PER_BUFFER))
-		for j in range(0, available):
-			self.chunk_number += 1
-			try:
-				rawdata = self.stream.read(FRAMES_PER_BUFFER)
-			except IOError as inst:
-				# FIXME specialize this exception handling code
-				# to treat overflow errors particularly
-				print inst
-				print "Caught an IOError on stream read."
-				break
-			floatdata = fromstring(rawdata, int16)/(2.**(16-1))
-			# update the circular buffer
-			if len(floatdata) > self.buffer_length:
-				print "buffer error"
-				exit(1)
-			
-			# first copy, always complete
-			self.audiobuffer[self.offset : self.offset + len(floatdata)] = floatdata[:]
-			# second copy, can be folded
-			direct = min(len(floatdata), self.buffer_length - self.offset)
-			folded = len(floatdata) - direct
-			self.audiobuffer[self.offset + self.buffer_length: self.offset + self.buffer_length + direct] = floatdata[0 : direct]
-			self.audiobuffer[:folded] = floatdata[direct:]
-			
-			self.offset = int((self.offset + len(floatdata)) % self.buffer_length)
-
-		self.buffer_timer_time = (95.*self.buffer_timer_time + 5.*t.elapsed())/100.
 
 	def statistics(self):
 		level_label = "Chunk #%d\n"\
@@ -376,9 +344,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 
 	def levels(self):
 		time = SMOOTH_DISPLAY_TIMER_PERIOD_MS/1000.
-		start = self.offset + self.buffer_length - time*SAMPLING_RATE
-		stop = self.offset + self.buffer_length
-		floatdata = self.audiobuffer[start : stop]
+		floatdata = self.audiobuffer.data(time*SAMPLING_RATE)
 		
 		level_rms = 10*log10((floatdata**2).sum()/len(floatdata)*2. + 0*1e-80) #*2. to get 0dB for a sine wave
 		level_max = 20*log10(abs(floatdata).max() + 0*1e-80)
@@ -389,18 +355,18 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 
 	def scope(self):
 		time = SMOOTH_DISPLAY_TIMER_PERIOD_MS/1000.
-		start = self.offset + self.buffer_length - time*SAMPLING_RATE
-		stop = self.offset + self.buffer_length
 		#basic trigger capability on leading edge
-		max = self.audiobuffer[start : stop].max()
+		floatdata = self.audiobuffer.data(time*SAMPLING_RATE)
+		max = floatdata.max()
 		trigger_level = max*2./3.
-		trigger_pos = where((self.audiobuffer[start-1 : stop-1] < trigger_level)*(self.audiobuffer[start : stop] >= trigger_level))[0]
+		trigger_pos = where((floatdata[:-1] < trigger_level)*(floatdata[1:] >= trigger_level))[0]
 		if len(trigger_pos) > 0:
-			pos = trigger_pos[-1]
+			pos = trigger_pos[0]
 			shift = time*SAMPLING_RATE - pos
-			start = start - shift
-			stop = stop - shift
-		floatdata = self.audiobuffer[start : stop]
+		else:
+			shift = 0
+		floatdata = self.audiobuffer.data(time*SAMPLING_RATE + shift)
+		floatdata = floatdata[0 : time*SAMPLING_RATE]
 		y = floatdata - floatdata.mean()
 		
 		dBscope = False
@@ -413,8 +379,9 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 
 	def spectrum(self):
 		maxfreq = self.settings_dialog.spinBox_maxfreq.value()
-		sp, freq = self.proc.analyzelive(self.audiobuffer[self.offset + self.buffer_length - self.fft_size: self.offset + self.buffer_length], self.fft_size, maxfreq)
-		#sp, freq = self.proc.analyzelive_cochlear(self.audiobuffer[self.offset + self.buffer_length - self.fft_size: self.offset + self.buffer_length], 50, minfreq, maxfreq)
+		floatdata = self.audiobuffer.data(self.fft_size)
+		sp, freq = self.proc.analyzelive(floatdata, self.fft_size, maxfreq)
+		#sp, freq = self.proc.analyzelive_cochlear(floatdata, 50, minfreq, maxfreq)
 		# scale the db spectrum from [- spec_range db ... 0 db] > [0..1]
 		epsilon = 1e-30
 		db_spectrogram = 20*log10(sp + epsilon)
