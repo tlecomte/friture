@@ -61,8 +61,7 @@ import logger
 
 # the sample rate below should be dynamic, taken from PyAudio/PortAudio
 SAMPLING_RATE = 44100
-NUM_SAMPLES = 1024
-FRAMES_PER_BUFFER = NUM_SAMPLES
+FRAMES_PER_BUFFER = 1024
 SMOOTH_DISPLAY_TIMER_PERIOD_MS = 25
 
 class Friture(QtGui.QMainWindow, Ui_MainWindow):
@@ -256,7 +255,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 	#return True on success
 	def try_input_device(self):
 		n_try = 0
-		while self.stream.get_read_available() < NUM_SAMPLES and n_try < 1000000:
+		while self.stream.get_read_available() < FRAMES_PER_BUFFER and n_try < 1000000:
 			n_try +=1
 
 		if n_try == 1000000:
@@ -321,12 +320,12 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		# ask for how much data is available
 		available = self.stream.get_read_available()
 		# read what is available
-		# we read by multiples of NUM_SAMPLES, otherwise segfaults !
-		available = int(floor(available/NUM_SAMPLES))
+		# we read by multiples of FRAMES_PER_BUFFER, otherwise segfaults !
+		available = int(floor(available/FRAMES_PER_BUFFER))
 		for j in range(0, available):
 			self.i += 1
 			try:
-				rawdata = self.stream.read(NUM_SAMPLES)
+				rawdata = self.stream.read(FRAMES_PER_BUFFER)
 			except IOError as inst:
 				# FIXME specialize this exception handling code
 				# to treat overflow errors particularly
