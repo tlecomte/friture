@@ -24,6 +24,8 @@ FRAMES_PER_BUFFER = 1024
 
 class AudioBuffer():
 	def __init__(self):
+		# FIXME the buffer length could be made dynamic based on the
+		# needs
 		self.buffer_length = 100000.
 		self.audiobuffer = zeros(2*self.buffer_length)
 		self.offset = 0
