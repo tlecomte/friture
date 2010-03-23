@@ -497,15 +497,16 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		
 		# save current stream in case we need to restore it
 		previous_stream = self.stream
+		previous_index = self.device_index
 
 		self.stream = self.pa.open(format=paInt16, channels=1, rate=SAMPLING_RATE, input=True,
 				frames_per_buffer=FRAMES_PER_BUFFER, input_device_index=index)
+		self.device_index = index
 
 		self.logger.push("Trying to read from input device #%d" % (index))
 		if self.try_input_device():
 			self.logger.push("Success")
 			previous_stream.close()
-			self.device_index = index
 		else:
 			self.logger.push("Fail")
 			error_message = QtGui.QErrorMessage(self)
@@ -513,7 +514,8 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 			error_message.showMessage("Impossible to use the selected device, reverting to the previous one")
 			self.stream.close()
 			self.stream = previous_stream
-			self.settings_dialog.comboBox_inputDevice.setCurrentIndex(self.device_index)
+			self.device_index = previous_index
+			self.settings_dialog.comboBox_inputDevice.setCurrentIndex(previous_index)
 		
 		lat_ms = 1000*self.stream.get_input_latency()
 		self.max_in_a_row = int(ceil(lat_ms/TIMER_PERIOD_MS))
