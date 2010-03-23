@@ -136,6 +136,9 @@ peak</string>
    </widget>
   </widget>
   <widget class="QDockWidget" name="dockWidgetStatistics">
+   <property name="styleSheet">
+    <string notr="true"/>
+   </property>
    <property name="windowTitle">
     <string>Statistics</string>
    </property>
@@ -164,8 +167,14 @@ peak</string>
           <x>0</x>
           <y>0</y>
           <width>150</width>
-          <height>128</height>
+          <height>125</height>
          </rect>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QWidget {
+background: white
+}
+</string>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout">
          <item>
@@ -318,8 +327,14 @@ color: white;
           <x>0</x>
           <y>0</y>
           <width>142</width>
-          <height>64</height>
+          <height>129</height>
          </rect>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QWidget {
+background: white
+}
+</string>
         </property>
         <layout class="QGridLayout" name="gridLayout_10">
          <item row="0" column="0">
