@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2009 Timothée Lecomte
+# Copyright (C) 2009 TimothÃ©e Lecomte
 
 # This file is part of Friture.
 #
