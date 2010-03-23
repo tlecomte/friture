@@ -150,13 +150,13 @@ class ImagePlot(Qwt.QwtPlot):
 		self.setAxisScaleEngine(Qwt.QwtPlot.yRight, Qwt.QwtLog10ScaleEngine())
 		self.replot()
 		
-	def setlog2freqscale(self):
-		self.plotImage.erase()
-		self.logfreqscale = 2
-		print "Warning: Frequency scales are not implemented in the spectrogram"
-		self.setAxisScaleEngine(Qwt.QwtPlot.yLeft, Qwt.QwtLog10ScaleEngine())
-		self.setAxisScaleEngine(Qwt.QwtPlot.yRight, Qwt.QwtLog10ScaleEngine())
-		self.replot()
+	#def setlog2freqscale(self):
+	#	self.plotImage.erase()
+	#	self.logfreqscale = 2
+	#	print "Warning: Frequency scales are not implemented in the spectrogram"
+	#	self.setAxisScaleEngine(Qwt.QwtPlot.yLeft, Qwt.QwtLog10ScaleEngine())
+	#	self.setAxisScaleEngine(Qwt.QwtPlot.yRight, Qwt.QwtLog10ScaleEngine())
+	#	self.replot()
 
 	def settimerange(self, timerange_seconds):
 		self.plotImage.settimerange(timerange_seconds)

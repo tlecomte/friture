@@ -392,11 +392,12 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 
 	def freqscalechanged(self, index):
 		self.logger.push("freq_scale slot %d" %index)
-		if index == 2:
-			self.PlotZoneSpect.setlogfreqscale()
-			self.logger.push("Warning: Spectrum widget still in base 10 logarithmic")
-			self.PlotZoneImage.setlog2freqscale()
-		elif index == 1:
+		#if index == 2:
+		#	self.PlotZoneSpect.setlogfreqscale()
+		#	self.logger.push("Warning: Spectrum widget still in base 10 logarithmic")
+		#	self.PlotZoneImage.setlog2freqscale()
+		#elif index == 1:
+		if index == 1:
 			self.PlotZoneSpect.setlogfreqscale()
 			self.PlotZoneImage.setlog10freqscale()
 		else:
