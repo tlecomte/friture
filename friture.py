@@ -361,8 +361,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		trigger_level = max*2./3.
 		trigger_pos = where((floatdata[:-1] < trigger_level)*(floatdata[1:] >= trigger_level))[0]
 		if len(trigger_pos) > 0:
-			pos = trigger_pos[0]
-			shift = time*SAMPLING_RATE - pos
+			shift = time*SAMPLING_RATE - trigger_pos[0]
 		else:
 			shift = 0
 		floatdata = self.audiobuffer.data(time*SAMPLING_RATE + shift)
