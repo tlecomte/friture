@@ -175,6 +175,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		self.connect(self.PlotZoneImage.plotImage.canvasscaledspectrogram, QtCore.SIGNAL("canvasWidthChanged"), self.canvasWidthChanged)
 		
 		self.connect(self.logger, QtCore.SIGNAL('logChanged'), self.log_changed)
+		self.connect(self.scrollArea_2.verticalScrollBar(), QtCore.SIGNAL('rangeChanged(int,int)'), self.log_scroll_range_changed)
 		
 		self.restoreAppState()
 
@@ -185,8 +186,14 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		
 		self.logger.push("Init finished, entering the main loop")
 	
+	# update the log widget with the new log content
 	def log_changed(self):
 		self.LabelLog.setText(self.logger.text())
+	
+	# scroll the log widget so that the last line is visible
+	def log_scroll_range_changed(self, min, max):
+		scrollbar = self.scrollArea_2.verticalScrollBar()
+		scrollbar.setValue(max)
 	
 	def settings_called(self):
 		self.settings_dialog.show()
