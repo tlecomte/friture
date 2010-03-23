@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'friture.ui'
 #
-# Created: Wed Mar 17 18:51:42 2010
+# Created: Tue Mar 23 18:19:54 2010
 #      by: PyQt4 UI code generator 4.7
 #
 # WARNING! All changes made in this file will be lost!
@@ -89,7 +89,11 @@ class Ui_MainWindow(object):
         self.scrollArea.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
         self.scrollArea.setObjectName("scrollArea")
         self.scrollAreaWidgetContents = QtGui.QWidget(self.scrollArea)
-        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 150, 128))
+        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 150, 125))
+        self.scrollAreaWidgetContents.setStyleSheet("QWidget {\n"
+"background: white\n"
+"}\n"
+"")
         self.scrollAreaWidgetContents.setObjectName("scrollAreaWidgetContents")
         self.verticalLayout = QtGui.QVBoxLayout(self.scrollAreaWidgetContents)
         self.verticalLayout.setObjectName("verticalLayout")
@@ -179,12 +183,17 @@ class Ui_MainWindow(object):
         self.scrollArea_2.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
         self.scrollArea_2.setObjectName("scrollArea_2")
         self.scrollAreaWidgetContents_2 = QtGui.QWidget(self.scrollArea_2)
-        self.scrollAreaWidgetContents_2.setGeometry(QtCore.QRect(0, 0, 142, 64))
+        self.scrollAreaWidgetContents_2.setGeometry(QtCore.QRect(0, 0, 142, 129))
+        self.scrollAreaWidgetContents_2.setStyleSheet("QWidget {\n"
+"background: white\n"
+"}\n"
+"")
         self.scrollAreaWidgetContents_2.setObjectName("scrollAreaWidgetContents_2")
         self.gridLayout_10 = QtGui.QGridLayout(self.scrollAreaWidgetContents_2)
         self.gridLayout_10.setObjectName("gridLayout_10")
         self.LabelLog = QtGui.QLabel(self.scrollAreaWidgetContents_2)
         self.LabelLog.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
+        self.LabelLog.setTextInteractionFlags(QtCore.Qt.LinksAccessibleByKeyboard|QtCore.Qt.LinksAccessibleByMouse|QtCore.Qt.TextBrowserInteraction|QtCore.Qt.TextSelectableByKeyboard|QtCore.Qt.TextSelectableByMouse)
         self.LabelLog.setObjectName("LabelLog")
         self.gridLayout_10.addWidget(self.LabelLog, 0, 0, 1, 1)
         self.scrollArea_2.setWidget(self.scrollAreaWidgetContents_2)

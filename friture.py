@@ -19,7 +19,7 @@
 
 import sys, os, platform
 from pyaudio import PyAudio, paInt16
-from numpy import transpose, log10, sqrt, ceil, linspace, arange, floor, zeros, int16, fromstring, where, sign
+from numpy import transpose, log10, sqrt, ceil, linspace, arange, where, sign
 from PyQt4 import QtGui, QtCore, Qt
 import PyQt4.Qwt5 as Qwt
 from Ui_friture import Ui_MainWindow
@@ -28,7 +28,8 @@ import audiodata
 import audioproc
 import about # About dialog
 import settings # Setting dialog
-import logger # logger class
+import logger # Logging class
+import audiobuffer # audio ring buffer class
 
 #pyuic4 friture.ui > Ui_friture.py
 #pyrcc4 resource.qrc > resource_rc.py
@@ -61,9 +62,7 @@ import logger # logger class
 
 # the sample rate below should be dynamic, taken from PyAudio/PortAudio
 SAMPLING_RATE = 44100
-NUM_SAMPLES = 1024
-FRAMES_PER_BUFFER = NUM_SAMPLES
-TIMER_PERIOD_MS = int(ceil(1000.*NUM_SAMPLES/float(SAMPLING_RATE)))
+FRAMES_PER_BUFFER = 1024
 SMOOTH_DISPLAY_TIMER_PERIOD_MS = 25
 
 class Friture(QtGui.QMainWindow, Ui_MainWindow):
@@ -103,21 +102,19 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		self.levelsIsVisible = True
 		self.spectrumIsVisible = True
 
-		self.i = 0
+		self.chunk_number = 0
 		self.spec_min = -100.
 		self.spec_max = -20.
 		self.fft_size = 256
-		self.max_in_a_row = 1
 		self.timerange_s = 10.
 		self.canvas_width = 100.
 		
 		self.display_timer_time = 0.
 		self.spectrogram_timer_time = 0.
 		self.buffer_timer_time = 0.
-		
-		self.buffer_length = 100000.
-		self.audiobuffer = zeros(2*self.buffer_length)
-		self.offset = 0
+
+		# Initialize the audio data ring buffer
+		self.audiobuffer = audiobuffer.AudioBuffer()
 
 		self.logger.push("Initializing PyAudio")
 		self.pa = PyAudio()
@@ -133,15 +130,11 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 
 		for index in devices:
 			self.logger.push("Opening the stream")
-			self.stream = self.pa.open(format=paInt16, channels=1, rate=SAMPLING_RATE, input=True,
-			frames_per_buffer=FRAMES_PER_BUFFER, input_device_index=index)
-			self.device_index = index
+			self.open_stream(index)
 
 			self.logger.push("Trying to read from input device #%d" % (index))
 			if self.try_input_device():
 				self.logger.push("Success")
-				lat_ms = 1000*self.stream.get_input_latency()
-				self.max_in_a_row = int(ceil(lat_ms/TIMER_PERIOD_MS))
 				break
 			else:
 				self.logger.push("Fail")
@@ -182,6 +175,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		self.connect(self.PlotZoneImage.plotImage.canvasscaledspectrogram, QtCore.SIGNAL("canvasWidthChanged"), self.canvasWidthChanged)
 		
 		self.connect(self.logger, QtCore.SIGNAL('logChanged'), self.log_changed)
+		self.connect(self.scrollArea_2.verticalScrollBar(), QtCore.SIGNAL('rangeChanged(int,int)'), self.log_scroll_range_changed)
 		
 		self.restoreAppState()
 
@@ -192,11 +186,16 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		
 		self.logger.push("Init finished, entering the main loop")
 	
-	# slot
+	# update the log widget with the new log content
 	def log_changed(self):
 		self.LabelLog.setText(self.logger.text())
 	
 	# slot
+	# scroll the log widget so that the last line is visible
+	def log_scroll_range_changed(self, min, max):
+		scrollbar = self.scrollArea_2.verticalScrollBar()
+		scrollbar.setValue(max)
+	
 	def settings_called(self):
 		self.settings_dialog.show()
 	
@@ -272,7 +271,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 	#return True on success
 	def try_input_device(self):
 		n_try = 0
-		while self.stream.get_read_available() < NUM_SAMPLES and n_try < 1000000:
+		while self.stream.get_read_available() < FRAMES_PER_BUFFER and n_try < 1000000:
 			n_try +=1
 
 		if n_try == 1000000:
@@ -284,17 +283,20 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 
 	# slot
 	def timer_toggle(self):
-		self.logger.push("toggle")
 		if self.display_timer.isActive():
+			self.logger.push("Timer stop")
 			self.display_timer.stop()
 			self.spectrogram_timer.stop()
 		else:
+			self.logger.push("Timer start")
 			self.display_timer.start()
 			self.spectrogram_timer.start()
 
 	# slot
 	def display_timer_slot(self):
-		self.update_buffer()
+		(chunks, t) = self.audiobuffer.update(self.stream)
+		self.chunk_number += chunks
+		self.buffer_timer_time = (95.*self.buffer_timer_time + 5.*t)/100.
 		
 		t = QtCore.QTime()
 		t.start()
@@ -315,14 +317,17 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 
 	# slot
 	def spectrogram_timer_slot(self):
-		self.update_buffer()
+		(chunks, t) = self.audiobuffer.update(self.stream)
+		self.chunk_number += chunks
+		self.buffer_timer_time = (95.*self.buffer_timer_time + 5.*t)/100.
 
 		t = QtCore.QTime()
 		t.start()
 
 		maxfreq = self.settings_dialog.spinBox_maxfreq.value()
 		# FIXME We should allow here for more intelligent transforms, especially when the log freq scale is selected
-		sp, freq = self.proc.analyzelive(self.audiobuffer[self.offset + self.buffer_length - self.fft_size: self.offset + self.buffer_length], self.fft_size, maxfreq)
+		floatdata = self.audiobuffer.data(self.fft_size)
+		sp, freq = self.proc.analyzelive(floatdata, self.fft_size, maxfreq)
 		# scale the db spectrum from [- spec_range db ... 0 db] > [0..1]
 		epsilon = 1e-30
 		db_spectrogram = 20*log10(sp + epsilon)
@@ -331,44 +336,6 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		self.PlotZoneImage.addData(freq, norm_spectrogram)
 		
 		self.spectrogram_timer_time = (95.*self.spectrogram_timer_time + 5.*t.elapsed())/100.
-
-	# method
-	def update_buffer(self):
-		t = QtCore.QTime()
-		t.start()
-		
-		# ask for how much data is available
-		available = self.stream.get_read_available()
-		# read what is available
-		# we read by multiples of NUM_SAMPLES, otherwise segfaults !
-		available = int(floor(available/NUM_SAMPLES))
-		for j in range(0, available):
-			self.i += 1
-			try:
-				rawdata = self.stream.read(NUM_SAMPLES)
-			except IOError as inst:
-				# FIXME specialize this exception handling code
-				# to treat overflow errors particularly
-				print inst
-				print "Caught an IOError on stream read."
-				break
-			floatdata = fromstring(rawdata, int16)/(2.**(16-1))
-			# update the circular buffer
-			if len(floatdata) > self.buffer_length:
-				print "buffer error"
-				exit(1)
-			
-			# first copy, always complete
-			self.audiobuffer[self.offset : self.offset + len(floatdata)] = floatdata[:]
-			# second copy, can be folded
-			direct = min(len(floatdata), self.buffer_length - self.offset)
-			folded = len(floatdata) - direct
-			self.audiobuffer[self.offset + self.buffer_length: self.offset + self.buffer_length + direct] = floatdata[0 : direct]
-			self.audiobuffer[:folded] = floatdata[direct:]
-			
-			self.offset = int((self.offset + len(floatdata)) % self.buffer_length)
-
-		self.buffer_timer_time = (95.*self.buffer_timer_time + 5.*t.elapsed())/100.
 
 	# method
 	def statistics(self):
@@ -382,7 +349,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		"Scope painting: %.02f ms\n"\
 		"Spectrum painting: %.02f ms\n"\
 		"Spectrogram painting: %.02f ms"\
-		% (self.i,
+		% (self.chunk_number,
 		self.fft_size*1000./SAMPLING_RATE,
 		self.period_ms,
 		self.display_timer_time,
@@ -398,9 +365,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 	# method
 	def levels(self):
 		time = SMOOTH_DISPLAY_TIMER_PERIOD_MS/1000.
-		start = self.offset + self.buffer_length - time*SAMPLING_RATE
-		stop = self.offset + self.buffer_length
-		floatdata = self.audiobuffer[start : stop]
+		floatdata = self.audiobuffer.data(time*SAMPLING_RATE)
 		
 		level_rms = 10*log10((floatdata**2).sum()/len(floatdata)*2. + 0*1e-80) #*2. to get 0dB for a sine wave
 		level_max = 20*log10(abs(floatdata).max() + 0*1e-80)
@@ -412,18 +377,17 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 	# method
 	def scope(self):
 		time = SMOOTH_DISPLAY_TIMER_PERIOD_MS/1000.
-		start = self.offset + self.buffer_length - time*SAMPLING_RATE
-		stop = self.offset + self.buffer_length
 		#basic trigger capability on leading edge
-		max = self.audiobuffer[start : stop].max()
+		floatdata = self.audiobuffer.data(time*SAMPLING_RATE)
+		max = floatdata.max()
 		trigger_level = max*2./3.
-		trigger_pos = where((self.audiobuffer[start-1 : stop-1] < trigger_level)*(self.audiobuffer[start : stop] >= trigger_level))[0]
+		trigger_pos = where((floatdata[:-1] < trigger_level)*(floatdata[1:] >= trigger_level))[0]
 		if len(trigger_pos) > 0:
-			pos = trigger_pos[-1]
-			shift = time*SAMPLING_RATE - pos
-			start = start - shift
-			stop = stop - shift
-		floatdata = self.audiobuffer[start : stop]
+			shift = time*SAMPLING_RATE - trigger_pos[0]
+		else:
+			shift = 0
+		floatdata = self.audiobuffer.data(time*SAMPLING_RATE + shift)
+		floatdata = floatdata[0 : time*SAMPLING_RATE]
 		y = floatdata - floatdata.mean()
 		
 		dBscope = False
@@ -437,8 +401,9 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 	# method
 	def spectrum(self):
 		maxfreq = self.settings_dialog.spinBox_maxfreq.value()
-		sp, freq = self.proc.analyzelive(self.audiobuffer[self.offset + self.buffer_length - self.fft_size: self.offset + self.buffer_length], self.fft_size, maxfreq)
-		#sp, freq = self.proc.analyzelive_cochlear(self.audiobuffer[self.offset + self.buffer_length - self.fft_size: self.offset + self.buffer_length], 50, minfreq, maxfreq)
+		floatdata = self.audiobuffer.data(self.fft_size)
+		sp, freq = self.proc.analyzelive(floatdata, self.fft_size, maxfreq)
+		#sp, freq = self.proc.analyzelive_cochlear(floatdata, 50, minfreq, maxfreq)
 		# scale the db spectrum from [- spec_range db ... 0 db] > [0..1]
 		epsilon = 1e-30
 		db_spectrogram = 20*log10(sp + epsilon)
@@ -452,11 +417,12 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 	# slot
 	def freqscalechanged(self, index):
 		self.logger.push("freq_scale slot %d" %index)
-		if index == 2:
-			self.PlotZoneSpect.setlogfreqscale()
-			self.logger.push("Warning: Spectrum widget still in base 10 logarithmic")
-			self.PlotZoneImage.setlog2freqscale()
-		elif index == 1:
+		#if index == 2:
+		#	self.PlotZoneSpect.setlogfreqscale()
+		#	self.logger.push("Warning: Spectrum widget still in base 10 logarithmic")
+		#	self.PlotZoneImage.setlog2freqscale()
+		#elif index == 1:
+		if index == 1:
 			self.PlotZoneSpect.setlogfreqscale()
 			self.PlotZoneImage.setlog10freqscale()
 		else:
@@ -526,15 +492,14 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		
 		# save current stream in case we need to restore it
 		previous_stream = self.stream
+		previous_index = self.device_index
 
-		self.stream = self.pa.open(format=paInt16, channels=1, rate=SAMPLING_RATE, input=True,
-				frames_per_buffer=FRAMES_PER_BUFFER, input_device_index=index)
+		self.open_stream(index)
 
 		self.logger.push("Trying to read from input device #%d" % (index))
 		if self.try_input_device():
 			self.logger.push("Success")
 			previous_stream.close()
-			self.device_index = index
 		else:
 			self.logger.push("Fail")
 			error_message = QtGui.QErrorMessage(self)
@@ -542,14 +507,17 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 			error_message.showMessage("Impossible to use the selected device, reverting to the previous one")
 			self.stream.close()
 			self.stream = previous_stream
-			self.settings_dialog.comboBox_inputDevice.setCurrentIndex(self.device_index)
-		
-		lat_ms = 1000*self.stream.get_input_latency()
-		self.max_in_a_row = int(ceil(lat_ms/TIMER_PERIOD_MS))
+			self.device_index = previous_index
+			self.settings_dialog.comboBox_inputDevice.setCurrentIndex(previous_index)
 		
 		self.display_timer.start()
 		self.spectrogram_timer.start()
 		self.actionStart.setChecked(True)
+
+	def open_stream(self, index):
+		self.stream = self.pa.open(format=paInt16, channels=1, rate=SAMPLING_RATE, input=True,
+				frames_per_buffer=FRAMES_PER_BUFFER, input_device_index=index)
+		self.device_index = index
 
 if __name__ == "__main__":
 	if platform.system() == "Windows":
