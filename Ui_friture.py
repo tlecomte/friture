@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'friture.ui'
 #
-# Created: Tue Mar 23 18:07:27 2010
+# Created: Tue Mar 23 18:19:54 2010
 #      by: PyQt4 UI code generator 4.7
 #
 # WARNING! All changes made in this file will be lost!
@@ -193,6 +193,7 @@ class Ui_MainWindow(object):
         self.gridLayout_10.setObjectName("gridLayout_10")
         self.LabelLog = QtGui.QLabel(self.scrollAreaWidgetContents_2)
         self.LabelLog.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
+        self.LabelLog.setTextInteractionFlags(QtCore.Qt.LinksAccessibleByKeyboard|QtCore.Qt.LinksAccessibleByMouse|QtCore.Qt.TextBrowserInteraction|QtCore.Qt.TextSelectableByKeyboard|QtCore.Qt.TextSelectableByMouse)
         self.LabelLog.setObjectName("LabelLog")
         self.gridLayout_10.addWidget(self.LabelLog, 0, 0, 1, 1)
         self.scrollArea_2.setWidget(self.scrollAreaWidgetContents_2)
