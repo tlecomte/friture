@@ -133,9 +133,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 
 		for index in devices:
 			self.logger.push("Opening the stream")
-			self.stream = self.pa.open(format=paInt16, channels=1, rate=SAMPLING_RATE, input=True,
-			frames_per_buffer=FRAMES_PER_BUFFER, input_device_index=index)
-			self.device_index = index
+			self.open_stream(index)
 
 			self.logger.push("Trying to read from input device #%d" % (index))
 			if self.try_input_device():
@@ -499,9 +497,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		previous_stream = self.stream
 		previous_index = self.device_index
 
-		self.stream = self.pa.open(format=paInt16, channels=1, rate=SAMPLING_RATE, input=True,
-				frames_per_buffer=FRAMES_PER_BUFFER, input_device_index=index)
-		self.device_index = index
+		self.open_stream(index)
 
 		self.logger.push("Trying to read from input device #%d" % (index))
 		if self.try_input_device():
@@ -523,6 +519,11 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		self.display_timer.start()
 		self.spectrogram_timer.start()
 		self.actionStart.setChecked(True)
+
+	def open_stream(self, index):
+		self.stream = self.pa.open(format=paInt16, channels=1, rate=SAMPLING_RATE, input=True,
+				frames_per_buffer=FRAMES_PER_BUFFER, input_device_index=index)
+		self.device_index = index
 
 if __name__ == "__main__":
 	if platform.system() == "Windows":
