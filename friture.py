@@ -63,7 +63,6 @@ import logger
 SAMPLING_RATE = 44100
 NUM_SAMPLES = 1024
 FRAMES_PER_BUFFER = NUM_SAMPLES
-TIMER_PERIOD_MS = int(ceil(1000.*NUM_SAMPLES/float(SAMPLING_RATE)))
 SMOOTH_DISPLAY_TIMER_PERIOD_MS = 25
 
 class Friture(QtGui.QMainWindow, Ui_MainWindow):
@@ -107,7 +106,6 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		self.spec_min = -100.
 		self.spec_max = -20.
 		self.fft_size = 256
-		self.max_in_a_row = 1
 		self.timerange_s = 10.
 		self.canvas_width = 100.
 		
@@ -138,8 +136,6 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 			self.logger.push("Trying to read from input device #%d" % (index))
 			if self.try_input_device():
 				self.logger.push("Success")
-				lat_ms = 1000*self.stream.get_input_latency()
-				self.max_in_a_row = int(ceil(lat_ms/TIMER_PERIOD_MS))
 				break
 			else:
 				self.logger.push("Fail")
@@ -513,9 +509,6 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 			self.stream = previous_stream
 			self.device_index = previous_index
 			self.settings_dialog.comboBox_inputDevice.setCurrentIndex(previous_index)
-		
-		lat_ms = 1000*self.stream.get_input_latency()
-		self.max_in_a_row = int(ceil(lat_ms/TIMER_PERIOD_MS))
 		
 		self.display_timer.start()
 		self.spectrogram_timer.start()
