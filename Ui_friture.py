@@ -2,8 +2,8 @@
 
 # Form implementation generated from reading ui file 'friture.ui'
 #
-# Created: Tue Mar 23 18:19:54 2010
-#      by: PyQt4 UI code generator 4.7
+# Created: Tue Mar 23 23:13:00 2010
+#      by: PyQt4 UI code generator 4.5.4
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -21,8 +21,8 @@ class Ui_MainWindow(object):
         self.gridLayout_3 = QtGui.QGridLayout(self.centralwidget)
         self.gridLayout_3.setObjectName("gridLayout_3")
         self.PlotZoneImage = ImagePlot(self.centralwidget)
-        self.PlotZoneImage.setStyleSheet("QwtPlotCanvas {\n"
-"}")
+        self.PlotZoneImage.setStyleSheet("""QwtPlotCanvas {
+}""")
         self.PlotZoneImage.setObjectName("PlotZoneImage")
         self.gridLayout_3.addWidget(self.PlotZoneImage, 0, 0, 1, 2)
         MainWindow.setCentralWidget(self.centralwidget)
@@ -39,40 +39,9 @@ class Ui_MainWindow(object):
         self.frame_3.setObjectName("frame_3")
         self.gridLayout_8 = QtGui.QGridLayout(self.frame_3)
         self.gridLayout_8.setObjectName("gridLayout_8")
-        self.label_rms = QtGui.QLabel(self.frame_3)
-        font = QtGui.QFont()
-        font.setPointSize(14)
-        font.setWeight(75)
-        font.setBold(True)
-        self.label_rms.setFont(font)
-        self.label_rms.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing)
-        self.label_rms.setObjectName("label_rms")
-        self.gridLayout_8.addWidget(self.label_rms, 0, 0, 1, 1)
-        self.meter = qsynthMeter(self.frame_3)
-        self.meter.setStyleSheet("qsynthMeter {\n"
-"border: 1px solid gray;\n"
-"border-radius: 2px;\n"
-"padding: 1px;\n"
-"}")
-        self.meter.setObjectName("meter")
-        self.gridLayout_8.addWidget(self.meter, 0, 1, 2, 1)
-        self.label_peak = QtGui.QLabel(self.frame_3)
-        font = QtGui.QFont()
-        font.setPointSize(14)
-        font.setWeight(75)
-        font.setBold(True)
-        self.label_peak.setFont(font)
-        self.label_peak.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft)
-        self.label_peak.setObjectName("label_peak")
-        self.gridLayout_8.addWidget(self.label_peak, 0, 2, 1, 1)
-        self.label_rms_legend = QtGui.QLabel(self.frame_3)
-        self.label_rms_legend.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTop|QtCore.Qt.AlignTrailing)
-        self.label_rms_legend.setObjectName("label_rms_legend")
-        self.gridLayout_8.addWidget(self.label_rms_legend, 1, 0, 1, 1)
-        self.label_peak_legend = QtGui.QLabel(self.frame_3)
-        self.label_peak_legend.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
-        self.label_peak_legend.setObjectName("label_peak_legend")
-        self.gridLayout_8.addWidget(self.label_peak_legend, 1, 2, 1, 1)
+        self.levels = Levels_Widget(self.frame_3)
+        self.levels.setObjectName("levels")
+        self.gridLayout_8.addWidget(self.levels, 0, 0, 1, 1)
         self.gridLayout_4.addWidget(self.frame_3, 0, 0, 1, 1)
         self.dockWidgetLevels.setWidget(self.dockWidgetContents)
         MainWindow.addDockWidget(QtCore.Qt.DockWidgetArea(1), self.dockWidgetLevels)
@@ -89,11 +58,11 @@ class Ui_MainWindow(object):
         self.scrollArea.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
         self.scrollArea.setObjectName("scrollArea")
         self.scrollAreaWidgetContents = QtGui.QWidget(self.scrollArea)
-        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 150, 125))
-        self.scrollAreaWidgetContents.setStyleSheet("QWidget {\n"
-"background: white\n"
-"}\n"
-"")
+        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 164, 122))
+        self.scrollAreaWidgetContents.setStyleSheet("""QWidget {
+background: white
+}
+""")
         self.scrollAreaWidgetContents.setObjectName("scrollAreaWidgetContents")
         self.verticalLayout = QtGui.QVBoxLayout(self.scrollAreaWidgetContents)
         self.verticalLayout.setObjectName("verticalLayout")
@@ -107,12 +76,12 @@ class Ui_MainWindow(object):
         self.dockWidgetStatistics.setWidget(self.dockWidgetContents_2)
         MainWindow.addDockWidget(QtCore.Qt.DockWidgetArea(1), self.dockWidgetStatistics)
         self.dockWidgetScope = QtGui.QDockWidget(MainWindow)
-        self.dockWidgetScope.setStyleSheet("QwtPlotCanvas {\n"
-"  border: 1px solid gray;\n"
-" border-radius: 2px;\n"
-"  background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,\n"
-"stop: 0 #AAAAAA, stop: 0.3 #FFFFFF);\n"
-"}")
+        self.dockWidgetScope.setStyleSheet("""QwtPlotCanvas {
+  border: 1px solid gray;
+ border-radius: 2px;
+  background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+stop: 0 #AAAAAA, stop: 0.3 #FFFFFF);
+}""")
         self.dockWidgetScope.setObjectName("dockWidgetScope")
         self.dockWidgetContents_4 = QtGui.QWidget()
         self.dockWidgetContents_4.setObjectName("dockWidgetContents_4")
@@ -132,12 +101,12 @@ class Ui_MainWindow(object):
         self.dockWidgetScope.setWidget(self.dockWidgetContents_4)
         MainWindow.addDockWidget(QtCore.Qt.DockWidgetArea(4), self.dockWidgetScope)
         self.dockWidgetSpectrum = QtGui.QDockWidget(MainWindow)
-        self.dockWidgetSpectrum.setStyleSheet("QwtPlotCanvas {\n"
-"  border: 1px solid gray;\n"
-" border-radius: 2px;\n"
-"  background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,\n"
-"stop: 0 #AAAAAA, stop: 0.3 #FFFFFF);\n"
-"}")
+        self.dockWidgetSpectrum.setStyleSheet("""QwtPlotCanvas {
+  border: 1px solid gray;
+ border-radius: 2px;
+  background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+stop: 0 #AAAAAA, stop: 0.3 #FFFFFF);
+}""")
         self.dockWidgetSpectrum.setObjectName("dockWidgetSpectrum")
         self.dockWidgetContents_5 = QtGui.QWidget()
         self.dockWidgetContents_5.setObjectName("dockWidgetContents_5")
@@ -157,18 +126,18 @@ class Ui_MainWindow(object):
         self.dockWidgetSpectrum.setWidget(self.dockWidgetContents_5)
         MainWindow.addDockWidget(QtCore.Qt.DockWidgetArea(4), self.dockWidgetSpectrum)
         self.toolBar = QtGui.QToolBar(MainWindow)
-        self.toolBar.setStyleSheet("QToolBar {\n"
-"border: none;\n"
-"background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,\n"
-"stop: 0 #a6a6a6, stop: 0.08 #7f7f7f,\n"
-"stop: 0.39999 #717171, stop: 0.4 #626262,\n"
-"stop: 0.9 #4c4c4c, stop: 1 #333333);\n"
-"}\n"
-"\n"
-"QToolButton {\n"
-"color: white;\n"
-"}\n"
-"")
+        self.toolBar.setStyleSheet("""QToolBar {
+border: none;
+background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+stop: 0 #a6a6a6, stop: 0.08 #7f7f7f,
+stop: 0.39999 #717171, stop: 0.4 #626262,
+stop: 0.9 #4c4c4c, stop: 1 #333333);
+}
+
+QToolButton {
+color: white;
+}
+""")
         self.toolBar.setToolButtonStyle(QtCore.Qt.ToolButtonTextBesideIcon)
         self.toolBar.setObjectName("toolBar")
         MainWindow.addToolBar(QtCore.Qt.TopToolBarArea, self.toolBar)
@@ -183,11 +152,11 @@ class Ui_MainWindow(object):
         self.scrollArea_2.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
         self.scrollArea_2.setObjectName("scrollArea_2")
         self.scrollAreaWidgetContents_2 = QtGui.QWidget(self.scrollArea_2)
-        self.scrollAreaWidgetContents_2.setGeometry(QtCore.QRect(0, 0, 142, 129))
-        self.scrollAreaWidgetContents_2.setStyleSheet("QWidget {\n"
-"background: white\n"
-"}\n"
-"")
+        self.scrollAreaWidgetContents_2.setGeometry(QtCore.QRect(0, 0, 146, 132))
+        self.scrollAreaWidgetContents_2.setStyleSheet("""QWidget {
+background: white
+}
+""")
         self.scrollAreaWidgetContents_2.setObjectName("scrollAreaWidgetContents_2")
         self.gridLayout_10 = QtGui.QGridLayout(self.scrollAreaWidgetContents_2)
         self.gridLayout_10.setObjectName("gridLayout_10")
@@ -238,12 +207,6 @@ class Ui_MainWindow(object):
 "stop: 0.9 #4c4c4c, stop: 1 #333333);\n"
 " }", None, QtGui.QApplication.UnicodeUTF8))
         self.dockWidgetLevels.setWindowTitle(QtGui.QApplication.translate("MainWindow", "Input levels", None, QtGui.QApplication.UnicodeUTF8))
-        self.label_rms.setText(QtGui.QApplication.translate("MainWindow", "-100.0", None, QtGui.QApplication.UnicodeUTF8))
-        self.label_peak.setText(QtGui.QApplication.translate("MainWindow", "-100.0", None, QtGui.QApplication.UnicodeUTF8))
-        self.label_rms_legend.setText(QtGui.QApplication.translate("MainWindow", "dBFS\n"
-"RMS", None, QtGui.QApplication.UnicodeUTF8))
-        self.label_peak_legend.setText(QtGui.QApplication.translate("MainWindow", "dBFS\n"
-"peak", None, QtGui.QApplication.UnicodeUTF8))
         self.dockWidgetStatistics.setWindowTitle(QtGui.QApplication.translate("MainWindow", "Statistics", None, QtGui.QApplication.UnicodeUTF8))
         self.LabelLevel.setText(QtGui.QApplication.translate("MainWindow", "No statistics", None, QtGui.QApplication.UnicodeUTF8))
         self.dockWidgetScope.setWindowTitle(QtGui.QApplication.translate("MainWindow", "Scope", None, QtGui.QApplication.UnicodeUTF8))
@@ -257,7 +220,7 @@ class Ui_MainWindow(object):
         self.actionAbout.setText(QtGui.QApplication.translate("MainWindow", "About", None, QtGui.QApplication.UnicodeUTF8))
 
 from timeplot import TimePlot
-from qsynthmeter import qsynthMeter
+from levels import Levels_Widget
 from imageplot import ImagePlot
 from spectplot import SpectPlot
 import resource_rc

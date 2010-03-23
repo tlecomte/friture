@@ -63,71 +63,7 @@ stop: 0.9 #4c4c4c, stop: 1 #333333);
        </property>
        <layout class="QGridLayout" name="gridLayout_8">
         <item row="0" column="0">
-         <widget class="QLabel" name="label_rms">
-          <property name="font">
-           <font>
-            <pointsize>14</pointsize>
-            <weight>75</weight>
-            <bold>true</bold>
-           </font>
-          </property>
-          <property name="text">
-           <string>-100.0</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignBottom|Qt::AlignRight|Qt::AlignTrailing</set>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="1" rowspan="2">
-         <widget class="qsynthMeter" name="meter">
-          <property name="styleSheet">
-           <string notr="true">qsynthMeter {
-border: 1px solid gray;
-border-radius: 2px;
-padding: 1px;
-}</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="2">
-         <widget class="QLabel" name="label_peak">
-          <property name="font">
-           <font>
-            <pointsize>14</pointsize>
-            <weight>75</weight>
-            <bold>true</bold>
-           </font>
-          </property>
-          <property name="text">
-           <string>-100.0</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0">
-         <widget class="QLabel" name="label_rms_legend">
-          <property name="text">
-           <string>dBFS
-RMS</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignRight|Qt::AlignTop|Qt::AlignTrailing</set>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="2">
-         <widget class="QLabel" name="label_peak_legend">
-          <property name="text">
-           <string>dBFS
-peak</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-          </property>
-         </widget>
+         <widget class="Levels_Widget" name="levels" native="true"/>
         </item>
        </layout>
       </widget>
@@ -166,8 +102,8 @@ peak</string>
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>150</width>
-          <height>125</height>
+          <width>164</width>
+          <height>122</height>
          </rect>
         </property>
         <property name="styleSheet">
@@ -326,8 +262,8 @@ color: white;
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>142</width>
-          <height>129</height>
+          <width>146</width>
+          <height>132</height>
          </rect>
         </property>
         <property name="styleSheet">
@@ -390,7 +326,7 @@ background: white
   </action>
   <action name="actionAbout">
    <property name="icon">
-    <iconset resource="resource.qrc">
+    <iconset>
      <normaloff>:/about.svg</normaloff>:/about.svg</iconset>
    </property>
    <property name="text">
@@ -418,9 +354,9 @@ background: white
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>qsynthMeter</class>
-   <extends>QFrame</extends>
-   <header>qsynthmeter.h</header>
+   <class>Levels_Widget</class>
+   <extends>QWidget</extends>
+   <header>levels.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
