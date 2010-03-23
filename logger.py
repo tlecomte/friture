@@ -23,14 +23,16 @@ class Logger(QtCore.QObject):
 	def __init__(self):
 		QtCore.QObject.__init__(self)
 		
+		self.count = 0
 		self.log = ""
 
 	# push some text to the log
 	def push(self, text):
 		if len(self.log)==0:
-			self.log = text
+			self.log = "[0] %s" %text
 		else:
-			self.log = "%s\n%s" %(self.log, text)
+			self.log = "%s\n[%d] %s" %(self.log, self.count, text)
+		self.count += 1
 		self.emit(QtCore.SIGNAL('logChanged'))
 
 	# return the current log
