@@ -101,7 +101,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		self.levelsIsVisible = True
 		self.spectrumIsVisible = True
 
-		self.i = 0
+		self.chunk_number = 0
 		self.spec_min = -100.
 		self.spec_max = -20.
 		self.fft_size = 256
@@ -323,7 +323,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		# we read by multiples of FRAMES_PER_BUFFER, otherwise segfaults !
 		available = int(floor(available/FRAMES_PER_BUFFER))
 		for j in range(0, available):
-			self.i += 1
+			self.chunk_number += 1
 			try:
 				rawdata = self.stream.read(FRAMES_PER_BUFFER)
 			except IOError as inst:
@@ -361,7 +361,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		"Scope painting: %.02f ms\n"\
 		"Spectrum painting: %.02f ms\n"\
 		"Spectrogram painting: %.02f ms"\
-		% (self.i,
+		% (self.chunk_number,
 		self.fft_size*1000./SAMPLING_RATE,
 		self.period_ms,
 		self.display_timer_time,
