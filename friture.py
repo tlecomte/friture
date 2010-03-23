@@ -271,11 +271,12 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 			return True
 
 	def timer_toggle(self):
-		self.logger.push("toggle")
 		if self.display_timer.isActive():
+			self.logger.push("Timer stop")
 			self.display_timer.stop()
 			self.spectrogram_timer.stop()
 		else:
+			self.logger.push("Timer start")
 			self.display_timer.start()
 			self.spectrogram_timer.start()
 
