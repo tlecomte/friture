@@ -36,14 +36,20 @@ class Spectrogram_Widget(QtGui.QWidget, Ui_Spectrogram_Widget):
 		# initialize the class instance that will do the fft
 		self.proc = audioproc.audioproc()
 
+		self.maxfreq = SAMPLING_RATE/2
+
 	# method
-	def update(self, audiobuffer, maxfreq, fft_size, spec_min, spec_max):
+	def update(self, audiobuffer, fft_size, spec_min, spec_max):
 		# FIXME We should allow here for more intelligent transforms, especially when the log freq scale is selected
 		floatdata = audiobuffer.data(fft_size)
-		sp, freq = self.proc.analyzelive(floatdata, fft_size, maxfreq)
+		sp, freq = self.proc.analyzelive(floatdata, fft_size, self.maxfreq)
 		# scale the db spectrum from [- spec_range db ... 0 db] > [0..1]
 		epsilon = 1e-30
 		db_spectrogram = 20*log10(sp + epsilon)
 		norm_spectrogram = (db_spectrogram.clip(min = spec_min, max = spec_max) - spec_min)/(spec_max - spec_min)
 		
 		self.PlotZoneImage.addData(freq, norm_spectrogram)
+
+	def setfreqrange(self, minfreq, maxfreq):
+		self.PlotZoneImage.setfreqrange(minfreq, maxfreq)
+		self.maxfreq = maxfreq
