@@ -145,17 +145,14 @@ class SpectPlot(classplot.ClassPlot):
 		mask2_ter = mask2 * (self.peak + self.dBdecay >= y)
 		mask3 = (-mask1) * (-mask2)
 
-		self.peak = mask1 * y \
-		+ mask2_bis * y \
-		+ mask2_ter * (self.peak + self.dBdecay) \
-		+ mask3 * self.peak
+		self.peak[mask1] = y[mask1]
+		self.peak[mask2_bis] = y[mask2_bis]
+		self.peak[mask2_ter] = self.peak[mask2_ter] + self.dBdecay[mask2_ter]
 		
-		self.dBdecay = mask1 * 20. * log10(PEAK_DECAY_RATE) \
-		+ mask2_bis * self.dBdecay \
-		+ mask2_ter * 2 * self.dBdecay \
-		+ mask3 * self.dBdecay
+		self.dBdecay[mask1] = 20. * log10(PEAK_DECAY_RATE)
+		self.dBdecay[mask2_ter] = 2 * self.dBdecay[mask2_ter]
 		
-		self.peakHold = (-mask1) * self.peakHold
+		self.peakHold[mask1] = 0
 		self.peakHold += 1
 
 	def update_xscale(self):
