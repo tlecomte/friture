@@ -201,7 +201,7 @@ stop: 0 #AAAAAA, stop: 0.3 #FFFFFF);
        </property>
        <layout class="QGridLayout" name="gridLayout_7">
         <item row="0" column="0">
-         <widget class="SpectPlot" name="PlotZoneSpect"/>
+         <widget class="Spectrum_Widget" name="spectrum" native="true"/>
         </item>
        </layout>
       </widget>
@@ -342,12 +342,6 @@ background: white
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>SpectPlot</class>
-   <extends>QFrame</extends>
-   <header>spectplot.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>Levels_Widget</class>
    <extends>QWidget</extends>
    <header>levels.h</header>
@@ -357,6 +351,12 @@ background: white
    <class>Scope_Widget</class>
    <extends>QWidget</extends>
    <header>scope.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>Spectrum_Widget</class>
+   <extends>QWidget</extends>
+   <header>spectrum.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

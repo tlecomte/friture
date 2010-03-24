@@ -315,7 +315,8 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 			self.scope.update(self.audiobuffer)
 		
 		if self.spectrumIsVisible:
-			self.spectrum()
+			maxfreq = self.settings_dialog.spinBox_maxfreq.value()
+			self.spectrum.update(self.audiobuffer, maxfreq, self.proc, self.fft_size)
 		
 		self.display_timer_time = (95.*self.display_timer_time + 5.*t.elapsed())/100.
 
@@ -362,21 +363,10 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		self.levels.meter.m_ppValues[0].paint_time,
 		self.levels.meter.m_ppValues[1].paint_time,
 		self.scope.PlotZoneUp.paint_time,
-		self.PlotZoneSpect.paint_time,
+		self.spectrum.PlotZoneSpect.paint_time,
 		self.PlotZoneImage.paint_time)
 		
 		self.LabelLevel.setText(level_label)
-
-	# method
-	def spectrum(self):
-		maxfreq = self.settings_dialog.spinBox_maxfreq.value()
-		floatdata = self.audiobuffer.data(self.fft_size)
-		sp, freq = self.proc.analyzelive(floatdata, self.fft_size, maxfreq)
-		#sp, freq = self.proc.analyzelive_cochlear(floatdata, 50, minfreq, maxfreq)
-		# scale the db spectrum from [- spec_range db ... 0 db] > [0..1]
-		epsilon = 1e-30
-		db_spectrogram = 20*log10(sp + epsilon)
-		self.PlotZoneSpect.setdata(freq, db_spectrogram)
 
 	# slot
 	def fftsizechanged(self, index):
@@ -387,22 +377,22 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 	def freqscalechanged(self, index):
 		self.logger.push("freq_scale slot %d" %index)
 		#if index == 2:
-		#	self.PlotZoneSpect.setlogfreqscale()
+		#	self.spectrum.PlotZoneSpect.setlogfreqscale()
 		#	self.logger.push("Warning: Spectrum widget still in base 10 logarithmic")
 		#	self.PlotZoneImage.setlog2freqscale()
 		#elif index == 1:
 		if index == 1:
-			self.PlotZoneSpect.setlogfreqscale()
+			self.spectrum.PlotZoneSpect.setlogfreqscale()
 			self.PlotZoneImage.setlog10freqscale()
 		else:
-			self.PlotZoneSpect.setlinfreqscale()
+			self.spectrum.PlotZoneSpect.setlinfreqscale()
 			self.PlotZoneImage.setlinfreqscale()
 
 	# slot
 	def freqrangechanged(self, value):
 		minfreq = self.settings_dialog.spinBox_minfreq.value()
 		maxfreq = self.settings_dialog.spinBox_maxfreq.value()
-		self.PlotZoneSpect.setfreqrange(minfreq, maxfreq)
+		self.spectrum.PlotZoneSpect.setfreqrange(minfreq, maxfreq)
 		self.PlotZoneImage.setfreqrange(minfreq, maxfreq)
 
 	# slot

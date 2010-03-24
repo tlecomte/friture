@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'friture.ui'
 #
-# Created: Wed Mar 24 12:24:22 2010
+# Created: Wed Mar 24 15:18:39 2010
 #      by: PyQt4 UI code generator 4.7
 #
 # WARNING! All changes made in this file will be lost!
@@ -119,9 +119,9 @@ class Ui_MainWindow(object):
         self.frame_2.setObjectName("frame_2")
         self.gridLayout_7 = QtGui.QGridLayout(self.frame_2)
         self.gridLayout_7.setObjectName("gridLayout_7")
-        self.PlotZoneSpect = SpectPlot(self.frame_2)
-        self.PlotZoneSpect.setObjectName("PlotZoneSpect")
-        self.gridLayout_7.addWidget(self.PlotZoneSpect, 0, 0, 1, 1)
+        self.spectrum = Spectrum_Widget(self.frame_2)
+        self.spectrum.setObjectName("spectrum")
+        self.gridLayout_7.addWidget(self.spectrum, 0, 0, 1, 1)
         self.gridLayout_6.addWidget(self.frame_2, 0, 0, 1, 1)
         self.dockWidgetSpectrum.setWidget(self.dockWidgetContents_5)
         MainWindow.addDockWidget(QtCore.Qt.DockWidgetArea(4), self.dockWidgetSpectrum)
@@ -221,6 +221,6 @@ class Ui_MainWindow(object):
 
 from scope import Scope_Widget
 from levels import Levels_Widget
+from spectrum import Spectrum_Widget
 from imageplot import ImagePlot
-from spectplot import SpectPlot
 import resource_rc
