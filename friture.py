@@ -196,6 +196,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		scrollbar = self.scrollArea_2.verticalScrollBar()
 		scrollbar.setValue(max)
 	
+	# slot
 	def settings_called(self):
 		self.settings_dialog.show()
 	
