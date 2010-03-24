@@ -35,13 +35,19 @@ class Spectrum_Widget(QtGui.QWidget, Ui_Spectrum_Widget):
 		
 		# initialize the class instance that will do the fft
 		self.proc = audioproc.audioproc()
+		
+		self.maxfreq = SAMPLING_RATE/2
 
 	# method
-	def update(self, audiobuffer, maxfreq, fft_size):
+	def update(self, audiobuffer, fft_size):
 		floatdata = audiobuffer.data(fft_size)
-		sp, freq = self.proc.analyzelive(floatdata, fft_size, maxfreq)
+		sp, freq = self.proc.analyzelive(floatdata, fft_size, self.maxfreq)
 		#sp, freq = self.proc.analyzelive_cochlear(floatdata, 50, minfreq, maxfreq)
 		# scale the db spectrum from [- spec_range db ... 0 db] > [0..1]
 		epsilon = 1e-30
 		db_spectrogram = 20*log10(sp + epsilon)
 		self.PlotZoneSpect.setdata(freq, db_spectrogram)
+
+	def setfreqrange(self, minfreq, maxfreq):
+		self.PlotZoneSpect.setfreqrange(minfreq, maxfreq)
+		self.maxfreq = maxfreq

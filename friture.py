@@ -307,8 +307,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 			self.scope.update(self.audiobuffer)
 		
 		if self.spectrumIsVisible:
-			maxfreq = self.settings_dialog.spinBox_maxfreq.value()
-			self.spectrum.update(self.audiobuffer, maxfreq, self.fft_size)
+			self.spectrum.update(self.audiobuffer, self.fft_size)
 		
 		self.display_timer_time = (95.*self.display_timer_time + 5.*t.elapsed())/100.
 
@@ -376,7 +375,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 	def freqrangechanged(self, value):
 		minfreq = self.settings_dialog.spinBox_minfreq.value()
 		maxfreq = self.settings_dialog.spinBox_maxfreq.value()
-		self.spectrum.PlotZoneSpect.setfreqrange(minfreq, maxfreq)
+		self.spectrum.setfreqrange(minfreq, maxfreq)
 		self.spectrogram.PlotZoneImage.setfreqrange(minfreq, maxfreq)
 
 	# slot
