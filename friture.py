@@ -25,7 +25,6 @@ import PyQt4.Qwt5 as Qwt
 from Ui_friture import Ui_MainWindow
 import resource_rc
 import audiodata
-import audioproc
 import about # About dialog
 import settings # Setting dialog
 import logger # Logging class
@@ -180,9 +179,6 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		# restore the settings and widgets geometries
 		self.restoreAppState()
 
-		# initialize the class instance that will do the fft
-		self.proc = audioproc.audioproc()
-
 		# start timers
 		self.timer_toggle()
 		
@@ -316,7 +312,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		
 		if self.spectrumIsVisible:
 			maxfreq = self.settings_dialog.spinBox_maxfreq.value()
-			self.spectrum.update(self.audiobuffer, maxfreq, self.proc, self.fft_size)
+			self.spectrum.update(self.audiobuffer, maxfreq, self.fft_size)
 		
 		self.display_timer_time = (95.*self.display_timer_time + 5.*t.elapsed())/100.
 
@@ -330,7 +326,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		t.start()
 
 		maxfreq = self.settings_dialog.spinBox_maxfreq.value()
-		self.spectrogram.update(self.audiobuffer, maxfreq, self.proc, self.fft_size, self.spec_min, self.spec_max)
+		self.spectrogram.update(self.audiobuffer, maxfreq, self.fft_size, self.spec_min, self.spec_max)
 		
 		self.spectrogram_timer_time = (95.*self.spectrogram_timer_time + 5.*t.elapsed())/100.
 

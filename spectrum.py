@@ -20,6 +20,7 @@
 from PyQt4 import QtGui
 from numpy import log10, where, linspace
 from Ui_spectrum import Ui_Spectrum_Widget
+import audioproc # audio processing class
 
 SMOOTH_DISPLAY_TIMER_PERIOD_MS = 25
 SAMPLING_RATE = 44100
@@ -31,11 +32,14 @@ class Spectrum_Widget(QtGui.QWidget, Ui_Spectrum_Widget):
 		
 		# Setup the user interface
 		self.setupUi(self)
+		
+		# initialize the class instance that will do the fft
+		self.proc = audioproc.audioproc()
 
 	# method
-	def update(self, audiobuffer, maxfreq, proc, fft_size):
+	def update(self, audiobuffer, maxfreq, fft_size):
 		floatdata = audiobuffer.data(fft_size)
-		sp, freq = proc.analyzelive(floatdata, fft_size, maxfreq)
+		sp, freq = self.proc.analyzelive(floatdata, fft_size, maxfreq)
 		#sp, freq = self.proc.analyzelive_cochlear(floatdata, 50, minfreq, maxfreq)
 		# scale the db spectrum from [- spec_range db ... 0 db] > [0..1]
 		epsilon = 1e-30
