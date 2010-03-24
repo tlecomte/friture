@@ -24,7 +24,6 @@ from PyQt4 import QtGui, QtCore, Qt
 import PyQt4.Qwt5 as Qwt
 from Ui_friture import Ui_MainWindow
 import resource_rc
-import audiodata
 import about # About dialog
 import settings # Setting dialog
 import logger # Logging class
