@@ -100,7 +100,6 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		self.chunk_number = 0
 		self.spec_min = -100.
 		self.spec_max = -20.
-		self.fft_size = 256
 		self.timerange_s = 10.
 		self.canvas_width = 100.
 		
@@ -307,7 +306,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 			self.scope.update(self.audiobuffer)
 		
 		if self.spectrumIsVisible:
-			self.spectrum.update(self.audiobuffer, self.fft_size)
+			self.spectrum.update(self.audiobuffer)
 		
 		self.display_timer_time = (95.*self.display_timer_time + 5.*t.elapsed())/100.
 
@@ -320,7 +319,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		t = QtCore.QTime()
 		t.start()
 
-		self.spectrogram.update(self.audiobuffer, self.fft_size, self.spec_min, self.spec_max)
+		self.spectrogram.update(self.audiobuffer, self.spec_min, self.spec_max)
 		
 		self.spectrogram_timer_time = (95.*self.spectrogram_timer_time + 5.*t.elapsed())/100.
 
@@ -337,7 +336,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		"Spectrum painting: %.02f ms\n"\
 		"Spectrogram painting: %.02f ms"\
 		% (self.chunk_number,
-		self.fft_size*1000./SAMPLING_RATE,
+		self.spectrum.fft_size*1000./SAMPLING_RATE,
 		self.period_ms,
 		self.display_timer_time,
 		self.spectrogram_timer_time,
@@ -352,8 +351,10 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 
 	# slot
 	def fftsizechanged(self, index):
-		self.logger.push("fft_size_changed slot %d %d %f" %(index, 2**index*32, 150000/self.fft_size))
-		self.fft_size = 2**index*32
+		self.logger.push("fft_size_changed slot %d %d %f" %(index, 2**index*32, 150000/2**index*32))
+		fft_size = 2**index*32
+		self.spectrum.setfftsize(fft_size)
+		self.spectrogram.setfftsize(fft_size)
 
 	# slot
 	def freqscalechanged(self, index):
