@@ -98,8 +98,6 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		self.spectrumIsVisible = True
 
 		self.chunk_number = 0
-		self.spec_min = -100.
-		self.spec_max = -20.
 		self.timerange_s = 10.
 		self.canvas_width = 100.
 		
@@ -154,8 +152,8 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		
 		self.connect(self.settings_dialog.comboBox_freqscale, QtCore.SIGNAL('currentIndexChanged(int)'), self.freqscalechanged)
 		self.connect(self.settings_dialog.comboBox_fftsize, QtCore.SIGNAL('currentIndexChanged(int)'), self.fftsizechanged)
-		self.connect(self.settings_dialog.spinBox_specmax, QtCore.SIGNAL('valueChanged(int)'), self.specrangechanged)
-		self.connect(self.settings_dialog.spinBox_specmin, QtCore.SIGNAL('valueChanged(int)'), self.specrangechanged)
+		self.connect(self.settings_dialog.spinBox_specmax, QtCore.SIGNAL('valueChanged(int)'), self.specmaxchanged)
+		self.connect(self.settings_dialog.spinBox_specmin, QtCore.SIGNAL('valueChanged(int)'), self.specminchanged)
 		self.connect(self.settings_dialog.doubleSpinBox_timerange, QtCore.SIGNAL('valueChanged(double)'), self.timerangechanged)
 		self.connect(self.settings_dialog.spinBox_minfreq, QtCore.SIGNAL('valueChanged(int)'), self.minfreqchanged)
 		self.connect(self.settings_dialog.spinBox_maxfreq, QtCore.SIGNAL('valueChanged(int)'), self.maxfreqchanged)
@@ -319,7 +317,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		t = QtCore.QTime()
 		t.start()
 
-		self.spectrogram.update(self.audiobuffer, self.spec_min, self.spec_max)
+		self.spectrogram.update(self.audiobuffer)
 		
 		self.spectrogram_timer_time = (95.*self.spectrogram_timer_time + 5.*t.elapsed())/100.
 
@@ -382,9 +380,12 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		self.spectrogram.setmaxfreq(freq)
 
 	# slot
-	def specrangechanged(self, value):
-		self.spec_max = self.settings_dialog.spinBox_specmax.value()
-		self.spec_min = self.settings_dialog.spinBox_specmin.value()
+	def specmaxchanged(self, value):
+		self.spectrogram.setmax(value)
+		
+	# slot
+	def specminchanged(self, value):
+		self.spectrogram.setmin(value)
 
 	# slot
 	def timerangechanged(self, value):
