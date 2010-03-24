@@ -158,11 +158,6 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		self.connect(self.settings_dialog.spinBox_minfreq, QtCore.SIGNAL('valueChanged(int)'), self.minfreqchanged)
 		self.connect(self.settings_dialog.spinBox_maxfreq, QtCore.SIGNAL('valueChanged(int)'), self.maxfreqchanged)
 		self.connect(self.settings_dialog.comboBox_inputDevice, QtCore.SIGNAL('currentIndexChanged(int)'), self.input_device_changed)
-		
-		self.connect(self.dockWidgetScope, QtCore.SIGNAL('visibilityChanged(bool)'), self.scopeVisibility)
-		self.connect(self.dockWidgetStatistics, QtCore.SIGNAL('visibilityChanged(bool)'), self.statisticsVisibility)
-		self.connect(self.dockWidgetLevels, QtCore.SIGNAL('visibilityChanged(bool)'), self.levelsVisibility)
-		self.connect(self.dockWidgetSpectrum, QtCore.SIGNAL('visibilityChanged(bool)'), self.spectrumVisibility)
 
 		self.connect(self.spectrogram.PlotZoneImage.plotImage.canvasscaledspectrogram, QtCore.SIGNAL("canvasWidthChanged"), self.canvasWidthChanged)
 		
@@ -245,22 +240,6 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		
 		settings.endGroup()
 
-	# slot
-	def scopeVisibility(self, visible):
-		self.scopeIsVisible = visible
-
-	# slot
-	def statisticsVisibility(self, visible):
-		self.statisticsIsVisible = visible
-
-	# slot
-	def levelsVisibility(self, visible):
-		self.levelsIsVisible = visible
-
-	# slot
-	def spectrumVisibility(self, visible):
-		self.spectrumIsVisible = visible
-
 	#return True on success
 	def try_input_device(self):
 		n_try = 0
@@ -294,17 +273,13 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		t = QtCore.QTime()
 		t.start()
 		
-		if self.statisticsIsVisible:
-			self.statistics()
+		self.statistics()
 		
-		if self.levelsIsVisible:
-			self.levels.update(self.audiobuffer)
+		self.levels.update(self.audiobuffer)
 		
-		if self.scopeIsVisible:
-			self.scope.update(self.audiobuffer)
+		self.scope.update(self.audiobuffer)
 		
-		if self.spectrumIsVisible:
-			self.spectrum.update(self.audiobuffer)
+		self.spectrum.update(self.audiobuffer)
 		
 		self.display_timer_time = (95.*self.display_timer_time + 5.*t.elapsed())/100.
 
@@ -323,6 +298,9 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 
 	# method
 	def statistics(self):
+		if not self.LabelLevel.isVisible():
+		    return
+		    
 		level_label = "Chunk #%d\n"\
 		"FFT period : %.01f ms\n"\
 		"Spectrogram timer period : %.01f ms\n"\

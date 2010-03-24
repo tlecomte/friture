@@ -42,6 +42,9 @@ class Spectrum_Widget(QtGui.QWidget, Ui_Spectrum_Widget):
 
 	# method
 	def update(self, audiobuffer):
+		if not self.isVisible():
+		    return
+		
 		floatdata = audiobuffer.data(self.fft_size)
 		sp, freq = self.proc.analyzelive(floatdata, self.fft_size, self.maxfreq)
 		#sp, freq = self.proc.analyzelive_cochlear(floatdata, 50, minfreq, maxfreq)

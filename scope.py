@@ -34,6 +34,9 @@ class Scope_Widget(QtGui.QWidget, Ui_Scope_Widget):
 
 	# method
 	def update(self, audiobuffer):
+		if not self.isVisible():
+			return
+
 		time = SMOOTH_DISPLAY_TIMER_PERIOD_MS/1000.
 		#basic trigger capability on leading edge
 		floatdata = audiobuffer.data(time*SAMPLING_RATE)

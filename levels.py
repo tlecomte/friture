@@ -34,6 +34,9 @@ class Levels_Widget(QtGui.QWidget, Ui_Levels_Widget):
 
 	# method
 	def update(self, audiobuffer):
+		if not self.isVisible():
+			return
+		
 		time = SMOOTH_DISPLAY_TIMER_PERIOD_MS/1000.
 		floatdata = audiobuffer.data(time*SAMPLING_RATE)
 		

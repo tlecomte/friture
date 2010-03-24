@@ -44,6 +44,9 @@ class Spectrogram_Widget(QtGui.QWidget, Ui_Spectrogram_Widget):
 
 	# method
 	def update(self, audiobuffer):
+		if not self.isVisible():
+			return
+		
 		# FIXME We should allow here for more intelligent transforms, especially when the log freq scale is selected
 		floatdata = audiobuffer.data(self.fft_size)
 		sp, freq = self.proc.analyzelive(floatdata, self.fft_size, self.maxfreq)
