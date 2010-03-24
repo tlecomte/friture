@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'friture.ui'
 #
-# Created: Wed Mar 24 15:18:39 2010
+# Created: Wed Mar 24 15:58:44 2010
 #      by: PyQt4 UI code generator 4.7
 #
 # WARNING! All changes made in this file will be lost!
@@ -20,11 +20,9 @@ class Ui_MainWindow(object):
         self.centralwidget.setObjectName("centralwidget")
         self.gridLayout_3 = QtGui.QGridLayout(self.centralwidget)
         self.gridLayout_3.setObjectName("gridLayout_3")
-        self.PlotZoneImage = ImagePlot(self.centralwidget)
-        self.PlotZoneImage.setStyleSheet("QwtPlotCanvas {\n"
-"}")
-        self.PlotZoneImage.setObjectName("PlotZoneImage")
-        self.gridLayout_3.addWidget(self.PlotZoneImage, 0, 0, 1, 2)
+        self.spectrogram = Spectrogram_Widget(self.centralwidget)
+        self.spectrogram.setObjectName("spectrogram")
+        self.gridLayout_3.addWidget(self.spectrogram, 0, 0, 1, 1)
         MainWindow.setCentralWidget(self.centralwidget)
         self.dockWidgetLevels = QtGui.QDockWidget(MainWindow)
         self.dockWidgetLevels.setObjectName("dockWidgetLevels")
@@ -219,8 +217,8 @@ class Ui_MainWindow(object):
         self.actionSettings.setToolTip(QtGui.QApplication.translate("MainWindow", "Display settings dialog", None, QtGui.QApplication.UnicodeUTF8))
         self.actionAbout.setText(QtGui.QApplication.translate("MainWindow", "About", None, QtGui.QApplication.UnicodeUTF8))
 
+from spectrogram import Spectrogram_Widget
 from scope import Scope_Widget
 from levels import Levels_Widget
 from spectrum import Spectrum_Widget
-from imageplot import ImagePlot
 import resource_rc

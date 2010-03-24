@@ -31,13 +31,8 @@ stop: 0.9 #4c4c4c, stop: 1 #333333);
     <string notr="true"/>
    </property>
    <layout class="QGridLayout" name="gridLayout_3">
-    <item row="0" column="0" colspan="2">
-     <widget class="ImagePlot" name="PlotZoneImage">
-      <property name="styleSheet">
-       <string notr="true">QwtPlotCanvas {
-}</string>
-      </property>
-     </widget>
+    <item row="0" column="0">
+     <widget class="Spectrogram_Widget" name="spectrogram" native="true"/>
     </item>
    </layout>
   </widget>
@@ -336,12 +331,6 @@ background: white
  </widget>
  <customwidgets>
   <customwidget>
-   <class>ImagePlot</class>
-   <extends>QFrame</extends>
-   <header>imageplot.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>Levels_Widget</class>
    <extends>QWidget</extends>
    <header>levels.h</header>
@@ -357,6 +346,12 @@ background: white
    <class>Spectrum_Widget</class>
    <extends>QWidget</extends>
    <header>spectrum.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>Spectrogram_Widget</class>
+   <extends>QWidget</extends>
+   <header>spectrogram.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
