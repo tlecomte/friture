@@ -37,6 +37,7 @@ class Spectrogram_Widget(QtGui.QWidget, Ui_Spectrogram_Widget):
 		self.proc = audioproc.audioproc()
 
 		self.maxfreq = SAMPLING_RATE/2
+		self.minfreq = 0
 
 	# method
 	def update(self, audiobuffer, fft_size, spec_min, spec_max):
@@ -50,6 +51,10 @@ class Spectrogram_Widget(QtGui.QWidget, Ui_Spectrogram_Widget):
 		
 		self.PlotZoneImage.addData(freq, norm_spectrogram)
 
-	def setfreqrange(self, minfreq, maxfreq):
-		self.PlotZoneImage.setfreqrange(minfreq, maxfreq)
-		self.maxfreq = maxfreq
+	def setminfreq(self, freq):
+		self.minfreq = freq
+		self.PlotZoneImage.setfreqrange(self.minfreq, self.maxfreq)
+
+	def setmaxfreq(self, freq):
+		self.maxfreq = freq
+		self.PlotZoneImage.setfreqrange(self.minfreq, self.maxfreq)

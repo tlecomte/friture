@@ -158,8 +158,8 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		self.connect(self.settings_dialog.spinBox_specmax, QtCore.SIGNAL('valueChanged(int)'), self.specrangechanged)
 		self.connect(self.settings_dialog.spinBox_specmin, QtCore.SIGNAL('valueChanged(int)'), self.specrangechanged)
 		self.connect(self.settings_dialog.doubleSpinBox_timerange, QtCore.SIGNAL('valueChanged(double)'), self.timerangechanged)
-		self.connect(self.settings_dialog.spinBox_minfreq, QtCore.SIGNAL('valueChanged(int)'), self.freqrangechanged)
-		self.connect(self.settings_dialog.spinBox_maxfreq, QtCore.SIGNAL('valueChanged(int)'), self.freqrangechanged)
+		self.connect(self.settings_dialog.spinBox_minfreq, QtCore.SIGNAL('valueChanged(int)'), self.minfreqchanged)
+		self.connect(self.settings_dialog.spinBox_maxfreq, QtCore.SIGNAL('valueChanged(int)'), self.maxfreqchanged)
 		self.connect(self.settings_dialog.comboBox_inputDevice, QtCore.SIGNAL('currentIndexChanged(int)'), self.input_device_changed)
 		
 		self.connect(self.dockWidgetScope, QtCore.SIGNAL('visibilityChanged(bool)'), self.scopeVisibility)
@@ -371,11 +371,14 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 			self.spectrogram.PlotZoneImage.setlinfreqscale()
 
 	# slot
-	def freqrangechanged(self, value):
-		minfreq = self.settings_dialog.spinBox_minfreq.value()
-		maxfreq = self.settings_dialog.spinBox_maxfreq.value()
-		self.spectrum.setfreqrange(minfreq, maxfreq)
-		self.spectrogram.setfreqrange(minfreq, maxfreq)
+	def minfreqchanged(self, freq):
+		self.spectrum.setminfreq(freq)
+		self.spectrogram.setminfreq(freq)
+
+	# slot
+	def maxfreqchanged(self, freq):
+		self.spectrum.setmaxfreq(freq)
+		self.spectrogram.setmaxfreq(freq)
 
 	# slot
 	def specrangechanged(self, value):
