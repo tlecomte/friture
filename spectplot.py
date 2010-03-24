@@ -141,15 +141,15 @@ class SpectPlot(classplot.ClassPlot):
 
 		mask1 = (self.peak < y)
 		mask2 = (-mask1) * (self.peakHold > (PEAK_FALLOFF_COUNT - 1.))
-		mask2_bis = mask2 * (self.peak + self.dBdecay < y)
-		mask2_ter = mask2 * (self.peak + self.dBdecay >= y)
+		mask2_a = mask2 * (self.peak + self.dBdecay < y)
+		mask2_b = mask2 * (self.peak + self.dBdecay >= y)
 
 		self.peak[mask1] = y[mask1]
-		self.peak[mask2_bis] = y[mask2_bis]
-		self.peak[mask2_ter] = self.peak[mask2_ter] + self.dBdecay[mask2_ter]
+		self.peak[mask2_a] = y[mask2_a]
+		self.peak[mask2_b] = self.peak[mask2_b] + self.dBdecay[mask2_b]
 		
 		self.dBdecay[mask1] = 20. * log10(PEAK_DECAY_RATE)
-		self.dBdecay[mask2_ter] = 2 * self.dBdecay[mask2_ter]
+		self.dBdecay[mask2_b] = 2 * self.dBdecay[mask2_b]
 		
 		self.peakHold[mask1] = 0
 		self.peakHold += 1
