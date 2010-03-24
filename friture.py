@@ -177,8 +177,10 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		self.connect(self.logger, QtCore.SIGNAL('logChanged'), self.log_changed)
 		self.connect(self.scrollArea_2.verticalScrollBar(), QtCore.SIGNAL('rangeChanged(int,int)'), self.log_scroll_range_changed)
 		
+		# restore the settings and widgets geometries
 		self.restoreAppState()
 
+		# initialize the class instance that will do the fft
 		self.proc = audioproc.audioproc()
 
 		# start timers
@@ -186,6 +188,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		
 		self.logger.push("Init finished, entering the main loop")
 	
+	# slot
 	# update the log widget with the new log content
 	def log_changed(self):
 		self.LabelLog.setText(self.logger.text())
