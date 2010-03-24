@@ -356,11 +356,12 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		self.display_timer_time,
 		self.spectrogram_timer_time,
 		self.buffer_timer_time,
-		self.meter.m_ppValues[0].paint_time,
-		self.meter.m_ppValues[1].paint_time,
+		self.levels.meter.m_ppValues[0].paint_time,
+		self.levels.meter.m_ppValues[1].paint_time,
 		self.PlotZoneUp.paint_time,
 		self.PlotZoneSpect.paint_time,
 		self.PlotZoneImage.paint_time)
+		
 		self.LabelLevel.setText(level_label)
 
 	# method
