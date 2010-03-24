@@ -102,8 +102,8 @@ stop: 0.9 #4c4c4c, stop: 1 #333333);
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>164</width>
-          <height>122</height>
+          <width>82</width>
+          <height>151</height>
          </rect>
         </property>
         <property name="styleSheet">
@@ -163,7 +163,7 @@ stop: 0 #AAAAAA, stop: 0.3 #FFFFFF);
        </property>
        <layout class="QGridLayout" name="gridLayout">
         <item row="0" column="0">
-         <widget class="TimePlot" name="PlotZoneUp"/>
+         <widget class="Scope_Widget" name="scope" native="true"/>
         </item>
        </layout>
       </widget>
@@ -262,8 +262,8 @@ color: white;
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>146</width>
-          <height>132</height>
+          <width>74</width>
+          <height>158</height>
          </rect>
         </property>
         <property name="styleSheet">
@@ -326,7 +326,7 @@ background: white
   </action>
   <action name="actionAbout">
    <property name="icon">
-    <iconset>
+    <iconset resource="resource.qrc">
      <normaloff>:/about.svg</normaloff>:/about.svg</iconset>
    </property>
    <property name="text">
@@ -342,12 +342,6 @@ background: white
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>TimePlot</class>
-   <extends>QFrame</extends>
-   <header>timeplot.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>SpectPlot</class>
    <extends>QFrame</extends>
    <header>spectplot.h</header>
@@ -357,6 +351,12 @@ background: white
    <class>Levels_Widget</class>
    <extends>QWidget</extends>
    <header>levels.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>Scope_Widget</class>
+   <extends>QWidget</extends>
+   <header>scope.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
