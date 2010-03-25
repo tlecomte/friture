@@ -396,7 +396,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 			api = self.pa.get_host_api_info_by_index(dev['hostApi'])['name']
 			desc = "%d: (%s) %s" %(dev['index'], api, dev['name'])
 			if i == default_device_index:
-				desc += ' (system default)'			
+				desc += ' (system default)'
 			self.settings_dialog.comboBox_inputDevice.addItem(desc)
 
 	# method
