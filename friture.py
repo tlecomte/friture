@@ -108,30 +108,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		# Initialize the audio data ring buffer
 		self.audiobuffer = audiobuffer.AudioBuffer()
 
-		self.logger.push("Initializing PyAudio")
-		self.pa = PyAudio()
-
-		self.set_devices_list()
-		device_count = self.get_device_count()
-		default_device_index = self.get_default_input_device()
-		
-		# we will try to open all the devices until one works, starting by the default input device
-		devices = range(0, device_count)
-		devices.remove(default_device_index)
-		devices = [default_device_index] + devices
-
-		for index in devices:
-			self.logger.push("Opening the stream")
-			self.open_stream(index)
-
-			self.logger.push("Trying to read from input device #%d" % (index))
-			if self.try_input_device():
-				self.logger.push("Success")
-				break
-			else:
-				self.logger.push("Fail")
-
-		self.settings_dialog.comboBox_inputDevice.setCurrentIndex(self.device_index)
+		self.init_audio()
 
 		# this timer is used to update widgets that just need to display as fast as they can
 		self.display_timer = QtCore.QTimer()
@@ -438,10 +415,38 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		self.spectrogram_timer.start()
 		self.actionStart.setChecked(True)
 
+	# method
 	def open_stream(self, index):
 		self.stream = self.pa.open(format=paInt16, channels=1, rate=SAMPLING_RATE, input=True,
 				frames_per_buffer=FRAMES_PER_BUFFER, input_device_index=index)
 		self.device_index = index
+
+	# method
+	def init_audio(self):
+		self.logger.push("Initializing PyAudio")
+		self.pa = PyAudio()
+
+		self.set_devices_list()
+		device_count = self.get_device_count()
+		default_device_index = self.get_default_input_device()
+		
+		# we will try to open all the devices until one works, starting by the default input device
+		devices = range(0, device_count)
+		devices.remove(default_device_index)
+		devices = [default_device_index] + devices
+
+		for index in devices:
+			self.logger.push("Opening the stream")
+			self.open_stream(index)
+
+			self.logger.push("Trying to read from input device #%d" % (index))
+			if self.try_input_device():
+				self.logger.push("Success")
+				break
+			else:
+				self.logger.push("Fail")
+
+		self.settings_dialog.comboBox_inputDevice.setCurrentIndex(self.device_index)
 
 if __name__ == "__main__":
 	if platform.system() == "Windows":
