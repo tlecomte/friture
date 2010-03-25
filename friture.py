@@ -18,13 +18,13 @@
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
 import sys, os, platform
-from pyaudio import PyAudio, paInt16
 from PyQt4 import QtGui, QtCore
 from Ui_friture import Ui_MainWindow
 import about # About dialog
 import settings # Setting dialog
 import logger # Logging class
 import audiobuffer # audio ring buffer class
+import audiobackend # audio backend class
 
 #pyuic4 friture.ui > Ui_friture.py
 #pyrcc4 resource.qrc > resource_rc.py
@@ -57,7 +57,6 @@ import audiobuffer # audio ring buffer class
 
 # the sample rate below should be dynamic, taken from PyAudio/PortAudio
 SAMPLING_RATE = 44100
-FRAMES_PER_BUFFER = 1024
 SMOOTH_DISPLAY_TIMER_PERIOD_MS = 25
 
 class Friture(QtGui.QMainWindow, Ui_MainWindow):
@@ -108,7 +107,15 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		# Initialize the audio data ring buffer
 		self.audiobuffer = audiobuffer.AudioBuffer()
 
-		self.init_audio()
+		# Initialize the audio backend
+		self.audiobackend = audiobackend.AudioBackend(self.logger)
+		
+		devices = self.audiobackend.get_devices()
+		for dev in devices:
+			self.settings_dialog.comboBox_inputDevice.addItem(dev)
+
+		current_device = self.audiobackend.get_current_device()
+		self.settings_dialog.comboBox_inputDevice.setCurrentIndex(current_device)
 
 		# this timer is used to update widgets that just need to display as fast as they can
 		self.display_timer = QtCore.QTimer()
@@ -140,6 +147,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		
 		self.connect(self.logger, QtCore.SIGNAL('logChanged'), self.log_changed)
 		self.connect(self.scrollArea_2.verticalScrollBar(), QtCore.SIGNAL('rangeChanged(int,int)'), self.log_scroll_range_changed)
+		self.connect(self.audiobackend, QtCore.SIGNAL('deviceReverted'), self.device_reverted)
 		
 		# restore the settings and widgets geometries
 		self.restoreAppState()
@@ -153,6 +161,12 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 	# update the log widget with the new log content
 	def log_changed(self):
 		self.LabelLog.setText(self.logger.text())
+	
+	# slot
+	def device_reverted(self):
+		error_message = QtGui.QErrorMessage(self)
+		error_message.setWindowTitle("Input device error")
+		error_message.showMessage("Impossible to use the selected device, reverting to the previous one")
 	
 	# slot
 	# scroll the log widget so that the last line is visible
@@ -217,19 +231,6 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		
 		settings.endGroup()
 
-	#return True on success
-	def try_input_device(self):
-		n_try = 0
-		while self.stream.get_read_available() < FRAMES_PER_BUFFER and n_try < 1000000:
-			n_try +=1
-
-		if n_try == 1000000:
-			return False
-		else:
-			lat_ms = 1000*self.stream.get_input_latency()
-			self.logger.push("Device claims %d ms latency" %(lat_ms))
-			return True
-
 	# slot
 	def timer_toggle(self):
 		if self.display_timer.isActive():
@@ -243,7 +244,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 
 	# slot
 	def display_timer_slot(self):
-		(chunks, t) = self.audiobuffer.update(self.stream)
+		(chunks, t) = self.audiobuffer.update(self.audiobackend.stream)
 		self.chunk_number += chunks
 		self.buffer_timer_time = (95.*self.buffer_timer_time + 5.*t)/100.
 		
@@ -262,7 +263,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 
 	# slot
 	def spectrogram_timer_slot(self):
-		(chunks, t) = self.audiobuffer.update(self.stream)
+		(chunks, t) = self.audiobuffer.update(self.audiobackend.stream)
 		self.chunk_number += chunks
 		self.buffer_timer_time = (95.*self.buffer_timer_time + 5.*t)/100.
 
@@ -363,90 +364,19 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		self.logger.push("Resetting the timer, will fire every %d ms" %(self.period_ms))
 		self.spectrogram_timer.setInterval(self.period_ms)
 
-	# method
-	def set_devices_list(self):
-		default_device_index = self.get_default_input_device()
-		device_count = self.get_device_count()
-		
-		for i in range(0, device_count):
-			dev = self.pa.get_device_info_by_index(i)
-			api = self.pa.get_host_api_info_by_index(dev['hostApi'])['name']
-			desc = "%d: (%s) %s" %(dev['index'], api, dev['name'])
-			if i == default_device_index:
-				desc += ' (system default)'
-			self.settings_dialog.comboBox_inputDevice.addItem(desc)
-
-	# method
-	def get_default_input_device(self):
-		return self.pa.get_default_input_device_info()['index']
-
-	# method
-	def get_device_count(self):
-		# FIXME only input devices should be chosen, not all of them !
-		return self.pa.get_device_count()
-
 	# slot
 	def input_device_changed(self, index):
 		self.display_timer.stop()
 		self.spectrogram_timer.stop()
 		self.actionStart.setChecked(False)
 		
-		# save current stream in case we need to restore it
-		previous_stream = self.stream
-		previous_index = self.device_index
-
-		self.open_stream(index)
-
-		self.logger.push("Trying to read from input device #%d" % (index))
-		if self.try_input_device():
-			self.logger.push("Success")
-			previous_stream.close()
-		else:
-			self.logger.push("Fail")
-			error_message = QtGui.QErrorMessage(self)
-			error_message.setWindowTitle("Input device error")
-			error_message.showMessage("Impossible to use the selected device, reverting to the previous one")
-			self.stream.close()
-			self.stream = previous_stream
-			self.device_index = previous_index
-			self.settings_dialog.comboBox_inputDevice.setCurrentIndex(previous_index)
+		index = self.audiobackend.select_input_device(index)
+		
+		self.settings_dialog.comboBox_inputDevice.setCurrentIndex(index)
 		
 		self.display_timer.start()
 		self.spectrogram_timer.start()
 		self.actionStart.setChecked(True)
-
-	# method
-	def open_stream(self, index):
-		self.stream = self.pa.open(format=paInt16, channels=1, rate=SAMPLING_RATE, input=True,
-				frames_per_buffer=FRAMES_PER_BUFFER, input_device_index=index)
-		self.device_index = index
-
-	# method
-	def init_audio(self):
-		self.logger.push("Initializing PyAudio")
-		self.pa = PyAudio()
-
-		self.set_devices_list()
-		device_count = self.get_device_count()
-		default_device_index = self.get_default_input_device()
-		
-		# we will try to open all the devices until one works, starting by the default input device
-		devices = range(0, device_count)
-		devices.remove(default_device_index)
-		devices = [default_device_index] + devices
-
-		for index in devices:
-			self.logger.push("Opening the stream")
-			self.open_stream(index)
-
-			self.logger.push("Trying to read from input device #%d" % (index))
-			if self.try_input_device():
-				self.logger.push("Success")
-				break
-			else:
-				self.logger.push("Fail")
-
-		self.settings_dialog.comboBox_inputDevice.setCurrentIndex(self.device_index)
 
 if __name__ == "__main__":
 	if platform.system() == "Windows":
