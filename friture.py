@@ -64,11 +64,11 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		QtGui.QMainWindow.__init__(self)
 		Ui_MainWindow.__init__(self)
 
-		# Setup the user interface
-		self.setupUi(self)
-		
 		# logger
 		self.logger = logger
+
+		# Setup the user interface
+		self.setupUi(self)
 		
 		self.settings_dialog = settings.Settings_Dialog()
 		self.about_dialog = about.About_Dialog()
@@ -97,11 +97,8 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		self.spectrumIsVisible = True
 
 		self.chunk_number = 0
-		self.timerange_s = 10.
-		self.canvas_width = 100.
 		
 		self.display_timer_time = 0.
-		self.spectrogram_timer_time = 0.
 		self.buffer_timer_time = 0.
 
 		# Initialize the audio data ring buffer
@@ -121,34 +118,17 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		self.display_timer = QtCore.QTimer()
 		self.display_timer.setInterval(SMOOTH_DISPLAY_TIMER_PERIOD_MS) # constant timing
 
-		# this timer is used to update the spectrogram widget, whose update period
-		# is fixed by the time scale and the width of the widget canvas
-		self.spectrogram_timer = QtCore.QTimer()
-		self.period_ms = SMOOTH_DISPLAY_TIMER_PERIOD_MS
-		self.spectrogram_timer.setInterval(self.period_ms) # variable timing
-
 		# timer ticks
 		self.connect(self.display_timer, QtCore.SIGNAL('timeout()'), self.display_timer_slot)
-		self.connect(self.spectrogram_timer, QtCore.SIGNAL('timeout()'), self.spectrogram_timer_slot)
 		
 		# toolbar clicks
 		self.connect(self.actionStart, QtCore.SIGNAL('triggered()'), self.timer_toggle)
 		self.connect(self.actionSettings, QtCore.SIGNAL('triggered()'), self.settings_called)
 		self.connect(self.actionAbout, QtCore.SIGNAL('triggered()'), self.about_called)
 		
+		# settings signals
 		self.connect(self.settings_dialog.comboBox_inputDevice, QtCore.SIGNAL('currentIndexChanged(int)'), self.input_device_changed)
-		# the settings below should go in a specific dialogs and classes
-		self.connect(self.settings_dialog.comboBox_freqscale, QtCore.SIGNAL('currentIndexChanged(int)'), self.freqscalechanged)
-		self.connect(self.settings_dialog.comboBox_fftsize, QtCore.SIGNAL('currentIndexChanged(int)'), self.fftsizechanged)
-		self.connect(self.settings_dialog.spinBox_specmax, QtCore.SIGNAL('valueChanged(int)'), self.specmaxchanged)
-		self.connect(self.settings_dialog.spinBox_specmin, QtCore.SIGNAL('valueChanged(int)'), self.specminchanged)
-		self.connect(self.settings_dialog.doubleSpinBox_timerange, QtCore.SIGNAL('valueChanged(double)'), self.timerangechanged)
-		self.connect(self.settings_dialog.spinBox_minfreq, QtCore.SIGNAL('valueChanged(int)'), self.minfreqchanged)
-		self.connect(self.settings_dialog.spinBox_maxfreq, QtCore.SIGNAL('valueChanged(int)'), self.maxfreqchanged)
 
-		# window resize
-		self.connect(self.spectrogram.PlotZoneImage.plotImage.canvasscaledspectrogram, QtCore.SIGNAL("canvasWidthChanged"), self.canvasWidthChanged)
-		
 		# log change
 		self.connect(self.logger, QtCore.SIGNAL('logChanged'), self.log_changed)
 		self.connect(self.scrollArea_2.verticalScrollBar(), QtCore.SIGNAL('rangeChanged(int,int)'), self.log_scroll_range_changed)
@@ -193,14 +173,11 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		settings.beginGroup("MainWindow")
 		settings.setValue("windowState", windowState)
 		
-		settings.beginGroup("Audio")
-		settings.setValue("fftSize", self.settings_dialog.comboBox_fftsize.currentIndex())
-		settings.setValue("freqScale", self.settings_dialog.comboBox_freqscale.currentIndex())
-		settings.setValue("freqMin", self.settings_dialog.spinBox_minfreq.value())
-		settings.setValue("freqMax", self.settings_dialog.spinBox_maxfreq.value())
-		settings.setValue("timeRange", self.settings_dialog.doubleSpinBox_timerange.value())
-		settings.setValue("colorMin", self.settings_dialog.spinBox_specmin.value())
-		settings.setValue("colorMax", self.settings_dialog.spinBox_specmax.value())
+		settings.beginGroup("Spectrogram")
+		self.spectrogram.saveState(settings)
+		
+		settings.beginGroup("Spectrum")
+		self.spectrum.saveState(settings)
 		
 		settings.endGroup()
 	
@@ -211,22 +188,12 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		settings.beginGroup("MainWindow")
 		self.restoreState(settings.value("windowState").toByteArray())
 		
-		settings.beginGroup("Audio")
-		(fft_size, ok) = settings.value("fftSize", 7).toInt() # 7th index is 1024 points
-		self.settings_dialog.comboBox_fftsize.setCurrentIndex(fft_size)
-		(freqscale, ok) = settings.value("freqScale", 0).toInt()
-		self.settings_dialog.comboBox_freqscale.setCurrentIndex(freqscale)
-		(freqMin, ok) = settings.value("freqMin", 20).toInt()
-		self.settings_dialog.spinBox_minfreq.setValue(freqMin)
-		(freqMax, ok) = settings.value("freqMax", 20000).toInt()
-		self.settings_dialog.spinBox_maxfreq.setValue(freqMax)
-		(timeRange, ok) = settings.value("timeRange", 10.).toDouble()
-		self.settings_dialog.doubleSpinBox_timerange.setValue(timeRange)
-		(colorMin, ok) = settings.value("colorMin", -100).toInt()
-		self.settings_dialog.spinBox_specmin.setValue(colorMin)
-		(colorMax, ok) = settings.value("colorMax", -20).toInt()
-		self.settings_dialog.spinBox_specmax.setValue(colorMax)
-		
+		settings.beginGroup("Spectrogram")
+		self.spectrogram.restoreState(settings)
+
+		settings.beginGroup("Spectrum")
+		self.spectrum.restoreState(settings)
+
 		settings.endGroup()
 
 	# slot
@@ -234,11 +201,11 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		if self.display_timer.isActive():
 			self.logger.push("Timer stop")
 			self.display_timer.stop()
-			self.spectrogram_timer.stop()
+			self.spectrogram.timer.stop()
 		else:
 			self.logger.push("Timer start")
 			self.display_timer.start()
-			self.spectrogram_timer.start()
+			self.spectrogram.timer.start()
 
 	# slot
 	def display_timer_slot(self):
@@ -259,19 +226,6 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		
 		self.display_timer_time = (95.*self.display_timer_time + 5.*t.elapsed())/100.
 
-	# slot
-	def spectrogram_timer_slot(self):
-		(chunks, t) = self.audiobuffer.update(self.audiobackend.stream)
-		self.chunk_number += chunks
-		self.buffer_timer_time = (95.*self.buffer_timer_time + 5.*t)/100.
-
-		t = QtCore.QTime()
-		t.start()
-
-		self.spectrogram.update(self.audiobuffer)
-		
-		self.spectrogram_timer_time = (95.*self.spectrogram_timer_time + 5.*t.elapsed())/100.
-
 	# method
 	def statistics(self):
 		if not self.LabelLevel.isVisible():
@@ -289,9 +243,9 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		"Spectrogram painting: %.02f ms"\
 		% (self.chunk_number,
 		self.spectrum.fft_size*1000./SAMPLING_RATE,
-		self.period_ms,
+		self.spectrogram.period_ms,
 		self.display_timer_time,
-		self.spectrogram_timer_time,
+		self.spectrogram.spectrogram_timer_time,
 		self.buffer_timer_time,
 		self.levels.meter.m_ppValues[0].paint_time,
 		self.levels.meter.m_ppValues[1].paint_time,
@@ -300,67 +254,6 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		self.spectrogram.PlotZoneImage.paint_time)
 		
 		self.LabelLevel.setText(level_label)
-
-	# slot
-	def fftsizechanged(self, index):
-		self.logger.push("fft_size_changed slot %d %d %f" %(index, 2**index*32, 150000/2**index*32))
-		fft_size = 2**index*32
-		self.spectrum.setfftsize(fft_size)
-		self.spectrogram.setfftsize(fft_size)
-
-	# slot
-	def freqscalechanged(self, index):
-		self.logger.push("freq_scale slot %d" %index)
-		#if index == 2:
-		#	self.spectrum.PlotZoneSpect.setlogfreqscale()
-		#	self.logger.push("Warning: Spectrum widget still in base 10 logarithmic")
-		#	self.spectrogram.PlotZoneImage.setlog2freqscale()
-		#elif index == 1:
-		if index == 1:
-			self.spectrum.PlotZoneSpect.setlogfreqscale()
-			self.spectrogram.PlotZoneImage.setlog10freqscale()
-		else:
-			self.spectrum.PlotZoneSpect.setlinfreqscale()
-			self.spectrogram.PlotZoneImage.setlinfreqscale()
-
-	# slot
-	def minfreqchanged(self, freq):
-		self.spectrum.setminfreq(freq)
-		self.spectrogram.setminfreq(freq)
-
-	# slot
-	def maxfreqchanged(self, freq):
-		self.spectrum.setmaxfreq(freq)
-		self.spectrogram.setmaxfreq(freq)
-
-	# slot
-	def specmaxchanged(self, value):
-		self.spectrogram.setmax(value)
-		
-	# slot
-	def specminchanged(self, value):
-		self.spectrogram.setmin(value)
-
-	# slot
-	def timerangechanged(self, value):
-		self.timerange_s = value
-		self.spectrogram.PlotZoneImage.settimerange(value)
-		self.reset_timer()
-
-	# slot
-	def canvasWidthChanged(self, width):
-		self.canvas_width = width
-		self.reset_timer()
-
-	# method
-	def reset_timer(self):
-		# FIXME millisecond resolution is limiting !
-		# need to find a way to integrate this cleverly in the GUI
-		# When the period is smaller than 25 ms, we can reasonably
-		# try to draw as many columns at once as possible
-		self.period_ms = 1000.*self.timerange_s/self.canvas_width
-		self.logger.push("Resetting the timer, will fire every %d ms" %(self.period_ms))
-		self.spectrogram_timer.setInterval(self.period_ms)
 
 	# slot
 	def input_device_changed(self, index):

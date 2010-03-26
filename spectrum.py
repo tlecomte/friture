@@ -17,19 +17,25 @@
 # You should have received a copy of the GNU General Public License
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt4 import QtGui
+from PyQt4 import QtGui, QtCore
 from numpy import log10, where, linspace
 from Ui_spectrum import Ui_Spectrum_Widget
 import audioproc # audio processing class
+import spectrum_settings # settings dialog
 
 SMOOTH_DISPLAY_TIMER_PERIOD_MS = 25
 SAMPLING_RATE = 44100
 
 class Spectrum_Widget(QtGui.QWidget, Ui_Spectrum_Widget):
-	def __init__(self, parent = None):
+	def __init__(self, parent):
 		QtGui.QWidget.__init__(self, parent)
 		Ui_Spectrum_Widget.__init__(self)
-		
+
+		# store the logger instance
+		# FIXME
+		#self.logger = parent.parent().logger
+		self.logger = None
+
 		# Setup the user interface
 		self.setupUi(self)
 		
@@ -39,6 +45,12 @@ class Spectrum_Widget(QtGui.QWidget, Ui_Spectrum_Widget):
 		self.maxfreq = SAMPLING_RATE/2
 		self.minfreq = 0
 		self.fft_size = 256
+		
+		# initialize the settings dialog
+		self.settings_dialog = spectrum_settings.Spectrum_Settings_Dialog(self, self.logger)
+
+		# display the settings dialog
+		self.connect(self.pushButtonSettings, QtCore.SIGNAL('clicked(bool)'), self.settings_called)
 
 	# method
 	def update(self, audiobuffer):
@@ -53,7 +65,6 @@ class Spectrum_Widget(QtGui.QWidget, Ui_Spectrum_Widget):
 		db_spectrogram = 20*log10(sp + epsilon)
 		self.PlotZoneSpect.setdata(freq, db_spectrogram)
 
-
 	def setminfreq(self, freq):
 		self.minfreq = freq
 		self.PlotZoneSpect.setfreqrange(self.minfreq, self.maxfreq)
@@ -64,3 +75,20 @@ class Spectrum_Widget(QtGui.QWidget, Ui_Spectrum_Widget):
 
 	def setfftsize(self, fft_size):
 		self.fft_size = fft_size
+
+	def setmin(self, value):
+		# FIXME should change the plot range
+		self.spec_min = value
+	
+	def setmax(self, value):
+		# FIXME should change the plot range
+		self.spec_max = value
+
+	def settings_called(self, checked):
+		self.settings_dialog.show()
+	
+	def saveState(self, settings):
+		self.settings_dialog.saveState(settings)
+
+	def restoreState(self, settings):
+		self.settings_dialog.restoreState(settings)

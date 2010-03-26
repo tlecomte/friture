@@ -14,8 +14,15 @@
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0">
+   <item row="1" column="0">
     <widget class="SpectPlot" name="PlotZoneSpect" native="true"/>
+   </item>
+   <item row="0" column="0">
+    <widget class="QPushButton" name="pushButtonSettings">
+     <property name="text">
+      <string>Settings</string>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>
