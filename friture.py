@@ -119,6 +119,7 @@ class Friture(QtGui.QMainWindow, ):
 		self.display_timer.setInterval(SMOOTH_DISPLAY_TIMER_PERIOD_MS) # constant timing
 
 		# timer ticks
+		self.connect(self.display_timer, QtCore.SIGNAL('timeout()'), self.update_buffer)
 		self.connect(self.display_timer, QtCore.SIGNAL('timeout()'), self.display_timer_slot)
 		
 		# toolbar clicks
@@ -221,11 +222,13 @@ class Friture(QtGui.QMainWindow, ):
 			self.ui.spectrogram.timer.start()
 
 	# slot
-	def display_timer_slot(self):
+	def update_buffer(self):
 		(chunks, t) = self.audiobuffer.update(self.audiobackend.stream)
 		self.chunk_number += chunks
 		self.buffer_timer_time = (95.*self.buffer_timer_time + 5.*t)/100.
-		
+
+	# slot
+	def display_timer_slot(self):
 		t = QtCore.QTime()
 		t.start()
 		
