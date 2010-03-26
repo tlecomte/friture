@@ -91,11 +91,6 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		self.toolBar.addAction(statisticsAction)
 		self.toolBar.addAction(logAction)
 		
-		self.scopeIsVisible = True
-		self.statisticsIsVisible = True
-		self.levelsIsVisible = True
-		self.spectrumIsVisible = True
-
 		self.chunk_number = 0
 		
 		self.display_timer_time = 0.
