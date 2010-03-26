@@ -98,7 +98,6 @@ class Friture(QtGui.QMainWindow, ):
 		
 		self.chunk_number = 0
 		
-		self.display_timer_time = 0.
 		self.buffer_timer_time = 0.
 
 		# Initialize the audio data ring buffer
@@ -229,18 +228,10 @@ class Friture(QtGui.QMainWindow, ):
 
 	# slot
 	def display_timer_slot(self):
-		t = QtCore.QTime()
-		t.start()
-		
 		self.statistics()
-		
 		self.ui.levels.update(self.audiobuffer)
-		
 		self.ui.scope.update(self.audiobuffer)
-		
 		self.ui.spectrum.update(self.audiobuffer)
-		
-		self.display_timer_time = (95.*self.display_timer_time + 5.*t.elapsed())/100.
 
 	# method
 	def statistics(self):
@@ -250,7 +241,6 @@ class Friture(QtGui.QMainWindow, ):
 		level_label = "Chunk #%d\n"\
 		"FFT period : %.01f ms\n"\
 		"Spectrogram timer period : %.01f ms\n"\
-		"Levels, scope and spectrum computation: %.02f ms\n"\
 		"Spectrogram computation: %.02f ms\n"\
 		"Audio buffer retrieval: %.02f ms\n"\
 		"Levels painting: %.02f ms and %.02f ms\n"\
@@ -260,7 +250,6 @@ class Friture(QtGui.QMainWindow, ):
 		% (self.chunk_number,
 		self.ui.spectrum.fft_size*1000./SAMPLING_RATE,
 		self.ui.spectrogram.period_ms,
-		self.display_timer_time,
 		self.ui.spectrogram.spectrogram_timer_time,
 		self.buffer_timer_time,
 		self.ui.levels.meter.m_ppValues[0].paint_time,
