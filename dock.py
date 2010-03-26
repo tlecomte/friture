@@ -44,6 +44,7 @@ class Dock(QtGui.QDockWidget):
 			widget = Spectrum_Widget(self)
 		else:
 			widget = Spectrogram_Widget(self, self.logger)
+			widget.timer.start()
 		
 		widget.set_buffer(self.parent.audiobuffer)
 		
