@@ -127,13 +127,17 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		self.period_ms = SMOOTH_DISPLAY_TIMER_PERIOD_MS
 		self.spectrogram_timer.setInterval(self.period_ms) # variable timing
 
+		# timer ticks
 		self.connect(self.display_timer, QtCore.SIGNAL('timeout()'), self.display_timer_slot)
 		self.connect(self.spectrogram_timer, QtCore.SIGNAL('timeout()'), self.spectrogram_timer_slot)
 		
+		# toolbar clicks
 		self.connect(self.actionStart, QtCore.SIGNAL('triggered()'), self.timer_toggle)
 		self.connect(self.actionSettings, QtCore.SIGNAL('triggered()'), self.settings_called)
 		self.connect(self.actionAbout, QtCore.SIGNAL('triggered()'), self.about_called)
 		
+		self.connect(self.settings_dialog.comboBox_inputDevice, QtCore.SIGNAL('currentIndexChanged(int)'), self.input_device_changed)
+		# the settings below should go in a specific dialogs and classes
 		self.connect(self.settings_dialog.comboBox_freqscale, QtCore.SIGNAL('currentIndexChanged(int)'), self.freqscalechanged)
 		self.connect(self.settings_dialog.comboBox_fftsize, QtCore.SIGNAL('currentIndexChanged(int)'), self.fftsizechanged)
 		self.connect(self.settings_dialog.spinBox_specmax, QtCore.SIGNAL('valueChanged(int)'), self.specmaxchanged)
@@ -141,10 +145,11 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		self.connect(self.settings_dialog.doubleSpinBox_timerange, QtCore.SIGNAL('valueChanged(double)'), self.timerangechanged)
 		self.connect(self.settings_dialog.spinBox_minfreq, QtCore.SIGNAL('valueChanged(int)'), self.minfreqchanged)
 		self.connect(self.settings_dialog.spinBox_maxfreq, QtCore.SIGNAL('valueChanged(int)'), self.maxfreqchanged)
-		self.connect(self.settings_dialog.comboBox_inputDevice, QtCore.SIGNAL('currentIndexChanged(int)'), self.input_device_changed)
 
+		# window resize
 		self.connect(self.spectrogram.PlotZoneImage.plotImage.canvasscaledspectrogram, QtCore.SIGNAL("canvasWidthChanged"), self.canvasWidthChanged)
 		
+		# log change
 		self.connect(self.logger, QtCore.SIGNAL('logChanged'), self.log_changed)
 		self.connect(self.scrollArea_2.verticalScrollBar(), QtCore.SIGNAL('rangeChanged(int,int)'), self.log_scroll_range_changed)
 		
