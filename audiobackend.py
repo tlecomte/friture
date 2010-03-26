@@ -91,14 +91,15 @@ class AudioBackend(QtCore.QObject):
 		if self.try_input_device():
 			self.logger.push("Success")
 			previous_stream.close()
+			success = True
 		else:
 			self.logger.push("Fail")
-			self.emit(QtCore.SIGNAL('deviceReverted'))
 			self.stream.close()
 			self.stream = previous_stream
 			self.device_index = previous_index
+			success = False
 
-		return self.device_index
+		return success, self.device_index
 
 	# method
 	def open_stream(self, index):

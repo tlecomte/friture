@@ -147,7 +147,6 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		
 		self.connect(self.logger, QtCore.SIGNAL('logChanged'), self.log_changed)
 		self.connect(self.scrollArea_2.verticalScrollBar(), QtCore.SIGNAL('rangeChanged(int,int)'), self.log_scroll_range_changed)
-		self.connect(self.audiobackend, QtCore.SIGNAL('deviceReverted'), self.device_reverted)
 		
 		# restore the settings and widgets geometries
 		self.restoreAppState()
@@ -161,12 +160,6 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 	# update the log widget with the new log content
 	def log_changed(self):
 		self.LabelLog.setText(self.logger.text())
-	
-	# slot
-	def device_reverted(self):
-		error_message = QtGui.QErrorMessage(self)
-		error_message.setWindowTitle("Input device error")
-		error_message.showMessage("Impossible to use the selected device, reverting to the previous one")
 	
 	# slot
 	# scroll the log widget so that the last line is visible
@@ -370,9 +363,14 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		self.spectrogram_timer.stop()
 		self.actionStart.setChecked(False)
 		
-		index = self.audiobackend.select_input_device(index)
+		success, index = self.audiobackend.select_input_device(index)
 		
 		self.settings_dialog.comboBox_inputDevice.setCurrentIndex(index)
+		
+		if not success:
+			error_message = QtGui.QErrorMessage(self)
+			error_message.setWindowTitle("Input device error")
+			error_message.showMessage("Impossible to use the selected device, reverting to the previous one")
 		
 		self.display_timer.start()
 		self.spectrogram_timer.start()
