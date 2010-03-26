@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'friture.ui'
 #
-# Created: Wed Mar 24 15:58:44 2010
+# Created: Fri Mar 26 18:33:36 2010
 #      by: PyQt4 UI code generator 4.7
 #
 # WARNING! All changes made in this file will be lost!
@@ -188,9 +188,12 @@ class Ui_MainWindow(object):
         icon3.addPixmap(QtGui.QPixmap(":/about.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.actionAbout.setIcon(icon3)
         self.actionAbout.setObjectName("actionAbout")
+        self.actionNew_dock = QtGui.QAction(MainWindow)
+        self.actionNew_dock.setObjectName("actionNew_dock")
         self.toolBar.addAction(self.actionStart)
         self.toolBar.addAction(self.actionSettings)
         self.toolBar.addAction(self.actionAbout)
+        self.toolBar.addAction(self.actionNew_dock)
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
@@ -216,6 +219,8 @@ class Ui_MainWindow(object):
         self.actionSettings.setText(QtGui.QApplication.translate("MainWindow", "Settings", None, QtGui.QApplication.UnicodeUTF8))
         self.actionSettings.setToolTip(QtGui.QApplication.translate("MainWindow", "Display settings dialog", None, QtGui.QApplication.UnicodeUTF8))
         self.actionAbout.setText(QtGui.QApplication.translate("MainWindow", "About", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionNew_dock.setText(QtGui.QApplication.translate("MainWindow", "New dock", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionNew_dock.setToolTip(QtGui.QApplication.translate("MainWindow", "Add a new dock to Friture window", None, QtGui.QApplication.UnicodeUTF8))
 
 from spectrogram import Spectrogram_Widget
 from scope import Scope_Widget

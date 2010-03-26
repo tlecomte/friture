@@ -234,6 +234,7 @@ color: white;
    <addaction name="actionStart"/>
    <addaction name="actionSettings"/>
    <addaction name="actionAbout"/>
+   <addaction name="actionNew_dock"/>
   </widget>
   <widget class="QDockWidget" name="dockWidgetLog">
    <property name="windowTitle">
@@ -326,6 +327,14 @@ background: white
    </property>
    <property name="text">
     <string>About</string>
+   </property>
+  </action>
+  <action name="actionNew_dock">
+   <property name="text">
+    <string>New dock</string>
+   </property>
+   <property name="toolTip">
+    <string>Add a new dock to Friture window</string>
    </property>
   </action>
  </widget>

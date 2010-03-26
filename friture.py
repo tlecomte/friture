@@ -120,6 +120,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		self.connect(self.actionStart, QtCore.SIGNAL('triggered()'), self.timer_toggle)
 		self.connect(self.actionSettings, QtCore.SIGNAL('triggered()'), self.settings_called)
 		self.connect(self.actionAbout, QtCore.SIGNAL('triggered()'), self.about_called)
+		self.connect(self.actionNew_dock, QtCore.SIGNAL('triggered()'), self.new_dock_called)
 		
 		# settings signals
 		self.connect(self.settings_dialog.comboBox_inputDevice, QtCore.SIGNAL('currentIndexChanged(int)'), self.input_device_changed)
@@ -154,6 +155,10 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 	# slot
 	def about_called(self):
 		self.about_dialog.show()
+	
+	# slot
+	def new_dock_called(self):
+		print "plouf"
 	
 	# event handler
 	def closeEvent(self, event):
