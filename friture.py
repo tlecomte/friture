@@ -253,7 +253,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 	# slot
 	def input_device_changed(self, index):
 		self.display_timer.stop()
-		self.spectrogram_timer.stop()
+		self.spectrogram.timer.stop()
 		self.actionStart.setChecked(False)
 		
 		success, index = self.audiobackend.select_input_device(index)
@@ -266,7 +266,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 			error_message.showMessage("Impossible to use the selected device, reverting to the previous one")
 		
 		self.display_timer.start()
-		self.spectrogram_timer.start()
+		self.spectrogram.timer.start()
 		self.actionStart.setChecked(True)
 
 if __name__ == "__main__":
