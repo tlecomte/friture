@@ -19,6 +19,9 @@
 
 from PyQt4 import QtGui, QtCore
 from levels import Levels_Widget
+from spectrum import Spectrum_Widget
+from spectrogram import Spectrogram_Widget
+from scope import Scope_Widget
 
 class Dock(QtGui.QDockWidget):
 	def __init__(self, parent, logger, name):
@@ -26,9 +29,33 @@ class Dock(QtGui.QDockWidget):
 		
 		self.setObjectName(name)
 		
-		widget = Levels_Widget(self)
-		widget.set_buffer(parent.audiobuffer)
+		self.parent = parent
+		self.logger = logger
+		
+		self.widget_select(0)
+
+	# slot
+	def widget_select(self, item):
+		if item is 0:
+			widget = Levels_Widget(self)
+		elif item is 1:
+			widget = Scope_Widget(self)
+		elif item is 2:
+			widget = Spectrum_Widget(self)
+		else:
+			widget = Spectrogram_Widget(self, self.logger)
+		
+		widget.set_buffer(self.parent.audiobuffer)
+		
 		if widget.update is not None:
-			self.connect(parent.display_timer, QtCore.SIGNAL('timeout()'), widget.update)
-			
+			self.connect(self.parent.display_timer, QtCore.SIGNAL('timeout()'), widget.update)
+		
+		self.comboBox_select = QtGui.QComboBox(widget)
+		self.comboBox_select.addItem("Levels")
+		self.comboBox_select.addItem("Scope")
+		self.comboBox_select.addItem("Spectrum")
+		self.comboBox_select.addItem("Spectrogram")
+		self.comboBox_select.setCurrentIndex(item)
+		self.connect(self.comboBox_select, QtCore.SIGNAL('currentIndexChanged(int)'), self.widget_select)
+		
 		self.setWidget(widget)
