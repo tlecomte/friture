@@ -29,17 +29,23 @@ class Scope_Widget(QtGui.QWidget, Ui_Scope_Widget):
 		QtGui.QWidget.__init__(self, parent)
 		Ui_Scope_Widget.__init__(self)
 		
+		self.audiobuffer = None
+		
 		# Setup the user interface
 		self.setupUi(self)
 
 	# method
-	def update(self, audiobuffer):
+	def set_buffer(self, buffer):
+		self.audiobuffer = buffer
+
+	# method
+	def update(self):
 		if not self.isVisible():
 			return
 
 		time = SMOOTH_DISPLAY_TIMER_PERIOD_MS/1000.
 		#basic trigger capability on leading edge
-		floatdata = audiobuffer.data(time*SAMPLING_RATE)
+		floatdata = self.audiobuffer.data(time*SAMPLING_RATE)
 		max = floatdata.max()
 		trigger_level = max*2./3.
 		trigger_pos = where((floatdata[:-1] < trigger_level)*(floatdata[1:] >= trigger_level))[0]
@@ -47,7 +53,7 @@ class Scope_Widget(QtGui.QWidget, Ui_Scope_Widget):
 			shift = time*SAMPLING_RATE - trigger_pos[0]
 		else:
 			shift = 0
-		floatdata = audiobuffer.data(time*SAMPLING_RATE + shift)
+		floatdata = self.audiobuffer.data(time*SAMPLING_RATE + shift)
 		floatdata = floatdata[0 : time*SAMPLING_RATE]
 		y = floatdata - floatdata.mean()
 		

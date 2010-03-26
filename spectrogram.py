@@ -36,6 +36,8 @@ class Spectrogram_Widget(QtGui.QWidget, Ui_Spectrogram_Widget):
 		
 		self.parent = parent
 		
+		self.audiobuffer = None
+		
 		# Setup the user interface
 		self.setupUi(self)
 		
@@ -72,12 +74,16 @@ class Spectrogram_Widget(QtGui.QWidget, Ui_Spectrogram_Widget):
 		self.connect(self.PlotZoneImage.plotImage.canvasscaledspectrogram, QtCore.SIGNAL("canvasWidthChanged"), self.canvasWidthChanged)
 
 	# method
-	def update(self, audiobuffer):
+	def set_buffer(self, buffer):
+		self.audiobuffer = buffer
+
+	# method
+	def update(self):
 		if not self.isVisible():
 			return
 		
 		# FIXME We should allow here for more intelligent transforms, especially when the log freq scale is selected
-		floatdata = audiobuffer.data(self.fft_size)
+		floatdata = self.audiobuffer.data(self.fft_size)
 		sp, freq = self.proc.analyzelive(floatdata, self.fft_size, self.maxfreq)
 		# scale the db spectrum from [- spec_range db ... 0 db] > [0..1]
 		epsilon = 1e-30
@@ -142,6 +148,6 @@ class Spectrogram_Widget(QtGui.QWidget, Ui_Spectrogram_Widget):
 		t = QtCore.QTime()
 		t.start()
 
-		self.update(self.parent.parent().audiobuffer)
+		self.update()
 		
 		self.spectrogram_timer_time = (95.*self.spectrogram_timer_time + 5.*t.elapsed())/100.

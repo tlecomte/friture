@@ -36,6 +36,8 @@ class Spectrum_Widget(QtGui.QWidget, Ui_Spectrum_Widget):
 		#self.logger = parent.parent().logger
 		self.logger = None
 
+		self.audiobuffer = None
+
 		# Setup the user interface
 		self.setupUi(self)
 		
@@ -53,11 +55,15 @@ class Spectrum_Widget(QtGui.QWidget, Ui_Spectrum_Widget):
 		self.connect(self.pushButtonSettings, QtCore.SIGNAL('clicked(bool)'), self.settings_called)
 
 	# method
-	def update(self, audiobuffer):
+	def set_buffer(self, buffer):
+		self.audiobuffer = buffer
+
+	# method
+	def update(self):
 		if not self.isVisible():
 		    return
 		
-		floatdata = audiobuffer.data(self.fft_size)
+		floatdata = self.audiobuffer.data(self.fft_size)
 		sp, freq = self.proc.analyzelive(floatdata, self.fft_size, self.maxfreq)
 		#sp, freq = self.proc.analyzelive_cochlear(floatdata, 50, minfreq, maxfreq)
 		# scale the db spectrum from [- spec_range db ... 0 db] > [0..1]

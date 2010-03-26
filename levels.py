@@ -29,16 +29,22 @@ class Levels_Widget(QtGui.QWidget, Ui_Levels_Widget):
 		QtGui.QWidget.__init__(self, parent)
 		Ui_Levels_Widget.__init__(self)
 		
+		self.audiobuffer = None
+		
 		# Setup the user interface
 		self.setupUi(self)
 
 	# method
-	def update(self, audiobuffer):
+	def set_buffer(self, buffer):
+		self.audiobuffer = buffer
+
+	# method
+	def update(self):
 		if not self.isVisible():
 			return
 		
 		time = SMOOTH_DISPLAY_TIMER_PERIOD_MS/1000.
-		floatdata = audiobuffer.data(time*SAMPLING_RATE)
+		floatdata = self.audiobuffer.data(time*SAMPLING_RATE)
 		
 		level_rms = 10*log10((floatdata**2).sum()/len(floatdata)*2. + 0*1e-80) #*2. to get 0dB for a sine wave
 		level_max = 20*log10(abs(floatdata).max() + 0*1e-80)

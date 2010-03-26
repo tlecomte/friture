@@ -113,6 +113,12 @@ class Friture(QtGui.QMainWindow, ):
 		current_device = self.audiobackend.get_current_device()
 		self.settings_dialog.comboBox_inputDevice.setCurrentIndex(current_device)
 
+		# pass the audio buffer to the analysis widgets
+		self.ui.levels.set_buffer(self.audiobuffer)
+		self.ui.scope.set_buffer(self.audiobuffer)
+		self.ui.spectrum.set_buffer(self.audiobuffer)
+		self.ui.spectrogram.set_buffer(self.audiobuffer)
+
 		# this timer is used to update widgets that just need to display as fast as they can
 		self.display_timer = QtCore.QTimer()
 		self.display_timer.setInterval(SMOOTH_DISPLAY_TIMER_PERIOD_MS) # constant timing
@@ -229,9 +235,9 @@ class Friture(QtGui.QMainWindow, ):
 
 	# slot
 	def display_timer_slot(self):
-		self.ui.levels.update(self.audiobuffer)
-		self.ui.scope.update(self.audiobuffer)
-		self.ui.spectrum.update(self.audiobuffer)
+		self.ui.levels.update()
+		self.ui.scope.update()
+		self.ui.spectrum.update()
 
 	# method
 	def statistics(self):
