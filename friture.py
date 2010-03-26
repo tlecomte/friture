@@ -120,6 +120,7 @@ class Friture(QtGui.QMainWindow, ):
 		# timer ticks
 		self.connect(self.display_timer, QtCore.SIGNAL('timeout()'), self.update_buffer)
 		self.connect(self.display_timer, QtCore.SIGNAL('timeout()'), self.display_timer_slot)
+		self.connect(self.display_timer, QtCore.SIGNAL('timeout()'), self.statistics)
 		
 		# toolbar clicks
 		self.connect(self.ui.actionStart, QtCore.SIGNAL('triggered()'), self.timer_toggle)
@@ -228,7 +229,6 @@ class Friture(QtGui.QMainWindow, ):
 
 	# slot
 	def display_timer_slot(self):
-		self.statistics()
 		self.ui.levels.update(self.audiobuffer)
 		self.ui.scope.update(self.audiobuffer)
 		self.ui.spectrum.update(self.audiobuffer)
