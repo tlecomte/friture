@@ -27,12 +27,15 @@ SMOOTH_DISPLAY_TIMER_PERIOD_MS = 25
 SAMPLING_RATE = 44100
 
 class Spectrogram_Widget(QtGui.QWidget, Ui_Spectrogram_Widget):
-	def __init__(self, parent):
+	def __init__(self, parent, logger = None):
 		QtGui.QWidget.__init__(self, parent)
 		Ui_Spectrogram_Widget.__init__(self)
 		
 		# store the logger instance
-		self.logger = parent.parent().logger
+		if logger is None:
+		    self.logger = parent.parent().logger
+		else:
+		    self.logger = logger
 		
 		self.parent = parent
 		
