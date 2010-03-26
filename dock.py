@@ -26,9 +26,14 @@ class Dock(QtGui.QDockWidget):
 		
 		self.setObjectName(name)
 		
-		widget = Levels_Widget(self)
-		widget.set_buffer(parent.audiobuffer)
-		if widget.update is not None:
-			self.connect(parent.display_timer, QtCore.SIGNAL('timeout()'), widget.update)
-			
+		widget = QtGui.QWidget(self)
+		layout = QtGui.QVBoxLayout(widget)
+		
+		analysis_widget = Levels_Widget(widget)
+		analysis_widget.set_buffer(parent.audiobuffer)
+		if analysis_widget.update is not None:
+			self.connect(parent.display_timer, QtCore.SIGNAL('timeout()'), analysis_widget.update)
+		
+		layout.addWidget(analysis_widget)
+		widget.setLayout(layout)
 		self.setWidget(widget)
