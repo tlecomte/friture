@@ -20,6 +20,7 @@
 import sys, os, platform
 from PyQt4 import QtGui, QtCore
 from Ui_friture import Ui_MainWindow
+from levels import Levels_Widget
 import about # About dialog
 import settings # Setting dialog
 import logger # Logging class
@@ -59,7 +60,7 @@ import audiobackend # audio backend class
 SAMPLING_RATE = 44100
 SMOOTH_DISPLAY_TIMER_PERIOD_MS = 25
 
-class Friture(QtGui.QMainWindow, Ui_MainWindow):
+class Friture(QtGui.QMainWindow, ):
 	def __init__(self, logger):
 		QtGui.QMainWindow.__init__(self)
 		Ui_MainWindow.__init__(self)
@@ -68,16 +69,17 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		self.logger = logger
 
 		# Setup the user interface
-		self.setupUi(self)
+		self.ui = Ui_MainWindow()
+		self.ui.setupUi(self)
 		
 		self.settings_dialog = settings.Settings_Dialog()
 		self.about_dialog = about.About_Dialog()
 		
-		levelsAction = self.dockWidgetLevels.toggleViewAction()
-		scopeAction = self.dockWidgetScope.toggleViewAction()
-		spectrumAction = self.dockWidgetSpectrum.toggleViewAction()
-		statisticsAction = self.dockWidgetStatistics.toggleViewAction()
-		logAction = self.dockWidgetLog.toggleViewAction()
+		levelsAction = self.ui.dockWidgetLevels.toggleViewAction()
+		scopeAction = self.ui.dockWidgetScope.toggleViewAction()
+		spectrumAction = self.ui.dockWidgetSpectrum.toggleViewAction()
+		statisticsAction = self.ui.dockWidgetStatistics.toggleViewAction()
+		logAction = self.ui.dockWidgetLog.toggleViewAction()
 		
 		levelsAction.setIcon(QtGui.QIcon(":/levels.svg"))
 		scopeAction.setIcon(QtGui.QIcon(":/scope.svg"))
@@ -85,11 +87,14 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		statisticsAction.setIcon(QtGui.QIcon(":/statistics.svg"))
 		logAction.setIcon(QtGui.QIcon(":/log.svg"))
 		
-		self.toolBar.addAction(levelsAction)
-		self.toolBar.addAction(scopeAction)
-		self.toolBar.addAction(spectrumAction)
-		self.toolBar.addAction(statisticsAction)
-		self.toolBar.addAction(logAction)
+		self.ui.toolBar.addAction(levelsAction)
+		self.ui.toolBar.addAction(scopeAction)
+		self.ui.toolBar.addAction(spectrumAction)
+		self.ui.toolBar.addAction(statisticsAction)
+		self.ui.toolBar.addAction(logAction)
+		
+		# list of docks
+		self.docks = []
 		
 		self.chunk_number = 0
 		
@@ -117,17 +122,17 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		self.connect(self.display_timer, QtCore.SIGNAL('timeout()'), self.display_timer_slot)
 		
 		# toolbar clicks
-		self.connect(self.actionStart, QtCore.SIGNAL('triggered()'), self.timer_toggle)
-		self.connect(self.actionSettings, QtCore.SIGNAL('triggered()'), self.settings_called)
-		self.connect(self.actionAbout, QtCore.SIGNAL('triggered()'), self.about_called)
-		self.connect(self.actionNew_dock, QtCore.SIGNAL('triggered()'), self.new_dock_called)
+		self.connect(self.ui.actionStart, QtCore.SIGNAL('triggered()'), self.timer_toggle)
+		self.connect(self.ui.actionSettings, QtCore.SIGNAL('triggered()'), self.settings_called)
+		self.connect(self.ui.actionAbout, QtCore.SIGNAL('triggered()'), self.about_called)
+		self.connect(self.ui.actionNew_dock, QtCore.SIGNAL('triggered()'), self.new_dock_called)
 		
 		# settings signals
 		self.connect(self.settings_dialog.comboBox_inputDevice, QtCore.SIGNAL('currentIndexChanged(int)'), self.input_device_changed)
 
 		# log change
 		self.connect(self.logger, QtCore.SIGNAL('logChanged'), self.log_changed)
-		self.connect(self.scrollArea_2.verticalScrollBar(), QtCore.SIGNAL('rangeChanged(int,int)'), self.log_scroll_range_changed)
+		self.connect(self.ui.scrollArea_2.verticalScrollBar(), QtCore.SIGNAL('rangeChanged(int,int)'), self.log_scroll_range_changed)
 		
 		# restore the settings and widgets geometries
 		self.restoreAppState()
@@ -140,12 +145,12 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 	# slot
 	# update the log widget with the new log content
 	def log_changed(self):
-		self.LabelLog.setText(self.logger.text())
+		self.ui.LabelLog.setText(self.logger.text())
 	
 	# slot
 	# scroll the log widget so that the last line is visible
 	def log_scroll_range_changed(self, min, max):
-		scrollbar = self.scrollArea_2.verticalScrollBar()
+		scrollbar = self.ui.scrollArea_2.verticalScrollBar()
 		scrollbar.setValue(max)
 	
 	# slot
@@ -158,7 +163,15 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 	
 	# slot
 	def new_dock_called(self):
-		print "plouf"
+		index = len(self.docks)
+		name = "Dock %d" %index
+		new_dock = QtGui.QDockWidget(name, self)
+		new_dock.setObjectName(name)
+		self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, new_dock)
+		widget = Levels_Widget(new_dock)
+		new_dock.setWidget(widget)
+		#self.connect(self.display_timer, QtCore.SIGNAL('timeout()'),new_dock.display_timer_slot)
+		self.docks += [new_dock]
 	
 	# event handler
 	def closeEvent(self, event):
@@ -174,10 +187,10 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		settings.setValue("windowState", windowState)
 		
 		settings.beginGroup("Spectrogram")
-		self.spectrogram.saveState(settings)
+		self.ui.spectrogram.saveState(settings)
 		
 		settings.beginGroup("Spectrum")
-		self.spectrum.saveState(settings)
+		self.ui.spectrum.saveState(settings)
 		
 		settings.endGroup()
 	
@@ -189,10 +202,10 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		self.restoreState(settings.value("windowState").toByteArray())
 		
 		settings.beginGroup("Spectrogram")
-		self.spectrogram.restoreState(settings)
+		self.ui.spectrogram.restoreState(settings)
 
 		settings.beginGroup("Spectrum")
-		self.spectrum.restoreState(settings)
+		self.ui.spectrum.restoreState(settings)
 
 		settings.endGroup()
 
@@ -201,11 +214,11 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		if self.display_timer.isActive():
 			self.logger.push("Timer stop")
 			self.display_timer.stop()
-			self.spectrogram.timer.stop()
+			self.ui.spectrogram.timer.stop()
 		else:
 			self.logger.push("Timer start")
 			self.display_timer.start()
-			self.spectrogram.timer.start()
+			self.ui.spectrogram.timer.start()
 
 	# slot
 	def display_timer_slot(self):
@@ -218,17 +231,17 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		
 		self.statistics()
 		
-		self.levels.update(self.audiobuffer)
+		self.ui.levels.update(self.audiobuffer)
 		
-		self.scope.update(self.audiobuffer)
+		self.ui.scope.update(self.audiobuffer)
 		
-		self.spectrum.update(self.audiobuffer)
+		self.ui.spectrum.update(self.audiobuffer)
 		
 		self.display_timer_time = (95.*self.display_timer_time + 5.*t.elapsed())/100.
 
 	# method
 	def statistics(self):
-		if not self.LabelLevel.isVisible():
+		if not self.ui.LabelLevel.isVisible():
 		    return
 		    
 		level_label = "Chunk #%d\n"\
@@ -242,24 +255,24 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 		"Spectrum painting: %.02f ms\n"\
 		"Spectrogram painting: %.02f ms"\
 		% (self.chunk_number,
-		self.spectrum.fft_size*1000./SAMPLING_RATE,
-		self.spectrogram.period_ms,
+		self.ui.spectrum.fft_size*1000./SAMPLING_RATE,
+		self.ui.spectrogram.period_ms,
 		self.display_timer_time,
-		self.spectrogram.spectrogram_timer_time,
+		self.ui.spectrogram.spectrogram_timer_time,
 		self.buffer_timer_time,
-		self.levels.meter.m_ppValues[0].paint_time,
-		self.levels.meter.m_ppValues[1].paint_time,
-		self.scope.PlotZoneUp.paint_time,
-		self.spectrum.PlotZoneSpect.paint_time,
-		self.spectrogram.PlotZoneImage.paint_time)
+		self.ui.levels.meter.m_ppValues[0].paint_time,
+		self.ui.levels.meter.m_ppValues[1].paint_time,
+		self.ui.scope.PlotZoneUp.paint_time,
+		self.ui.spectrum.PlotZoneSpect.paint_time,
+		self.ui.spectrogram.PlotZoneImage.paint_time)
 		
-		self.LabelLevel.setText(level_label)
+		self.ui.LabelLevel.setText(level_label)
 
 	# slot
 	def input_device_changed(self, index):
 		self.display_timer.stop()
-		self.spectrogram.timer.stop()
-		self.actionStart.setChecked(False)
+		self.ui.spectrogram.timer.stop()
+		self.ui.actionStart.setChecked(False)
 		
 		success, index = self.audiobackend.select_input_device(index)
 		
@@ -271,7 +284,7 @@ class Friture(QtGui.QMainWindow, Ui_MainWindow):
 			error_message.showMessage("Impossible to use the selected device, reverting to the previous one")
 		
 		self.display_timer.start()
-		self.spectrogram.timer.start()
+		self.ui.spectrogram.timer.start()
 		self.actionStart.setChecked(True)
 
 if __name__ == "__main__":
