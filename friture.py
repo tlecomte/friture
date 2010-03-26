@@ -20,7 +20,7 @@
 import sys, os, platform
 from PyQt4 import QtGui, QtCore
 from Ui_friture import Ui_MainWindow
-from levels import Levels_Widget
+from dock import Dock
 import about # About dialog
 import settings # Setting dialog
 import logger # Logging class
@@ -174,14 +174,9 @@ class Friture(QtGui.QMainWindow, ):
 	def new_dock_called(self):
 		index = len(self.docks)
 		name = "Dock %d" %index
-		new_dock = QtGui.QDockWidget(name, self)
-		new_dock.setObjectName(name)
+		new_dock = Dock(self, self.logger, name)
 		self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, new_dock)
-		widget = Levels_Widget(new_dock)
-		new_dock.setWidget(widget)
-		widget.set_buffer(self.audiobuffer)
-		if widget.update is not None:
-		    self.connect(self.display_timer, QtCore.SIGNAL('timeout()'), widget.update)
+		
 		self.docks += [new_dock]
 	
 	# event handler
