@@ -73,12 +73,16 @@ class Spectrogram_Widget(QtGui.QWidget, Ui_Spectrogram_Widget):
 		# window resize
 		self.connect(self.PlotZoneImage.plotImage.canvasscaledspectrogram, QtCore.SIGNAL("canvasWidthChanged"), self.canvasWidthChanged)
 
+		# we do not use the display timer since we have a special one
+		# tell the caller by setting this variable as None
+		self.update = None
+
 	# method
 	def set_buffer(self, buffer):
 		self.audiobuffer = buffer
 
 	# method
-	def update(self):
+	def custom_update(self):
 		if not self.isVisible():
 			return
 		
@@ -148,6 +152,6 @@ class Spectrogram_Widget(QtGui.QWidget, Ui_Spectrogram_Widget):
 		t = QtCore.QTime()
 		t.start()
 
-		self.update()
+		self.custom_update()
 		
 		self.spectrogram_timer_time = (95.*self.spectrogram_timer_time + 5.*t.elapsed())/100.

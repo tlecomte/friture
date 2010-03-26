@@ -179,7 +179,9 @@ class Friture(QtGui.QMainWindow, ):
 		self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, new_dock)
 		widget = Levels_Widget(new_dock)
 		new_dock.setWidget(widget)
-		#self.connect(self.display_timer, QtCore.SIGNAL('timeout()'),new_dock.display_timer_slot)
+		widget.set_buffer(self.audiobuffer)
+		if widget.update is not None:
+		    self.connect(self.display_timer, QtCore.SIGNAL('timeout()'), widget.update)
 		self.docks += [new_dock]
 	
 	# event handler
