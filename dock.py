@@ -67,21 +67,21 @@ class Dock(QtGui.QDockWidget):
 	# slot
 	def widget_select(self, item):
 		if item is 0:
-			widget = Levels_Widget(self)
+			self.audiowidget = Levels_Widget(self)
 		elif item is 1:
-			widget = Scope_Widget(self)
+			self.audiowidget = Scope_Widget(self)
 		elif item is 2:
-			widget = Spectrum_Widget(self)
+			self.audiowidget = Spectrum_Widget(self)
 		else:
-			widget = Spectrogram_Widget(self, self.logger)
-			widget.timer.start()
+			self.audiowidget = Spectrogram_Widget(self, self.logger)
+			self.audiowidget.timer.start()
 		
-		widget.set_buffer(self.parent.audiobuffer)
+		self.audiowidget.set_buffer(self.parent.audiobuffer)
 		
-		if widget.update is not None:
-			self.connect(self.parent.display_timer, QtCore.SIGNAL('timeout()'), widget.update)
+		if self.audiowidget.update is not None:
+			self.connect(self.parent.display_timer, QtCore.SIGNAL('timeout()'), self.audiowidget.update)
 		
-		self.setWidget(widget)
+		self.setWidget(self.audiowidget)
 
 	# slot
 	def settings_slot(self, checked):
