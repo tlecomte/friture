@@ -32,6 +32,32 @@ class Dock(QtGui.QDockWidget):
 		self.parent = parent
 		self.logger = logger
 		
+		self.controlWidget = QtGui.QWidget(self)
+		self.layout = QtGui.QHBoxLayout(self.controlWidget)
+		
+		self.comboBox_select = QtGui.QComboBox(self.controlWidget)
+		self.comboBox_select.addItem("Levels")
+		self.comboBox_select.addItem("Scope")
+		self.comboBox_select.addItem("Spectrum")
+		self.comboBox_select.addItem("Spectrogram")
+		self.comboBox_select.setCurrentIndex(0)
+		
+		self.settingsButton = QtGui.QPushButton ("Settings", self.controlWidget)
+		self.undockButton = QtGui.QPushButton ("Undock", self.controlWidget)
+		self.closeButton = QtGui.QPushButton ("Close", self.controlWidget)
+		
+		self.connect(self.comboBox_select, QtCore.SIGNAL('currentIndexChanged(int)'), self.widget_select)
+		self.connect(self.settingsButton, QtCore.SIGNAL('clicked(bool)'), self.settings_slot)
+		self.connect(self.undockButton, QtCore.SIGNAL('clicked(bool)'), self.undock_slot)
+		self.connect(self.closeButton, QtCore.SIGNAL('clicked(bool)'), self.close_slot)
+		
+		self.layout.addWidget(self.comboBox_select)
+		self.layout.addWidget(self.settingsButton)
+		self.layout.addWidget(self.undockButton)
+		self.layout.addWidget(self.closeButton)
+		
+		self.setTitleBarWidget(self.controlWidget)
+		
 		self.widget_select(0)
 
 	# slot
@@ -51,12 +77,16 @@ class Dock(QtGui.QDockWidget):
 		if widget.update is not None:
 			self.connect(self.parent.display_timer, QtCore.SIGNAL('timeout()'), widget.update)
 		
-		self.comboBox_select = QtGui.QComboBox(widget)
-		self.comboBox_select.addItem("Levels")
-		self.comboBox_select.addItem("Scope")
-		self.comboBox_select.addItem("Spectrum")
-		self.comboBox_select.addItem("Spectrogram")
-		self.comboBox_select.setCurrentIndex(item)
-		self.connect(self.comboBox_select, QtCore.SIGNAL('currentIndexChanged(int)'), self.widget_select)
-		
 		self.setWidget(widget)
+
+	# slot
+	def settings_slot(self, checked):
+		self.widget().settings_called(checked)
+
+	# slot
+	def undock_slot(self, checked):
+		self.setFloating(True)
+
+	# slot
+	def close_slot(self, checked):
+		self.close()
