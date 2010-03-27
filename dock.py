@@ -85,13 +85,16 @@ class Dock(QtGui.QDockWidget):
 		self.floatingcomboBox_select.setCurrentIndex(0)
 		
 		self.floatingsettingsButton = QtGui.QPushButton ("Settings", self.floatingcontrolWidget)
+		self.floatingdockButton = QtGui.QPushButton ("Dock", self.floatingcontrolWidget)
 		
 		self.connect(self.floatingcomboBox_select, QtCore.SIGNAL('activated(int)'), self.widget_select)
 		self.connect(self.floatingsettingsButton, QtCore.SIGNAL('clicked(bool)'), self.settings_slot)
+		self.connect(self.floatingdockButton, QtCore.SIGNAL('clicked(bool)'), self.dock_slot)
 		
 		self.floatingcontrolLayout.addWidget(self.floatingcomboBox_select)
 		self.floatingcontrolLayout.addStretch()
 		self.floatingcontrolLayout.addWidget(self.floatingsettingsButton)
+		self.floatingcontrolLayout.addWidget(self.floatingdockButton)
 		
 		self.dockwidget = QtGui.QWidget(self)
 		self.floatingLayout = QtGui.QVBoxLayout(self.dockwidget)
@@ -144,6 +147,10 @@ class Dock(QtGui.QDockWidget):
 	# slot
 	def undock_slot(self, checked):
 		self.setFloating(True)
+	
+	# slot
+	def dock_slot(self, checked):
+		self.setFloating(False)
 
 	# slot
 	def close_slot(self, checked):
