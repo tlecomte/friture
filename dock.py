@@ -35,7 +35,7 @@ color: black;
 }"""
 
 class Dock(QtGui.QDockWidget):
-	def __init__(self, parent, logger, name):
+	def __init__(self, parent, logger, name, type = 0):
 		QtGui.QDockWidget.__init__(self, name, parent)
 		
 		self.setObjectName(name)
@@ -115,7 +115,7 @@ class Dock(QtGui.QDockWidget):
 		self.setWidget(self.dockwidget)
 		
 		self.audiowidget = None
-		self.widget_select(0)
+		self.widget_select(type)
 
 	# slot
 	def widget_select(self, item):
