@@ -33,7 +33,7 @@ class Dock(QtGui.QDockWidget):
 		self.logger = logger
 		
 		self.controlWidget = QtGui.QWidget(self)
-		self.layout = QtGui.QHBoxLayout(self.controlWidget)
+		self.controlLayout = QtGui.QHBoxLayout(self.controlWidget)
 		
 		self.comboBox_select = QtGui.QComboBox(self.controlWidget)
 		self.comboBox_select.addItem("Levels")
@@ -51,10 +51,12 @@ class Dock(QtGui.QDockWidget):
 		self.connect(self.undockButton, QtCore.SIGNAL('clicked(bool)'), self.undock_slot)
 		self.connect(self.closeButton, QtCore.SIGNAL('clicked(bool)'), self.close_slot)
 		
-		self.layout.addWidget(self.comboBox_select)
-		self.layout.addWidget(self.settingsButton)
-		self.layout.addWidget(self.undockButton)
-		self.layout.addWidget(self.closeButton)
+		self.controlLayout.addWidget(self.comboBox_select)
+		self.controlLayout.addWidget(self.settingsButton)
+		self.controlLayout.addWidget(self.undockButton)
+		self.controlLayout.addWidget(self.closeButton)
+		
+		self.controlWidget.setLayout(self.controlLayout)
 		
 		self.setTitleBarWidget(self.controlWidget)
 		
