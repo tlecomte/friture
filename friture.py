@@ -169,6 +169,7 @@ class Friture(QtGui.QMainWindow, ):
 	
 	# slot
 	def new_dock_called(self):
+		# FIXME the dock objectName should be unique
 		index = len(self.docks)
 		name = "Dock %d" %index
 		new_dock = Dock(self, self.logger, name)
