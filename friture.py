@@ -93,9 +93,6 @@ class Friture(QtGui.QMainWindow, ):
 		self.ui.toolBar.addAction(statisticsAction)
 		self.ui.toolBar.addAction(logAction)
 		
-		# list of docks
-		self.docks = []
-		
 		self.chunk_number = 0
 		
 		self.buffer_timer_time = 0.
@@ -189,6 +186,10 @@ class Friture(QtGui.QMainWindow, ):
 		windowState = self.saveState()
 		settings = QtCore.QSettings("Friture", "Friture")
 		
+		settings.beginGroup("Docks")
+		docks = [dock.objectName() for dock in self.docks]
+		settings.setValue("dockStates", docks)
+		
 		settings.beginGroup("MainWindow")
 		settings.setValue("windowState", windowState)
 		
@@ -203,7 +204,13 @@ class Friture(QtGui.QMainWindow, ):
 	# method
 	def restoreAppState(self):
 		settings = QtCore.QSettings("Friture", "Friture")
-		
+
+		settings.beginGroup("Docks")
+		docks = settings.value("dockStates", []).toList()
+		docknames = [dock.toString() for dock in docks]
+		# list of docks
+		self.docks = [Dock(self, self.logger, name) for name in docknames]
+
 		settings.beginGroup("MainWindow")
 		self.restoreState(settings.value("windowState").toByteArray())
 		
