@@ -187,8 +187,8 @@ class Friture(QtGui.QMainWindow, ):
 		settings = QtCore.QSettings("Friture", "Friture")
 		
 		settings.beginGroup("Docks")
-		docks = [dock.objectName() for dock in self.docks]
-		settings.setValue("dockStates", docks)
+		docknames = [dock.objectName() for dock in self.docks]
+		settings.setValue("dockNames", docknames)
 		
 		settings.beginGroup("MainWindow")
 		settings.setValue("windowState", windowState)
@@ -206,8 +206,8 @@ class Friture(QtGui.QMainWindow, ):
 		settings = QtCore.QSettings("Friture", "Friture")
 
 		settings.beginGroup("Docks")
-		docks = settings.value("dockStates", []).toList()
-		docknames = [dock.toString() for dock in docks]
+		docknames = settings.value("dockNames", []).toList()
+		docknames = [dockname.toString() for dockname in docknames]
 		# list of docks
 		self.docks = [Dock(self, self.logger, name) for name in docknames]
 
