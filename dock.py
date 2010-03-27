@@ -52,6 +52,7 @@ class Dock(QtGui.QDockWidget):
 		self.connect(self.closeButton, QtCore.SIGNAL('clicked(bool)'), self.close_slot)
 		
 		self.controlLayout.addWidget(self.comboBox_select)
+		self.controlLayout.addStretch()
 		self.controlLayout.addWidget(self.settingsButton)
 		self.controlLayout.addWidget(self.undockButton)
 		self.controlLayout.addWidget(self.closeButton)
@@ -115,6 +116,7 @@ class Dock(QtGui.QDockWidget):
 			self.connect(self.floatingsettingsButton, QtCore.SIGNAL('clicked(bool)'), self.settings_slot)
 		
 			self.floatingcontrolLayout.addWidget(self.floatingcomboBox_select)
+			self.floatingcontrolLayout.addStretch()
 			self.floatingcontrolLayout.addWidget(self.floatingsettingsButton)
 		
 			self.floatingcontrolWidget.setLayout(self.floatingcontrolLayout)
