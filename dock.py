@@ -46,7 +46,7 @@ class Dock(QtGui.QDockWidget):
 		self.undockButton = QtGui.QPushButton ("Undock", self.controlWidget)
 		self.closeButton = QtGui.QPushButton ("Close", self.controlWidget)
 		
-		self.connect(self.comboBox_select, QtCore.SIGNAL('currentIndexChanged(int)'), self.widget_select)
+		self.connect(self.comboBox_select, QtCore.SIGNAL('activated(int)'), self.widget_select)
 		self.connect(self.settingsButton, QtCore.SIGNAL('clicked(bool)'), self.settings_slot)
 		self.connect(self.undockButton, QtCore.SIGNAL('clicked(bool)'), self.undock_slot)
 		self.connect(self.closeButton, QtCore.SIGNAL('clicked(bool)'), self.close_slot)
@@ -61,12 +61,44 @@ class Dock(QtGui.QDockWidget):
 		
 		self.setTitleBarWidget(self.controlWidget)
 		
-		self.widget_select(0)
-		
 		self.connect(self, QtCore.SIGNAL("topLevelChanged(bool)"), self.topLevelChanged_slot)
+		
+		self.floatingcontrolWidget = QtGui.QWidget(self)
+		self.floatingcontrolLayout = QtGui.QHBoxLayout(self.floatingcontrolWidget)
+		
+		self.floatingcomboBox_select = QtGui.QComboBox(self.floatingcontrolWidget)
+		self.floatingcomboBox_select.addItem("Levels")
+		self.floatingcomboBox_select.addItem("Scope")
+		self.floatingcomboBox_select.addItem("Spectrum")
+		self.floatingcomboBox_select.addItem("Spectrogram")
+		self.floatingcomboBox_select.setCurrentIndex(0)
+		
+		self.floatingsettingsButton = QtGui.QPushButton ("Settings", self.floatingcontrolWidget)
+		
+		self.connect(self.floatingcomboBox_select, QtCore.SIGNAL('activated(int)'), self.widget_select)
+		self.connect(self.floatingsettingsButton, QtCore.SIGNAL('clicked(bool)'), self.settings_slot)
+		
+		self.floatingcontrolLayout.addWidget(self.floatingcomboBox_select)
+		self.floatingcontrolLayout.addStretch()
+		self.floatingcontrolLayout.addWidget(self.floatingsettingsButton)
+		
+		self.dockwidget = QtGui.QWidget(self)
+		self.floatingLayout = QtGui.QVBoxLayout(self.dockwidget)
+		self.floatingLayout.addWidget(self.floatingcontrolWidget)
+		self.dockwidget.setLayout(self.floatingLayout)
+		
+		self.floatingcontrolWidget.hide()
+		
+		self.setWidget(self.dockwidget)
+		
+		self.audiowidget = None
+		self.widget_select(0)
 
 	# slot
 	def widget_select(self, item):
+		if self.audiowidget is not None:
+		    self.audiowidget.close()
+		
 		if item is 0:
 			self.audiowidget = Levels_Widget(self)
 		elif item is 1:
@@ -81,12 +113,15 @@ class Dock(QtGui.QDockWidget):
 		
 		if self.audiowidget.update is not None:
 			self.connect(self.parent.display_timer, QtCore.SIGNAL('timeout()'), self.audiowidget.update)
+
+		self.floatingLayout.addWidget(self.audiowidget)
 		
-		self.setWidget(self.audiowidget)
+		self.floatingcomboBox_select.setCurrentIndex(item)
+		self.comboBox_select.setCurrentIndex(item)
 
 	# slot
 	def settings_slot(self, checked):
-		self.widget().settings_called(checked)
+		self.audiowidget.settings_called(checked)
 
 	# slot
 	def undock_slot(self, checked):
@@ -100,33 +135,8 @@ class Dock(QtGui.QDockWidget):
 	def topLevelChanged_slot(self, topLevel):
 		if topLevel:
 			self.setTitleBarWidget(None)
-			self.floatingcontrolWidget = QtGui.QWidget(self)
-			self.floatingcontrolLayout = QtGui.QHBoxLayout(self.floatingcontrolWidget)
-		
-			self.floatingcomboBox_select = QtGui.QComboBox(self.floatingcontrolWidget)
-			self.floatingcomboBox_select.addItem("Levels")
-			self.floatingcomboBox_select.addItem("Scope")
-			self.floatingcomboBox_select.addItem("Spectrum")
-			self.floatingcomboBox_select.addItem("Spectrogram")
-			self.floatingcomboBox_select.setCurrentIndex(0)
-		
-			self.floatingsettingsButton = QtGui.QPushButton ("Settings", self.floatingcontrolWidget)
-		
-			self.connect(self.floatingcomboBox_select, QtCore.SIGNAL('currentIndexChanged(int)'), self.widget_select)
-			self.connect(self.floatingsettingsButton, QtCore.SIGNAL('clicked(bool)'), self.settings_slot)
-		
-			self.floatingcontrolLayout.addWidget(self.floatingcomboBox_select)
-			self.floatingcontrolLayout.addStretch()
-			self.floatingcontrolLayout.addWidget(self.floatingsettingsButton)
-		
-			self.floatingcontrolWidget.setLayout(self.floatingcontrolLayout)
-		
-			self.dockwidget = QtGui.QWidget(self)
-			self.floatingLayout = QtGui.QVBoxLayout(self.dockwidget)
-			self.floatingLayout.addWidget(self.floatingcontrolWidget)
-			self.floatingLayout.addWidget(self.audiowidget)
-			self.dockwidget.setLayout(self.floatingLayout)
-			self.setWidget(self.dockwidget)
+			self.floatingcontrolWidget.show()
+
 		else:
 			self.setTitleBarWidget(self.controlWidget)
-			self.setWidget(self.audiowidget)
+			self.floatingcontrolWidget.hide()
