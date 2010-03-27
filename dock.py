@@ -59,6 +59,8 @@ class Dock(QtGui.QDockWidget):
 		self.setTitleBarWidget(self.controlWidget)
 		
 		self.widget_select(0)
+		
+		self.connect(self, QtCore.SIGNAL("topLevelChanged(bool)"), self.topLevelChanged_slot)
 
 	# slot
 	def widget_select(self, item):
@@ -86,7 +88,15 @@ class Dock(QtGui.QDockWidget):
 	# slot
 	def undock_slot(self, checked):
 		self.setFloating(True)
+		self.setTitleBarWidget(None)
 
 	# slot
 	def close_slot(self, checked):
 		self.close()
+	
+	# slot
+	def topLevelChanged_slot(self, topLevel):
+		if topLevel:
+			self.setTitleBarWidget(None)
+		else:
+			self.setTitleBarWidget(self.controlWidget)
