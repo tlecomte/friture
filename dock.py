@@ -107,7 +107,9 @@ class Dock(QtGui.QDockWidget):
 		self.floatingcontrolLayout.setContentsMargins(0, 0, 0, 0)
 		self.controlLayout.setContentsMargins(0, 0, 0, 0)
 		self.controlWidget.setObjectName("controlWidget")
+		self.controlWidget.setMaximumHeight(24)
 		self.floatingcontrolWidget.setObjectName("floatingcontrolWidget")
+		self.floatingcontrolWidget.setMaximumHeight(24)
 		self.setStyleSheet(STYLESHEET)
 		
 		self.setWidget(self.dockwidget)
