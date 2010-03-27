@@ -89,6 +89,11 @@ class Dock(QtGui.QDockWidget):
 		
 		self.floatingcontrolWidget.hide()
 		
+		self.floatingLayout.setContentsMargins(0, 0, 0, 0)
+		self.floatingcontrolLayout.setContentsMargins(0, 0, 0, 0)
+		self.controlLayout.setContentsMargins(0, 0, 0, 0)
+		#self.setStyleSheet("QWidget {margin: 0px; padding: 0 px}")
+		
 		self.setWidget(self.dockwidget)
 		
 		self.audiowidget = None
