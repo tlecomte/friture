@@ -23,6 +23,17 @@ from spectrum import Spectrum_Widget
 from spectrogram import Spectrogram_Widget
 from scope import Scope_Widget
 
+STYLESHEET = """QWidget#controlWidget, QWidget#floatingcontrolWidget {
+border: none;
+background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+stop: 0 #a6a6a6, stop: 0.08 #7f7f7f,
+stop: 0.39999 #717171, stop: 0.4 #626262,
+stop: 0.9 #4c4c4c, stop: 1 #333333);
+}
+QComboBox {
+color: black;
+}"""
+
 class Dock(QtGui.QDockWidget):
 	def __init__(self, parent, logger, name):
 		QtGui.QDockWidget.__init__(self, name, parent)
@@ -92,7 +103,9 @@ class Dock(QtGui.QDockWidget):
 		self.floatingLayout.setContentsMargins(0, 0, 0, 0)
 		self.floatingcontrolLayout.setContentsMargins(0, 0, 0, 0)
 		self.controlLayout.setContentsMargins(0, 0, 0, 0)
-		#self.setStyleSheet("QWidget {margin: 0px; padding: 0 px}")
+		self.controlWidget.setObjectName("controlWidget")
+		self.floatingcontrolWidget.setObjectName("floatingcontrolWidget")
+		self.setStyleSheet(STYLESHEET)
 		
 		self.setWidget(self.dockwidget)
 		
