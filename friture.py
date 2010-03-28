@@ -226,8 +226,8 @@ class Friture(QtGui.QMainWindow, ):
 		settings.endGroup()
 
 		settings.beginGroup("MainWindow")
-		self.restoreGeometry(settings.value("windowGeometry").toByteArray())
 		self.restoreState(settings.value("windowState").toByteArray())
+		self.restoreGeometry(settings.value("windowGeometry").toByteArray())
 		settings.endGroup()
 		
 		settings.beginGroup("Spectrogram")
