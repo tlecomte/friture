@@ -55,7 +55,11 @@ class Dock(QtGui.QDockWidget):
 		
 		self.settingsButton = QtGui.QPushButton ("Settings", self.controlWidget)
 		self.undockButton = QtGui.QPushButton ("Undock", self.controlWidget)
-		self.closeButton = QtGui.QPushButton ("Close", self.controlWidget)
+		self.closeButton = QtGui.QToolButton (self.controlWidget)
+		
+		icon = QtGui.QIcon()
+		icon.addPixmap(QtGui.QPixmap(":/dock-close.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+		self.closeButton.setIcon(icon)
 		
 		self.connect(self.comboBox_select, QtCore.SIGNAL('activated(int)'), self.widget_select)
 		self.connect(self.settingsButton, QtCore.SIGNAL('clicked(bool)'), self.settings_slot)
