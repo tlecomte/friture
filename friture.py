@@ -190,16 +190,18 @@ class Friture(QtGui.QMainWindow, ):
 		settings.beginGroup("Docks")
 		docknames = [dock.objectName() for dock in self.docks]
 		settings.setValue("dockNames", docknames)
+		settings.endGroup()
 		
 		settings.beginGroup("MainWindow")
 		settings.setValue("windowState", windowState)
+		settings.endGroup()
 		
 		settings.beginGroup("Spectrogram")
 		self.ui.spectrogram.saveState(settings)
+		settings.endGroup()
 		
 		settings.beginGroup("Spectrum")
 		self.ui.spectrum.saveState(settings)
-		
 		settings.endGroup()
 	
 	# method
@@ -211,16 +213,18 @@ class Friture(QtGui.QMainWindow, ):
 		docknames = [dockname.toString() for dockname in docknames]
 		# list of docks
 		self.docks = [Dock(self, self.logger, name) for name in docknames]
+		settings.endGroup()
 
 		settings.beginGroup("MainWindow")
 		self.restoreState(settings.value("windowState").toByteArray())
+		settings.endGroup()
 		
 		settings.beginGroup("Spectrogram")
 		self.ui.spectrogram.restoreState(settings)
+		settings.endGroup()
 
 		settings.beginGroup("Spectrum")
 		self.ui.spectrum.restoreState(settings)
-
 		settings.endGroup()
 
 	# slot
