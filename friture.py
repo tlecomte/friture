@@ -173,7 +173,7 @@ class Friture(QtGui.QMainWindow, ):
 		index = len(self.docks)
 		name = "Dock %d" %index
 		new_dock = Dock(self, self.logger, name)
-		self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, new_dock)
+		self.addDockWidget(QtCore.Qt.TopDockWidgetArea, new_dock)
 		
 		self.docks += [new_dock]
 	
