@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="512"
+   height="512"
+   id="svg3297"
+   sodipodi:version="0.32"
+   inkscape:version="0.47 r22583"
+   sodipodi:docname="about.svg"
+   inkscape:output_extension="org.inkscape.output.svg.inkscape"
+   version="1.1">
+  <defs
+     id="defs3299">
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="0 : 8 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="16 : 8 : 1"
+       inkscape:persp3d-origin="8 : 5.3333333 : 1"
+       id="perspective3305" />
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#7b6464"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="1"
+     inkscape:pageshadow="2"
+     inkscape:zoom="1.0078125"
+     inkscape:cx="256"
+     inkscape:cy="250.84038"
+     inkscape:current-layer="layer1"
+     showgrid="true"
+     inkscape:grid-bbox="true"
+     inkscape:document-units="px"
+     inkscape:snap-bbox="true"
+     inkscape:object-paths="true"
+     inkscape:object-nodes="true"
+     objecttolerance="11"
+     gridtolerance="11"
+     guidetolerance="11"
+     inkscape:snap-global="false"
+     showguides="true"
+     inkscape:guide-bbox="true"
+     inkscape:window-width="1280"
+     inkscape:window-height="778"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1">
+    <inkscape:grid
+       type="xygrid"
+       id="grid3307"
+       visible="true"
+       enabled="true"
+       empspacing="5"
+       snapvisiblegridlinesonly="true" />
+  </sodipodi:namedview>
+  <metadata
+     id="metadata3302">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     id="layer1"
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     transform="translate(0,496)">
+    <path
+       sodipodi:type="inkscape:offset"
+       inkscape:radius="24.983675"
+       inkscape:original="M 255.34375 -456.40625 C 250.5892 -456.40585 246.18602 -455.36093 242.125 -453.28125 C 238.06382 -451.20078 234.45082 -448.32075 231.28125 -444.65625 C 228.11155 -440.99096 225.62661 -436.67093 223.84375 -431.71875 C 222.06077 -426.76581 221.15619 -421.5465 221.15625 -416 C 221.15619 -406.88693 223.10569 -399.82722 226.96875 -394.875 C 230.83168 -389.9221 237.21031 -387.46842 246.125 -387.46875 C 251.07748 -387.46842 255.65226 -388.53929 259.8125 -390.71875 C 263.97255 -392.89754 267.58556 -395.83476 270.65625 -399.5 C 273.72673 -403.16455 276.15447 -407.45333 277.9375 -412.40625 C 279.72031 -417.35845 280.59363 -422.60901 280.59375 -428.15625 C 280.59363 -446.9756 272.18236 -456.40585 255.34375 -456.40625 z M 261.59375 -338.71875 C 256.44299 -336.34124 250.79734 -333.9707 244.65625 -331.59375 C 238.515 -329.21624 232.07917 -326.98605 225.34375 -324.90625 C 218.60821 -322.8259 211.80324 -320.9336 204.96875 -319.25 C 198.13418 -317.56586 191.64115 -316.12585 185.5 -314.9375 L 185.5 -303.0625 C 195.99941 -302.07174 204.07279 -300.80332 209.71875 -299.21875 C 215.36462 -297.63369 219.48711 -295.09155 222.0625 -291.625 C 224.63777 -288.15797 226.13498 -283.3025 226.53125 -277.0625 C 226.92739 -270.82205 227.12494 -262.66552 227.125 -252.5625 L 227.125 -84.375 C 227.12494 -81.601536 223.53788 -78.581167 216.40625 -75.3125 C 209.27451 -72.043789 198.97094 -69.02342 185.5 -66.25 L 185.5 -53.46875 L 313.28125 -53.46875 L 313.28125 -66.25 C 298.81963 -69.02342 288.26131 -72.126936 281.625 -75.59375 C 274.98845 -79.060519 271.68739 -81.997741 271.6875 -84.375 L 271.6875 -338.71875 L 261.59375 -338.71875 z "
+       style="font-size:608.57110596px;font-style:normal;font-weight:normal;fill:#ffffff;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+       id="path2842"
+       d="m 255.34375,-481.375 c -8.41374,7.1e-4 -17.03337,1.97202 -24.59375,5.84375 a 24.986173,24.986173 0 0 0 -0.0312,0 c -7.03682,3.60484 -13.26586,8.66044 -18.34375,14.53125 -5.29713,6.12534 -9.31078,13.25596 -12.03125,20.8125 -2.76539,7.68198 -4.15634,15.92443 -4.15625,24.1875 -8e-5,12.67622 2.65545,25.68259 11.09375,36.5 9.60447,12.31448 25.34428,17.0005 38.84375,17 8.55497,5.7e-4 17.43185,-1.98162 25.28125,-6.09375 7.0684,-3.70201 13.35975,-8.85139 18.40625,-14.875 5.06981,-6.0507 8.95078,-13.04028 11.625,-20.46875 2.80838,-7.80097 4.12482,-16.04968 4.125,-24.21875 -8e-5,-13.13178 -2.93733,-26.93319 -12.65625,-37.8125 -9.71892,-10.87931 -24.47936,-15.40594 -37.5625,-15.40625 z m 6.25,117.6875 a 24.986173,24.986173 0 0 0 -10.46875,2.28125 c -4.58101,2.11452 -9.76665,4.28087 -15.5,6.5 -5.56637,2.15495 -11.44479,4.20699 -17.65625,6.125 -6.28368,1.94079 -12.61607,3.71634 -18.96875,5.28125 -6.47772,1.59621 -12.58001,2.93407 -18.25,4.03125 a 24.986173,24.986173 0 0 0 -20.21875,24.53125 l 0,11.875 a 24.986173,24.986173 0 0 0 22.625,24.875 c 8.80503,0.83087 15.02393,1.91738 18.4375,2.75 0.34136,5.38999 0.56244,13.11091 0.5625,22.875 l 0,155.875 c -4.81311,1.784395 -11.73183,3.919061 -21.6875,5.96875 A 24.986173,24.986173 0 0 0 160.53125,-66.25 l 0,12.78125 A 24.986173,24.986173 0 0 0 185.5,-28.5 l 127.78125,0 A 24.986173,24.986173 0 0 0 338.25,-53.46875 l 0,-12.78125 A 24.986173,24.986173 0 0 0 318,-90.78125 C 307.47735,-92.799263 300.68517,-94.96537 296.65625,-96.5 l 0,-242.21875 A 24.986173,24.986173 0 0 0 271.6875,-363.6875 l -10.09375,0 z"
+       transform="translate(-0.99224806,16.868217)" />
+    <text
+       xml:space="preserve"
+       style="font-size:608.57110596px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+       x="163.718"
+       y="-36.589153"
+       id="text2834"><tspan
+         sodipodi:role="line"
+         id="tspan2836"
+         x="163.718"
+         y="-36.589153"
+         style="font-size:608.57110596px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Gentium Basic;-inkscape-font-specification:Gentium Basic">i</tspan></text>
+  </g>
+</svg>
