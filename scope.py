@@ -64,3 +64,11 @@ class Scope_Widget(QtGui.QWidget, Ui_Scope_Widget):
 	
 		time = linspace(0., len(floatdata)/float(SAMPLING_RATE), len(floatdata))
 		self.PlotZoneUp.setdata(time, y)
+
+	# method
+	def saveState(self, settings):
+		return
+	
+	# method
+	def restoreState(self, settings):
+		return

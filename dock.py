@@ -122,6 +122,8 @@ class Dock(QtGui.QDockWidget):
 		if self.audiowidget is not None:
 		    self.audiowidget.close()
 		
+		self.type = item
+		
 		if item is 0:
 			self.audiowidget = Levels_Widget(self)
 		elif item is 1:
@@ -167,3 +169,11 @@ class Dock(QtGui.QDockWidget):
 		else:
 			self.setTitleBarWidget(self.controlWidget)
 			self.floatingcontrolWidget.hide()
+
+	# method
+	def saveState(self, settings):
+		self.audiowidget.saveState(settings)
+	
+	# method
+	def restoreState(self, settings):
+		self.audiowidget.restoreState(settings)

@@ -52,3 +52,11 @@ class Levels_Widget(QtGui.QWidget, Ui_Levels_Widget):
 		self.label_peak.setText("%.01f" % level_max)
 		self.meter.setValue(0, level_rms)
 		self.meter.setValue(1, level_max)
+
+	# method
+	def saveState(self, settings):
+		return
+	
+	# method
+	def restoreState(self, settings):
+		return
