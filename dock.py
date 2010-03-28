@@ -172,8 +172,11 @@ class Dock(QtGui.QDockWidget):
 
 	# method
 	def saveState(self, settings):
+		settings.setValue("type", self.type)
 		self.audiowidget.saveState(settings)
 	
 	# method
 	def restoreState(self, settings):
+		(type, ok) = settings.value("type", 0).toInt()
+		self.widget_select(type)
 		self.audiowidget.restoreState(settings)

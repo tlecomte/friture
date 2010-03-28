@@ -192,7 +192,6 @@ class Friture(QtGui.QMainWindow, ):
 		settings.setValue("dockNames", docknames)
 		for dock in self.docks:
 			settings.beginGroup(dock.objectName())
-			settings.setValue("type", dock.type)
 			dock.saveState(settings)
 			settings.endGroup()
 		settings.endGroup()
@@ -220,8 +219,7 @@ class Friture(QtGui.QMainWindow, ):
 		self.docks = []
 		for name in docknames:
 			settings.beginGroup(name)
-			(type, ok) = settings.value("type", 0).toInt()
-			dock = Dock(self, self.logger, name, type)
+			dock = Dock(self, self.logger, name)
 			dock.restoreState(settings)
 			self.docks += [dock]
 			settings.endGroup()
