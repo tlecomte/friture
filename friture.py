@@ -216,12 +216,10 @@ class Friture(QtGui.QMainWindow, ):
 		docknames = settings.value("dockNames", []).toList()
 		docknames = [dockname.toString() for dockname in docknames]
 		# list of docks
-		self.docks = []
-		for name in docknames:
-			settings.beginGroup(name)
-			dock = Dock(self, self.logger, name)
+		self.docks = [Dock(self, self.logger, name) for name in docknames]
+		for dock in self.docks:
+			settings.beginGroup(dock.objectName())
 			dock.restoreState(settings)
-			self.docks += [dock]
 			settings.endGroup()
 		settings.endGroup()
 
