@@ -196,6 +196,8 @@ class Friture(QtGui.QMainWindow, ):
 		settings.endGroup()
 		
 		settings.beginGroup("MainWindow")
+		windowGeometry = self.saveGeometry()
+		settings.setValue("windowGeometry", windowGeometry)
 		windowState = self.saveState()
 		settings.setValue("windowState", windowState)
 		settings.endGroup()
@@ -224,6 +226,7 @@ class Friture(QtGui.QMainWindow, ):
 		settings.endGroup()
 
 		settings.beginGroup("MainWindow")
+		self.restoreGeometry(settings.value("windowGeometry").toByteArray())
 		self.restoreState(settings.value("windowState").toByteArray())
 		settings.endGroup()
 		
