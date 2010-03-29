@@ -53,13 +53,17 @@ class Dock(QtGui.QDockWidget):
 		self.comboBox_select.addItem("Spectrogram")
 		self.comboBox_select.setCurrentIndex(0)
 		
-		self.settingsButton = QtGui.QPushButton ("Settings", self.controlWidget)
+		self.settingsButton = QtGui.QToolButton (self.controlWidget)
 		self.undockButton = QtGui.QToolButton (self.controlWidget)
 		self.closeButton = QtGui.QToolButton (self.controlWidget)
 		
 		icon = QtGui.QIcon()
 		icon.addPixmap(QtGui.QPixmap(":/dock-close.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
 		self.closeButton.setIcon(icon)
+		
+		settings_icon = QtGui.QIcon()
+		settings_icon.addPixmap(QtGui.QPixmap(":/dock-settings.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+		self.settingsButton.setIcon(settings_icon)
 		
 		undock_icon = QtGui.QIcon()
 		undock_icon.addPixmap(QtGui.QPixmap(":/dock-undock.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
@@ -92,12 +96,14 @@ class Dock(QtGui.QDockWidget):
 		self.floatingcomboBox_select.addItem("Spectrogram")
 		self.floatingcomboBox_select.setCurrentIndex(0)
 		
-		self.floatingsettingsButton = QtGui.QPushButton ("Settings", self.floatingcontrolWidget)
+		self.floatingsettingsButton = QtGui.QToolButton (self.floatingcontrolWidget)
 		self.floatingdockButton = QtGui.QToolButton (self.floatingcontrolWidget)
 		
 		dock_icon = QtGui.QIcon()
 		dock_icon.addPixmap(QtGui.QPixmap(":/dock-dock.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
 		self.floatingdockButton.setIcon(dock_icon)
+		
+		self.floatingsettingsButton.setIcon(settings_icon)
 		
 		self.connect(self.floatingcomboBox_select, QtCore.SIGNAL('activated(int)'), self.widget_select)
 		self.connect(self.floatingsettingsButton, QtCore.SIGNAL('clicked(bool)'), self.settings_slot)

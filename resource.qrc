@@ -1,5 +1,6 @@
 <RCC>
   <qresource>
+    <file>dock-settings.svg</file>
     <file>dock-dock.svg</file>
     <file>dock-close.svg</file>
     <file>about.svg</file>
