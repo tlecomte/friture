@@ -93,7 +93,11 @@ class Dock(QtGui.QDockWidget):
 		self.floatingcomboBox_select.setCurrentIndex(0)
 		
 		self.floatingsettingsButton = QtGui.QPushButton ("Settings", self.floatingcontrolWidget)
-		self.floatingdockButton = QtGui.QPushButton ("Dock", self.floatingcontrolWidget)
+		self.floatingdockButton = QtGui.QToolButton (self.floatingcontrolWidget)
+		
+		dock_icon = QtGui.QIcon()
+		dock_icon.addPixmap(QtGui.QPixmap(":/dock-dock.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+		self.floatingdockButton.setIcon(dock_icon)
 		
 		self.connect(self.floatingcomboBox_select, QtCore.SIGNAL('activated(int)'), self.widget_select)
 		self.connect(self.floatingsettingsButton, QtCore.SIGNAL('clicked(bool)'), self.settings_slot)
