@@ -208,13 +208,13 @@ class Friture(QtGui.QMainWindow, ):
 			settings.endGroup()
 		settings.endGroup()
 
-		settings.beginGroup("MainWindow")
-		self.restoreState(settings.value("windowState").toByteArray())
-		self.restoreGeometry(settings.value("windowGeometry").toByteArray())
-		settings.endGroup()
-		
 		settings.beginGroup("CentralWidget")
 		self.centralwidget.restoreState(settings)
+		settings.endGroup()
+
+		settings.beginGroup("MainWindow")
+		self.restoreGeometry(settings.value("windowGeometry").toByteArray())
+		self.restoreState(settings.value("windowState").toByteArray())
 		settings.endGroup()
 
 	# slot
