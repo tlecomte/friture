@@ -211,6 +211,10 @@ class Friture(QtGui.QMainWindow, ):
 		#self.ui.spectrogram.saveState(settings)
 		settings.endGroup()
 		
+		settings.beginGroup("CentralWidget")
+		self.centralwidget.saveState(settings)
+		settings.endGroup()
+		
 		settings.beginGroup("Spectrum")
 		self.ui.spectrum.saveState(settings)
 		settings.endGroup()
@@ -237,6 +241,10 @@ class Friture(QtGui.QMainWindow, ):
 		
 		settings.beginGroup("Spectrogram")
 		#self.ui.spectrogram.restoreState(settings)
+		settings.endGroup()
+		
+		settings.beginGroup("CentralWidget")
+		self.centralwidget.restoreState(settings)
 		settings.endGroup()
 
 		settings.beginGroup("Spectrum")
