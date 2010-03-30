@@ -26,6 +26,7 @@ import settings # Setting dialog
 import logger # Logging class
 import audiobuffer # audio ring buffer class
 import audiobackend # audio backend class
+from centralwidget import CentralWidget
 
 #pyuic4 friture.ui > Ui_friture.py
 #pyrcc4 resource.qrc > resource_rc.py
@@ -114,7 +115,11 @@ class Friture(QtGui.QMainWindow, ):
 		self.ui.levels.set_buffer(self.audiobuffer)
 		self.ui.scope.set_buffer(self.audiobuffer)
 		self.ui.spectrum.set_buffer(self.audiobuffer)
-		self.ui.spectrogram.set_buffer(self.audiobuffer)
+		#self.ui.spectrogram.set_buffer(self.audiobuffer)
+		
+		self.centralwidget = CentralWidget(self.ui.centralwidget, self.logger, "central_widget", 3)
+		self.centralLayout = QtGui.QVBoxLayout(self.ui.centralwidget)
+		self.centralLayout.addWidget(self.centralwidget)
 
 		# this timer is used to update widgets that just need to display as fast as they can
 		self.display_timer = QtCore.QTimer()
@@ -203,7 +208,7 @@ class Friture(QtGui.QMainWindow, ):
 		settings.endGroup()
 		
 		settings.beginGroup("Spectrogram")
-		self.ui.spectrogram.saveState(settings)
+		#self.ui.spectrogram.saveState(settings)
 		settings.endGroup()
 		
 		settings.beginGroup("Spectrum")
@@ -231,7 +236,7 @@ class Friture(QtGui.QMainWindow, ):
 		settings.endGroup()
 		
 		settings.beginGroup("Spectrogram")
-		self.ui.spectrogram.restoreState(settings)
+		#self.ui.spectrogram.restoreState(settings)
 		settings.endGroup()
 
 		settings.beginGroup("Spectrum")
@@ -243,11 +248,11 @@ class Friture(QtGui.QMainWindow, ):
 		if self.display_timer.isActive():
 			self.logger.push("Timer stop")
 			self.display_timer.stop()
-			self.ui.spectrogram.timer.stop()
+			#self.ui.spectrogram.timer.stop()
 		else:
 			self.logger.push("Timer start")
 			self.display_timer.start()
-			self.ui.spectrogram.timer.start()
+			#self.ui.spectrogram.timer.start()
 
 	# slot
 	def update_buffer(self):
@@ -271,21 +276,21 @@ class Friture(QtGui.QMainWindow, ):
 		"Spectrogram painting: %.02f ms"\
 		% (self.chunk_number,
 		self.ui.spectrum.fft_size*1000./SAMPLING_RATE,
-		self.ui.spectrogram.period_ms,
-		self.ui.spectrogram.spectrogram_timer_time,
+		0,#self.ui.spectrogram.period_ms,
+		0,#self.ui.spectrogram.spectrogram_timer_time,
 		self.buffer_timer_time,
 		self.ui.levels.meter.m_ppValues[0].paint_time,
 		self.ui.levels.meter.m_ppValues[1].paint_time,
 		self.ui.scope.PlotZoneUp.paint_time,
 		self.ui.spectrum.PlotZoneSpect.paint_time,
-		self.ui.spectrogram.PlotZoneImage.paint_time)
+		0)#self.ui.spectrogram.PlotZoneImage.paint_time)
 		
 		self.ui.LabelLevel.setText(level_label)
 
 	# slot
 	def input_device_changed(self, index):
 		self.display_timer.stop()
-		self.ui.spectrogram.timer.stop()
+		#self.ui.spectrogram.timer.stop()
 		self.ui.actionStart.setChecked(False)
 		
 		success, index = self.audiobackend.select_input_device(index)
@@ -298,7 +303,7 @@ class Friture(QtGui.QMainWindow, ):
 			error_message.showMessage("Impossible to use the selected device, reverting to the previous one")
 		
 		self.display_timer.start()
-		self.ui.spectrogram.timer.start()
+		#self.ui.spectrogram.timer.start()
 		self.actionStart.setChecked(True)
 
 if __name__ == "__main__":

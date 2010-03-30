@@ -30,11 +30,6 @@ stop: 0.9 #4c4c4c, stop: 1 #333333);
    <property name="styleSheet">
     <string notr="true"/>
    </property>
-   <layout class="QGridLayout" name="gridLayout_3">
-    <item row="0" column="0">
-     <widget class="Spectrogram_Widget" name="spectrogram" native="true"/>
-    </item>
-   </layout>
   </widget>
   <widget class="QDockWidget" name="dockWidgetLevels">
    <property name="windowTitle">
@@ -339,12 +334,6 @@ background: white
    <class>Spectrum_Widget</class>
    <extends>QWidget</extends>
    <header>spectrum.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>Spectrogram_Widget</class>
-   <extends>QWidget</extends>
-   <header>spectrogram.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

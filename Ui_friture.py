@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'friture.ui'
 #
-# Created: Tue Mar 30 10:40:54 2010
+# Created: Tue Mar 30 11:24:09 2010
 #      by: PyQt4 UI code generator 4.7
 #
 # WARNING! All changes made in this file will be lost!
@@ -18,11 +18,6 @@ class Ui_MainWindow(object):
         MainWindow.setWindowIcon(icon)
         self.centralwidget = QtGui.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
-        self.gridLayout_3 = QtGui.QGridLayout(self.centralwidget)
-        self.gridLayout_3.setObjectName("gridLayout_3")
-        self.spectrogram = Spectrogram_Widget(self.centralwidget)
-        self.spectrogram.setObjectName("spectrogram")
-        self.gridLayout_3.addWidget(self.spectrogram, 0, 0, 1, 1)
         MainWindow.setCentralWidget(self.centralwidget)
         self.dockWidgetLevels = QtGui.QDockWidget(MainWindow)
         self.dockWidgetLevels.setObjectName("dockWidgetLevels")
@@ -210,7 +205,6 @@ class Ui_MainWindow(object):
         self.actionNew_dock.setText(QtGui.QApplication.translate("MainWindow", "New dock", None, QtGui.QApplication.UnicodeUTF8))
         self.actionNew_dock.setToolTip(QtGui.QApplication.translate("MainWindow", "Add a new dock to Friture window", None, QtGui.QApplication.UnicodeUTF8))
 
-from spectrogram import Spectrogram_Widget
 from scope import Scope_Widget
 from levels import Levels_Widget
 from spectrum import Spectrum_Widget
