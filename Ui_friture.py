@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'friture.ui'
 #
-# Created: Tue Mar 30 11:24:09 2010
+# Created: Tue Mar 30 12:03:27 2010
 #      by: PyQt4 UI code generator 4.7
 #
 # WARNING! All changes made in this file will be lost!
@@ -19,25 +19,6 @@ class Ui_MainWindow(object):
         self.centralwidget = QtGui.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         MainWindow.setCentralWidget(self.centralwidget)
-        self.dockWidgetLevels = QtGui.QDockWidget(MainWindow)
-        self.dockWidgetLevels.setObjectName("dockWidgetLevels")
-        self.dockWidgetContents = QtGui.QWidget()
-        self.dockWidgetContents.setObjectName("dockWidgetContents")
-        self.gridLayout_4 = QtGui.QGridLayout(self.dockWidgetContents)
-        self.gridLayout_4.setMargin(0)
-        self.gridLayout_4.setSpacing(0)
-        self.gridLayout_4.setObjectName("gridLayout_4")
-        self.frame_3 = QtGui.QFrame(self.dockWidgetContents)
-        self.frame_3.setFrameShape(QtGui.QFrame.StyledPanel)
-        self.frame_3.setObjectName("frame_3")
-        self.gridLayout_8 = QtGui.QGridLayout(self.frame_3)
-        self.gridLayout_8.setObjectName("gridLayout_8")
-        self.levels = Levels_Widget(self.frame_3)
-        self.levels.setObjectName("levels")
-        self.gridLayout_8.addWidget(self.levels, 0, 0, 1, 1)
-        self.gridLayout_4.addWidget(self.frame_3, 0, 0, 1, 1)
-        self.dockWidgetLevels.setWidget(self.dockWidgetContents)
-        MainWindow.addDockWidget(QtCore.Qt.DockWidgetArea(1), self.dockWidgetLevels)
         self.dockWidgetStatistics = QtGui.QDockWidget(MainWindow)
         self.dockWidgetStatistics.setObjectName("dockWidgetStatistics")
         self.dockWidgetContents_2 = QtGui.QWidget()
@@ -51,7 +32,7 @@ class Ui_MainWindow(object):
         self.scrollArea.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
         self.scrollArea.setObjectName("scrollArea")
         self.scrollAreaWidgetContents = QtGui.QWidget(self.scrollArea)
-        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 82, 151))
+        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 82, 227))
         self.scrollAreaWidgetContents.setStyleSheet("QWidget {\n"
 "background: white\n"
 "}\n"
@@ -68,44 +49,6 @@ class Ui_MainWindow(object):
         self.gridLayout_2.addWidget(self.scrollArea, 0, 0, 1, 1)
         self.dockWidgetStatistics.setWidget(self.dockWidgetContents_2)
         MainWindow.addDockWidget(QtCore.Qt.DockWidgetArea(1), self.dockWidgetStatistics)
-        self.dockWidgetScope = QtGui.QDockWidget(MainWindow)
-        self.dockWidgetScope.setObjectName("dockWidgetScope")
-        self.dockWidgetContents_4 = QtGui.QWidget()
-        self.dockWidgetContents_4.setObjectName("dockWidgetContents_4")
-        self.gridLayout_5 = QtGui.QGridLayout(self.dockWidgetContents_4)
-        self.gridLayout_5.setMargin(0)
-        self.gridLayout_5.setSpacing(0)
-        self.gridLayout_5.setObjectName("gridLayout_5")
-        self.frame = QtGui.QFrame(self.dockWidgetContents_4)
-        self.frame.setFrameShape(QtGui.QFrame.StyledPanel)
-        self.frame.setObjectName("frame")
-        self.gridLayout = QtGui.QGridLayout(self.frame)
-        self.gridLayout.setObjectName("gridLayout")
-        self.scope = Scope_Widget(self.frame)
-        self.scope.setObjectName("scope")
-        self.gridLayout.addWidget(self.scope, 0, 0, 1, 1)
-        self.gridLayout_5.addWidget(self.frame, 0, 0, 1, 1)
-        self.dockWidgetScope.setWidget(self.dockWidgetContents_4)
-        MainWindow.addDockWidget(QtCore.Qt.DockWidgetArea(4), self.dockWidgetScope)
-        self.dockWidgetSpectrum = QtGui.QDockWidget(MainWindow)
-        self.dockWidgetSpectrum.setObjectName("dockWidgetSpectrum")
-        self.dockWidgetContents_5 = QtGui.QWidget()
-        self.dockWidgetContents_5.setObjectName("dockWidgetContents_5")
-        self.gridLayout_6 = QtGui.QGridLayout(self.dockWidgetContents_5)
-        self.gridLayout_6.setMargin(0)
-        self.gridLayout_6.setSpacing(0)
-        self.gridLayout_6.setObjectName("gridLayout_6")
-        self.frame_2 = QtGui.QFrame(self.dockWidgetContents_5)
-        self.frame_2.setFrameShape(QtGui.QFrame.StyledPanel)
-        self.frame_2.setObjectName("frame_2")
-        self.gridLayout_7 = QtGui.QGridLayout(self.frame_2)
-        self.gridLayout_7.setObjectName("gridLayout_7")
-        self.spectrum = Spectrum_Widget(self.frame_2)
-        self.spectrum.setObjectName("spectrum")
-        self.gridLayout_7.addWidget(self.spectrum, 0, 0, 1, 1)
-        self.gridLayout_6.addWidget(self.frame_2, 0, 0, 1, 1)
-        self.dockWidgetSpectrum.setWidget(self.dockWidgetContents_5)
-        MainWindow.addDockWidget(QtCore.Qt.DockWidgetArea(4), self.dockWidgetSpectrum)
         self.toolBar = QtGui.QToolBar(MainWindow)
         self.toolBar.setStyleSheet("QToolBar {\n"
 "border: none;\n"
@@ -133,7 +76,7 @@ class Ui_MainWindow(object):
         self.scrollArea_2.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
         self.scrollArea_2.setObjectName("scrollArea_2")
         self.scrollAreaWidgetContents_2 = QtGui.QWidget(self.scrollArea_2)
-        self.scrollAreaWidgetContents_2.setGeometry(QtCore.QRect(0, 0, 74, 158))
+        self.scrollAreaWidgetContents_2.setGeometry(QtCore.QRect(0, 0, 74, 240))
         self.scrollAreaWidgetContents_2.setStyleSheet("QWidget {\n"
 "background: white\n"
 "}\n"
@@ -190,11 +133,8 @@ class Ui_MainWindow(object):
 "stop: 0.39999 #717171, stop: 0.4 #626262,\n"
 "stop: 0.9 #4c4c4c, stop: 1 #333333);\n"
 " }", None, QtGui.QApplication.UnicodeUTF8))
-        self.dockWidgetLevels.setWindowTitle(QtGui.QApplication.translate("MainWindow", "Input levels", None, QtGui.QApplication.UnicodeUTF8))
         self.dockWidgetStatistics.setWindowTitle(QtGui.QApplication.translate("MainWindow", "Statistics", None, QtGui.QApplication.UnicodeUTF8))
         self.LabelLevel.setText(QtGui.QApplication.translate("MainWindow", "No statistics", None, QtGui.QApplication.UnicodeUTF8))
-        self.dockWidgetScope.setWindowTitle(QtGui.QApplication.translate("MainWindow", "Scope", None, QtGui.QApplication.UnicodeUTF8))
-        self.dockWidgetSpectrum.setWindowTitle(QtGui.QApplication.translate("MainWindow", "Spectrum", None, QtGui.QApplication.UnicodeUTF8))
         self.toolBar.setWindowTitle(QtGui.QApplication.translate("MainWindow", "toolBar", None, QtGui.QApplication.UnicodeUTF8))
         self.dockWidgetLog.setWindowTitle(QtGui.QApplication.translate("MainWindow", "Log", None, QtGui.QApplication.UnicodeUTF8))
         self.actionStart.setText(QtGui.QApplication.translate("MainWindow", "Start", None, QtGui.QApplication.UnicodeUTF8))
@@ -205,7 +145,4 @@ class Ui_MainWindow(object):
         self.actionNew_dock.setText(QtGui.QApplication.translate("MainWindow", "New dock", None, QtGui.QApplication.UnicodeUTF8))
         self.actionNew_dock.setToolTip(QtGui.QApplication.translate("MainWindow", "Add a new dock to Friture window", None, QtGui.QApplication.UnicodeUTF8))
 
-from scope import Scope_Widget
-from levels import Levels_Widget
-from spectrum import Spectrum_Widget
 import resource_rc
