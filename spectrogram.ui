@@ -14,15 +14,8 @@
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="1" column="1">
-    <widget class="ImagePlot" name="PlotZoneImage" native="true"/>
-   </item>
    <item row="0" column="1">
-    <widget class="QPushButton" name="pushButtonSettings">
-     <property name="text">
-      <string>Settings</string>
-     </property>
-    </widget>
+    <widget class="ImagePlot" name="PlotZoneImage" native="true"/>
    </item>
   </layout>
  </widget>

@@ -66,9 +66,6 @@ class Spectrogram_Widget(QtGui.QWidget, Ui_Spectrogram_Widget):
 		
 		# initialize the settings dialog
 		self.settings_dialog = spectrogram_settings.Spectrogram_Settings_Dialog(self, self.logger)
-
-		# display the settings dialog
-		self.connect(self.pushButtonSettings, QtCore.SIGNAL('clicked(bool)'), self.settings_called)
 		
 		# timer ticks
 		self.connect(self.timer, QtCore.SIGNAL('timeout()'), self.timer_slot)

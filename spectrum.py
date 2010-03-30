@@ -62,9 +62,6 @@ class Spectrum_Widget(QtGui.QWidget, Ui_Spectrum_Widget):
 		# initialize the settings dialog
 		self.settings_dialog = spectrum_settings.Spectrum_Settings_Dialog(self, self.logger)
 
-		# display the settings dialog
-		self.connect(self.pushButtonSettings, QtCore.SIGNAL('clicked(bool)'), self.settings_called)
-
 	# method
 	def set_buffer(self, buffer):
 		self.audiobuffer = buffer
