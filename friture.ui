@@ -129,14 +129,6 @@ background: white
    </widget>
   </widget>
   <widget class="QDockWidget" name="dockWidgetScope">
-   <property name="styleSheet">
-    <string notr="true">QwtPlotCanvas {
-  border: 1px solid gray;
- border-radius: 2px;
-  background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-stop: 0 #AAAAAA, stop: 0.3 #FFFFFF);
-}</string>
-   </property>
    <property name="windowTitle">
     <string>Scope</string>
    </property>

@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'friture.ui'
 #
-# Created: Fri Mar 26 18:33:36 2010
+# Created: Tue Mar 30 10:39:51 2010
 #      by: PyQt4 UI code generator 4.7
 #
 # WARNING! All changes made in this file will be lost!
@@ -74,12 +74,6 @@ class Ui_MainWindow(object):
         self.dockWidgetStatistics.setWidget(self.dockWidgetContents_2)
         MainWindow.addDockWidget(QtCore.Qt.DockWidgetArea(1), self.dockWidgetStatistics)
         self.dockWidgetScope = QtGui.QDockWidget(MainWindow)
-        self.dockWidgetScope.setStyleSheet("QwtPlotCanvas {\n"
-"  border: 1px solid gray;\n"
-" border-radius: 2px;\n"
-"  background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,\n"
-"stop: 0 #AAAAAA, stop: 0.3 #FFFFFF);\n"
-"}")
         self.dockWidgetScope.setObjectName("dockWidgetScope")
         self.dockWidgetContents_4 = QtGui.QWidget()
         self.dockWidgetContents_4.setObjectName("dockWidgetContents_4")

@@ -24,6 +24,15 @@ from Ui_scope import Ui_Scope_Widget
 SMOOTH_DISPLAY_TIMER_PERIOD_MS = 25
 SAMPLING_RATE = 44100
 
+STYLESHEET = """
+QwtPlotCanvas {
+	border: 1px solid gray;
+	border-radius: 2px;
+	background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+	stop: 0 #AAAAAA, stop: 0.3 #FFFFFF);
+}
+"""
+
 class Scope_Widget(QtGui.QWidget, Ui_Scope_Widget):
 	def __init__(self, parent = None):
 		QtGui.QWidget.__init__(self, parent)
@@ -33,6 +42,8 @@ class Scope_Widget(QtGui.QWidget, Ui_Scope_Widget):
 		
 		# Setup the user interface
 		self.setupUi(self)
+		
+		self.setStyleSheet(STYLESHEET)
 
 	# method
 	def set_buffer(self, buffer):
