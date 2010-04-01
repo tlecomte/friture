@@ -39,6 +39,8 @@ QwtPlotCanvas {
 DEFAULT_FFT_SIZE = 7
 DEFAULT_MAXFREQ = SAMPLING_RATE/2
 DEFAULT_MINFREQ = 20
+DEFAULT_SPEC_MIN = -140
+DEFAULT_SPEC_MAX = 0
 
 class Spectrum_Widget(QtGui.QWidget, Ui_Spectrum_Widget):
 	def __init__(self, parent):
@@ -63,6 +65,8 @@ class Spectrum_Widget(QtGui.QWidget, Ui_Spectrum_Widget):
 		self.maxfreq = DEFAULT_MAXFREQ
 		self.minfreq = DEFAULT_MINFREQ
 		self.fft_size = 2**DEFAULT_FFT_SIZE*32
+		self.spec_min = DEFAULT_SPEC_MIN
+		self.spec_max = DEFAULT_SPEC_MAX
 		
 		# initialize the settings dialog
 		self.settings_dialog = spectrum_settings.Spectrum_Settings_Dialog(self, self.logger)
@@ -96,12 +100,12 @@ class Spectrum_Widget(QtGui.QWidget, Ui_Spectrum_Widget):
 		self.fft_size = fft_size
 
 	def setmin(self, value):
-		# FIXME should change the plot range
 		self.spec_min = value
+		self.PlotZoneSpect.setspecrange(self.spec_min, self.spec_max)
 	
 	def setmax(self, value):
-		# FIXME should change the plot range
 		self.spec_max = value
+		self.PlotZoneSpect.setspecrange(self.spec_min, self.spec_max)
 
 	def settings_called(self, checked):
 		self.settings_dialog.show()

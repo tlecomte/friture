@@ -24,6 +24,8 @@ SAMPLING_RATE = 44100
 DEFAULT_FFT_SIZE = 7
 DEFAULT_MAXFREQ = SAMPLING_RATE/2
 DEFAULT_MINFREQ = 0
+DEFAULT_SPEC_MIN = -140
+DEFAULT_SPEC_MAX = 0
 
 class Spectrum_Settings_Dialog(QtGui.QDialog):
 	def __init__(self, parent, logger):
@@ -75,7 +77,7 @@ class Spectrum_Settings_Dialog(QtGui.QDialog):
 		self.spinBox_specmin.setKeyboardTracking(False)
 		self.spinBox_specmin.setMinimum(-200)
 		self.spinBox_specmin.setMaximum(200)
-		self.spinBox_specmin.setProperty("value", -100)
+		self.spinBox_specmin.setProperty("value", DEFAULT_SPEC_MIN)
 		self.spinBox_specmin.setObjectName("spinBox_specmin")
 		self.spinBox_specmin.setSuffix(" dB")
 
@@ -83,7 +85,7 @@ class Spectrum_Settings_Dialog(QtGui.QDialog):
 		self.spinBox_specmax.setKeyboardTracking(False)
 		self.spinBox_specmax.setMinimum(-200)
 		self.spinBox_specmax.setMaximum(200)
-		self.spinBox_specmax.setProperty("value", -20)
+		self.spinBox_specmax.setProperty("value", DEFAULT_SPEC_MAX)
 		self.spinBox_specmax.setObjectName("spinBox_specmax")
 		self.spinBox_specmax.setSuffix(" dB")
 
@@ -140,7 +142,7 @@ class Spectrum_Settings_Dialog(QtGui.QDialog):
 		self.spinBox_minfreq.setValue(freqMin)
 		(freqMax, ok) = settings.value("freqMax", DEFAULT_MAXFREQ).toInt()
 		self.spinBox_maxfreq.setValue(freqMax)
-		(colorMin, ok) = settings.value("Min", -100).toInt()
+		(colorMin, ok) = settings.value("Min", DEFAULT_SPEC_MIN).toInt()
 		self.spinBox_specmin.setValue(colorMin)
-		(colorMax, ok) = settings.value("Max", -20).toInt()
+		(colorMax, ok) = settings.value("Max", DEFAULT_SPEC_MAX).toInt()
 		self.spinBox_specmax.setValue(colorMax)

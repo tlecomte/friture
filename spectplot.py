@@ -181,6 +181,10 @@ class SpectPlot(classplot.ClassPlot):
 		self.update_xscale()
 		self.needfullreplot = True
 	
+	def setspecrange(self, min, max):
+		self.setAxisScale(Qwt.QwtPlot.yLeft, min, max)
+		self.needfullreplot = True
+	
 	def drawCanvas(self, painter):
 		t = QtCore.QTime()
 		t.start()
