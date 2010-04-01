@@ -19,6 +19,12 @@
 
 from PyQt4 import QtGui, QtCore
 
+# shared with spectrum_settings.py
+SAMPLING_RATE = 44100
+DEFAULT_FFT_SIZE = 7
+DEFAULT_MAXFREQ = SAMPLING_RATE/2
+DEFAULT_MINFREQ = 0
+
 class Spectrum_Settings_Dialog(QtGui.QDialog):
 	def __init__(self, parent, logger):
 		QtGui.QDialog.__init__(self, parent)
@@ -42,6 +48,7 @@ class Spectrum_Settings_Dialog(QtGui.QDialog):
 		self.comboBox_fftsize.addItem("4096 points")
 		self.comboBox_fftsize.addItem("8192 points")
 		self.comboBox_fftsize.addItem("16384 points")
+		self.comboBox_fftsize.setCurrentIndex(DEFAULT_FFT_SIZE)
 
 		self.comboBox_freqscale = QtGui.QComboBox(self)
 		self.comboBox_freqscale.setObjectName("comboBox_freqscale")
@@ -50,16 +57,17 @@ class Spectrum_Settings_Dialog(QtGui.QDialog):
 
 		self.spinBox_minfreq = QtGui.QSpinBox(self)
 		self.spinBox_minfreq.setMinimum(20)
-		self.spinBox_minfreq.setMaximum(20000)
+		self.spinBox_minfreq.setMaximum(SAMPLING_RATE/2)
 		self.spinBox_minfreq.setSingleStep(10)
+		self.spinBox_minfreq.setValue(DEFAULT_MINFREQ)
 		self.spinBox_minfreq.setObjectName("spinBox_minfreq")
 		self.spinBox_minfreq.setSuffix(" Hz")
 		
 		self.spinBox_maxfreq = QtGui.QSpinBox(self)
 		self.spinBox_maxfreq.setMinimum(20)
-		self.spinBox_maxfreq.setMaximum(20000)
+		self.spinBox_maxfreq.setMaximum(SAMPLING_RATE/2)
 		self.spinBox_maxfreq.setSingleStep(1000)
-		self.spinBox_maxfreq.setProperty("value", 20000)
+		self.spinBox_maxfreq.setProperty("value", DEFAULT_MAXFREQ)
 		self.spinBox_maxfreq.setObjectName("spinBox_maxfreq")
 		self.spinBox_maxfreq.setSuffix(" Hz")
 
@@ -124,13 +132,13 @@ class Spectrum_Settings_Dialog(QtGui.QDialog):
 
 	# method
 	def restoreState(self, settings):
-		(fft_size, ok) = settings.value("fftSize", 7).toInt() # 7th index is 1024 points
+		(fft_size, ok) = settings.value("fftSize", DEFAULT_FFT_SIZE).toInt() # 7th index is 1024 points
 		self.comboBox_fftsize.setCurrentIndex(fft_size)
 		(freqscale, ok) = settings.value("freqScale", 0).toInt()
 		self.comboBox_freqscale.setCurrentIndex(freqscale)
-		(freqMin, ok) = settings.value("freqMin", 20).toInt()
+		(freqMin, ok) = settings.value("freqMin", DEFAULT_MINFREQ).toInt()
 		self.spinBox_minfreq.setValue(freqMin)
-		(freqMax, ok) = settings.value("freqMax", 20000).toInt()
+		(freqMax, ok) = settings.value("freqMax", DEFAULT_MAXFREQ).toInt()
 		self.spinBox_maxfreq.setValue(freqMax)
 		(colorMin, ok) = settings.value("Min", -100).toInt()
 		self.spinBox_specmin.setValue(colorMin)

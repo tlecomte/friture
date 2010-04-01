@@ -35,6 +35,11 @@ QwtPlotCanvas {
 }
 """
 
+# shared with spectrum_settings.py
+DEFAULT_FFT_SIZE = 7
+DEFAULT_MAXFREQ = SAMPLING_RATE/2
+DEFAULT_MINFREQ = 20
+
 class Spectrum_Widget(QtGui.QWidget, Ui_Spectrum_Widget):
 	def __init__(self, parent):
 		QtGui.QWidget.__init__(self, parent)
@@ -55,9 +60,9 @@ class Spectrum_Widget(QtGui.QWidget, Ui_Spectrum_Widget):
 		# initialize the class instance that will do the fft
 		self.proc = audioproc.audioproc()
 		
-		self.maxfreq = SAMPLING_RATE/2
-		self.minfreq = 0
-		self.fft_size = 256
+		self.maxfreq = DEFAULT_MAXFREQ
+		self.minfreq = DEFAULT_MINFREQ
+		self.fft_size = 2**DEFAULT_FFT_SIZE*32
 		
 		# initialize the settings dialog
 		self.settings_dialog = spectrum_settings.Spectrum_Settings_Dialog(self, self.logger)
