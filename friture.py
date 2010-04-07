@@ -104,6 +104,7 @@ class Friture(QtGui.QMainWindow, ):
 
 		self.centralwidget = CentralWidget(self.ui.centralwidget, self.logger, "central_widget", 3)
 		self.centralLayout = QtGui.QVBoxLayout(self.ui.centralwidget)
+		self.centralLayout.setContentsMargins(0, 0, 0, 0)
 		self.centralLayout.addWidget(self.centralwidget)
 
 		# this timer is used to update widgets that just need to display as fast as they can
