@@ -43,14 +43,15 @@ DEFAULT_SPEC_MIN = -140
 DEFAULT_SPEC_MAX = 0
 
 class Spectrum_Widget(QtGui.QWidget, Ui_Spectrum_Widget):
-	def __init__(self, parent):
+	def __init__(self, parent, logger = None):
 		QtGui.QWidget.__init__(self, parent)
 		Ui_Spectrum_Widget.__init__(self)
 
 		# store the logger instance
-		# FIXME
-		#self.logger = parent.parent().logger
-		self.logger = None
+		if logger is None:
+		    self.logger = parent.parent.logger
+		else:
+		    self.logger = logger
 
 		self.audiobuffer = None
 

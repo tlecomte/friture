@@ -87,11 +87,11 @@ class CentralWidget(QtGui.QWidget):
 		self.type = item
 		
 		if item is 0:
-			self.audiowidget = Levels_Widget(self)
+			self.audiowidget = Levels_Widget(self, self.logger)
 		elif item is 1:
-			self.audiowidget = Scope_Widget(self)
+			self.audiowidget = Scope_Widget(self, self.logger)
 		elif item is 2:
-			self.audiowidget = Spectrum_Widget(self)
+			self.audiowidget = Spectrum_Widget(self, self.logger)
 		else:
 			self.audiowidget = Spectrogram_Widget(self, self.logger)
 			self.audiowidget.timer.start()
