@@ -20,19 +20,29 @@
 from PyQt4 import QtGui
 from numpy import log10
 from Ui_levels import Ui_Levels_Widget
+import levels_settings # settings dialog
 
 SMOOTH_DISPLAY_TIMER_PERIOD_MS = 25
 SAMPLING_RATE = 44100
 
 class Levels_Widget(QtGui.QWidget, Ui_Levels_Widget):
-	def __init__(self, parent = None):
+	def __init__(self, parent = None, logger = None):
 		QtGui.QWidget.__init__(self, parent)
 		Ui_Levels_Widget.__init__(self)
-		
+
+		# store the logger instance
+		if logger is None:
+		    self.logger = parent.parent.logger
+		else:
+		    self.logger = logger
+
 		self.audiobuffer = None
 		
 		# Setup the user interface
 		self.setupUi(self)
+		
+		# initialize the settings dialog
+		self.settings_dialog = levels_settings.Levels_Settings_Dialog(self, self.logger)
 
 	# method
 	def set_buffer(self, buffer):
@@ -53,10 +63,14 @@ class Levels_Widget(QtGui.QWidget, Ui_Levels_Widget):
 		self.meter.setValue(0, level_rms)
 		self.meter.setValue(1, level_max)
 
+	# slot
+	def settings_called(self, checked):
+		self.settings_dialog.show()
+
 	# method
 	def saveState(self, settings):
-		return
+		self.settings_dialog.saveState(settings)
 	
 	# method
 	def restoreState(self, settings):
-		return
+		self.settings_dialog.restoreState(settings)
