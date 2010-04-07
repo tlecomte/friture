@@ -20,6 +20,7 @@
 from PyQt4 import QtGui
 from numpy import log10, where, linspace
 from Ui_scope import Ui_Scope_Widget
+import scope_settings # settings dialog
 
 SMOOTH_DISPLAY_TIMER_PERIOD_MS = 25
 SAMPLING_RATE = 44100
@@ -34,16 +35,24 @@ QwtPlotCanvas {
 """
 
 class Scope_Widget(QtGui.QWidget, Ui_Scope_Widget):
-	def __init__(self, parent = None):
+	def __init__(self, parent = None, logger = None):
 		QtGui.QWidget.__init__(self, parent)
 		Ui_Scope_Widget.__init__(self)
 		
 		self.audiobuffer = None
 		
+		# store the logger instance
+		if logger is None:
+		    self.logger = parent.parent.logger
+		else:
+		    self.logger = logger
+		
 		# Setup the user interface
 		self.setupUi(self)
 		
 		self.setStyleSheet(STYLESHEET)
+
+		self.settings_dialog = scope_settings.Scope_Settings_Dialog(self, self.logger)
 
 	# method
 	def set_buffer(self, buffer):
@@ -76,10 +85,14 @@ class Scope_Widget(QtGui.QWidget, Ui_Scope_Widget):
 		time = linspace(0., len(floatdata)/float(SAMPLING_RATE), len(floatdata))
 		self.PlotZoneUp.setdata(time, y)
 
+	# slot
+	def settings_called(self, checked):
+		self.settings_dialog.show()
+
 	# method
 	def saveState(self, settings):
-		return
+		self.settings_dialog.saveState(settings)
 	
 	# method
 	def restoreState(self, settings):
-		return
+		self.settings_dialog.restoreState(settings)
