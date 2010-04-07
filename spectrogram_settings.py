@@ -19,6 +19,16 @@
 
 from PyQt4 import QtGui, QtCore
 
+SAMPLING_RATE = 44100
+
+# shared with spectrogram.py
+DEFAULT_FFT_SIZE = 7
+DEFAULT_MAXFREQ = SAMPLING_RATE/2
+DEFAULT_MINFREQ = 20
+DEFAULT_SPEC_MIN = -140
+DEFAULT_SPEC_MAX = 0
+DEFAULT_TIMERANGE = 10.
+
 class Spectrogram_Settings_Dialog(QtGui.QDialog):
 	def __init__(self, parent, logger):
 		QtGui.QDialog.__init__(self, parent)
@@ -34,7 +44,7 @@ class Spectrogram_Settings_Dialog(QtGui.QDialog):
 		self.doubleSpinBox_timerange.setDecimals(1)
 		self.doubleSpinBox_timerange.setMinimum(0.1)
 		self.doubleSpinBox_timerange.setMaximum(1000.0)
-		self.doubleSpinBox_timerange.setProperty("value", 10.0)
+		self.doubleSpinBox_timerange.setProperty("value", DEFAULT_TIMERANGE)
 		self.doubleSpinBox_timerange.setObjectName("doubleSpinBox_timerange")
 		self.doubleSpinBox_timerange.setSuffix(" s")
 		
@@ -50,6 +60,7 @@ class Spectrogram_Settings_Dialog(QtGui.QDialog):
 		self.comboBox_fftsize.addItem("4096 points")
 		self.comboBox_fftsize.addItem("8192 points")
 		self.comboBox_fftsize.addItem("16384 points")
+		self.comboBox_fftsize.setCurrentIndex(DEFAULT_FFT_SIZE)
 
 		self.comboBox_freqscale = QtGui.QComboBox(self)
 		self.comboBox_freqscale.setObjectName("comboBox_freqscale")
@@ -58,16 +69,17 @@ class Spectrogram_Settings_Dialog(QtGui.QDialog):
 
 		self.spinBox_minfreq = QtGui.QSpinBox(self)
 		self.spinBox_minfreq.setMinimum(20)
-		self.spinBox_minfreq.setMaximum(20000)
+		self.spinBox_minfreq.setMaximum(SAMPLING_RATE/2)
 		self.spinBox_minfreq.setSingleStep(10)
+		self.spinBox_minfreq.setValue(DEFAULT_MINFREQ)
 		self.spinBox_minfreq.setObjectName("spinBox_minfreq")
 		self.spinBox_minfreq.setSuffix(" Hz")
 		
 		self.spinBox_maxfreq = QtGui.QSpinBox(self)
 		self.spinBox_maxfreq.setMinimum(20)
-		self.spinBox_maxfreq.setMaximum(20000)
+		self.spinBox_maxfreq.setMaximum(SAMPLING_RATE/2)
 		self.spinBox_maxfreq.setSingleStep(1000)
-		self.spinBox_maxfreq.setProperty("value", 20000)
+		self.spinBox_maxfreq.setProperty("value", DEFAULT_MAXFREQ)
 		self.spinBox_maxfreq.setObjectName("spinBox_maxfreq")
 		self.spinBox_maxfreq.setSuffix(" Hz")
 
@@ -75,7 +87,7 @@ class Spectrogram_Settings_Dialog(QtGui.QDialog):
 		self.spinBox_specmin.setKeyboardTracking(False)
 		self.spinBox_specmin.setMinimum(-200)
 		self.spinBox_specmin.setMaximum(200)
-		self.spinBox_specmin.setProperty("value", -100)
+		self.spinBox_specmin.setProperty("value", DEFAULT_SPEC_MIN)
 		self.spinBox_specmin.setObjectName("spinBox_specmin")
 		self.spinBox_specmin.setSuffix(" dB")
 
@@ -83,7 +95,7 @@ class Spectrogram_Settings_Dialog(QtGui.QDialog):
 		self.spinBox_specmax.setKeyboardTracking(False)
 		self.spinBox_specmax.setMinimum(-200)
 		self.spinBox_specmax.setMaximum(200)
-		self.spinBox_specmax.setProperty("value", -20)
+		self.spinBox_specmax.setProperty("value", DEFAULT_SPEC_MAX)
 		self.spinBox_specmax.setObjectName("spinBox_specmax")
 		self.spinBox_specmax.setSuffix(" dB")
 
@@ -131,17 +143,17 @@ class Spectrogram_Settings_Dialog(QtGui.QDialog):
 
 	# method
 	def restoreState(self, settings):
-		(timeRange, ok) = settings.value("timeRange", 10.).toDouble()
+		(timeRange, ok) = settings.value("timeRange", DEFAULT_TIMERANGE).toDouble()
 		self.doubleSpinBox_timerange.setValue(timeRange)
-		(fft_size, ok) = settings.value("fftSize", 7).toInt() # 7th index is 1024 points
+		(fft_size, ok) = settings.value("fftSize", DEFAULT_FFT_SIZE).toInt() # 7th index is 1024 points
 		self.comboBox_fftsize.setCurrentIndex(fft_size)
 		(freqscale, ok) = settings.value("freqScale", 0).toInt()
 		self.comboBox_freqscale.setCurrentIndex(freqscale)
-		(freqMin, ok) = settings.value("freqMin", 20).toInt()
+		(freqMin, ok) = settings.value("freqMin", DEFAULT_MINFREQ).toInt()
 		self.spinBox_minfreq.setValue(freqMin)
-		(freqMax, ok) = settings.value("freqMax", 20000).toInt()
+		(freqMax, ok) = settings.value("freqMax", DEFAULT_MAXFREQ).toInt()
 		self.spinBox_maxfreq.setValue(freqMax)
-		(colorMin, ok) = settings.value("colorMin", -100).toInt()
+		(colorMin, ok) = settings.value("colorMin", DEFAULT_SPEC_MIN).toInt()
 		self.spinBox_specmin.setValue(colorMin)
-		(colorMax, ok) = settings.value("colorMax", -20).toInt()
+		(colorMax, ok) = settings.value("colorMax", DEFAULT_SPEC_MAX).toInt()
 		self.spinBox_specmax.setValue(colorMax)

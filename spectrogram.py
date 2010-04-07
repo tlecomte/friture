@@ -26,6 +26,14 @@ import spectrogram_settings # settings dialog
 SMOOTH_DISPLAY_TIMER_PERIOD_MS = 25
 SAMPLING_RATE = 44100
 
+# shared with spectrogram_settings.py
+DEFAULT_FFT_SIZE = 7
+DEFAULT_MAXFREQ = SAMPLING_RATE/2
+DEFAULT_MINFREQ = 20
+DEFAULT_SPEC_MIN = -140
+DEFAULT_SPEC_MAX = 0
+DEFAULT_TIMERANGE = 10.
+
 class Spectrogram_Widget(QtGui.QWidget, Ui_Spectrogram_Widget):
 	def __init__(self, parent, logger = None):
 		QtGui.QWidget.__init__(self, parent)
@@ -47,15 +55,15 @@ class Spectrogram_Widget(QtGui.QWidget, Ui_Spectrogram_Widget):
 		# initialize the class instance that will do the fft
 		self.proc = audioproc.audioproc()
 
-		self.maxfreq = SAMPLING_RATE/2
-		self.minfreq = 0
-		self.fft_size = 256
-		self.spec_min = -100.
-		self.spec_max = -20.
+		self.maxfreq = DEFAULT_MAXFREQ
+		self.minfreq = DEFAULT_MINFREQ
+		self.fft_size = 2**DEFAULT_FFT_SIZE*32
+		self.spec_min = DEFAULT_SPEC_MIN
+		self.spec_max = DEFAULT_SPEC_MAX
 		
 		self.spectrogram_timer_time = 0.
 		
-		self.timerange_s = 10.
+		self.timerange_s = DEFAULT_TIMERANGE
 		self.canvas_width = 100.
 		
 		# this timer is used to update the spectrogram widget, whose update period
