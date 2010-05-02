@@ -61,9 +61,24 @@ from centralwidget import CentralWidget
 SAMPLING_RATE = 44100
 SMOOTH_DISPLAY_TIMER_PERIOD_MS = 25
 
+STYLESHEET = """
+QMainWindow::separator {
+background: black;
+width: 1px;
+height: 1px;
+}
+
+QMainWindow::separator:hover {
+background: black;
+width: 1px;
+height: 1px;
+}
+"""
+
 class Friture(QtGui.QMainWindow, ):
 	def __init__(self, logger):
 		QtGui.QMainWindow.__init__(self)
+
 		Ui_MainWindow.__init__(self)
 
 		# logger
@@ -299,6 +314,12 @@ if __name__ == "__main__":
 	splash.show()
 	splash.showMessage("Initializing the audio subsystem")
 	app.processEvents()
+	
+	# Set the separator stylesheet here
+	# As of Qt 4.6, separator width is not handled correctly
+	# when the stylesheet is applied directly to the QMainWindow instance.
+	# QtCreator workarounds it with a "minisplitter" special class
+	app.setStyleSheet(STYLESHEET)
 	
 	# Logger class
 	logger = logger.Logger()
