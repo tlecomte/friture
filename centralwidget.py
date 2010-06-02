@@ -109,16 +109,20 @@ background-color: rgba(255,255,255,30%);
 }
 """
 
-class CentralWidget(QtGui.QWidget):
-	def __init__(self, parent, logger, name, type = 0):
-		QtGui.QWidget.__init__(self, parent)
+class CentralWidget(QtGui.QSplitter):
+	def __init__(self, parent, logger, name, audiobuffer, display_timer, type = 0):
+		QtGui.QSplitter.__init__(self, parent)
 		
 		self.setObjectName(name)
 		
 		self.parent = parent
 		self.logger = logger
+		self.audiobuffer = audiobuffer
+		self.display_timer = display_timer
 		
-		self.floatingcontrolWidget = QtGui.QWidget(self)
+		self.contained_widget = QtGui.QWidget(self)
+		
+		self.floatingcontrolWidget = QtGui.QWidget(self.contained_widget)
 		self.floatingcontrolLayout = QtGui.QHBoxLayout(self.floatingcontrolWidget)
 		
 		self.floatingcomboBox_select = QtGui.QComboBox(self.floatingcontrolWidget)
@@ -129,6 +133,9 @@ class CentralWidget(QtGui.QWidget):
 		self.floatingcomboBox_select.setCurrentIndex(0)
 		
 		self.floatingsettingsButton = QtGui.QToolButton (self.floatingcontrolWidget)
+		self.floatinghsplitButton = QtGui.QToolButton (self.floatingcontrolWidget)
+		self.floatingvsplitButton = QtGui.QToolButton (self.floatingcontrolWidget)
+		self.floatingcloseButton = QtGui.QToolButton (self.floatingcontrolWidget)
 		
 		settings_icon = QtGui.QIcon()
 		settings_icon.addPixmap(QtGui.QPixmap(":/dock-settings.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
@@ -136,12 +143,17 @@ class CentralWidget(QtGui.QWidget):
 		
 		self.connect(self.floatingcomboBox_select, QtCore.SIGNAL('activated(int)'), self.widget_select)
 		self.connect(self.floatingsettingsButton, QtCore.SIGNAL('clicked(bool)'), self.settings_slot)
+		self.connect(self.floatinghsplitButton, QtCore.SIGNAL('clicked(bool)'), self.hsplit_slot)
+		self.connect(self.floatingvsplitButton, QtCore.SIGNAL('clicked(bool)'), self.vsplit_slot)
 		
 		self.floatingcontrolLayout.addWidget(self.floatingcomboBox_select)
 		self.floatingcontrolLayout.addStretch()
 		self.floatingcontrolLayout.addWidget(self.floatingsettingsButton)
+		self.floatingcontrolLayout.addWidget(self.floatinghsplitButton)
+		self.floatingcontrolLayout.addWidget(self.floatingvsplitButton)
+		self.floatingcontrolLayout.addWidget(self.floatingcloseButton)
 		
-		self.floatingLayout = QtGui.QVBoxLayout(self)
+		self.floatingLayout = QtGui.QVBoxLayout(self.contained_widget)
 		self.floatingLayout.addWidget(self.floatingcontrolWidget)
 		#self.setLayout(self.floatingLayout)
 		
@@ -151,6 +163,8 @@ class CentralWidget(QtGui.QWidget):
 		self.floatingcontrolWidget.setObjectName("floatingcontrolWidget")
 		self.floatingcontrolWidget.setMaximumHeight(24)
 		self.setStyleSheet(STYLESHEET)
+		
+		self.addWidget(self.contained_widget)
 		
 		self.audiowidget = None
 		self.widget_select(type)
@@ -172,10 +186,10 @@ class CentralWidget(QtGui.QWidget):
 			self.audiowidget = Spectrogram_Widget(self, self.logger)
 			self.audiowidget.timer.start()
 		
-		self.audiowidget.set_buffer(self.parent.parent().audiobuffer)
+		self.audiowidget.set_buffer(self.audiobuffer)
 		
 		if self.audiowidget.update is not None:
-			self.connect(self.parent.parent().display_timer, QtCore.SIGNAL('timeout()'), self.audiowidget.update)
+			self.connect(self.display_timer, QtCore.SIGNAL('timeout()'), self.audiowidget.update)
 
 		self.floatingLayout.addWidget(self.audiowidget)
 		
@@ -195,3 +209,14 @@ class CentralWidget(QtGui.QWidget):
 		(type, ok) = settings.value("type", 0).toInt()
 		self.widget_select(type)
 		self.audiowidget.restoreState(settings)
+	
+	# slot
+	def hsplit_slot(self):
+		self.child_splitter = CentralWidget(self, self.logger, "essai", self.audiobuffer, self.display_timer)
+		self.addWidget(self.child_splitter)
+
+	# slot
+	def vsplit_slot(self):
+		self.child_splitter = CentralWidget(self, self.logger, "essai", self.audiobuffer, self.display_timer)
+		self.setOrientation(QtCore.Qt.Vertical)
+		self.addWidget(self.child_splitter)

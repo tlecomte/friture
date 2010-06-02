@@ -62,8 +62,8 @@ stop: 0.9 #4c4c4c, stop: 1 #333333);
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>82</width>
-          <height>227</height>
+          <width>87</width>
+          <height>221</height>
          </rect>
         </property>
         <property name="styleSheet">
@@ -147,8 +147,8 @@ color: white;
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>74</width>
-          <height>240</height>
+          <width>69</width>
+          <height>250</height>
          </rect>
         </property>
         <property name="styleSheet">

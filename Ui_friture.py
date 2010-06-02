@@ -2,8 +2,8 @@
 
 # Form implementation generated from reading ui file 'friture.ui'
 #
-# Created: Tue Mar 30 12:03:27 2010
-#      by: PyQt4 UI code generator 4.7
+# Created: Sun May 02 14:29:38 2010
+#      by: PyQt4 UI code generator 4.5.4
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -32,11 +32,11 @@ class Ui_MainWindow(object):
         self.scrollArea.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
         self.scrollArea.setObjectName("scrollArea")
         self.scrollAreaWidgetContents = QtGui.QWidget(self.scrollArea)
-        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 82, 227))
-        self.scrollAreaWidgetContents.setStyleSheet("QWidget {\n"
-"background: white\n"
-"}\n"
-"")
+        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 87, 221))
+        self.scrollAreaWidgetContents.setStyleSheet("""QWidget {
+background: white
+}
+""")
         self.scrollAreaWidgetContents.setObjectName("scrollAreaWidgetContents")
         self.verticalLayout = QtGui.QVBoxLayout(self.scrollAreaWidgetContents)
         self.verticalLayout.setObjectName("verticalLayout")
@@ -50,18 +50,18 @@ class Ui_MainWindow(object):
         self.dockWidgetStatistics.setWidget(self.dockWidgetContents_2)
         MainWindow.addDockWidget(QtCore.Qt.DockWidgetArea(1), self.dockWidgetStatistics)
         self.toolBar = QtGui.QToolBar(MainWindow)
-        self.toolBar.setStyleSheet("QToolBar {\n"
-"border: none;\n"
-"background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,\n"
-"stop: 0 #a6a6a6, stop: 0.08 #7f7f7f,\n"
-"stop: 0.39999 #717171, stop: 0.4 #626262,\n"
-"stop: 0.9 #4c4c4c, stop: 1 #333333);\n"
-"}\n"
-"\n"
-"QToolButton {\n"
-"color: white;\n"
-"}\n"
-"")
+        self.toolBar.setStyleSheet("""QToolBar {
+border: none;
+background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+stop: 0 #a6a6a6, stop: 0.08 #7f7f7f,
+stop: 0.39999 #717171, stop: 0.4 #626262,
+stop: 0.9 #4c4c4c, stop: 1 #333333);
+}
+
+QToolButton {
+color: white;
+}
+""")
         self.toolBar.setToolButtonStyle(QtCore.Qt.ToolButtonTextBesideIcon)
         self.toolBar.setObjectName("toolBar")
         MainWindow.addToolBar(QtCore.Qt.TopToolBarArea, self.toolBar)
@@ -76,11 +76,11 @@ class Ui_MainWindow(object):
         self.scrollArea_2.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
         self.scrollArea_2.setObjectName("scrollArea_2")
         self.scrollAreaWidgetContents_2 = QtGui.QWidget(self.scrollArea_2)
-        self.scrollAreaWidgetContents_2.setGeometry(QtCore.QRect(0, 0, 74, 240))
-        self.scrollAreaWidgetContents_2.setStyleSheet("QWidget {\n"
-"background: white\n"
-"}\n"
-"")
+        self.scrollAreaWidgetContents_2.setGeometry(QtCore.QRect(0, 0, 69, 250))
+        self.scrollAreaWidgetContents_2.setStyleSheet("""QWidget {
+background: white
+}
+""")
         self.scrollAreaWidgetContents_2.setObjectName("scrollAreaWidgetContents_2")
         self.gridLayout_10 = QtGui.QGridLayout(self.scrollAreaWidgetContents_2)
         self.gridLayout_10.setObjectName("gridLayout_10")

@@ -117,14 +117,14 @@ class Friture(QtGui.QMainWindow, ):
 		current_device = self.audiobackend.get_current_device()
 		self.settings_dialog.comboBox_inputDevice.setCurrentIndex(current_device)
 
-		self.centralwidget = CentralWidget(self.ui.centralwidget, self.logger, "central_widget", 3)
-		self.centralLayout = QtGui.QVBoxLayout(self.ui.centralwidget)
-		self.centralLayout.setContentsMargins(0, 0, 0, 0)
-		self.centralLayout.addWidget(self.centralwidget)
-
 		# this timer is used to update widgets that just need to display as fast as they can
 		self.display_timer = QtCore.QTimer()
 		self.display_timer.setInterval(SMOOTH_DISPLAY_TIMER_PERIOD_MS) # constant timing
+
+		self.centralwidget = CentralWidget(self.ui.centralwidget, self.logger, "central_widget", self.audiobuffer, self.display_timer, 3)
+		self.centralLayout = QtGui.QVBoxLayout(self.ui.centralwidget)
+		self.centralLayout.setContentsMargins(0, 0, 0, 0)
+		self.centralLayout.addWidget(self.centralwidget)
 
 		# timer ticks
 		self.connect(self.display_timer, QtCore.SIGNAL('timeout()'), self.update_buffer)
