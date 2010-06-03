@@ -233,6 +233,9 @@ class Friture(QtGui.QMainWindow, ):
 			self.docks += [Dock(self, self.logger, "Dock 2", type = 2)] #spectrum
 			for dock in self.docks:
 				self.addDockWidget(QtCore.Qt.TopDockWidgetArea, dock)
+			# by default, hide the log and statistics docks
+			self.ui.dockWidgetLog.hide()
+			self.ui.dockWidgetStatistics.hide()
 
 		settings.endGroup()
 
