@@ -62,18 +62,19 @@ SAMPLING_RATE = 44100
 SMOOTH_DISPLAY_TIMER_PERIOD_MS = 25
 
 STYLESHEET = """
-QMainWindow::separator {
-background: black;
-width: 1px;
-height: 1px;
-}
-
-QMainWindow::separator:hover {
-background: black;
-width: 1px;
-height: 1px;
-}
 """
+#QMainWindow::separator {
+#background: black;
+#width: 1px;
+#height: 1px;
+#}
+#
+#QMainWindow::separator:hover {
+#background: black;
+#width: 1px;
+#height: 1px;
+#}
+#"""
 
 class Friture(QtGui.QMainWindow, ):
 	def __init__(self, logger):
