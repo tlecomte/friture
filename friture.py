@@ -304,7 +304,10 @@ if __name__ == "__main__":
 		# set the App ID for Windows 7 to properly display the icon in the
 		# taskbar.
 		myappid = 'Friture.Friture.Friture.current' # arbitrary string
-		ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
+		try:
+			ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
+		except:
+			print "Could not set the app model ID. If the plaftorm is older than Windows 7, this is normal."
 
 	app = QtGui.QApplication(sys.argv)
 
