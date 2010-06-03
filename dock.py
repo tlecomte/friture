@@ -186,8 +186,8 @@ class Dock(QtGui.QDockWidget):
 		#self.connect(self.floatingdockButton, QtCore.SIGNAL('clicked(bool)'), self.dock_slot)
 		
 		self.floatingcontrolLayout.addWidget(self.floatingcomboBox_select)
-		self.floatingcontrolLayout.addStretch()
 		self.floatingcontrolLayout.addWidget(self.floatingsettingsButton)
+		self.floatingcontrolLayout.addStretch()
 		#self.floatingcontrolLayout.addWidget(self.floatingdockButton)
 		
 		self.dockwidget = QtGui.QWidget(self)

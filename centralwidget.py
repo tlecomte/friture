@@ -139,8 +139,8 @@ class CentralWidget(QtGui.QWidget):
 		self.connect(self.floatingsettingsButton, QtCore.SIGNAL('clicked(bool)'), self.settings_slot)
 		
 		self.floatingcontrolLayout.addWidget(self.floatingcomboBox_select)
-		self.floatingcontrolLayout.addStretch()
 		self.floatingcontrolLayout.addWidget(self.floatingsettingsButton)
+		self.floatingcontrolLayout.addStretch()
 		
 		self.floatingLayout = QtGui.QVBoxLayout(self)
 		self.floatingLayout.addWidget(self.floatingcontrolWidget)
