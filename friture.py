@@ -215,9 +215,16 @@ class Friture(QtGui.QMainWindow, ):
 		settings = QtCore.QSettings("Friture", "Friture")
 
 		settings.beginGroup("Docks")
-		docknames = settings.value("dockNames", []).toList()
-		docknames = [dockname.toString() for dockname in docknames]
-		if len(docknames) is 0:
+		if settings.contains("dockNames"):
+			docknames = settings.value("dockNames", []).toList()
+			docknames = [dockname.toString() for dockname in docknames]
+			# list of docks
+			self.docks = [Dock(self, self.logger, name) for name in docknames]
+			for dock in self.docks:
+				settings.beginGroup(dock.objectName())
+				dock.restoreState(settings)
+				settings.endGroup()
+		else:
 			print "First launch, display a default set of docks"
 			default_docknames = ["Dock 0, Dock 1, Dock 2"]
 			self.docks = []
@@ -226,13 +233,7 @@ class Friture(QtGui.QMainWindow, ):
 			self.docks += [Dock(self, self.logger, "Dock 2", type = 2)] #spectrum
 			for dock in self.docks:
 				self.addDockWidget(QtCore.Qt.TopDockWidgetArea, dock)
-		else:
-			# list of docks
-			self.docks = [Dock(self, self.logger, name) for name in docknames]
-			for dock in self.docks:
-				settings.beginGroup(dock.objectName())
-				dock.restoreState(settings)
-				settings.endGroup()
+
 		settings.endGroup()
 
 		settings.beginGroup("CentralWidget")
