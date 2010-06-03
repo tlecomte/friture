@@ -98,8 +98,14 @@ class ImagePlot(Qwt.QwtPlot):
 		self.setAxisScaleDraw(Qwt.QwtPlot.yLeft, FreqScaleDraw())
 		self.setAxisScaleDraw(Qwt.QwtPlot.yRight, FreqScaleDraw())
 		# set axis titles
-		self.setAxisTitle(Qwt.QwtPlot.xBottom, 'Time (s)')
-		self.setAxisTitle(Qwt.QwtPlot.yLeft, 'Frequency (Hz)')
+		xtitle = Qwt.QwtText('Time (s)')
+		xtitle.setFont(QtGui.QFont(8))
+		self.setAxisTitle(Qwt.QwtPlot.xBottom, xtitle)
+		# self.setAxisTitle(Qwt.QwtPlot.xBottom, 'Time (s)')
+		ytitle = Qwt.QwtText('Frequency (Hz)')
+		ytitle.setFont(QtGui.QFont(8))
+		self.setAxisTitle(Qwt.QwtPlot.yLeft, ytitle)
+		# self.setAxisTitle(Qwt.QwtPlot.yLeft, 'Frequency (Hz)')
 		self.enableAxis(Qwt.QwtPlot.yRight)
 		# attach a plot image
 		self.plotImage = PlotImage()

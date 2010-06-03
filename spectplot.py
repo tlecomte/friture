@@ -56,9 +56,14 @@ class SpectPlot(classplot.ClassPlot):
 		self.canvas().setPaintAttribute(Qwt.QwtPlotCanvas.PaintPacked, False)
 
 		self.setAxisScale(Qwt.QwtPlot.yLeft, -140., 0.)
-		self.setAxisTitle(Qwt.QwtPlot.xBottom, 'Frequency (Hz)')
-		self.setAxisTitle(Qwt.QwtPlot.yLeft, 'PSD (dB)')
-		#self.axisWidget(Qwt.QwtPlot.xBottom).setFont(self.font())
+		xtitle = Qwt.QwtText('Frequency (Hz)')
+		xtitle.setFont(QtGui.QFont(8))
+		self.setAxisTitle(Qwt.QwtPlot.xBottom, xtitle)
+		# self.setAxisTitle(Qwt.QwtPlot.xBottom, 'Frequency (Hz)')
+		ytitle = Qwt.QwtText('PSD (dB)')
+		ytitle.setFont(QtGui.QFont(8))
+		self.setAxisTitle(Qwt.QwtPlot.yLeft, ytitle)
+		# self.setAxisTitle(Qwt.QwtPlot.yLeft, 'PSD (dB)')
 
 		# attach a grid
 		grid = Qwt.QwtPlotGrid()

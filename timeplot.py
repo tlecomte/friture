@@ -19,7 +19,7 @@
 
 import classplot
 import PyQt4.Qwt5 as Qwt
-from PyQt4 import QtCore, Qt
+from PyQt4 import QtCore, Qt, QtGui
 from numpy import log10, interp, linspace
 
 class picker(Qwt.QwtPlotPicker):
@@ -43,8 +43,14 @@ class TimePlot(classplot.ClassPlot):
 		grid.setMajPen(Qt.QPen(Qt.Qt.lightGray))
 		grid.attach(self)
 
-		self.setAxisTitle(Qwt.QwtPlot.xBottom, 'Time (ms)')
-		self.setAxisTitle(Qwt.QwtPlot.yLeft, 'Signal')
+		xtitle = Qwt.QwtText('Time (ms)')
+		xtitle.setFont(QtGui.QFont(8))
+		self.setAxisTitle(Qwt.QwtPlot.xBottom, xtitle)
+		# self.setAxisTitle(Qwt.QwtPlot.xBottom, 'Time (ms)')
+		ytitle = Qwt.QwtText('Signal')
+		ytitle.setFont(QtGui.QFont(8))
+		self.setAxisTitle(Qwt.QwtPlot.yLeft, ytitle)
+		# self.setAxisTitle(Qwt.QwtPlot.yLeft, 'Signal')
 		self.setAxisScale(Qwt.QwtPlot.yLeft, -1., 1.)
 		self.setAxisScaleEngine(Qwt.QwtPlot.xBottom, Qwt.QwtLinearScaleEngine())
 		self.xmax = 0
