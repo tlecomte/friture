@@ -5,10 +5,15 @@ from glob import glob
 
 # to build an executable for Windows, run 'python setup.py py2exe'
 
+#include the QT svg plugin to render the icons
 data_files = [("imageformats", glob(r'C:\Python*\Lib\site-packages\PyQt4\plugins\imageformats\qsvg4.dll'))]
+#exclude some python libraries that py2exe includes by error
+excludes = ["matplotlib","_ssl","Tkconstants","Tkinter","tcl"]
+#exclude dlls that py2exe includes by error
+dll_excludes = ["powrprof.dll"]
+#manually exclude python libraries that py2exe fails to detect
+includes = ["sip", "PyQt4.QtSvg"]
 
 setup(windows=[{"script":'friture.py', "icon_resources":[(1, "window-icon.ico")]}],
-	  options={"py2exe":{"includes":["sip", "PyQt4.QtSvg"],
-						 "excludes":["matplotlib","_ssl","Tkconstants","Tkinter","tcl"],
-						 "dll_excludes":["powrprof.dll"]}},
+	  options={"py2exe":{"includes":includes, "excludes":excludes, "dll_excludes":dll_excludes}},
 	  data_files=data_files)
