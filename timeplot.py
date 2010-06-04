@@ -30,6 +30,20 @@ class picker(Qwt.QwtPlotPicker):
 		pos2 = self.invTransform(pos)
 		return Qwt.QwtText("%.3g ms, %.3g" %(pos2.x(), pos2.y()))
 
+	def drawTracker(self, painter):
+		textRect = self.trackerRect(painter.font())
+		if not textRect.isEmpty():
+		  	   label = self.trackerText(self.trackerPosition())
+		  	   if not label.isEmpty():
+		  	   	   painter.save()
+		  	   	   painter.setPen(Qt.Qt.NoPen)
+		  	   	   painter.setBrush(Qt.Qt.white)
+		  	   	   painter.drawRect(textRect)
+		  	   	   painter.setPen(Qt.Qt.black)
+		  	   	   #painter->setRenderHint(QPainter::TextAntialiasing, false);
+		  	   	   label.draw(painter, textRect)
+		  	   	   painter.restore()
+
 class TimePlot(classplot.ClassPlot):
 	def __init__(self, *args):
 		classplot.ClassPlot.__init__(self, *args)

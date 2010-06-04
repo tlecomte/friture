@@ -45,7 +45,21 @@ class picker(Qwt.QwtPlotPicker):
 		
 	def trackerText(self, pos):
 		pos2 = self.invTransform(pos)
-		return Qwt.QwtText("%d Hz, %d dB" %(pos2.x(), pos2.y()))
+		return Qwt.QwtText("%d Hz, %.1f dB" %(pos2.x(), pos2.y()))
+
+	def drawTracker(self, painter):
+		textRect = self.trackerRect(painter.font())
+		if not textRect.isEmpty():
+		  	   label = self.trackerText(self.trackerPosition())
+		  	   if not label.isEmpty():
+		  	   	   painter.save()
+		  	   	   painter.setPen(Qt.Qt.NoPen)
+		  	   	   painter.setBrush(Qt.Qt.white)
+		  	   	   painter.drawRect(textRect)
+		  	   	   painter.setPen(Qt.Qt.black)
+		  	   	   #painter->setRenderHint(QPainter::TextAntialiasing, false);
+		  	   	   label.draw(painter, textRect)
+		  	   	   painter.restore()
 
 class SpectPlot(classplot.ClassPlot):
 	def __init__(self, *args):
