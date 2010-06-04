@@ -196,6 +196,10 @@ background: white
    </property>
   </action>
   <action name="actionNew_dock">
+   <property name="icon">
+    <iconset resource="resource.qrc">
+     <normaloff>:/new-dock.svg</normaloff>:/new-dock.svg</iconset>
+   </property>
    <property name="text">
     <string>New dock</string>
    </property>
