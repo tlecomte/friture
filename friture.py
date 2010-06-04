@@ -74,6 +74,18 @@ STYLESHEET = """
 #width: 1px;
 #height: 1px;
 #}
+#
+#QToolBar {
+#border: none;
+#background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+#stop: 0 #a6a6a6, stop: 0.08 #7f7f7f,
+#stop: 0.39999 #717171, stop: 0.4 #626262,
+#stop: 0.9 #4c4c4c, stop: 1 #333333);
+#}
+#
+#QToolButton {
+#color: white;
+#}
 #"""
 
 class Friture(QtGui.QMainWindow, ):

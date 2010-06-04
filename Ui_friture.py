@@ -2,8 +2,8 @@
 
 # Form implementation generated from reading ui file 'friture.ui'
 #
-# Created: Tue Mar 30 12:03:27 2010
-#      by: PyQt4 UI code generator 4.7
+# Created: Fri Jun  4 14:25:41 2010
+#      by: PyQt4 UI code generator 4.7.2
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -17,9 +17,11 @@ class Ui_MainWindow(object):
         icon.addPixmap(QtGui.QPixmap(":/window-icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         MainWindow.setWindowIcon(icon)
         self.centralwidget = QtGui.QWidget(MainWindow)
+        self.centralwidget.setStyleSheet("None")
         self.centralwidget.setObjectName("centralwidget")
         MainWindow.setCentralWidget(self.centralwidget)
         self.dockWidgetStatistics = QtGui.QDockWidget(MainWindow)
+        self.dockWidgetStatistics.setStyleSheet("None")
         self.dockWidgetStatistics.setObjectName("dockWidgetStatistics")
         self.dockWidgetContents_2 = QtGui.QWidget()
         self.dockWidgetContents_2.setObjectName("dockWidgetContents_2")
@@ -50,21 +52,9 @@ class Ui_MainWindow(object):
         self.dockWidgetStatistics.setWidget(self.dockWidgetContents_2)
         MainWindow.addDockWidget(QtCore.Qt.DockWidgetArea(1), self.dockWidgetStatistics)
         self.toolBar = QtGui.QToolBar(MainWindow)
-        self.toolBar.setStyleSheet("QToolBar {\n"
-"border: none;\n"
-"background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,\n"
-"stop: 0 #a6a6a6, stop: 0.08 #7f7f7f,\n"
-"stop: 0.39999 #717171, stop: 0.4 #626262,\n"
-"stop: 0.9 #4c4c4c, stop: 1 #333333);\n"
-"}\n"
-"\n"
-"QToolButton {\n"
-"color: white;\n"
-"}\n"
-"")
         self.toolBar.setToolButtonStyle(QtCore.Qt.ToolButtonTextBesideIcon)
         self.toolBar.setObjectName("toolBar")
-        MainWindow.addToolBar(QtCore.Qt.TopToolBarArea, self.toolBar)
+        MainWindow.addToolBar(QtCore.Qt.ToolBarArea(QtCore.Qt.TopToolBarArea), self.toolBar)
         self.dockWidgetLog = QtGui.QDockWidget(MainWindow)
         self.dockWidgetLog.setObjectName("dockWidgetLog")
         self.dockWidgetContents_3 = QtGui.QWidget()
@@ -126,13 +116,6 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QtGui.QApplication.translate("MainWindow", "Friture", None, QtGui.QApplication.UnicodeUTF8))
-        MainWindow.setStyleSheet(QtGui.QApplication.translate("MainWindow", "QToolBar {\n"
-"border: none;\n"
-"background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,\n"
-"stop: 0 #a6a6a6, stop: 0.08 #7f7f7f,\n"
-"stop: 0.39999 #717171, stop: 0.4 #626262,\n"
-"stop: 0.9 #4c4c4c, stop: 1 #333333);\n"
-" }", None, QtGui.QApplication.UnicodeUTF8))
         self.dockWidgetStatistics.setWindowTitle(QtGui.QApplication.translate("MainWindow", "Statistics", None, QtGui.QApplication.UnicodeUTF8))
         self.LabelLevel.setText(QtGui.QApplication.translate("MainWindow", "No statistics", None, QtGui.QApplication.UnicodeUTF8))
         self.toolBar.setWindowTitle(QtGui.QApplication.translate("MainWindow", "toolBar", None, QtGui.QApplication.UnicodeUTF8))
