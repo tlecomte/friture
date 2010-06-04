@@ -192,7 +192,7 @@ background: white
      <normaloff>:/window-icon.svg</normaloff>:/window-icon.svg</iconset>
    </property>
    <property name="text">
-    <string>About</string>
+    <string>About Friture</string>
    </property>
   </action>
   <action name="actionNew_dock">
