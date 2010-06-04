@@ -189,7 +189,7 @@ background: white
   <action name="actionAbout">
    <property name="icon">
     <iconset resource="resource.qrc">
-     <normaloff>:/about.svg</normaloff>:/about.svg</iconset>
+     <normaloff>:/window-icon.svg</normaloff>:/window-icon.svg</iconset>
    </property>
    <property name="text">
     <string>About</string>
