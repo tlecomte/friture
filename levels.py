@@ -53,6 +53,8 @@ class Levels_Widget(QtGui.QWidget, Ui_Levels_Widget):
 		if not self.isVisible():
 			return
 		
+		# for slower response, we need to implement a low-pass filter here. 
+		
 		time = SMOOTH_DISPLAY_TIMER_PERIOD_MS/1000.
 		floatdata = self.audiobuffer.data(time*SAMPLING_RATE)
 		
