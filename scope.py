@@ -18,7 +18,7 @@
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
 from PyQt4 import QtGui
-from numpy import log10, where, linspace
+from numpy import log10, where, linspace, sign
 from Ui_scope import Ui_Scope_Widget
 import scope_settings # settings dialog
 
@@ -79,7 +79,7 @@ class Scope_Widget(QtGui.QWidget, Ui_Scope_Widget):
 		
 		dBscope = False
 		if dBscope:
-		    dBmin = -40.
+		    dBmin = -50.
 		    y = sign(y)*(20*log10(abs(y))).clip(dBmin, 0.)/(-dBmin) + sign(y)*1.
 	
 		time = linspace(0., len(floatdata)/float(SAMPLING_RATE), len(floatdata))
