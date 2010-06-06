@@ -28,7 +28,7 @@ class Levels_Settings_Dialog(QtGui.QDialog):
 		
 		self.setWindowTitle("Levels settings")
 		
-		#self.formLayout = QtGui.QFormLayout(self)
+		self.formLayout = QtGui.QFormLayout(self)
 		
 		#self.doubleSpinBox_timerange = QtGui.QDoubleSpinBox(self)
 		#self.doubleSpinBox_timerange.setDecimals(1)
@@ -39,8 +39,9 @@ class Levels_Settings_Dialog(QtGui.QDialog):
 		#self.doubleSpinBox_timerange.setSuffix(" s")
 
 		#self.formLayout.addRow("Time range:", self.doubleSpinBox_timerange)
+		self.formLayout.addRow("No settings for the levels.", None)
 		
-		#self.setLayout(self.formLayout)
+		self.setLayout(self.formLayout)
 
 		#self.connect(self.doubleSpinBox_timerange, QtCore.SIGNAL('valueChanged(double)'), self.parent.timerangechanged)
 
