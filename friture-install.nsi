@@ -112,7 +112,7 @@ SectionEnd
 Section MSVC
   InitPluginsDir
   SetOutPath $PLUGINSDIR
-  File ""
+  File "vcredist_x86.exe"
   DetailPrint "Installing Visual C++ 2008 Libraries"
   ExecWait '"$PLUGINSDIR\vcredist_x86.exe" /qb!"'
 SectionEnd
