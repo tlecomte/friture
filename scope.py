@@ -30,7 +30,7 @@ QwtPlotCanvas {
 	border: 1px solid gray;
 	border-radius: 2px;
 	background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-	stop: 0 #C0C0C0, stop: 0.3 #FFFFFF);
+	stop: 0 #E0E0E0, stop: 0.5 #FFFFFF);
 }
 """
 
