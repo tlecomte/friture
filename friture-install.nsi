@@ -109,6 +109,14 @@ Section "SectionPrincipale" SEC01
   File "TODO"
 SectionEnd
 
+Section MSVC
+  InitPluginsDir
+  SetOutPath $PLUGINSDIR
+  File ""
+  DetailPrint "Installing Visual C++ 2008 Libraries"
+  ExecWait '"$PLUGINSDIR\vcredist_x86.exe" /qb!"'
+SectionEnd
+
 Section -AdditionalIcons
   CreateShortCut "$SMPROGRAMS\Friture\Uninstall.lnk" "$INSTDIR\uninst.exe"
 SectionEnd
@@ -162,7 +170,6 @@ Section Uninstall
   Delete "$INSTDIR\PyQt4.QtCore.pyd"
   Delete "$INSTDIR\PyQt4.Qt.pyd"
   Delete "$INSTDIR\pyexpat.pyd"
-  Delete "$INSTDIR\POWRPROF.dll"
   Delete "$INSTDIR\numpy.random.mtrand.pyd"
   Delete "$INSTDIR\numpy.linalg.lapack_lite.pyd"
   Delete "$INSTDIR\numpy.lib._compiled_base.pyd"
@@ -173,13 +180,9 @@ Section Uninstall
   Delete "$INSTDIR\numpy.core.scalarmath.pyd"
   Delete "$INSTDIR\numpy.core.multiarray.pyd"
   Delete "$INSTDIR\library.zip"
-  Delete "$INSTDIR\KERNELBASE.dll"
   Delete "$INSTDIR\imageformats\qsvg4.dll"
   Delete "$INSTDIR\friture.exe"
   Delete "$INSTDIR\bz2.pyd"
-  Delete "$INSTDIR\API-MS-Win-Security-Base-L1-1-0.dll"
-  Delete "$INSTDIR\API-MS-Win-Core-ProcessThreads-L1-1-0.dll"
-  Delete "$INSTDIR\API-MS-Win-Core-LocalRegistry-L1-1-0.dll"
 
   Delete "$SMPROGRAMS\Friture\Uninstall.lnk"
   Delete "$DESKTOP\Friture.lnk"
