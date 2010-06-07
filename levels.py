@@ -17,18 +17,60 @@
 # You should have received a copy of the GNU General Public License
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt4 import QtGui
+from PyQt4 import QtCore, QtGui
 from numpy import log10
-from Ui_levels import Ui_Levels_Widget
 import levels_settings # settings dialog
+from qsynthmeter import qsynthMeter
+
+STYLESHEET = """
+qsynthMeter {
+border: 1px solid gray;
+border-radius: 2px;
+padding: 1px;
+}
+"""
 
 SMOOTH_DISPLAY_TIMER_PERIOD_MS = 25
 SAMPLING_RATE = 44100
 
-class Levels_Widget(QtGui.QWidget, Ui_Levels_Widget):
+class Levels_Widget(QtGui.QWidget):
 	def __init__(self, parent = None, logger = None):
 		QtGui.QWidget.__init__(self, parent)
-		Ui_Levels_Widget.__init__(self)
+		self.setObjectName("Levels_Widget")
+		
+		self.gridLayout = QtGui.QGridLayout(self)
+		self.gridLayout.setObjectName("gridLayout")
+		self.label_rms = QtGui.QLabel(self)
+		font = QtGui.QFont()
+		font.setPointSize(14)
+		font.setWeight(75)
+		font.setBold(True)
+		self.label_rms.setFont(font)
+		self.label_rms.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing)
+		self.label_rms.setObjectName("label_rms")
+		self.gridLayout.addWidget(self.label_rms, 0, 0, 1, 1)
+		self.meter = qsynthMeter(self)
+		self.meter.setStyleSheet(STYLESHEET)
+		self.meter.setObjectName("meter")
+		self.gridLayout.addWidget(self.meter, 0, 1, 2, 1)
+		self.label_peak = QtGui.QLabel(self)
+		self.label_peak.setFont(font)
+		self.label_peak.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft)
+		self.label_peak.setObjectName("label_peak")
+		self.gridLayout.addWidget(self.label_peak, 0, 2, 1, 1)
+		self.label_rms_legend = QtGui.QLabel(self)
+		self.label_rms_legend.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTop|QtCore.Qt.AlignTrailing)
+		self.label_rms_legend.setObjectName("label_rms_legend")
+		self.gridLayout.addWidget(self.label_rms_legend, 1, 0, 1, 1)
+		self.label_peak_legend = QtGui.QLabel(self)
+		self.label_peak_legend.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
+		self.label_peak_legend.setObjectName("label_peak_legend")
+		self.gridLayout.addWidget(self.label_peak_legend, 1, 2, 1, 1)
+
+		self.label_rms.setText("-100.0")
+		self.label_peak.setText("-100.0")
+		self.label_rms_legend.setText("dBFS\n RMS")
+		self.label_peak_legend.setText("dBFS\n peak")
 
 		# store the logger instance
 		if logger is None:
@@ -37,9 +79,6 @@ class Levels_Widget(QtGui.QWidget, Ui_Levels_Widget):
 		    self.logger = logger
 
 		self.audiobuffer = None
-		
-		# Setup the user interface
-		self.setupUi(self)
 		
 		# initialize the settings dialog
 		self.settings_dialog = levels_settings.Levels_Settings_Dialog(self, self.logger)
