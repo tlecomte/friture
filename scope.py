@@ -19,7 +19,7 @@
 
 from PyQt4 import QtGui
 from numpy import log10, where, linspace, sign
-from Ui_scope import Ui_Scope_Widget
+from timeplot import TimePlot
 import scope_settings # settings dialog
 
 SMOOTH_DISPLAY_TIMER_PERIOD_MS = 25
@@ -34,11 +34,17 @@ QwtPlotCanvas {
 }
 """
 
-class Scope_Widget(QtGui.QWidget, Ui_Scope_Widget):
+class Scope_Widget(QtGui.QWidget):
 	def __init__(self, parent = None, logger = None):
 		QtGui.QWidget.__init__(self, parent)
-		Ui_Scope_Widget.__init__(self)
-		
+
+		self.setObjectName("Scope_Widget")
+		self.gridLayout = QtGui.QGridLayout(self)
+		self.gridLayout.setObjectName("gridLayout")
+		self.PlotZoneUp = TimePlot(self)
+		self.PlotZoneUp.setObjectName("PlotZoneUp")
+		self.gridLayout.addWidget(self.PlotZoneUp, 0, 0, 1, 1)
+
 		self.audiobuffer = None
 		
 		# store the logger instance
@@ -46,9 +52,6 @@ class Scope_Widget(QtGui.QWidget, Ui_Scope_Widget):
 		    self.logger = parent.parent.logger
 		else:
 		    self.logger = logger
-		
-		# Setup the user interface
-		self.setupUi(self)
 		
 		self.setStyleSheet(STYLESHEET)
 
