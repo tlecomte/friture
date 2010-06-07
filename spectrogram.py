@@ -19,7 +19,7 @@
 
 from PyQt4 import QtGui, QtCore
 from numpy import log10, where, linspace
-from Ui_spectrogram import Ui_Spectrogram_Widget
+from imageplot import ImagePlot
 import audioproc # audio processing class
 import spectrogram_settings # settings dialog
 
@@ -34,11 +34,17 @@ DEFAULT_SPEC_MIN = -140
 DEFAULT_SPEC_MAX = 0
 DEFAULT_TIMERANGE = 10.
 
-class Spectrogram_Widget(QtGui.QWidget, Ui_Spectrogram_Widget):
+class Spectrogram_Widget(QtGui.QWidget):
 	def __init__(self, parent, logger = None):
 		QtGui.QWidget.__init__(self, parent)
-		Ui_Spectrogram_Widget.__init__(self)
-		
+
+		self.setObjectName("Spectrogram_Widget")
+		self.gridLayout = QtGui.QGridLayout(self)
+		self.gridLayout.setObjectName("gridLayout")
+		self.PlotZoneImage = ImagePlot(self)
+		self.PlotZoneImage.setObjectName("PlotZoneImage")
+		self.gridLayout.addWidget(self.PlotZoneImage, 0, 1, 1, 1)
+
 		# store the logger instance
 		if logger is None:
 		    self.logger = parent.parent().logger
@@ -48,9 +54,6 @@ class Spectrogram_Widget(QtGui.QWidget, Ui_Spectrogram_Widget):
 		self.parent = parent
 		
 		self.audiobuffer = None
-		
-		# Setup the user interface
-		self.setupUi(self)
 		
 		# initialize the class instance that will do the fft
 		self.proc = audioproc.audioproc()
