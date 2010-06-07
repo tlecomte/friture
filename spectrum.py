@@ -19,7 +19,7 @@
 
 from PyQt4 import QtGui, QtCore
 from numpy import log10, where, linspace
-from Ui_spectrum import Ui_Spectrum_Widget
+from spectplot import SpectPlot
 import audioproc # audio processing class
 import spectrum_settings # settings dialog
 
@@ -42,10 +42,16 @@ DEFAULT_MINFREQ = 20
 DEFAULT_SPEC_MIN = -140
 DEFAULT_SPEC_MAX = 0
 
-class Spectrum_Widget(QtGui.QWidget, Ui_Spectrum_Widget):
+class Spectrum_Widget(QtGui.QWidget):
 	def __init__(self, parent, logger = None):
 		QtGui.QWidget.__init__(self, parent)
-		Ui_Spectrum_Widget.__init__(self)
+
+		self.setObjectName("Spectrum_Widget")
+		self.gridLayout = QtGui.QGridLayout(self)
+		self.gridLayout.setObjectName("gridLayout")
+		self.PlotZoneSpect = SpectPlot(self)
+		self.PlotZoneSpect.setObjectName("PlotZoneSpect")
+		self.gridLayout.addWidget(self.PlotZoneSpect, 0, 0, 1, 1)
 
 		# store the logger instance
 		if logger is None:
@@ -55,9 +61,6 @@ class Spectrum_Widget(QtGui.QWidget, Ui_Spectrum_Widget):
 
 		self.audiobuffer = None
 
-		# Setup the user interface
-		self.setupUi(self)
-		
 		self.setStyleSheet(STYLESHEET)
 		
 		# initialize the class instance that will do the fft
