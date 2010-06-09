@@ -27,6 +27,7 @@ import logger # Logging class
 import audiobuffer # audio ring buffer class
 import audiobackend # audio backend class
 from centralwidget import CentralWidget
+import psutil # for CPU usage monitoring
 
 #pyuic4 friture.ui > Ui_friture.py
 #pyrcc4 resource.qrc > resource_rc.py
@@ -116,6 +117,8 @@ class Friture(QtGui.QMainWindow, ):
 		self.chunk_number = 0
 		
 		self.buffer_timer_time = 0.
+		
+		self.cpu_percent = 0.
 
 		# Initialize the audio data ring buffer
 		self.audiobuffer = audiobuffer.AudioBuffer()
@@ -143,6 +146,13 @@ class Friture(QtGui.QMainWindow, ):
 		self.connect(self.display_timer, QtCore.SIGNAL('timeout()'), self.update_buffer)
 		self.connect(self.display_timer, QtCore.SIGNAL('timeout()'), self.statistics)
 		
+		# slow timer
+		self.slow_timer = QtCore.QTimer()
+		self.slow_timer.setInterval(1000) # constant timing
+
+		# timer ticks
+		self.connect(self.slow_timer, QtCore.SIGNAL('timeout()'), self.get_cpu_percent)
+		
 		# toolbar clicks
 		self.connect(self.ui.actionStart, QtCore.SIGNAL('triggered()'), self.timer_toggle)
 		self.connect(self.ui.actionSettings, QtCore.SIGNAL('triggered()'), self.settings_called)
@@ -161,6 +171,7 @@ class Friture(QtGui.QMainWindow, ):
 
 		# start timers
 		self.timer_toggle()
+		self.slow_timer.start()
 		
 		self.logger.push("Init finished, entering the main loop")
 	
@@ -275,6 +286,9 @@ class Friture(QtGui.QMainWindow, ):
 		self.chunk_number += chunks
 		self.buffer_timer_time = (95.*self.buffer_timer_time + 5.*t)/100.
 
+	def get_cpu_percent(self):
+		self.cpu_percent = psutil.cpu_percent()
+
 	# method
 	def statistics(self):
 		if not self.ui.LabelLevel.isVisible():
@@ -288,7 +302,8 @@ class Friture(QtGui.QMainWindow, ):
 		"Levels painting: %.02f ms and %.02f ms\n"\
 		"Scope painting: %.02f ms\n"\
 		"Spectrum painting: %.02f ms\n"\
-		"Spectrogram painting: %.02f ms"\
+		"Spectrogram painting: %.02f ms\n"\
+		"Global CPU usage: %d %%"\
 		% (self.chunk_number,
 		0,#self.ui.spectrum.fft_size*1000./SAMPLING_RATE,
 		0,#self.ui.spectrogram.period_ms,
@@ -298,7 +313,8 @@ class Friture(QtGui.QMainWindow, ):
 		0,#self.ui.levels.meter.m_ppValues[1].paint_time,
 		0,#self.ui.scope.PlotZoneUp.paint_time,
 		0,#self.ui.spectrum.PlotZoneSpect.paint_time,
-		0)#self.ui.spectrogram.PlotZoneImage.paint_time)
+		0,#self.ui.spectrogram.PlotZoneImage.paint_time)
+		self.cpu_percent)
 		
 		self.ui.LabelLevel.setText(level_label)
 
