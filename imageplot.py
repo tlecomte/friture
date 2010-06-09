@@ -142,6 +142,9 @@ class ImagePlot(Qwt.QwtPlot):
 		self.replot()
 		
 		self.cached_canvas = self.canvas()
+		
+		# set the size policy to "Preferred" to allow the widget to be shrinked under the default size, which is quite big
+		self.setSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Preferred)
 
 	def addData(self, freq, xyzs):
 		self.plotImage.addData(freq, xyzs, self.logfreqscale)

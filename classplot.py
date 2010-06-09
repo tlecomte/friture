@@ -41,6 +41,9 @@ class ClassPlot(Qwt.QwtPlot):
 		# temporarly initialize some data
 		x = linspace(0.0, 10.0, 11)
 		self.curve.setData(x, sin(x))
+		
+		# set the size policy to "Preferred" to allow the widget to be shrinked under the default size, which is quite big
+		self.setSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Preferred)
 
 	def setdata(self,x,y):
 		# FIXME the following raises issues with the peaks display in the spectrum
