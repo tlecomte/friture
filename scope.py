@@ -38,13 +38,6 @@ class Scope_Widget(QtGui.QWidget):
 	def __init__(self, parent = None, logger = None):
 		QtGui.QWidget.__init__(self, parent)
 
-		self.setObjectName("Scope_Widget")
-		self.gridLayout = QtGui.QGridLayout(self)
-		self.gridLayout.setObjectName("gridLayout")
-		self.PlotZoneUp = TimePlot(self)
-		self.PlotZoneUp.setObjectName("PlotZoneUp")
-		self.gridLayout.addWidget(self.PlotZoneUp, 0, 0, 1, 1)
-
 		self.audiobuffer = None
 		
 		# store the logger instance
@@ -52,6 +45,13 @@ class Scope_Widget(QtGui.QWidget):
 		    self.logger = parent.parent.logger
 		else:
 		    self.logger = logger
+		
+		self.setObjectName("Scope_Widget")
+		self.gridLayout = QtGui.QGridLayout(self)
+		self.gridLayout.setObjectName("gridLayout")
+		self.PlotZoneUp = TimePlot(self, self.logger)
+		self.PlotZoneUp.setObjectName("PlotZoneUp")
+		self.gridLayout.addWidget(self.PlotZoneUp, 0, 0, 1, 1)
 		
 		self.setStyleSheet(STYLESHEET)
 

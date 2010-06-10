@@ -45,8 +45,11 @@ class picker(Qwt.QwtPlotPicker):
 		  	   	   painter.restore()
 
 class TimePlot(classplot.ClassPlot):
-	def __init__(self, *args):
-		classplot.ClassPlot.__init__(self, *args)
+	def __init__(self, parent, logger):
+		classplot.ClassPlot.__init__(self)
+
+		# store the logger instance
+		self.logger = logger
 
 		# we do not need caching
 		self.canvas().setPaintAttribute(Qwt.QwtPlotCanvas.PaintCached, False)
@@ -85,14 +88,14 @@ class TimePlot(classplot.ClassPlot):
 
 	def setdata(self, x, y):
 		if self.canvas_width <> self.cached_canvas.width():
-			print "changed canvas width"
+			self.logger.push("timeplot : changed canvas width")
 			self.canvas_width = self.cached_canvas.width()
 			self.update_xscale()
 		
 		x_ms =  1e3*x
 		needfullreplot = False
 		if self.xmax <> x_ms[-1]:
-			print "changing x scale"
+			self.logger.push("timeplot : changing x scale")
 			self.xmax = x_ms[-1]
 			self.setAxisScale(Qwt.QwtPlot.xBottom, 0., self.xmax)
 			self.update_xscale()
