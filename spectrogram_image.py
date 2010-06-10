@@ -22,8 +22,12 @@ from PyQt4 import Qt, QtCore, QtGui
 import PyQt4.Qwt5 as Qwt
 
 class CanvasScaledSpectrogram(QtCore.QObject):
-	def __init__(self, spectrum_length = 129, T = 10., canvas_height = 2,  canvas_width = 2):
+	def __init__(self, logger, spectrum_length = 129, T = 10., canvas_height = 2,  canvas_width = 2):
 		QtCore.QObject.__init__(self)
+		
+		# store the logger instance
+		self.logger = logger
+		
 		self.spectrum_length = spectrum_length
 		self.T = T
 		self.canvas_height = canvas_height
@@ -79,21 +83,21 @@ class CanvasScaledSpectrogram(QtCore.QObject):
 			self.T = T
 			self.current_total = 0
 			self.erase()
-			print "T changed, now: %.02f (%.03f frames per line)" %(T, self.n())
+			self.logger.push("Spectrogram image: T changed, now: %.02f (%.03f frames per line)" %(T, self.n()))
 
 	def setspectrum_length(self, spectrum_length):
 		if self.spectrum_length <> spectrum_length:
 			self.spectrum_length = spectrum_length
 			self.current_total = 0
 			self.erase()
-			print "spectrum_length changed, now: %d (%.03f frames per line)" %(spectrum_length, self.n())
+			self.logger.push("Spectrogram image: spectrum_length changed, now: %d (%.03f frames per line)" %(spectrum_length, self.n()))
 
 	def setcanvas_height(self, canvas_height):
 		if self.canvas_height <> canvas_height:
 			self.canvas_height = canvas_height
 			self.update_xscale()
 			self.erase()
-			print "canvas_height changed, now: %d (%.03f frames per line)" %(canvas_height, self.n())
+			self.logger.push("Spectrogram image: canvas_height changed, now: %d (%.03f frames per line)" %(canvas_height, self.n()))
 
 	def setcanvas_width(self, canvas_width):
 		if self.canvas_width <> canvas_width:
@@ -101,17 +105,17 @@ class CanvasScaledSpectrogram(QtCore.QObject):
 			self.current_total = 0
 			self.erase()
 			self.emit(QtCore.SIGNAL("canvasWidthChanged"), canvas_width)
-			print "canvas_width changed, now: %d (%.03f frames per line)" %(canvas_width, self.n())
+			self.logger.push("Spectrogram image: canvas_width changed, now: %d (%.03f frames per line)" %(canvas_width, self.n()))
 
 	def setlogfreqscale(self, logfreqscale):
 		if logfreqscale <> self.logfreqscale:
-			print "freq scale changed", logfreqscale
+			self.logger.push("Spectrogram image: freq scale changed %d" %(logfreqscale))
 			self.logfreqscale = logfreqscale
 			self.update_xscale()
 			self.erase()
 
 	def setfreqrange(self, minfreq, maxfreq):
-		print "freq range changed", minfreq, maxfreq
+		self.logger.push("Spectrogram image: freq range changed %.2f %.2f" %(minfreq, maxfreq))
 		self.minfreq = minfreq
 		self.maxfreq = maxfreq
 		self.update_xscale()

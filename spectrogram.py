@@ -38,13 +38,6 @@ class Spectrogram_Widget(QtGui.QWidget):
 	def __init__(self, parent, logger = None):
 		QtGui.QWidget.__init__(self, parent)
 
-		self.setObjectName("Spectrogram_Widget")
-		self.gridLayout = QtGui.QGridLayout(self)
-		self.gridLayout.setObjectName("gridLayout")
-		self.PlotZoneImage = ImagePlot(self)
-		self.PlotZoneImage.setObjectName("PlotZoneImage")
-		self.gridLayout.addWidget(self.PlotZoneImage, 0, 1, 1, 1)
-
 		# store the logger instance
 		if logger is None:
 		    self.logger = parent.parent().logger
@@ -52,7 +45,14 @@ class Spectrogram_Widget(QtGui.QWidget):
 		    self.logger = logger
 		
 		self.parent = parent
-		
+
+		self.setObjectName("Spectrogram_Widget")
+		self.gridLayout = QtGui.QGridLayout(self)
+		self.gridLayout.setObjectName("gridLayout")
+		self.PlotZoneImage = ImagePlot(self, self.logger)
+		self.PlotZoneImage.setObjectName("PlotZoneImage")
+		self.gridLayout.addWidget(self.PlotZoneImage, 0, 1, 1, 1)
+
 		self.audiobuffer = None
 		
 		# initialize the class instance that will do the fft

@@ -55,9 +55,9 @@ class picker(Qwt.QwtPlotPicker):
 		  	   	   painter.restore()
 
 class PlotImage(Qwt.QwtPlotItem):
-	def __init__(self):
+	def __init__(self, logger):
 		Qwt.QwtPlotItem.__init__(self)
-		self.canvasscaledspectrogram = CanvasScaledSpectrogram()
+		self.canvasscaledspectrogram = CanvasScaledSpectrogram(logger)
 
 	def addData(self, freq, xyzs, logfreqscale):
 		self.canvasscaledspectrogram.setlogfreqscale(logfreqscale)
@@ -95,8 +95,8 @@ class PlotImage(Qwt.QwtPlotItem):
 
 class ImagePlot(Qwt.QwtPlot):
 
-	def __init__(self, *args):
-		Qwt.QwtPlot.__init__(self, *args)
+	def __init__(self, parent, logger):
+		Qwt.QwtPlot.__init__(self)
 
 		# we do not need caching
 		self.canvas().setPaintAttribute(Qwt.QwtPlotCanvas.PaintCached, False)
@@ -122,7 +122,7 @@ class ImagePlot(Qwt.QwtPlot):
 		# self.setAxisTitle(Qwt.QwtPlot.yLeft, 'Frequency (Hz)')
 		self.enableAxis(Qwt.QwtPlot.yRight)
 		# attach a plot image
-		self.plotImage = PlotImage()
+		self.plotImage = PlotImage(logger)
 		self.plotImage.attach(self)
 		self.setlinfreqscale()
 		self.setfreqrange(20., 20000.)
