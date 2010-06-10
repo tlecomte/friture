@@ -248,7 +248,7 @@ class Friture(QtGui.QMainWindow, ):
 				dock.restoreState(settings)
 				settings.endGroup()
 		else:
-			print "First launch, display a default set of docks"
+			self.logger.push("First launch, display a default set of docks")
 			default_docknames = ["Dock 0, Dock 1, Dock 2"]
 			self.docks = []
 			self.docks += [Dock(self, self.logger, "Dock 0", type = 0)] #level
