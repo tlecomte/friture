@@ -98,9 +98,9 @@ background: white
     <bool>false</bool>
    </attribute>
    <addaction name="actionStart"/>
+   <addaction name="actionNew_dock"/>
    <addaction name="actionSettings"/>
    <addaction name="actionAbout"/>
-   <addaction name="actionNew_dock"/>
   </widget>
   <widget class="QDockWidget" name="dockWidgetLog">
    <property name="windowTitle">
