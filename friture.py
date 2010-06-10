@@ -111,8 +111,8 @@ class Friture(QtGui.QMainWindow, ):
 		statisticsAction.setIcon(QtGui.QIcon(":/statistics.svg"))
 		logAction.setIcon(QtGui.QIcon(":/log.svg"))
 		
-		self.ui.toolBar.addAction(statisticsAction)
-		self.ui.toolBar.addAction(logAction)
+		self.ui.toolBar.insertAction(self.ui.actionAbout, statisticsAction)
+		self.ui.toolBar.insertAction(self.ui.actionAbout, logAction)
 		
 		self.chunk_number = 0
 		
