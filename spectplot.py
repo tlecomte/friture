@@ -62,8 +62,11 @@ class picker(Qwt.QwtPlotPicker):
 		  	   	   painter.restore()
 
 class SpectPlot(classplot.ClassPlot):
-	def __init__(self, *args):
-		classplot.ClassPlot.__init__(self, *args)
+	def __init__(self, parent, logger):
+		classplot.ClassPlot.__init__(self)
+
+		# store the logger instance
+		self.logger = logger
 
 		# we do not need caching
 		self.canvas().setPaintAttribute(Qwt.QwtPlotCanvas.PaintCached, False)
@@ -119,12 +122,12 @@ class SpectPlot(classplot.ClassPlot):
 
 	def setdata(self, x, y):
 		if self.canvas_width <> self.cached_canvas.width():
-			print "changed canvas width"
+			self.logger.push("spectplot : changed canvas width")
 			self.canvas_width = self.cached_canvas.width()
 			self.update_xscale()
 		
 		if self.xmax <> x[-1]:
-			print "changing x scale"
+			self.logger.push("spectplot : changing x scale")
 			self.xmax = x[-1]
 			self.update_xscale()
 			self.needfullreplot = True

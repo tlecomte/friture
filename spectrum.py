@@ -46,13 +46,6 @@ class Spectrum_Widget(QtGui.QWidget):
 	def __init__(self, parent, logger = None):
 		QtGui.QWidget.__init__(self, parent)
 
-		self.setObjectName("Spectrum_Widget")
-		self.gridLayout = QtGui.QGridLayout(self)
-		self.gridLayout.setObjectName("gridLayout")
-		self.PlotZoneSpect = SpectPlot(self)
-		self.PlotZoneSpect.setObjectName("PlotZoneSpect")
-		self.gridLayout.addWidget(self.PlotZoneSpect, 0, 0, 1, 1)
-
 		# store the logger instance
 		if logger is None:
 		    self.logger = parent.parent.logger
@@ -60,6 +53,13 @@ class Spectrum_Widget(QtGui.QWidget):
 		    self.logger = logger
 
 		self.audiobuffer = None
+
+		self.setObjectName("Spectrum_Widget")
+		self.gridLayout = QtGui.QGridLayout(self)
+		self.gridLayout.setObjectName("gridLayout")
+		self.PlotZoneSpect = SpectPlot(self, self.logger)
+		self.PlotZoneSpect.setObjectName("PlotZoneSpect")
+		self.gridLayout.addWidget(self.PlotZoneSpect, 0, 0, 1, 1)
 
 		self.setStyleSheet(STYLESHEET)
 		
