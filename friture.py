@@ -126,12 +126,12 @@ class Friture(QtGui.QMainWindow, ):
 		# Initialize the audio backend
 		self.audiobackend = audiobackend.AudioBackend(self.logger)
 		
-		devices = self.audiobackend.get_devices()
-		for dev in devices:
-			self.settings_dialog.comboBox_inputDevice.addItem(dev)
+		streams = self.audiobackend.get_readable_stream_list()
+		for stream in streams:
+			self.settings_dialog.comboBox_inputDevice.addItem(stream)
 
-		current_device = self.audiobackend.get_current_device()
-		self.settings_dialog.comboBox_inputDevice.setCurrentIndex(current_device)
+		current_stream = self.audiobackend.get_current_stream()
+		self.settings_dialog.comboBox_inputDevice.setCurrentIndex(current_stream)
 
 		self.centralwidget = CentralWidget(self.ui.centralwidget, self.logger, "central_widget", 3)
 		self.centralLayout = QtGui.QVBoxLayout(self.ui.centralwidget)
@@ -282,7 +282,9 @@ class Friture(QtGui.QMainWindow, ):
 
 	# slot
 	def update_buffer(self):
-		(chunks, t) = self.audiobuffer.update(self.audiobackend.stream)
+		channel = self.audiobackend.get_current_stream_channel()
+		nchannels = self.audiobackend.get_current_stream_nchannels()
+		(chunks, t) = self.audiobuffer.update(self.audiobackend.stream, channel, nchannels)
 		self.chunk_number += chunks
 		self.buffer_timer_time = (95.*self.buffer_timer_time + 5.*t)/100.
 
@@ -323,7 +325,7 @@ class Friture(QtGui.QMainWindow, ):
 		self.display_timer.stop()
 		self.ui.actionStart.setChecked(False)
 		
-		success, index = self.audiobackend.select_input_device(index)
+		success, index = self.audiobackend.select_input_stream(index)
 		
 		self.settings_dialog.comboBox_inputDevice.setCurrentIndex(index)
 		

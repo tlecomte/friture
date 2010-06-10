@@ -32,7 +32,7 @@ class AudioBuffer():
 
 	# try to update the audio buffer
 	# return the number of chunks retrieved, and the time elapsed
-	def update(self, stream):
+	def update(self, stream, channel, nchannels):
 		t = QtCore.QTime()
 		t.start()
 		
@@ -53,7 +53,7 @@ class AudioBuffer():
 				print inst
 				print "Caught an IOError on stream read."
 				break
-			floatdata = fromstring(rawdata, int16)/(2.**(16-1))
+			floatdata = fromstring(rawdata, int16)[channel::nchannels]/(2.**(16-1))
 			# update the circular buffer
 			if len(floatdata) > self.buffer_length:
 				print "buffer error"
