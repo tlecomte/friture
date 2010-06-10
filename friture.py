@@ -333,7 +333,7 @@ class Friture(QtGui.QMainWindow, ):
 			error_message.showMessage("Impossible to use the selected device, reverting to the previous one")
 		
 		self.display_timer.start()
-		self.actionStart.setChecked(True)
+		self.ui.actionStart.setChecked(True)
 
 if __name__ == "__main__":
 	if platform.system() == "Windows":
