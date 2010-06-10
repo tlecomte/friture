@@ -25,10 +25,13 @@ SAMPLING_RATE = 44100
 #from cochlear import MakeERBFilters, ERBFilterBank, frequencies
 
 class audioproc():
-	def __init__(self):
+	def __init__(self, logger):
 		self.freq = linspace(0, SAMPLING_RATE/2, 10)
 		self.maxfreq = 0
 		self.decimation = 0
+		
+		# store the logger instance
+		self.logger = logger
 
 	def analyzelive(self, samples, fft_size, maxfreq):
 		#samples *= window
@@ -55,8 +58,9 @@ class audioproc():
 		spectrum = abs(fft) / float(fft_size/self.decimation)
 
 		if len(self.freq) <> fft_size/2/self.decimation + 1 :
-			print "audioproc: updating self.freq cache"
+			self.logger.push("audioproc: updating self.freq cache")
 			self.freq = linspace(0, SAMPLING_RATE/2/self.decimation, fft_size/2/self.decimation + 1)
+		
 		return spectrum, self.freq
 
 	# above is done a FFT of the signal. This is ok for linear frequency scale, but

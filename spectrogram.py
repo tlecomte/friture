@@ -56,7 +56,7 @@ class Spectrogram_Widget(QtGui.QWidget):
 		self.audiobuffer = None
 		
 		# initialize the class instance that will do the fft
-		self.proc = audioproc.audioproc()
+		self.proc = audioproc.audioproc(self.logger)
 
 		self.maxfreq = DEFAULT_MAXFREQ
 		self.minfreq = DEFAULT_MINFREQ
