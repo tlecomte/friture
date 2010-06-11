@@ -330,7 +330,9 @@ class Friture(QtGui.QMainWindow, ):
 		self.settings_dialog.comboBox_inputDevice.setCurrentIndex(index)
 		
 		if not success:
-			error_message = QtGui.QErrorMessage(self)
+			# Note: the error message is a child of the settings dialog, so that
+			# that dialog remains on top when the error message is closed
+			error_message = QtGui.QErrorMessage(self.settings_dialog)
 			error_message.setWindowTitle("Input device error")
 			error_message.showMessage("Impossible to use the selected device, reverting to the previous one")
 		
