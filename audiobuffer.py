@@ -54,6 +54,9 @@ class AudioBuffer():
 				print "Caught an IOError on stream read."
 				break
 			floatdata = fromstring(rawdata, int16)[channel::nchannels]/(2.**(16-1))
+			#uncomment the following line to make difference measurements !!
+			#floatdata -= fromstring(rawdata, int16)[channel+1::nchannels]/(2.**(16-1))
+			
 			# update the circular buffer
 			if len(floatdata) > self.buffer_length:
 				print "buffer error"
