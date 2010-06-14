@@ -36,6 +36,9 @@ import psutil # for CPU usage monitoring
 #first : sudo ln -s libqwt-qt4.so libqwt.so
 #then, in the pyqwt configure subdirectory (for ubuntu jaunty):
 #python configure.py -Q ../qwt-5.1 -4 -L /usr/lib -I /usr/include/ --module-install-path=/usr/lib/python2.6/dist-packages/PyQt4/Qwt5
+#on lucid lynx:
+#python configure.py -Q ../qwt-5.2 --module-install-path=/usr/lib/pymodules/python2.6/PyQt4/Qwt5
+
 #make
 #sudo make install
 
