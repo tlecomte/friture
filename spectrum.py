@@ -41,6 +41,7 @@ DEFAULT_MAXFREQ = SAMPLING_RATE/2
 DEFAULT_MINFREQ = 20
 DEFAULT_SPEC_MIN = -140
 DEFAULT_SPEC_MAX = 0
+DEFAULT_WEIGHTING = 1 #A
 
 class Spectrum_Widget(QtGui.QWidget):
 	def __init__(self, parent, logger = None):
@@ -71,6 +72,7 @@ class Spectrum_Widget(QtGui.QWidget):
 		self.fft_size = 2**DEFAULT_FFT_SIZE*32
 		self.spec_min = DEFAULT_SPEC_MIN
 		self.spec_max = DEFAULT_SPEC_MAX
+		self.weighting = DEFAULT_WEIGHTING
 		
 		# initialize the settings dialog
 		self.settings_dialog = spectrum_settings.Spectrum_Settings_Dialog(self, self.logger)
@@ -85,11 +87,22 @@ class Spectrum_Widget(QtGui.QWidget):
 		    return
 		
 		floatdata = self.audiobuffer.data(self.fft_size)
-		sp, freq = self.proc.analyzelive(floatdata, self.fft_size, self.maxfreq)
+		sp, freq, A, B, C = self.proc.analyzelive(floatdata, self.fft_size, self.maxfreq)
 		#sp, freq = self.proc.analyzelive_cochlear(floatdata, 50, minfreq, maxfreq)
 		# scale the db spectrum from [- spec_range db ... 0 db] > [0..1]
+		#print freq[len(freq)/6], A[len(freq)/6]
 		epsilon = 1e-30
-		db_spectrogram = 20*log10(sp + epsilon)
+		
+		if self.weighting is 0:
+			w = 0.
+		elif self.weighting is 1:
+			w = A
+		elif self.weighting is 2:
+			w = B
+		else:
+			w = C
+		
+		db_spectrogram = 20*log10(sp + epsilon) + w
 		self.PlotZoneSpect.setdata(freq, db_spectrogram)
 
 	def setminfreq(self, freq):
@@ -110,6 +123,9 @@ class Spectrum_Widget(QtGui.QWidget):
 	def setmax(self, value):
 		self.spec_max = value
 		self.PlotZoneSpect.setspecrange(self.spec_min, self.spec_max)
+
+	def setweighting(self, weighting):
+		self.weighting = weighting
 
 	def settings_called(self, checked):
 		self.settings_dialog.show()

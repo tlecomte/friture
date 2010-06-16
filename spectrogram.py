@@ -33,6 +33,7 @@ DEFAULT_MINFREQ = 20
 DEFAULT_SPEC_MIN = -140
 DEFAULT_SPEC_MAX = 0
 DEFAULT_TIMERANGE = 10.
+DEFAULT_WEIGHTING = 1 #A
 
 class Spectrogram_Widget(QtGui.QWidget):
 	def __init__(self, parent, logger = None):
@@ -63,6 +64,7 @@ class Spectrogram_Widget(QtGui.QWidget):
 		self.fft_size = 2**DEFAULT_FFT_SIZE*32
 		self.spec_min = DEFAULT_SPEC_MIN
 		self.spec_max = DEFAULT_SPEC_MAX
+		self.weighting = DEFAULT_WEIGHTING
 		
 		self.spectrogram_timer_time = 0.
 		
@@ -99,10 +101,20 @@ class Spectrogram_Widget(QtGui.QWidget):
 		
 		# FIXME We should allow here for more intelligent transforms, especially when the log freq scale is selected
 		floatdata = self.audiobuffer.data(self.fft_size)
-		sp, freq = self.proc.analyzelive(floatdata, self.fft_size, self.maxfreq)
+		sp, freq, A, B, C = self.proc.analyzelive(floatdata, self.fft_size, self.maxfreq)
 		# scale the db spectrum from [- spec_range db ... 0 db] > [0..1]
 		epsilon = 1e-30
-		db_spectrogram = 20*log10(sp + epsilon)
+		
+		if self.weighting is 0:
+			w = 0.
+		elif self.weighting is 1:
+			w = A
+		elif self.weighting is 2:
+			w = B
+		else:
+			w = C
+		
+		db_spectrogram = 20*log10(sp + epsilon) + w
 		norm_spectrogram = (db_spectrogram.clip(min = self.spec_min, max = self.spec_max) - self.spec_min)/(self.spec_max - self.spec_min)
 		
 		self.PlotZoneImage.addData(freq, norm_spectrogram)
@@ -123,6 +135,9 @@ class Spectrogram_Widget(QtGui.QWidget):
 	
 	def setmax(self, value):
 		self.spec_max = value
+	
+	def setweighting(self, weighting):
+		self.weighting = weighting
 	
 	def settings_called(self, checked):
 		self.settings_dialog.show()
