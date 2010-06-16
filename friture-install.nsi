@@ -64,7 +64,6 @@ FunctionEnd
 Section "SectionPrincipale" SEC01
   SetOutPath "$INSTDIR"
   SetOverwrite try
-  File "dist\bz2.pyd"
   File "dist\friture.exe"
   CreateDirectory "$SMPROGRAMS\Friture"
   CreateShortCut "$SMPROGRAMS\Friture\Friture.lnk" "$INSTDIR\friture.exe"
@@ -103,6 +102,7 @@ Section "SectionPrincipale" SEC01
   File "dist\_ctypes.pyd"
   File "dist\_hashlib.pyd"
   File "dist\_portaudio.pyd"
+  File "dist\_psutil_mswindows.pyd"
   File "dist\_socket.pyd"
   File "COPYING"
   File "README"
