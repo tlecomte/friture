@@ -126,6 +126,7 @@ class Spectrum_Widget(QtGui.QWidget):
 
 	def setweighting(self, weighting):
 		self.weighting = weighting
+		self.PlotZoneSpect.setweighting(weighting)
 
 	def settings_called(self, checked):
 		self.settings_dialog.show()

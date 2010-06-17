@@ -77,7 +77,7 @@ class SpectPlot(classplot.ClassPlot):
 		xtitle.setFont(QtGui.QFont(8))
 		self.setAxisTitle(Qwt.QwtPlot.xBottom, xtitle)
 		# self.setAxisTitle(Qwt.QwtPlot.xBottom, 'Frequency (Hz)')
-		ytitle = Qwt.QwtText('PSD (dB)')
+		ytitle = Qwt.QwtText('PSD (dB A)')
 		ytitle.setFont(QtGui.QFont(8))
 		self.setAxisTitle(Qwt.QwtPlot.yLeft, ytitle)
 		# self.setAxisTitle(Qwt.QwtPlot.yLeft, 'PSD (dB)')
@@ -206,6 +206,20 @@ class SpectPlot(classplot.ClassPlot):
 	def setspecrange(self, min, max):
 		self.setAxisScale(Qwt.QwtPlot.yLeft, min, max)
 		self.needfullreplot = True
+	
+	def setweighting(self, weighting):
+		if weighting is 0:
+			title = "PSD (dB)"
+		elif weighting is 1:
+			title = "PSD (dB A)"
+		elif weighting is 2:
+			title = "PSD (dB B)"
+		else:
+			title = "PSD (dB C)"
+		
+		ytitle = Qwt.QwtText(title)
+		ytitle.setFont(QtGui.QFont(8))
+		self.setAxisTitle(Qwt.QwtPlot.yLeft, ytitle)
 	
 	def drawCanvas(self, painter):
 		t = QtCore.QTime()
