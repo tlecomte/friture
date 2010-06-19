@@ -53,8 +53,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>82</width>
-          <height>227</height>
+          <width>87</width>
+          <height>220</height>
          </rect>
         </property>
         <property name="styleSheet">
@@ -124,8 +124,8 @@ background: white
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>74</width>
-          <height>240</height>
+          <width>69</width>
+          <height>249</height>
          </rect>
         </property>
         <property name="styleSheet">
@@ -161,14 +161,14 @@ background: white
    </property>
    <property name="icon">
     <iconset resource="resource.qrc">
-     <normaloff>:/stop.svg</normaloff>
-     <normalon>:/start.svg</normalon>
-     <disabledon>:/start.svg</disabledon>
-     <activeon>:/start.svg</activeon>
-     <selectedon>:/start.svg</selectedon>:/stop.svg</iconset>
+     <normaloff>:/start.svg</normaloff>
+     <normalon>:/stop.svg</normalon>
+     <disabledon>:/stop.svg</disabledon>
+     <activeon>:/stop.svg</activeon>
+     <selectedon>:/stop.svg</selectedon>:/start.svg</iconset>
    </property>
    <property name="text">
-    <string>Start</string>
+    <string>Stop</string>
    </property>
    <property name="toolTip">
     <string>Start/Stop</string>
