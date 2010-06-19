@@ -279,9 +279,11 @@ class Friture(QtGui.QMainWindow, ):
 		if self.display_timer.isActive():
 			self.logger.push("Timer stop")
 			self.display_timer.stop()
+			self.ui.actionStart.setText("Start")
 		else:
 			self.logger.push("Timer start")
 			self.display_timer.start()
+			self.ui.actionStart.setText("Stop")
 
 	# slot
 	def update_buffer(self):
