@@ -72,6 +72,18 @@ class CentralWidget(QtGui.QWidget):
 		
 		self.controlBar.comboBox_select.setCurrentIndex(item)
 
+	def custom_timer_start(self):
+		try:
+			self.audiowidget.timer.start()
+		except:
+			pass
+
+	def custom_timer_stop(self):
+		try:
+			self.audiowidget.timer.stop()
+		except:
+			pass
+
 	# slot
 	def settings_slot(self, checked):
 		self.audiowidget.settings_called(checked)

@@ -280,10 +280,16 @@ class Friture(QtGui.QMainWindow, ):
 			self.logger.push("Timer stop")
 			self.display_timer.stop()
 			self.ui.actionStart.setText("Start")
+			for dock in self.docks:
+				dock.custom_timer_stop()
+			self.centralwidget.custom_timer_stop()
 		else:
 			self.logger.push("Timer start")
 			self.display_timer.start()
 			self.ui.actionStart.setText("Stop")
+			for dock in self.docks:
+				dock.custom_timer_start()
+			self.centralwidget.custom_timer_start()
 
 	# slot
 	def update_buffer(self):
