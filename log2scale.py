@@ -254,6 +254,7 @@ class window(QMainWindow):
         curve.attach(self.plot)
         curve.setData(x,y)
         self.plot.setAxisScaleEngine(Qwt.QwtPlot.xBottom, CustomScaleEngine())
+        #self.plot.setAxisScaleEngine(Qwt.QwtPlot.xBottom, Qwt.QwtLinearScaleEngine())
         self.plot.replot()
 
 if __name__ == '__main__':
