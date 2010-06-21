@@ -108,13 +108,8 @@ class Friture(QtGui.QMainWindow, ):
 		self.settings_dialog = settings.Settings_Dialog()
 		self.about_dialog = about.About_Dialog()
 		
-		statisticsAction = self.ui.dockWidgetStatistics.toggleViewAction()
 		logAction = self.ui.dockWidgetLog.toggleViewAction()
-		
-		statisticsAction.setIcon(QtGui.QIcon(":/statistics.svg"))
 		logAction.setIcon(QtGui.QIcon(":/log.svg"))
-		
-		self.ui.toolBar.insertAction(self.ui.actionAbout, statisticsAction)
 		self.ui.toolBar.insertAction(self.ui.actionAbout, logAction)
 		
 		self.chunk_number = 0
@@ -304,10 +299,10 @@ class Friture(QtGui.QMainWindow, ):
 
 	# method
 	def statistics(self):
-		if not self.ui.LabelLevel.isVisible():
+		if not self.about_dialog.LabelStats.isVisible():
 		    return
 		    
-		level_label = "Chunk #%d\n"\
+		label = "Chunk #%d\n"\
 		"FFT period : %.01f ms\n"\
 		"Spectrogram timer period : %.01f ms\n"\
 		"Spectrogram computation: %.02f ms\n"\
@@ -329,7 +324,7 @@ class Friture(QtGui.QMainWindow, ):
 		0,#self.ui.spectrogram.PlotZoneImage.paint_time)
 		self.cpu_percent)
 		
-		self.ui.LabelLevel.setText(level_label)
+		self.about_dialog.LabelStats.setText(label)
 
 	# slot
 	def input_device_changed(self, index):

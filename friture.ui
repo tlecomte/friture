@@ -22,68 +22,6 @@
     <string notr="true"/>
    </property>
   </widget>
-  <widget class="QDockWidget" name="dockWidgetStatistics">
-   <property name="styleSheet">
-    <string notr="true"/>
-   </property>
-   <property name="windowTitle">
-    <string>Statistics</string>
-   </property>
-   <attribute name="dockWidgetArea">
-    <number>1</number>
-   </attribute>
-   <widget class="QWidget" name="dockWidgetContents_2">
-    <layout class="QGridLayout" name="gridLayout_2">
-     <property name="margin">
-      <number>0</number>
-     </property>
-     <property name="spacing">
-      <number>0</number>
-     </property>
-     <item row="0" column="0">
-      <widget class="QScrollArea" name="scrollArea">
-       <property name="widgetResizable">
-        <bool>true</bool>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-       </property>
-       <widget class="QWidget" name="scrollAreaWidgetContents">
-        <property name="geometry">
-         <rect>
-          <x>0</x>
-          <y>0</y>
-          <width>87</width>
-          <height>220</height>
-         </rect>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">QWidget {
-background: white
-}
-</string>
-        </property>
-        <layout class="QVBoxLayout" name="verticalLayout">
-         <item>
-          <widget class="QLabel" name="LabelLevel">
-           <property name="text">
-            <string>No statistics</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-           </property>
-           <property name="textInteractionFlags">
-            <set>Qt::LinksAccessibleByKeyboard|Qt::LinksAccessibleByMouse|Qt::TextBrowserInteraction|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </widget>
-      </widget>
-     </item>
-    </layout>
-   </widget>
-  </widget>
   <widget class="QToolBar" name="toolBar">
    <property name="windowTitle">
     <string>toolBar</string>
@@ -125,7 +63,7 @@ background: white
           <x>0</x>
           <y>0</y>
           <width>69</width>
-          <height>249</height>
+          <height>497</height>
          </rect>
         </property>
         <property name="styleSheet">

@@ -31,13 +31,11 @@ class About_Dialog(QtGui.QDialog):
 		icon = QtGui.QIcon()
 		icon.addPixmap(QtGui.QPixmap(":/window-icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
 		self.setWindowIcon(icon)
-		
 		self.verticalLayout = QtGui.QVBoxLayout(self)
 		self.verticalLayout.setObjectName("verticalLayout")
 		
 		self.tabWidget = QtGui.QTabWidget(self)
 		self.tabWidget.setObjectName("tabWidget")
-		
 		self.aboutTab = QtGui.QWidget()
 		self.aboutTab.setObjectName("aboutTab")
 		self.horizontalLayout = QtGui.QHBoxLayout(self.aboutTab)
@@ -60,18 +58,38 @@ class About_Dialog(QtGui.QDialog):
 		self.horizontalLayout.addWidget(self.label)
 		self.tabWidget.addTab(self.aboutTab, "About")
 		
-		#self.tab_2 = QtGui.QWidget()
-		#self.tab_2.setObjectName("tab_2")
-		#self.tabWidget.addTab(self.tab_2, "Tab 2")
-		#self.tabWidget.setCurrentIndex(0)
+		self.tab_stats = QtGui.QWidget()
+		self.tab_stats_layout = QtGui.QGridLayout(self.tab_stats)
+		self.stats_scrollarea = QtGui.QScrollArea(self.tab_stats)		
+		self.stats_scrollarea.setWidgetResizable(True)
+		self.stats_scrollarea.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
+		self.stats_scrollarea.setObjectName("stats_scrollArea")
+		self.scrollAreaWidgetContents = QtGui.QWidget(self.stats_scrollarea)
+		self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 87, 220))
+		self.scrollAreaWidgetContents.setStyleSheet("""QWidget { background: white }""")
+		self.scrollAreaWidgetContents.setObjectName("stats_scrollAreaWidgetContents")
+		self.stats_layout = QtGui.QVBoxLayout(self.scrollAreaWidgetContents)
+		self.stats_layout.setObjectName("stats_layout")
+		self.LabelStats = QtGui.QLabel(self.scrollAreaWidgetContents)
+		self.LabelStats.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
+		self.LabelStats.setTextInteractionFlags(QtCore.Qt.LinksAccessibleByKeyboard|QtCore.Qt.LinksAccessibleByMouse|QtCore.Qt.TextBrowserInteraction|QtCore.Qt.TextSelectableByKeyboard|QtCore.Qt.TextSelectableByMouse)
+		self.LabelStats.setObjectName("LabelStats")
+		self.stats_layout.addWidget(self.LabelStats)
+		self.stats_scrollarea.setWidget(self.scrollAreaWidgetContents)
+		self.tab_stats_layout.addWidget(self.stats_scrollarea)
+		self.tab_stats.setObjectName("tab_stats")
+		self.tabWidget.addTab(self.tab_stats, "Statistics")
 		
-		self.verticalLayout.addWidget(self.tabWidget)
+		self.tabWidget.setCurrentIndex(0)
+		
 		self.buttonBox = QtGui.QDialogButtonBox(self)
 		self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
 		self.buttonBox.setStandardButtons(QtGui.QDialogButtonBox.Close)
 		self.buttonBox.setObjectName("buttonBox")
+		
+		self.verticalLayout.addWidget(self.tabWidget)
 		self.verticalLayout.addWidget(self.buttonBox)
-
+		
 		QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL("accepted()"), self.accept)
 		QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL("rejected()"), self.reject)
 		QtCore.QMetaObject.connectSlotsByName(self)
