@@ -18,9 +18,10 @@
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
 from PyQt4 import QtCore, QtGui
-from numpy import log10
+from numpy import log10, abs
 import levels_settings # settings dialog
 from qsynthmeter import qsynthMeter
+import audioproc
 
 STYLESHEET = """
 qsynthMeter {
@@ -71,7 +72,11 @@ class Levels_Widget(QtGui.QWidget):
 		self.label_peak.setText("-100.0")
 		self.label_rms_legend.setText("dBFS\n RMS")
 		self.label_peak_legend.setText("dBFS\n peak")
-
+		#self.label_rms.setSizePolicy(QtGui.QSizePolicy(QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding))
+		#self.label_rms_legend.setSizePolicy(QtGui.QSizePolicy(QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding))
+		#self.label_peak.setSizePolicy(QtGui.QSizePolicy(QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding))
+		#self.label_peak_legend.setSizePolicy(QtGui.QSizePolicy(QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding))
+		
 		# store the logger instance
 		if logger is None:
 		    self.logger = parent.parent.logger
@@ -82,6 +87,9 @@ class Levels_Widget(QtGui.QWidget):
 		
 		# initialize the settings dialog
 		self.settings_dialog = levels_settings.Levels_Settings_Dialog(self, self.logger)
+		
+		# initialize the class instance that will do the fft
+		self.proc = audioproc.audioproc(self.logger)
 
 	# method
 	def set_buffer(self, buffer):
@@ -103,6 +111,12 @@ class Levels_Widget(QtGui.QWidget):
 		self.label_peak.setText("%.01f" % level_max)
 		self.meter.setValue(0, level_rms)
 		self.meter.setValue(1, level_max)
+		
+		if 0:
+			fft_size = time*SAMPLING_RATE #1024
+			maxfreq = SAMPLING_RATE/2
+			sp, freq, A, B, C = self.proc.analyzelive(floatdata, fft_size, maxfreq)
+			print level_rms, 10*log10((sp**2).sum()*2.), freq.max()
 
 	# slot
 	def settings_called(self, checked):
