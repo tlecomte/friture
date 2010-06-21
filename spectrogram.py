@@ -28,6 +28,7 @@ SAMPLING_RATE = 44100
 
 # shared with spectrogram_settings.py
 DEFAULT_FFT_SIZE = 7
+DEFAULT_FREQ_SCALE = 1 #log10
 DEFAULT_MAXFREQ = SAMPLING_RATE/2
 DEFAULT_MINFREQ = 20
 DEFAULT_SPEC_MIN = -140
@@ -65,6 +66,7 @@ class Spectrogram_Widget(QtGui.QWidget):
 		self.spec_min = DEFAULT_SPEC_MIN
 		self.spec_max = DEFAULT_SPEC_MAX
 		self.weighting = DEFAULT_WEIGHTING
+		self.PlotZoneImage.setlog10freqscale() #DEFAULT_FREQ_SCALE = 1 #log10
 		
 		self.spectrogram_timer_time = 0.
 		

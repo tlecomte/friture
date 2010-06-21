@@ -23,6 +23,7 @@ SAMPLING_RATE = 44100
 
 # shared with spectrogram.py
 DEFAULT_FFT_SIZE = 7
+DEFAULT_FREQ_SCALE = 1 #log10
 DEFAULT_MAXFREQ = SAMPLING_RATE/2
 DEFAULT_MINFREQ = 20
 DEFAULT_SPEC_MIN = -140
@@ -67,6 +68,7 @@ class Spectrogram_Settings_Dialog(QtGui.QDialog):
 		self.comboBox_freqscale.setObjectName("comboBox_freqscale")
 		self.comboBox_freqscale.addItem("Linear")
 		self.comboBox_freqscale.addItem("Logarithmic")
+		self.comboBox_freqscale.setCurrentIndex(DEFAULT_FREQ_SCALE)
 
 		self.spinBox_minfreq = QtGui.QSpinBox(self)
 		self.spinBox_minfreq.setMinimum(20)
