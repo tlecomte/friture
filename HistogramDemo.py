@@ -24,30 +24,20 @@ class HistogramItem(Qwt.QwtPlotItem):
         self.setItemAttribute(Qwt.QwtPlotItem.Legend, True)
         self.setZ(20.0)
 
-    # __init__()
-
     def setData(self, data):
         self.__data = data
         self.itemChanged()
 
-    # setData()
-
     def data(self):
         return self.__data
-
-    # data()
 
     def setColor(self, color):
         if self.__color != color:
             self.__color = color
             self.itemChanged()
 
-    # setColor()
-
     def color(self):
         return self.__color
-
-    # color()
 
     def boundingRect(self):
         result = self.__data.boundingRect()
@@ -67,12 +57,8 @@ class HistogramItem(Qwt.QwtPlotItem):
                 result.setTop(self.baseline())
         return result
 
-    # boundingRect()
-
     def rtti(self):
         return Qwt.QwtPlotItem.PlotHistogram
-
-    # rtti()
 
     def draw(self, painter, xMap, yMap, rect):
         iData = self.data()
@@ -129,19 +115,13 @@ class HistogramItem(Qwt.QwtPlotItem):
                 self.drawBar(
                     painter, Qt.Qt.Vertical, Qt.QRect(x1, y0, x2-x1, y2-y0))
 
-    # draw()
-
     def setBaseline(self, reference):
         if self.baseline() != reference:
             self.__reference = reference
             self.itemChanged()
-
-    # setBaseLine()
     
     def baseline(self,):
         return self.__reference
-
-    # baseline()
 
     def setHistogramAttribute(self, attribute, on = True):
         if self.testHistogramAttribute(attribute):
@@ -153,13 +133,9 @@ class HistogramItem(Qwt.QwtPlotItem):
             self.__attributes &= ~attribute
 
         self.itemChanged()
-    
-    # setHistogramAttribute()
 
     def testHistogramAttribute(self, attribute):
         return bool(self.__attributes & attribute) 
-
-    # testHistogramAttribute()
 
     def drawBar(self, painter, orientation, rect):
         painter.save()
@@ -198,23 +174,8 @@ class HistogramItem(Qwt.QwtPlotItem):
 
         painter.restore()
 
-    # drawBar()
-
-# class HistogramItem
-
-
 def make():
     demo = Qwt.QwtPlot()
-    #demo.setCanvasBackground(Qt.Qt.white)
-    #demo.setTitle("Histogram")
-
-    #grid = Qwt.QwtPlotGrid()
-    #grid.enableXMin(True)
-    #grid.enableYMin(True)
-    #grid.setMajPen(Qt.QPen(Qt.Qt.black, 0, Qt.Qt.DotLine));
-    #grid.setMinPen(Qt.QPen(Qt.Qt.gray, 0 , Qt.Qt.DotLine));
-     
-    #grid.attach(demo)
 
     histogram = HistogramItem()
     histogram.setColor(Qt.Qt.darkGreen)
@@ -243,22 +204,11 @@ def make():
 
     return demo
 
-# make()
-
 
 def main(args):
     app = Qt.QApplication(args)
     demo = make()
     sys.exit(app.exec_())
 
-# main()
-
-
-# Admire
 if __name__ == '__main__':
     main(sys.argv)
-
-# Local Variables: ***
-# mode: python ***
-# End: ***
-
