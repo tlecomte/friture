@@ -40,56 +40,6 @@
    <addaction name="actionSettings"/>
    <addaction name="actionAbout"/>
   </widget>
-  <widget class="QDockWidget" name="dockWidgetLog">
-   <property name="windowTitle">
-    <string>Log</string>
-   </property>
-   <attribute name="dockWidgetArea">
-    <number>1</number>
-   </attribute>
-   <widget class="QWidget" name="dockWidgetContents_3">
-    <layout class="QGridLayout" name="gridLayout_9">
-     <item row="0" column="0">
-      <widget class="QScrollArea" name="scrollArea_2">
-       <property name="widgetResizable">
-        <bool>true</bool>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-       </property>
-       <widget class="QWidget" name="scrollAreaWidgetContents_2">
-        <property name="geometry">
-         <rect>
-          <x>0</x>
-          <y>0</y>
-          <width>69</width>
-          <height>497</height>
-         </rect>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">QWidget {
-background: white
-}
-</string>
-        </property>
-        <layout class="QGridLayout" name="gridLayout_10">
-         <item row="0" column="0">
-          <widget class="QLabel" name="LabelLog">
-           <property name="alignment">
-            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-           </property>
-           <property name="textInteractionFlags">
-            <set>Qt::LinksAccessibleByKeyboard|Qt::LinksAccessibleByMouse|Qt::TextBrowserInteraction|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </widget>
-      </widget>
-     </item>
-    </layout>
-   </widget>
-  </widget>
   <action name="actionStart">
    <property name="checkable">
     <bool>true</bool>

@@ -108,10 +108,6 @@ class Friture(QtGui.QMainWindow, ):
 		self.settings_dialog = settings.Settings_Dialog()
 		self.about_dialog = about.About_Dialog()
 		
-		logAction = self.ui.dockWidgetLog.toggleViewAction()
-		logAction.setIcon(QtGui.QIcon(":/log.svg"))
-		self.ui.toolBar.insertAction(self.ui.actionAbout, logAction)
-		
 		self.chunk_number = 0
 		
 		self.buffer_timer_time = 0.
@@ -162,7 +158,7 @@ class Friture(QtGui.QMainWindow, ):
 
 		# log change
 		self.connect(self.logger, QtCore.SIGNAL('logChanged'), self.log_changed)
-		self.connect(self.ui.scrollArea_2.verticalScrollBar(), QtCore.SIGNAL('rangeChanged(int,int)'), self.log_scroll_range_changed)
+		self.connect(self.about_dialog.log_scrollarea.verticalScrollBar(), QtCore.SIGNAL('rangeChanged(int,int)'), self.log_scroll_range_changed)
 		
 		# restore the settings and widgets geometries
 		self.restoreAppState()
@@ -176,12 +172,12 @@ class Friture(QtGui.QMainWindow, ):
 	# slot
 	# update the log widget with the new log content
 	def log_changed(self):
-		self.ui.LabelLog.setText(self.logger.text())
+		self.about_dialog.LabelLog.setText(self.logger.text())
 	
 	# slot
 	# scroll the log widget so that the last line is visible
 	def log_scroll_range_changed(self, min, max):
-		scrollbar = self.ui.scrollArea_2.verticalScrollBar()
+		scrollbar = self.about_dialog.log_scrollarea.verticalScrollBar()
 		scrollbar.setValue(max)
 	
 	# slot
