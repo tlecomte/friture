@@ -188,7 +188,7 @@ def make():
     for i in range(numValues):
         width = 5 + random.randint(0, 4)
         value = random.randint(0, 99)
-        intervals.append(Qwt.QwtDoubleInterval(pos, pos+width));
+        intervals.append(Qwt.QwtDoubleInterval(pos, pos+width))
         values[i] = value
         pos += width
 
