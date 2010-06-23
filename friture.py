@@ -63,6 +63,9 @@ import psutil # for CPU usage monitoring
 
 # the sample rate below should be dynamic, taken from PyAudio/PortAudio
 SAMPLING_RATE = 44100
+
+# the display timer could be made faster when the processing
+# power allows it, firing down to every 10 ms
 SMOOTH_DISPLAY_TIMER_PERIOD_MS = 25
 
 STYLESHEET = """
