@@ -1,10 +1,11 @@
-from numpy import pi, exp, arange, cos, sin, sqrt, zeros, ones, log
+from numpy import pi, exp, arange, cos, sin, sqrt, zeros, ones, log, arange
 # the three following lines are a workaround for a bug with scipy and py2exe
 # together. See http://www.pyinstaller.org/ticket/83 for reference.
 from scipy.misc import factorial
 import scipy
 scipy.factorial = factorial
 from scipy.signal import lfilter
+from scipy.signal.filter_design import ellip
 
 # bank of filters for any other kind of frequency scale
 # http://cobweb.ecn.purdue.edu/~malcolm/apple/tr35/PattersonsEar.pdf
@@ -89,6 +90,91 @@ def ERBFilterBank(forward, feedback, x):
 		y[i,:] = lfilter(forward[i,:], feedback[i,:], x)
 	return y
 
+def octave_filters(Nchannels):
+	# Bandpass Filter Generation
+
+	fstart = 0.05      # Start frequency
+	fend = 0.95        # End frequency
+	pbrip = .5         # Pass band ripple
+	sbrip = 30         # Stop band rejection
+
+	K = arange(fstart, fend, (fend-fstart)/Nchannels)
+	B = []
+	A = []
+	
+	# For each frequency bin
+	for k in K:
+		# Scale fails by default
+		fail = 1
+		scale = 1
+
+		while fail == 1:
+			#The scale has to be adjusted so that filter coefficients are
+			# -1.0<coeff<1.0
+			#Scaling performed is 2^(-scale)
+			
+			#For lowpass, set equal to normalized Freq (cutoff/(Fs/2))
+			#For bandpass, set equal to normalized Freq vector ([low high]/(Fs/2))
+			freq = [k, k+(fend-fstart)/(2*Nchannels)]
+			
+			#Filter order:
+			#	use 2,4 for lowpass
+			#		1,2 for bandpass
+			#NOTE that for a bandpass filter (order) poles are generated for the high
+			#and low cutoffs, so the total order is (order)*2
+			order = 2
+	
+			#could also use butter, or cheby1 or cheby2 or besself
+			# but note that besself is lowpass only!
+			[b, a] = ellip(order, pbrip, sbrip, freq, btype='bandpass')
+	
+			b = b * (2**-scale)
+			a = -a * (2**-scale)
+	
+			# Keep increasing scale until coeffs are safe
+			if sum(abs(b) >= 1) | sum(abs(a) >= 1):
+				fail = 1
+				scale = scale + 1
+				print 'Retrying %f with new scale factor %d' %(k, scale)
+			else:
+				fail = 0
+	
+		ordera = order*len(freq)
+		if ordera==2:
+			scstr = 'IIR2 filter'
+		elif ordera==4:
+			scstr = 'IIR4 filter'
+		else:
+			error('order*length(freq) must equal 2 or 4')
+	
+		[b, a] = ellip(order, pbrip, sbrip, freq, btype='bandpass')
+		
+		B += [b]
+		A += [a]
+		
+	return [B, A]
+
+	##sampling rate on DE2 board
+	#Fs = 8000
+	#[fresponse, ffreq] = freqz(b,a,1000)
+	#plot(ffreq/pi*Fs/2,abs(fresponse))
+	#b = fix((b*(2**-scale))*2**16)/2**16
+	#a = fix((a*(2**-scale))*2**16)/2**16
+	#[fresponse, ffreq] = freqz(b,a,1000)
+	#plot(ffreq/pi*Fs/2,abs(fresponse))
+	#legend('exact','scaled 16-bit')
+
+def octave_filter_bank(forward, feedback, x):
+	# This function filters the waveform x with the array of filters
+	# specified by the forward and feedback parameters. Each row
+	# of the forward and feedback parameters are the parameters
+	# to the Matlab builtin function "filter".
+	Nbank = len(forward)
+	y = zeros((Nbank, len(x)))
+	for i in range(0, Nbank):
+		y[i,:] = lfilter(forward[i], feedback[i], x)
+	return y
+
 # main() is a test function
 def main():
     from matplotlib.pyplot import semilogx, plot, show, xlim, ylim
@@ -96,7 +182,7 @@ def main():
     from numpy import log10, linspace
 
     N = 2048
-    fs = 16000.
+    fs = 44100.
     Nchannels = 20
     low_freq = 20.
 
@@ -106,13 +192,16 @@ def main():
 
     [ERBforward, ERBfeedback] = MakeERBFilters(fs, Nchannels, low_freq)
     y = ERBFilterBank(ERBforward, ERBfeedback, impulse)
+    
+    [B, A] = octave_filters(Nchannels)
+    y = octave_filter_bank(B, A, impulse)
 
     response = 20.*log10(abs(fft(y)))
     freqScale = fftfreq(N, 1./fs)
 
     for i in range(0, response.shape[0]):
             semilogx(freqScale[0:N/2],response[i, 0:N/2])
-    xlim(1e2, 1e4)
+    xlim(fs/100, fs)
     ylim(-70, 10)
 
     show()
