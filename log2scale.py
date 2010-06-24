@@ -248,7 +248,7 @@ class window(QMainWindow):
         self.layout.addWidget(self.plot)
         
         import numpy
-        x = numpy.logspace(-3., 4., 100., base = 2.)
+        x = numpy.logspace(math.log(20., 2), math.log(20e3, 2), 100., base = 2.)
         y = numpy.random.rand(len(x)) + 1.
         curve = Qwt.QwtPlotCurve()
         curve.attach(self.plot)
