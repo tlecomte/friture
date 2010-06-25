@@ -250,8 +250,8 @@ class Friture(QtGui.QMainWindow, ):
 			self.docks = []
 			self.docks += [Dock(self, self.logger, "Dock 0", type = 0)] #level
 			self.docks += [Dock(self, self.logger, "Dock 1", type = 1)] #scope
-			self.docks += [Dock(self, self.logger, "Dock 2", type = 2)] #spectrum
-			self.docks += [Dock(self, self.logger, "Dock 2", type = 3)] #octave spectrum
+			self.docks += [Dock(self, self.logger, "Dock 2", type = 3)] #spectrogram
+			self.docks += [Dock(self, self.logger, "Dock 3", type = 4)] #octave spectrum
 			for dock in self.docks:
 				self.addDockWidget(QtCore.Qt.TopDockWidgetArea, dock)
 

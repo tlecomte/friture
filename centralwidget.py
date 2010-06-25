@@ -98,6 +98,6 @@ class CentralWidget(QtGui.QWidget):
 	
 	# method
 	def restoreState(self, settings):
-		(type, ok) = settings.value("type", 3).toInt()
+		(type, ok) = settings.value("type", 2).toInt()
 		self.widget_select(type)
 		self.audiowidget.restoreState(settings)
