@@ -81,6 +81,7 @@ Section "SectionPrincipale" SEC01
   File "dist\numpy.lib._compiled_base.pyd"
   File "dist\numpy.linalg.lapack_lite.pyd"
   File "dist\numpy.random.mtrand.pyd"
+  File "dist\scipy*.pyd"
   File "dist\PyQt4.Qt.pyd"
   File "dist\PyQt4.QtCore.pyd"
   File "dist\PyQt4.QtGui.pyd"
@@ -183,6 +184,7 @@ Section Uninstall
   Delete "$INSTDIR\imageformats\qsvg4.dll"
   Delete "$INSTDIR\friture.exe"
   Delete "$INSTDIR\bz2.pyd"
+  Delete "$INSTDIR\scipy*.pyd"
 
   Delete "$SMPROGRAMS\Friture\Uninstall.lnk"
   Delete "$DESKTOP\Friture.lnk"
