@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from numpy import pi, exp, arange, cos, sin, sqrt, zeros, ones, log, arange
 # the three following lines are a workaround for a bug with scipy and py2exe
 # together. See http://www.pyinstaller.org/ticket/83 for reference.
@@ -89,6 +90,18 @@ def ERBFilterBank(forward, feedback, x):
 	for i in range(0, rows):
 		y[i,:] = lfilter(forward[i,:], feedback[i,:], x)
 	return y
+
+#1/3 octave (or 1/10 decade) in audio means (ISO R 266 and ANSI S1.6-1984):
+#fc[n]=10*e^(n/10) 15<=n<=43
+#or
+#fc[k]=2^k/3*1000Hz
+
+#Nominal freq: 31.5 40 50 63 80 100 125 160 200 250 315 400 500 630 800 1000 1250
+#1600 2000 Hz, etc.
+#The upper and lower band edges are:
+#fcl=sqrt(fc[k-1]*fc[k])
+#fch=sqrt(fc[k]*fc[k+1])
+#def octave_frequencies():
 
 def octave_filters(Nchannels):
 	# Bandpass Filter Generation
