@@ -101,7 +101,24 @@ def ERBFilterBank(forward, feedback, x):
 #The upper and lower band edges are:
 #fcl=sqrt(fc[k-1]*fc[k])
 #fch=sqrt(fc[k]*fc[k+1])
-#def octave_frequencies():
+def octave_frequencies():
+	f0 = 1000. # audio reference frequency is 1 kHz
+	fs = 44100 # sampling rate
+	Nbands = 7
+	BandsPerOctave = 1
+	
+	b = 1./BandsPerOctave
+	
+	if Nbands%2 == 1:
+		i = arange(-Nbands/2, Nbands/2 + 1)
+	else:
+		i = arange(-Nbands/2, Nbands/2) + 0.5
+
+	fi = f0 * 2**(i*b)
+	f_low = fi * sqrt(2**(-b))
+	f_high = fi * sqrt(2**b)
+	
+	return fi, f_low, f_high
 
 def octave_filters(Nchannels):
 	# Bandpass Filter Generation
@@ -110,6 +127,8 @@ def octave_filters(Nchannels):
 	fend = 0.95        # End frequency
 	pbrip = .5         # Pass band ripple
 	sbrip = 30         # Stop band rejection
+
+	print octave_frequencies()
 
 	K = arange(fstart, fend, (fend-fstart)/Nchannels)
 	B = []
