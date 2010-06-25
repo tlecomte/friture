@@ -78,7 +78,7 @@ class Scope_Widget(QtGui.QWidget):
 			shift = 0
 		floatdata = self.audiobuffer.data(time*SAMPLING_RATE + shift)
 		floatdata = floatdata[0 : time*SAMPLING_RATE]
-		y = floatdata - floatdata.mean()
+		y = floatdata[::-1] - floatdata.mean()
 		
 		dBscope = False
 		if dBscope:
