@@ -150,7 +150,7 @@ class Spectrum_Settings_Dialog(QtGui.QDialog):
 	def restoreState(self, settings):
 		(fft_size, ok) = settings.value("fftSize", DEFAULT_FFT_SIZE).toInt() # 7th index is 1024 points
 		self.comboBox_fftsize.setCurrentIndex(fft_size)
-		(freqscale, ok) = settings.value("freqScale", 0).toInt()
+		(freqscale, ok) = settings.value("freqScale", DEFAULT_FREQ_SCALE).toInt()
 		self.comboBox_freqscale.setCurrentIndex(freqscale)
 		(freqMin, ok) = settings.value("freqMin", DEFAULT_MINFREQ).toInt()
 		self.spinBox_minfreq.setValue(freqMin)
