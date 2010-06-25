@@ -139,7 +139,7 @@ def octave_filters(Nbands, BandsPerOctave):
 		B += [b]
 		A += [a]
 		
-	return [B, A]
+	return [B, A, fi, f_low, f_high]
 
 def octave_filter_bank(forward, feedback, x):
 	# This function filters the waveform x with the array of filters
@@ -148,6 +148,7 @@ def octave_filter_bank(forward, feedback, x):
 	# to the Matlab builtin function "filter".
 	Nbank = len(forward)
 	y = zeros((Nbank, len(x)))
+	#print forward, feedback, x.shape, y.shape
 	for i in range(0, Nbank):
 		y[i,:] = lfilter(forward[i], feedback[i], x)
 	return y
@@ -172,7 +173,7 @@ def main():
 
 	Nbands = 7
 	BandsPerOctave = 1
-	[B, A] = octave_filters(Nbands, BandsPerOctave)
+	[B, A, fi, fl, fh] = octave_filters(Nbands, BandsPerOctave)
 	y = octave_filter_bank(B, A, impulse)
 
 	response = 20.*log10(abs(fft(y)))

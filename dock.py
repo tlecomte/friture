@@ -21,6 +21,7 @@ from PyQt4 import QtGui, QtCore
 from levels import Levels_Widget
 from spectrum import Spectrum_Widget
 from spectrogram import Spectrogram_Widget
+from octavespectrum import OctaveSpectrum_Widget
 from scope import Scope_Widget
 from controlbar import ControlBar
 
@@ -62,9 +63,11 @@ class Dock(QtGui.QDockWidget):
 			self.audiowidget = Scope_Widget(self, self.logger)
 		elif item is 2:
 			self.audiowidget = Spectrum_Widget(self, self.logger)
-		else:
+		elif item is 3:
 			self.audiowidget = Spectrogram_Widget(self, self.logger)
 			self.audiowidget.timer.start()
+		else:
+			self.audiowidget = OctaveSpectrum_Widget(self, self.logger)
 		
 		self.audiowidget.set_buffer(self.parent.audiobuffer)
 		

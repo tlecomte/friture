@@ -10,8 +10,8 @@ import math
 import sys
 import sip
 
-LOG2_MIN = 2.**(-100) # Mininum value for logarithmic scales.
-LOG2_MAX = 2.**100 # Maximum value for logarithmic scales. 
+LOG2_MIN = 2.**(-20) # Mininum value for logarithmic scales.
+LOG2_MAX = 2.**20 # Maximum value for logarithmic scales. 
 
 class CustomScaleEngine(Qwt.QwtScaleEngine):
 	def __init__(self):
@@ -27,7 +27,7 @@ class CustomScaleEngine(Qwt.QwtScaleEngine):
 		base = 2.
 		interval = Qwt.QwtDoubleInterval(x1 / pow(base, self.lowerMargin()), x2 * pow(base, self.upperMargin()) )
 
-		logRef = 1.0
+		logRef = 1.
 		if self.reference() > LOG2_MIN / 2:
 			logRef = min(self.reference(), LOG2_MAX / 2)
 		
@@ -229,6 +229,7 @@ class CustomScaleTransformation(Qwt.QwtScaleTransformation):
 		return CustomScaleTransformation()
 
 	def xForm(self, s, s1, s2, p1, p2):
+		s = max(s, LOG2_MIN)
 		return p1 + (p2 - p1) / math.log(s2 / s1, self.base) * math.log(s / s1, self.base)
 
 	def invXForm(self, p, p1, p2, s1, s2):

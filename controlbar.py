@@ -119,6 +119,7 @@ class ControlBar(QtGui.QWidget):
 		self.comboBox_select.addItem("Scope")
 		self.comboBox_select.addItem("Spectrum")
 		self.comboBox_select.addItem("Spectrogram")
+		self.comboBox_select.addItem("Octave Spectrum")
 		self.comboBox_select.setCurrentIndex(0)
 		
 		self.settingsButton = QtGui.QToolButton (self)
