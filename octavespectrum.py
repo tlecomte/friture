@@ -69,8 +69,8 @@ class OctaveSpectrum_Widget(QtGui.QWidget):
 		self.spec_max = DEFAULT_SPEC_MAX
 		self.weighting = DEFAULT_WEIGHTING
 		
-		Nbands = 7
 		BandsPerOctave = 1
+		Nbands = 7*BandsPerOctave
 		[self.b, self.a, self.fi, self.flow, self.fhigh] = octave_filters(Nbands, BandsPerOctave)
 		
 		# initialize the settings dialog
