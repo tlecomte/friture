@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
-from numpy import linspace, abs, log2, floor, log10
+from numpy import linspace, abs, log2, floor, log10, cos, arange, pi
 from numpy.fft import rfft
 # the sample rate below should be dynamic, taken from PyAudio/PortAudio
 SAMPLING_RATE = 44100
@@ -32,6 +32,7 @@ class audioproc():
 		self.C = 0.*self.freq
 		self.maxfreq = 0
 		self.decimation = 0
+		self.window = arange(0,1)
 		
 		# store the logger instance
 		self.logger = logger
@@ -55,10 +56,6 @@ class audioproc():
 		
 		#uncomment the following to disable the decimation altogether
 		#decimation = 1
-		
-		# FFT for a linear transformation in frequency scale
-		fft = rfft(samples)
-		spectrum = abs(fft) / float(fft_size/self.decimation)
 
 		if len(self.freq) <> fft_size/2/self.decimation + 1 :
 			self.logger.push("audioproc: updating self.freq cache")
@@ -71,7 +68,17 @@ class audioproc():
 			Ra = 12200.**2*f**4 / ((f**2 + 20.6**2)*(f**2 + 12200.**2)*((f**2 + 107.7**2)**0.5) * ((f**2 + 737.9**2)**0.5))         
 			self.C = 0.06 + 20.*log10(Rc)
 			self.B = 0.17 + 20.*log10(Rb)
-			self.A = 2.0  + 20.*log10(Ra) 
+			self.A = 2.0  + 20.*log10(Ra)
+		
+		if len(samples) <> len(self.window):
+			N = len(samples)
+			n = arange(0, N)
+			# Hann window : better frequency resolution than the rectangular window
+			self.window = 0.5*(1. - cos(2*pi*n/(N-1)))
+		
+		# FFT for a linear transformation in frequency scale
+		fft = rfft(samples*self.window)
+		spectrum = abs(fft) / float(fft_size/self.decimation)
 		
 		return spectrum, self.freq, self.A, self.B, self.C
 
