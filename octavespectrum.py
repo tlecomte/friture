@@ -18,11 +18,12 @@
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
 from PyQt4 import QtGui, QtCore
-from numpy import log10, where, linspace
+from numpy import log10, where, linspace, array
 from histplot import HistPlot
 import audioproc # audio processing class
 import octavespectrum_settings # settings dialog
 from cochlear import *
+from scipy.signal import cheby1
 
 SMOOTH_DISPLAY_TIMER_PERIOD_MS = 25
 SAMPLING_RATE = 44100
@@ -71,7 +72,15 @@ class OctaveSpectrum_Widget(QtGui.QWidget):
 		
 		BandsPerOctave = 1
 		Nbands = 7*BandsPerOctave
-		[self.b, self.a, self.fi, self.flow, self.fhigh] = octave_filters(Nbands, BandsPerOctave)
+		# brute force without decimation is the following line
+		#[self.b, self.a, self.fi, self.flow, self.fhigh] = octave_filters(Nbands, BandsPerOctave)
+		self.fi, self.flow, self.fhigh = octave_frequencies(Nbands, BandsPerOctave)
+		[self.bdec, self.adec, fi, flow, fhigh] = octave_filters_oneoctave(Nbands, BandsPerOctave)		
+		N = 4
+		# other possibilities
+		#(self.blow, self.alow) = ellip(N, 0.5, 30, 0.8*0.5)
+		#(self.blow, self.alow) = cheby1(N, 0.05, 0.8*0.5)
+		(self.blow, self.alow) = butter(N, 0.8*0.5)
 		
 		# initialize the settings dialog
 		self.settings_dialog = octavespectrum_settings.OctaveSpectrum_Settings_Dialog(self, self.logger)
@@ -88,9 +97,17 @@ class OctaveSpectrum_Widget(QtGui.QWidget):
 		#time = SMOOTH_DISPLAY_TIMER_PERIOD_MS/1000.
 		time = 0.135 #FAST setting for a sound level meter
 		floatdata = self.audiobuffer.data(time*SAMPLING_RATE)
-		y = octave_filter_bank(self.b, self.a, floatdata)
+		y, dec = octave_filter_bank_decimation(self.blow, self.alow, self.bdec, self.adec, floatdata)
 		
-		sp = (y**2).mean(axis=1)
+		sp = []
+		for bank, d in zip(y, dec):
+			sp += [(bank**2).mean()]
+		sp = array(sp)[::-1]
+
+		#brute force without decimation
+		#y_nodec = octave_filter_bank(self.b, self.a, floatdata)
+		#sp_nodec = (y_nodec**2).mean(axis=1)
+		
 		freq = self.fi
 		
 		# taken from http://www.cdc.gov/niosh/docs/98-126/chap4.html#41

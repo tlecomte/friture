@@ -6,7 +6,7 @@ from scipy.misc import factorial
 import scipy
 scipy.factorial = factorial
 from scipy.signal import lfilter
-from scipy.signal.filter_design import ellip
+from scipy.signal.filter_design import ellip, butter
 
 # bank of filters for any other kind of frequency scale
 # http://cobweb.ecn.purdue.edu/~malcolm/apple/tr35/PattersonsEar.pdf
@@ -141,6 +141,41 @@ def octave_filters(Nbands, BandsPerOctave):
 		
 	return [B, A, fi, f_low, f_high]
 
+def octave_filters_oneoctave(Nbands, BandsPerOctave):
+	# Bandpass Filter Generation
+	pbrip = .5	# Pass band ripple
+	sbrip = 30	# Stop band rejection
+
+	fi, f_low, f_high = octave_frequencies(Nbands, BandsPerOctave)
+
+	fi     = fi[-BandsPerOctave:]
+	f_low  = f_low[-BandsPerOctave:]
+	f_high = f_high[-BandsPerOctave:]
+
+	fs = 44100 # sampling rate
+	wi = fi/(fs/2.) # normalized frequencies
+	w_low = f_low/(fs/2.)
+	w_high = f_high/(fs/2.)
+
+	B = []
+	A = []
+	
+	# For each band
+	for w, wl, wh in zip(wi, w_low, w_high):
+		# normalized frequency vector
+		freq = [wl, wh]
+			
+		#Filter order
+		order = 2
+	
+		# could be another IIR filter
+		[b, a] = ellip(order, pbrip, sbrip, freq, btype='bandpass')
+		
+		B += [b]
+		A += [a]
+		
+	return [B, A, fi, f_low, f_high]
+
 def octave_filter_bank(forward, feedback, x):
 	# This function filters the waveform x with the array of filters
 	# specified by the forward and feedback parameters. Each row
@@ -152,6 +187,36 @@ def octave_filter_bank(forward, feedback, x):
 	for i in range(0, Nbank):
 		y[i,:] = lfilter(forward[i], feedback[i], x)
 	return y
+
+def octave_filter_bank_decimation(blow, alow, forward, feedback, x):
+	# This function filters the waveform x with the array of filters
+	# specified by the forward and feedback parameters. Each row
+	# of the forward and feedback parameters are the parameters
+	# to the Matlab builtin function "filter".
+	BandsPerOctave = len(forward)
+	Nbank = 7*BandsPerOctave
+	
+	#y = zeros((Nbank, len(x)))
+	y = []
+	dec = []
+	
+	x_dec = x
+	
+	for j in range(0, 7):
+		for i in range(0, BandsPerOctave)[::-1]:
+			#print j, i
+			#print y[j*BandsPerOctave + i,:].shape
+			#print x_dec.shape
+			#print 2**j
+			#print x_dec.shape*2**j
+			#print lfilter(forward[i], feedback[i], x_dec).repeat(2**j).shape
+			filt = lfilter(forward[i], feedback[i], x_dec)
+			#y[j*BandsPerOctave + i,:] = filt.repeat(2**j)[:len(y[j*BandsPerOctave + i])]
+			y += [filt]
+			dec += [2**j]
+		x_dec = lfilter(blow, alow, x_dec)[::2]
+	
+	return y, dec
 
 # main() is a test function
 def main():
