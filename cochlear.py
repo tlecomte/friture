@@ -110,6 +110,12 @@ def octave_frequencies(Nbands, BandsPerOctave):
 	
 	return fi, f_low, f_high
 
+# Note : A way to make the filtering more efficient is to do it with IIR + decimation
+# instead of IIR only
+# More precisely, we design as much filters as bands per octave (instead of total number
+# of bands), and apply it several times on repeatedly decimated signal to go from one octave
+# to its lower neighbor
+
 def octave_filters(Nbands, BandsPerOctave):
 	# Bandpass Filter Generation
 	pbrip = .5	# Pass band ripple
