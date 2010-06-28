@@ -110,12 +110,6 @@ def octave_frequencies(Nbands, BandsPerOctave):
 	
 	return fi, f_low, f_high
 
-# Note : A way to make the filtering more efficient is to do it with IIR + decimation
-# instead of IIR only
-# More precisely, we design as much filters as bands per octave (instead of total number
-# of bands), and apply it several times on repeatedly decimated signal to go from one octave
-# to its lower neighbor
-
 def octave_filters(Nbands, BandsPerOctave):
 	# Bandpass Filter Generation
 	pbrip = .5	# Pass band ripple
@@ -147,6 +141,11 @@ def octave_filters(Nbands, BandsPerOctave):
 		
 	return [B, A, fi, f_low, f_high]
 
+# Note : A way to make the filtering more efficient is to do it with IIR + decimation
+# instead of IIR only
+# More precisely, we design as much filters as bands per octave (instead of total number
+# of bands), and apply it several times on repeatedly decimated signal to go from one octave
+# to its lower neighbor
 def octave_filters_oneoctave(Nbands, BandsPerOctave):
 	# Bandpass Filter Generation
 	pbrip = .5	# Pass band ripple
@@ -189,7 +188,6 @@ def octave_filter_bank(forward, feedback, x):
 	# to the Matlab builtin function "filter".
 	Nbank = len(forward)
 	y = zeros((Nbank, len(x)))
-	#print forward, feedback, x.shape, y.shape
 	for i in range(0, Nbank):
 		y[i,:] = lfilter(forward[i], feedback[i], x)
 	return y
@@ -202,7 +200,6 @@ def octave_filter_bank_decimation(blow, alow, forward, feedback, x):
 	BandsPerOctave = len(forward)
 	Nbank = 7*BandsPerOctave
 	
-	#y = zeros((Nbank, len(x)))
 	y = []
 	dec = []
 	
@@ -210,14 +207,7 @@ def octave_filter_bank_decimation(blow, alow, forward, feedback, x):
 	
 	for j in range(0, 7):
 		for i in range(0, BandsPerOctave)[::-1]:
-			#print j, i
-			#print y[j*BandsPerOctave + i,:].shape
-			#print x_dec.shape
-			#print 2**j
-			#print x_dec.shape*2**j
-			#print lfilter(forward[i], feedback[i], x_dec).repeat(2**j).shape
 			filt = lfilter(forward[i], feedback[i], x_dec)
-			#y[j*BandsPerOctave + i,:] = filt.repeat(2**j)[:len(y[j*BandsPerOctave + i])]
 			y += [filt]
 			dec += [2**j]
 		x_dec = lfilter(blow, alow, x_dec)[::2]
