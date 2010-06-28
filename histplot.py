@@ -259,8 +259,17 @@ class HistPlot(Qwt.QwtPlot):
 		self.needfullreplot = False
 
 		self.setAxisScale(Qwt.QwtPlot.xBottom, 85., 12000.)
-		#self.setAxisScaleEngine(Qwt.QwtPlot.xBottom, Qwt.QwtLog10ScaleEngine())
-		self.setAxisScaleEngine(Qwt.QwtPlot.xBottom, log2scale.CustomScaleEngine())
+		#self.setAxisScaleEngine(Qwt.QwtPlot.xBottom, )
+		
+		try:
+			s = Qwt.QwtLog10ScaleEngine()
+			s.autoscale(1,1.,1.)
+		except:
+			print "The loaded PyQwt library has buggy QwtScaleEngine (and friends) SIP declarations"
+			print "... use a log10 scale engine instead of a log2 scale engine"
+			self.setAxisScaleEngine(Qwt.QwtPlot.xBottom, Qwt.QwtLog10ScaleEngine())
+		else:
+			self.setAxisScaleEngine(Qwt.QwtPlot.xBottom, log2scale.CustomScaleEngine())
 		
 		self.setAxisScaleDraw(Qwt.QwtPlot.xBottom, FreqScaleDraw())
 		
