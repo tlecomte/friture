@@ -210,10 +210,15 @@ def octave_filter_bank_decimation(blow, alow, forward, feedback, x):
 	
 	for j in range(0, 7):
 		for i in range(0, BandsPerOctave)[::-1]:
-			filt = lfilter(forward[i], feedback[i], x_dec)
+			zi = zeros(max(len(forward[i]), len(feedback[i]))-1) 
+			filt, zf = lfilter(forward[i], feedback[i], x_dec, zi=zi)
+			# here zf could be stored and reused to restart the filter
 			y += [filt]
 			dec += [2**j]
-		x_dec = lfilter(blow, alow, x_dec)[::2]
+		zi = zeros(max(len(blow),len(alow))-1)
+		x_dec, zf = lfilter(blow, alow, x_dec, zi=zi)
+		# here zf could be stored and reused to restart the filter
+		x_dec = x_dec[::2]
 	
 	return y, dec
 
