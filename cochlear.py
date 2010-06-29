@@ -192,6 +192,9 @@ def octave_filter_bank(forward, feedback, x):
 		y[i,:] = lfilter(forward[i], feedback[i], x)
 	return y
 
+# Note: we may have one filter in excess here : the low-pass filter for decimation
+# does approximately the same thing as the low-pass component of the highest band-pass
+# filter for the octave
 def octave_filter_bank_decimation(blow, alow, forward, feedback, x):
 	# This function filters the waveform x with the array of filters
 	# specified by the forward and feedback parameters. Each row
