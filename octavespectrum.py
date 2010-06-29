@@ -41,6 +41,7 @@ QwtPlotCanvas {
 DEFAULT_SPEC_MIN = -140
 DEFAULT_SPEC_MAX = 0
 DEFAULT_WEIGHTING = 1 #A
+DEFAULT_BANDSPEROCTAVE = 0
 
 class OctaveSpectrum_Widget(QtGui.QWidget):
 	def __init__(self, parent, logger = None):
@@ -70,12 +71,9 @@ class OctaveSpectrum_Widget(QtGui.QWidget):
 		self.spec_max = DEFAULT_SPEC_MAX
 		self.weighting = DEFAULT_WEIGHTING
 		
-		BandsPerOctave = 1
-		Nbands = 7*BandsPerOctave
-		# brute force without decimation is the following line
-		#[self.b, self.a, self.fi, self.flow, self.fhigh] = octave_filters(Nbands, BandsPerOctave)
-		self.fi, self.flow, self.fhigh = octave_frequencies(Nbands, BandsPerOctave)
-		[self.bdec, self.adec, fi, flow, fhigh] = octave_filters_oneoctave(Nbands, BandsPerOctave)		
+		bandsperoctave = 3*2**(DEFAULT_BANDSPEROCTAVE-1) if DEFAULT_BANDSPEROCTAVE >= 1 else 1
+		self.setbandsperoctave(bandsperoctave)
+				
 		N = 4
 		# other possibilities
 		#(self.blow, self.alow) = ellip(N, 0.5, 30, 0.8*0.5)
@@ -112,23 +110,17 @@ class OctaveSpectrum_Widget(QtGui.QWidget):
 		
 		freq = self.fi
 		
-		# taken from http://www.cdc.gov/niosh/docs/98-126/chap4.html#41
-		# which takes it in turn from ANSI standards
-		A = [-16.1, -8.6, -3.2, 0., 1.2, 1.0, -1.1]
-		B = [-4.2, -1.3, -0.3, 0., -0.1, -0.7, -2.9]
-		C = [-0.2, 0., 0., 0., -0.2, -0.8, -3.0]
-		
 		if self.weighting is 0:
 			w = 0.
 		elif self.weighting is 1:
-			w = A
+			w = self.A
 		elif self.weighting is 2:
-			w = B
+			w = self.B
 		else:
-			w = C
+			w = self.C
 		
 		epsilon = 1e-30
-		db_spectrogram = 20*log10(sp + epsilon) + w
+		db_spectrogram = 10*log10(sp + epsilon) + w
 		self.PlotZoneSpect.setdata(self.flow, self.fhigh, db_spectrogram)
 
 	def setmin(self, value):
@@ -142,6 +134,19 @@ class OctaveSpectrum_Widget(QtGui.QWidget):
 	def setweighting(self, weighting):
 		self.weighting = weighting
 		self.PlotZoneSpect.setweighting(weighting)
+
+	def setbandsperoctave(self, bandsperoctave):
+		self.bandsperoctave = bandsperoctave
+		self.nbands = 7*self.bandsperoctave
+		self.fi, self.flow, self.fhigh = octave_frequencies(self.nbands, self.bandsperoctave)
+		[self.bdec, self.adec, fi, flow, fhigh] = octave_filters_oneoctave(self.nbands, self.bandsperoctave)
+		f = self.fi
+		Rc = 12200.**2*f**2 / ((f**2 + 20.6**2)*(f**2 + 12200.**2))
+		Rb = 12200.**2*f**3 / ((f**2 + 20.6**2)*(f**2 + 12200.**2)*((f**2 + 158.5**2)**0.5))
+		Ra = 12200.**2*f**4 / ((f**2 + 20.6**2)*(f**2 + 12200.**2)*((f**2 + 107.7**2)**0.5) * ((f**2 + 737.9**2)**0.5))         
+		self.C = 0.06 + 20.*log10(Rc)
+		self.B = 0.17 + 20.*log10(Rb)
+		self.A = 2.0  + 20.*log10(Ra)		
 
 	def settings_called(self, checked):
 		self.settings_dialog.show()
