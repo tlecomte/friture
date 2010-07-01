@@ -98,7 +98,6 @@ class OctaveSpectrum_Settings_Dialog(QtGui.QDialog):
 	def restoreState(self, settings):
 		(bandsPerOctave, ok) = settings.value("bandsPerOctave", DEFAULT_BANDSPEROCTAVE).toInt()
 		self.comboBox_bandsperoctave.setCurrentIndex(bandsPerOctave)
-		print bandsPerOctave
 		(colorMin, ok) = settings.value("Min", DEFAULT_SPEC_MIN).toInt()
 		self.spinBox_specmin.setValue(colorMin)
 		(colorMax, ok) = settings.value("Max", DEFAULT_SPEC_MAX).toInt()
