@@ -137,7 +137,7 @@ class OctaveSpectrum_Widget(QtGui.QWidget):
 
 	def setbandsperoctave(self, bandsperoctave):
 		self.bandsperoctave = bandsperoctave
-		self.nbands = 7*self.bandsperoctave
+		self.nbands = 8*self.bandsperoctave
 		self.fi, self.flow, self.fhigh = octave_frequencies(self.nbands, self.bandsperoctave)
 		[self.bdec, self.adec, fi, flow, fhigh] = octave_filters_oneoctave(self.nbands, self.bandsperoctave)
 		f = self.fi

@@ -201,14 +201,14 @@ def octave_filter_bank_decimation(blow, alow, forward, feedback, x):
 	# of the forward and feedback parameters are the parameters
 	# to the Matlab builtin function "filter".
 	BandsPerOctave = len(forward)
-	Nbank = 7*BandsPerOctave
+	Nbank = 8*BandsPerOctave
 	
 	y = []
 	dec = []
 	
 	x_dec = x
 	
-	for j in range(0, 7):
+	for j in range(0, 8):
 		for i in range(0, BandsPerOctave)[::-1]:
 			zi = zeros(max(len(forward[i]), len(feedback[i]))-1) 
 			filt, zf = lfilter(forward[i], feedback[i], x_dec, zi=zi)

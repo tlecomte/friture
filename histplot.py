@@ -258,7 +258,7 @@ class HistPlot(Qwt.QwtPlot):
 
 		self.needfullreplot = False
 
-		self.setAxisScale(Qwt.QwtPlot.xBottom, 85., 12000.)
+		self.setAxisScale(Qwt.QwtPlot.xBottom, 63., 16000.)
 		#self.setAxisScaleEngine(Qwt.QwtPlot.xBottom, )
 		
 		try:
