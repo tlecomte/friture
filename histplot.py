@@ -190,6 +190,8 @@ class HistogramItem(Qwt.QwtPlotItem):
 	def testHistogramAttribute(self, attribute):
 		return bool(self.__attributes & attribute) 
 
+	# TODO For a dramatic speedup, the bars should be cached instead of drawn from scratch
+	# each time
 	def drawBar(self, painter, orientation, rect):
 		painter.save()
 		color = painter.pen().color()
