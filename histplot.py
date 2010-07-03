@@ -76,6 +76,8 @@ class HistogramItem(Qwt.QwtPlotItem):
 		self.setItemAttribute(Qwt.QwtPlotItem.AutoScale, True)
 		self.setItemAttribute(Qwt.QwtPlotItem.Legend, True)
 		self.setZ(20.0)
+		
+		self.rect = QtCore.QRect()
 
 	def setData(self, data):
 		self.__data = data
@@ -192,43 +194,65 @@ class HistogramItem(Qwt.QwtPlotItem):
 
 	# TODO For a dramatic speedup, the bars should be cached instead of drawn from scratch
 	# each time
-	def drawBar(self, painter, orientation, rect):
-		painter.save()
-		color = painter.pen().color()
+	def update_pixmap(self, rect):
+		self.rect = rect
+		
+		print rect.width(), rect.height(), self.plot().canvas().height()
+		#print rect.bottom(), rect.right()
+		
+		rect.setHeight(self.plot().canvas().height())
+		rect.moveLeft(0)
+		rect.moveTop(0)
+		
+		color = QtGui.QColor(self.color())
+		#print color.red(), color.green(), color.blue()
 		r = rect.normalized()
 		factor = 125
-		light = color.light(factor)
-		dark = color.dark(factor)
+		light = color.lighter(factor)
+		#print light.red(), light.green(), light.blue()
+		dark = color.darker(factor)
+		#print dark.red(), dark.green(), dark.blue()
+		
+		self.pixmap = QtGui.QPixmap(r.width(), r.height())
+		self.pixmap.fill()
+		
+		painter = QtGui.QPainter(self.pixmap)
 
 		painter.setBrush(color)
 		painter.setPen(Qt.Qt.NoPen)
-		Qwt.QwtPainter.drawRect(painter, r.x()+1, r.y()+1,
+		#print r.x(), r.y(), r.width(), r.height()
+		painter.drawRect(r.x()+1, r.y()+1,
 								r.width()-2, r.height()-2)
+		#painter.drawRect(1, 1, r.width()-2, r.height()-2)
 
 		painter.setBrush(Qt.Qt.NoBrush)
 
 		painter.setPen(Qt.QPen(light, 2))
-		Qwt.QwtPainter.drawLine(
-			painter, r.left()+1, r.top()+2, r.right()+1, r.top()+2)
+		painter.drawLine(r.left()+1, r.top()+2, r.right()+1, r.top()+2)
+		#painter.drawLine(1, 2, r.width()+1, 2)
 
 		painter.setPen(Qt.QPen(dark, 2))
-		Qwt.QwtPainter.drawLine(
-			painter, r.left()+1, r.bottom(), r.right()+1, r.bottom())
+		painter.drawLine(r.left()+1, r.bottom(), r.right()+1, r.bottom())
+		#painter.drawLine(1, rect.height(), r.width()+1, rect.height())
 
 		painter.setPen(Qt.QPen(light, 1))
-		Qwt.QwtPainter.drawLine(
-			painter, r.left(), r.top() + 1, r.left(), r.bottom())
-		Qwt.QwtPainter.drawLine(
-			painter, r.left()+1, r.top()+2, r.left()+1, r.bottom()-1)
+		painter.drawLine(r.left(), r.top() + 1, r.left(), r.bottom())
+		#painter.drawLine(1, 1, 1, -rect.height())
+		painter.drawLine(r.left()+1, r.top()+2, r.left()+1, r.bottom()-1)
+		#painter.drawLine(2, 2, 2, -rect.height()-1)
 
 		painter.setPen(Qt.QPen(dark, 1))
-		Qwt.QwtPainter.drawLine(
-			painter, r.right()+1, r.top()+1, r.right()+1, r.bottom())
-		Qwt.QwtPainter.drawLine(
-			painter, r.right(), r.top()+2, r.right(), r.bottom()-1)
-
-		painter.restore()
-
+		painter.drawLine(r.right()+1, r.top()+1, r.right()+1, r.bottom())
+		#painter.drawLine(r.width()-1, 1, r.width()-1, -r.height())
+		painter.drawLine(r.right(), r.top()+2, r.right(), r.bottom()-1)
+		#painter.drawLine(r.width()-2, 2, r.width()-2, -r.height()+1)
+	
+	def drawBar(self, painter, orientation, rect):
+		if rect.width() < self.rect.width() - 1 or rect.width() > self.rect.width() + 1:
+		#if rect.width() <> self.rect.width():
+			self.update_pixmap(rect)
+		
+		painter.drawPixmap(rect.left(), rect.bottom(), self.pixmap)
 
 class HistPlot(Qwt.QwtPlot):
 	def __init__(self, parent, logger):
