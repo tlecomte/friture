@@ -29,8 +29,7 @@ class RingBuffer():
 	def push(self, floatdata):
 		# update the circular buffer
 		if len(floatdata) > self.buffer_length:
-			print "buffer error"
-			exit(1)
+			raise StandardError("buffer error")
 		
 		# first copy, always complete
 		self.buffer[self.offset : self.offset + len(floatdata)] = floatdata[:]
