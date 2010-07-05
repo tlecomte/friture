@@ -100,7 +100,7 @@ class OctaveSpectrum_Widget(QtGui.QWidget):
 		y, dec = octave_filter_bank_decimation(self.blow, self.alow, self.bdec, self.adec, floatdata)
 		
 		sp = []
-		for bank, d in zip(y, dec):
+		for bank in y:
 			sp += [(bank**2).mean()]
 		sp = array(sp)[::-1]
 
