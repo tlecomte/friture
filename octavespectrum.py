@@ -166,7 +166,7 @@ class octave_filters():
 		# other possibilities
 		#(self.bdec, self.adec) = ellip(N, 0.5, 30, 0.8*0.5)
 		#(self.bdec, self.adec) = cheby1(N, 0.05, 0.8*0.5)
-		(self.bdec, self.adec) = butter(N, 1.*0.5)
+		(self.bdec, self.adec) = butter(N, .8*0.5)
 		
 		self.zfs = None
 		
