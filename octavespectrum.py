@@ -72,13 +72,7 @@ class OctaveSpectrum_Widget(QtGui.QWidget):
 		self.weighting = DEFAULT_WEIGHTING
 		
 		bandsperoctave = 3*2**(DEFAULT_BANDSPEROCTAVE-1) if DEFAULT_BANDSPEROCTAVE >= 1 else 1
-		self.setbandsperoctave(bandsperoctave)
-				
-		N = 4
-		# other possibilities
-		#(self.blow, self.alow) = ellip(N, 0.5, 30, 0.8*0.5)
-		#(self.blow, self.alow) = cheby1(N, 0.05, 0.8*0.5)
-		(self.blow, self.alow) = butter(N, 0.8*0.5)
+		self.filters = octave_filters(bandsperoctave)
 		
 		# initialize the settings dialog
 		self.settings_dialog = octavespectrum_settings.OctaveSpectrum_Settings_Dialog(self, self.logger)
@@ -105,7 +99,7 @@ class OctaveSpectrum_Widget(QtGui.QWidget):
 		#push to the ring buffer
 		#
 		
-		y, dec = octave_filter_bank_decimation(self.blow, self.alow, self.bdec, self.adec, floatdata)
+		y, dec = self.filters.filter(floatdata)
 		
 		sp = []
 		for bank in y:
@@ -116,20 +110,18 @@ class OctaveSpectrum_Widget(QtGui.QWidget):
 		#y_nodec = octave_filter_bank(self.b, self.a, floatdata)
 		#sp_nodec = (y_nodec**2).mean(axis=1)
 		
-		freq = self.fi
-		
 		if self.weighting is 0:
 			w = 0.
 		elif self.weighting is 1:
-			w = self.A
+			w = self.filters.A
 		elif self.weighting is 2:
-			w = self.B
+			w = self.filters.B
 		else:
-			w = self.C
+			w = self.filters.C
 		
 		epsilon = 1e-30
 		db_spectrogram = 10*log10(sp + epsilon) + w
-		self.PlotZoneSpect.setdata(self.flow, self.fhigh, db_spectrogram)
+		self.PlotZoneSpect.setdata(self.filters.flow, self.filters.fhigh, db_spectrogram)
 
 	def setmin(self, value):
 		self.spec_min = value
@@ -144,6 +136,32 @@ class OctaveSpectrum_Widget(QtGui.QWidget):
 		self.PlotZoneSpect.setweighting(weighting)
 
 	def setbandsperoctave(self, bandsperoctave):
+		self.filters.setbandsperoctave(bandsperoctave)
+
+	def settings_called(self, checked):
+		self.settings_dialog.show()
+	
+	def saveState(self, settings):
+		self.settings_dialog.saveState(settings)
+
+	def restoreState(self, settings):
+		self.settings_dialog.restoreState(settings)
+
+class octave_filters():
+	def __init__(self, bandsperoctave):
+		N = 4
+		# other possibilities
+		#(self.blow, self.alow) = ellip(N, 0.5, 30, 0.8*0.5)
+		#(self.blow, self.alow) = cheby1(N, 0.05, 0.8*0.5)
+		(self.blow, self.alow) = butter(N, 0.8*0.5)
+		
+		self.setbandsperoctave(bandsperoctave)
+
+	def filter(self, floatdata):
+		y, dec = octave_filter_bank_decimation(self.blow, self.alow, self.bdec, self.adec, floatdata)
+		return y, dec
+	
+	def setbandsperoctave(self, bandsperoctave):
 		self.bandsperoctave = bandsperoctave
 		self.nbands = 8*self.bandsperoctave
 		self.fi, self.flow, self.fhigh = octave_frequencies(self.nbands, self.bandsperoctave)
@@ -154,13 +172,4 @@ class OctaveSpectrum_Widget(QtGui.QWidget):
 		Ra = 12200.**2*f**4 / ((f**2 + 20.6**2)*(f**2 + 12200.**2)*((f**2 + 107.7**2)**0.5) * ((f**2 + 737.9**2)**0.5))         
 		self.C = 0.06 + 20.*log10(Rc)
 		self.B = 0.17 + 20.*log10(Rb)
-		self.A = 2.0  + 20.*log10(Ra)		
-
-	def settings_called(self, checked):
-		self.settings_dialog.show()
-	
-	def saveState(self, settings):
-		self.settings_dialog.saveState(settings)
-
-	def restoreState(self, settings):
-		self.settings_dialog.restoreState(settings)
+		self.A = 2.0  + 20.*log10(Ra)
