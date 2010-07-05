@@ -119,62 +119,34 @@ class HistogramItem(Qwt.QwtPlotItem):
 		return Qwt.QwtPlotItem.PlotHistogram
 
 	def draw(self, painter, xMap, yMap, rect):
-		
 		self.canvas_height = rect.height()
 		
 		iData = self.data()
-		painter.setPen(self.color())
 		x0 = xMap.transform(self.baseline())
 		y0 = yMap.transform(self.baseline())
 		for i in range(iData.size()):
-			if self.testHistogramAttribute(HistogramItem.Xfy):
-				x2 = xMap.transform(iData.value(i))
-				if x2 == x0:
-					continue
+			y2 = yMap.transform(iData.value(i))
+			if y2 == y0:
+				continue
 
-				y1 = yMap.transform(iData.interval(i).minValue())
-				y2 = yMap.transform(iData.interval(i).maxValue())
+			x1 = xMap.transform(iData.interval(i).minValue())
+			x2 = xMap.transform(iData.interval(i).maxValue())
 
-				if y1 > y2:
-					y1, y2 = y2, y1
-					
-				if  i < iData.size()-2:
-					yy1 = yMap.transform(iData.interval(i+1).minValue())
-					yy2 = yMap.transform(iData.interval(i+1).maxValue())
+			if x1 > x2:
+				x1, x2 = x2, x1
 
-					if y2 == min(yy1, yy2):
-						xx2 = xMap.transform(iData.interval(i+1).minValue())
-						if xx2 != x0 and ((xx2 < x0 and x2 < x0)
-										  or (xx2 > x0 and x2 > x0)):
-							# One pixel distance between neighboured bars
-							y2 += 1
-
-				self.drawBar(
-					painter, Qt.Qt.Horizontal, Qt.QRect(x0, y1, x2-x0, y2-y1))
-			else:
-				y2 = yMap.transform(iData.value(i))
-				if y2 == y0:
-					continue
-
-				x1 = xMap.transform(iData.interval(i).minValue())
-				x2 = xMap.transform(iData.interval(i).maxValue())
-
-				if x1 > x2:
-					x1, x2 = x2, x1
-
-				if i < iData.size()-2:
-					xx1 = xMap.transform(iData.interval(i+1).minValue())
-					xx2 = xMap.transform(iData.interval(i+1).maxValue())
-					x2 = min(xx1, xx2)
-					yy2 = yMap.transform(iData.value(i+1))
-					if x2 == min(xx1, xx2):
-						if yy2 != 0 and (( yy2 < y0 and y2 < y0)
-										 or (yy2 > y0 and y2 > y0)):
-							# One pixel distance between neighboured bars
-							x2 -= 1
+			if i < iData.size()-2:
+				xx1 = xMap.transform(iData.interval(i+1).minValue())
+				xx2 = xMap.transform(iData.interval(i+1).maxValue())
+				x2 = min(xx1, xx2)
+				yy2 = yMap.transform(iData.value(i+1))
+				if x2 == min(xx1, xx2):
+					if yy2 != 0 and (( yy2 < y0 and y2 < y0)
+									 or (yy2 > y0 and y2 > y0)):
+						# One pixel distance between neighboured bars
+						x2 -= 1
 				
-				self.drawBar(
-					painter, Qt.Qt.Vertical, Qt.QRect(x1, y0, x2-x1, y2-y0))
+			self.drawBar(painter, Qt.Qt.Vertical, Qt.QRect(x1, y0, x2-x1, y2-y0))
 
 	def setBaseline(self, reference):
 		if self.baseline() != reference:
