@@ -29,6 +29,7 @@ class AudioBuffer():
 		self.buffer_length = 100000.
 		self.audiobuffer = zeros(2*self.buffer_length)
 		self.offset = 0
+		self.newpoints = 0
 
 	# try to update the audio buffer
 	# return the number of chunks retrieved, and the time elapsed
@@ -72,9 +73,15 @@ class AudioBuffer():
 			
 			self.offset = int((self.offset + len(floatdata)) % self.buffer_length)
 
+		# holds the number of points acquired at the last update iteration
+		self.newpoints = chunks*FRAMES_PER_BUFFER
+
 		return (chunks, t.elapsed())
 
 	def data(self, length):
 		start = self.offset + self.buffer_length - length
 		stop = self.offset + self.buffer_length
 		return self.audiobuffer[start : stop]
+
+	def newdata(self):
+		return self.data(self.newpoints)
