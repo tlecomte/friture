@@ -21,8 +21,7 @@ from numpy import zeros
 
 class RingBuffer():
 	def __init__(self):
-		# FIXME the buffer length could be made dynamic based on the
-		# needs
+		# FIXME the buffer length could be made dynamic based on the needs
 		self.buffer_length = 100000.
 		self.buffer = zeros(2*self.buffer_length)
 		self.offset = 0
