@@ -78,6 +78,7 @@ class HistogramItem(Qwt.QwtPlotItem):
 		self.setZ(20.0)
 		
 		self.rect = QtCore.QRect()
+		self.canvas_height = 0
 		
 		self.pixmap = QtGui.QPixmap()
 
@@ -118,6 +119,9 @@ class HistogramItem(Qwt.QwtPlotItem):
 		return Qwt.QwtPlotItem.PlotHistogram
 
 	def draw(self, painter, xMap, yMap, rect):
+		
+		self.canvas_height = rect.height()
+		
 		iData = self.data()
 		painter.setPen(self.color())
 		x0 = xMap.transform(self.baseline())
@@ -199,7 +203,7 @@ class HistogramItem(Qwt.QwtPlotItem):
 		self.rect = rect
 		
 		r = rect.translated(0,0)
-		r.setHeight(self.plot().canvas().height())
+		r.setHeight(self.canvas_height)
 		r.moveLeft(0)
 		r.moveTop(0)
 		
@@ -255,7 +259,7 @@ class HistogramItem(Qwt.QwtPlotItem):
 		# If width() < 0 the function swaps the left and right corners, and it swaps the top and bottom corners if height() < 0.
 		rect = rect.normalized()
 		
-		if rect.width() < self.rect.width() - 1 or rect.width() > self.rect.width() + 1 or self.plot().canvas().height() <> self.rect.height():
+		if rect.width() < self.rect.width() - 1 or rect.width() > self.rect.width() + 1 or self.canvas_height <> self.rect.height():
 			self.update_pixmap(rect)
 		
 		if rect.width() == self.rect.width():
