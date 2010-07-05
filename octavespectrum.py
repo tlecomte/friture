@@ -155,10 +155,16 @@ class octave_filters():
 		#(self.bdec, self.adec) = cheby1(N, 0.05, 0.8*0.5)
 		(self.bdec, self.adec) = butter(N, 0.8*0.5)
 		
+		self.zfs = None
+		
 		self.setbandsperoctave(bandsperoctave)
 
 	def filter(self, floatdata):
-		y, dec = octave_filter_bank_decimation(self.bdec, self.adec, self.boct, self.aoct, floatdata)
+		y, dec, zfs = octave_filter_bank_decimation(self.bdec, self.adec, self.boct, self.aoct, floatdata)
+		#y, dec, zfs = octave_filter_bank_decimation(self.bdec, self.adec, self.boct, self.aoct, floatdata, zis=self.zfs)
+		
+		self.zfs = zfs
+		
 		return y, dec
 	
 	def setbandsperoctave(self, bandsperoctave):
@@ -173,3 +179,4 @@ class octave_filters():
 		self.C = 0.06 + 20.*log10(Rc)
 		self.B = 0.17 + 20.*log10(Rb)
 		self.A = 2.0  + 20.*log10(Ra)
+		self.zfs = None

@@ -195,7 +195,7 @@ def octave_filter_bank(forward, feedback, x):
 # Note: we may have one filter in excess here : the low-pass filter for decimation
 # does approximately the same thing as the low-pass component of the highest band-pass
 # filter for the octave
-def octave_filter_bank_decimation(blow, alow, forward, feedback, x):
+def octave_filter_bank_decimation(blow, alow, forward, feedback, x, zis=None):
 	# This function filters the waveform x with the array of filters
 	# specified by the forward and feedback parameters. Each row
 	# of the forward and feedback parameters are the parameters
@@ -208,19 +208,32 @@ def octave_filter_bank_decimation(blow, alow, forward, feedback, x):
 	
 	x_dec = x
 	
+	zfs = []
+	
 	for j in range(0, 8):
 		for i in range(0, BandsPerOctave)[::-1]:
-			zi = zeros(max(len(forward[i]), len(feedback[i]))-1) 
+			if zis == None:
+				zi = zeros(max(len(forward[i]), len(feedback[i]))-1) 
+			else:
+				zi = zis.pop(0)
 			filt, zf = lfilter(forward[i], feedback[i], x_dec, zi=zi)
-			# here zf could be stored and reused to restart the filter
+			# zf can be reused to restart the filter
+			zfs += [zf]
 			y += [filt]
 			dec += [2**j]
-		zi = zeros(max(len(blow),len(alow))-1)
+		if zis == None:
+			zi = zeros(max(len(blow),len(alow))-1)
+		else:
+			zi = zis.pop(0)
 		x_dec, zf = lfilter(blow, alow, x_dec, zi=zi)
-		# here zf could be stored and reused to restart the filter
+		# zf can be reused to restart the filter
+		zfs += [zf]
 		x_dec = x_dec[::2]
 	
-	return y, dec
+	if zis <> None and len(zis) <> 0:
+		raise StandardError("Filter zis error")
+	
+	return y, dec, zfs
 
 # main() is a test function
 def main():
