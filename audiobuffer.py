@@ -22,13 +22,38 @@ from numpy import floor, zeros, int16, fromstring
 
 FRAMES_PER_BUFFER = 1024
 
-class AudioBuffer():
+class RingBuffer():
 	def __init__(self):
 		# FIXME the buffer length could be made dynamic based on the
 		# needs
 		self.buffer_length = 100000.
-		self.audiobuffer = zeros(2*self.buffer_length)
+		self.buffer = zeros(2*self.buffer_length)
 		self.offset = 0
+
+	def push(self, floatdata):
+		# update the circular buffer
+		if len(floatdata) > self.buffer_length:
+			print "buffer error"
+			exit(1)
+		
+		# first copy, always complete
+		self.buffer[self.offset : self.offset + len(floatdata)] = floatdata[:]
+		# second copy, can be folded
+		direct = min(len(floatdata), self.buffer_length - self.offset)
+		folded = len(floatdata) - direct
+		self.buffer[self.offset + self.buffer_length: self.offset + self.buffer_length + direct] = floatdata[0 : direct]
+		self.buffer[:folded] = floatdata[direct:]
+		
+		self.offset = int((self.offset + len(floatdata)) % self.buffer_length)
+
+	def data(self, length):
+		start = self.offset + self.buffer_length - length
+		stop = self.offset + self.buffer_length
+		return self.buffer[start : stop]
+
+class AudioBuffer():
+	def __init__(self):
+		self.ringbuffer = RingBuffer()
 		self.newpoints = 0
 
 	# try to update the audio buffer
@@ -59,19 +84,7 @@ class AudioBuffer():
 			#floatdata -= fromstring(rawdata, int16)[channel+1::nchannels]/(2.**(16-1))
 			
 			# update the circular buffer
-			if len(floatdata) > self.buffer_length:
-				print "buffer error"
-				exit(1)
-			
-			# first copy, always complete
-			self.audiobuffer[self.offset : self.offset + len(floatdata)] = floatdata[:]
-			# second copy, can be folded
-			direct = min(len(floatdata), self.buffer_length - self.offset)
-			folded = len(floatdata) - direct
-			self.audiobuffer[self.offset + self.buffer_length: self.offset + self.buffer_length + direct] = floatdata[0 : direct]
-			self.audiobuffer[:folded] = floatdata[direct:]
-			
-			self.offset = int((self.offset + len(floatdata)) % self.buffer_length)
+			self.ringbuffer.push(floatdata)
 
 		# holds the number of points acquired at the last update iteration
 		self.newpoints = chunks*FRAMES_PER_BUFFER
@@ -79,9 +92,7 @@ class AudioBuffer():
 		return (chunks, t.elapsed())
 
 	def data(self, length):
-		start = self.offset + self.buffer_length - length
-		stop = self.offset + self.buffer_length
-		return self.audiobuffer[start : stop]
+		return self.ringbuffer.data(length)
 
 	def newdata(self):
 		return self.data(self.newpoints)
