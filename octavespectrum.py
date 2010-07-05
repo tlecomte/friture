@@ -98,8 +98,12 @@ class OctaveSpectrum_Widget(QtGui.QWidget):
 		time = 0.135 #FAST setting for a sound level meter
 		floatdata = self.audiobuffer.data(time*SAMPLING_RATE)
 		
-		#Compute the filtered output from the fresh data
+		#get the fresh data
 		#floatdata = self.audiobuffer.newdata()
+		#compute the filters' output
+		#
+		#push to the ring buffer
+		#
 		
 		y, dec = octave_filter_bank_decimation(self.blow, self.alow, self.bdec, self.adec, floatdata)
 		
