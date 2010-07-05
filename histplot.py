@@ -200,12 +200,12 @@ class HistogramItem(Qwt.QwtPlotItem):
 
 	# For a dramatic speedup, the bars are cached instead of drawn from scratch each time
 	def update_pixmap(self, rect):
-		self.rect = rect
-		
 		r = rect.translated(0,0)
 		r.setHeight(self.canvas_height)
 		r.moveLeft(0)
 		r.moveTop(0)
+		
+		self.rect = r.translated(0,0)
 		
 		color = QtGui.QColor(self.color())
 		
@@ -259,7 +259,7 @@ class HistogramItem(Qwt.QwtPlotItem):
 		# If width() < 0 the function swaps the left and right corners, and it swaps the top and bottom corners if height() < 0.
 		rect = rect.normalized()
 		
-		if rect.width() < self.rect.width() - 1 or rect.width() > self.rect.width() + 1 or self.canvas_height <> self.rect.height():
+		if rect.width() < self.rect.width() - 1 or rect.width() > self.rect.width() + 1 or self.canvas_height <> self.rect.height():	
 			self.update_pixmap(rect)
 		
 		if rect.width() == self.rect.width():
