@@ -151,21 +151,21 @@ class octave_filters():
 	def __init__(self, bandsperoctave):
 		N = 4
 		# other possibilities
-		#(self.blow, self.alow) = ellip(N, 0.5, 30, 0.8*0.5)
-		#(self.blow, self.alow) = cheby1(N, 0.05, 0.8*0.5)
-		(self.blow, self.alow) = butter(N, 0.8*0.5)
+		#(self.bdec, self.adec) = ellip(N, 0.5, 30, 0.8*0.5)
+		#(self.bdec, self.adec) = cheby1(N, 0.05, 0.8*0.5)
+		(self.bdec, self.adec) = butter(N, 0.8*0.5)
 		
 		self.setbandsperoctave(bandsperoctave)
 
 	def filter(self, floatdata):
-		y, dec = octave_filter_bank_decimation(self.blow, self.alow, self.bdec, self.adec, floatdata)
+		y, dec = octave_filter_bank_decimation(self.bdec, self.adec, self.boct, self.aoct, floatdata)
 		return y, dec
 	
 	def setbandsperoctave(self, bandsperoctave):
 		self.bandsperoctave = bandsperoctave
 		self.nbands = 8*self.bandsperoctave
 		self.fi, self.flow, self.fhigh = octave_frequencies(self.nbands, self.bandsperoctave)
-		[self.bdec, self.adec, fi, flow, fhigh] = octave_filters_oneoctave(self.nbands, self.bandsperoctave)
+		[self.boct, self.aoct, fi, flow, fhigh] = octave_filters_oneoctave(self.nbands, self.bandsperoctave)
 		f = self.fi
 		Rc = 12200.**2*f**2 / ((f**2 + 20.6**2)*(f**2 + 12200.**2))
 		Rb = 12200.**2*f**3 / ((f**2 + 20.6**2)*(f**2 + 12200.**2)*((f**2 + 158.5**2)**0.5))
