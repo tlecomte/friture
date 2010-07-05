@@ -122,29 +122,13 @@ class HistogramItem(Qwt.QwtPlotItem):
 		self.canvas_height = rect.height()
 		
 		iData = self.data()
-		x0 = xMap.transform(self.baseline())
+		
 		y0 = yMap.transform(self.baseline())
+		
 		for i in range(iData.size()):
-			y2 = yMap.transform(iData.value(i))
-			if y2 == y0:
-				continue
-
 			x1 = xMap.transform(iData.interval(i).minValue())
-			x2 = xMap.transform(iData.interval(i).maxValue())
-
-			if x1 > x2:
-				x1, x2 = x2, x1
-
-			if i < iData.size()-2:
-				xx1 = xMap.transform(iData.interval(i+1).minValue())
-				xx2 = xMap.transform(iData.interval(i+1).maxValue())
-				x2 = min(xx1, xx2)
-				yy2 = yMap.transform(iData.value(i+1))
-				if x2 == min(xx1, xx2):
-					if yy2 != 0 and (( yy2 < y0 and y2 < y0)
-									 or (yy2 > y0 and y2 > y0)):
-						# One pixel distance between neighboured bars
-						x2 -= 1
+			x2 = xMap.transform(iData.interval(i).maxValue())-1
+			y2 = yMap.transform(iData.value(i))
 				
 			self.drawBar(painter, Qt.Qt.Vertical, Qt.QRect(x1, y0, x2-x1, y2-y0))
 
