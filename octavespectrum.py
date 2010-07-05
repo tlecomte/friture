@@ -76,6 +76,8 @@ class OctaveSpectrum_Widget(QtGui.QWidget):
 		
 		# initialize the settings dialog
 		self.settings_dialog = octavespectrum_settings.OctaveSpectrum_Settings_Dialog(self, self.logger)
+		
+		self.bankbuffers = []
 
 	# method
 	def set_buffer(self, buffer):
@@ -90,21 +92,30 @@ class OctaveSpectrum_Widget(QtGui.QWidget):
 		
 		#time = SMOOTH_DISPLAY_TIMER_PERIOD_MS/1000.
 		time = 0.135 #FAST setting for a sound level meter
-		floatdata = self.audiobuffer.data(time*SAMPLING_RATE)
+		#floatdata = self.audiobuffer.data(time*SAMPLING_RATE)
 		
 		#get the fresh data
-		#floatdata = self.audiobuffer.newdata()
+		floatdata = self.audiobuffer.newdata()
 		#compute the filters' output
-		#
-		#push to the ring buffer
-		#
-		
 		y, dec = self.filters.filter(floatdata)
-		
+		#recreate the ring buffer if necessary
+		if len(y) <> len(self.bankbuffers):
+			self.bankbuffers = [RingBuffer() for bank in y]
+		#push to the ring buffer
+		for i, bankdata in enumerate(y):
+			self.bankbuffers[i].push(bankdata)
+		#compute the widget data
 		sp = []
-		for bank in y:
-			sp += [(bank**2).mean()]
+		for bankbuffer in self.bankbuffers:
+			sp += [(bankbuffer.data(time*SAMPLING_RATE)**2).mean()]
 		sp = array(sp)[::-1]
+		
+		#y, dec = self.filters.filter(floatdata)
+		
+		#sp = []
+		#for bank in y:
+			#sp += [(bank**2).mean()]
+		#sp = array(sp)[::-1]
 
 		#brute force without decimation
 		#y_nodec = octave_filter_bank(self.b, self.a, floatdata)
@@ -160,8 +171,8 @@ class octave_filters():
 		self.setbandsperoctave(bandsperoctave)
 
 	def filter(self, floatdata):
-		y, dec, zfs = octave_filter_bank_decimation(self.bdec, self.adec, self.boct, self.aoct, floatdata)
-		#y, dec, zfs = octave_filter_bank_decimation(self.bdec, self.adec, self.boct, self.aoct, floatdata, zis=self.zfs)
+		#y, dec, zfs = octave_filter_bank_decimation(self.bdec, self.adec, self.boct, self.aoct, floatdata)
+		y, dec, zfs = octave_filter_bank_decimation(self.bdec, self.adec, self.boct, self.aoct, floatdata, zis=self.zfs)
 		
 		self.zfs = zfs
 		
