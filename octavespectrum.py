@@ -24,6 +24,7 @@ import audioproc # audio processing class
 import octavespectrum_settings # settings dialog
 from cochlear import *
 from scipy.signal import cheby1
+from ringbuffer import RingBuffer
 
 SMOOTH_DISPLAY_TIMER_PERIOD_MS = 25
 SAMPLING_RATE = 44100
@@ -92,29 +93,30 @@ class OctaveSpectrum_Widget(QtGui.QWidget):
 		
 		#time = SMOOTH_DISPLAY_TIMER_PERIOD_MS/1000.
 		time = 0.135 #FAST setting for a sound level meter
-		#floatdata = self.audiobuffer.data(time*SAMPLING_RATE)
+		#time = 1. #SLOW setting for a sound level meter
 		
 		#get the fresh data
 		floatdata = self.audiobuffer.newdata()
 		#compute the filters' output
-		y, dec = self.filters.filter(floatdata)
+		y, decs = self.filters.filter(floatdata)
+		
 		#recreate the ring buffer if necessary
 		if len(y) <> len(self.bankbuffers):
+			print "Recreating ring buffers"
 			self.bankbuffers = [RingBuffer() for bank in y]
+		
 		#push to the ring buffer
-		for i, bankdata in enumerate(y):
-			self.bankbuffers[i].push(bankdata)
+		for bankbuffer, bankdata, dec in zip(self.bankbuffers, y, decs):
+			#print "bankdata", bankdata[::40]
+			bankbuffer.push(bankdata)
+			#print "bufferdata", bankbuffer.data(time*SAMPLING_RATE/dec)[::40]
 		#compute the widget data
-		sp = []
-		for bankbuffer in self.bankbuffers:
-			sp += [(bankbuffer.data(time*SAMPLING_RATE)**2).mean()]
+		sp = [(bankbuffer.data(time*SAMPLING_RATE/dec)**2).mean() for bankbuffer, dec in zip(self.bankbuffers, decs)]
 		sp = array(sp)[::-1]
 		
+		#floatdata = self.audiobuffer.data(time*SAMPLING_RATE)
 		#y, dec = self.filters.filter(floatdata)
-		
-		#sp = []
-		#for bank in y:
-			#sp += [(bank**2).mean()]
+		#sp = [(bank**2).mean() for bank in y]
 		#sp = array(sp)[::-1]
 
 		#brute force without decimation
@@ -164,7 +166,7 @@ class octave_filters():
 		# other possibilities
 		#(self.bdec, self.adec) = ellip(N, 0.5, 30, 0.8*0.5)
 		#(self.bdec, self.adec) = cheby1(N, 0.05, 0.8*0.5)
-		(self.bdec, self.adec) = butter(N, 0.8*0.5)
+		(self.bdec, self.adec) = butter(N, 1.*0.5)
 		
 		self.zfs = None
 		
