@@ -206,6 +206,7 @@ class HistogramItem(Qwt.QwtPlotItem):
 		
 		# If width() < 0 the function swaps the left and right corners, and it swaps the top and bottom corners if height() < 0.
 		r = rect.normalized()
+		
 		factor = 125
 		light = color.lighter(factor)
 		dark = color.darker(factor)
