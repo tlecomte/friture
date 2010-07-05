@@ -204,7 +204,6 @@ def octave_filter_bank_decimation(blow, alow, forward, feedback, x, zis=None):
 	Nbank = 8*BandsPerOctave
 	
 	y = []
-	dec = []
 	
 	x_dec = x
 	
@@ -220,7 +219,6 @@ def octave_filter_bank_decimation(blow, alow, forward, feedback, x, zis=None):
 			# zf can be reused to restart the filter
 			zfs += [zf]
 			y += [filt]
-			dec += [2**j]
 		if zis == None:
 			zi = zeros(max(len(blow),len(alow))-1)
 		else:
@@ -233,7 +231,7 @@ def octave_filter_bank_decimation(blow, alow, forward, feedback, x, zis=None):
 	if zis <> None and len(zis) <> 0:
 		raise StandardError("Filter zis error")
 	
-	return y, dec, zfs
+	return y, zfs
 
 # main() is a test function
 def main():
