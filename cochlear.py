@@ -149,7 +149,7 @@ def octave_filters(Nbands, BandsPerOctave):
 def octave_filters_oneoctave(Nbands, BandsPerOctave):
 	# Bandpass Filter Generation
 	pbrip = .5	# Pass band ripple
-	sbrip = 30	# Stop band rejection
+	sbrip = 80	# Stop band rejection
 
 	fi, f_low, f_high = octave_frequencies(Nbands, BandsPerOctave)
 
