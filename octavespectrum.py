@@ -111,7 +111,7 @@ class OctaveSpectrum_Widget(QtGui.QWidget):
 			bankbuffer.push(bankdata)
 		
 		#compute the widget data
-		sp = [(bankbuffer.data(time*SAMPLING_RATE/dec)**2).mean() for bankbuffer, dec in zip(self.bankbuffers, decs)]
+		sp = [((dec*bankbuffer.data(time*SAMPLING_RATE/dec))**2).mean() for bankbuffer, dec in zip(self.bankbuffers, decs)]
 		sp = array(sp)[::-1]
 		
 		#floatdata = self.audiobuffer.data(time*SAMPLING_RATE)
@@ -162,8 +162,8 @@ class OctaveSpectrum_Widget(QtGui.QWidget):
 
 class octave_filters():
 	def __init__(self, bandsperoctave):
-		N = 4
-		fc = 0.8*0.5
+		N = 3
+		fc = 0.5
 		# other possibilities
 		#(self.bdec, self.adec) = ellip(N, 0.05, 80, fc)
 		#(self.bdec, self.adec) = cheby1(N, 0.05, fc)
@@ -175,9 +175,11 @@ class octave_filters():
 
 	def filter(self, floatdata):
 		#y, dec, zfs = octave_filter_bank_decimation(self.bdec, self.adec, self.boct, self.aoct, floatdata)
-		#y, dec, zfs = octave_filter_bank_decimation(self.bdec, self.adec, self.boct, self.aoct, floatdata, zis=self.zfs)
-		y, zfs = octave_filter_bank(self.b_nodec, self.a_nodec, floatdata)
-		dec = [1.]*len(y)
+		y, dec, zfs = octave_filter_bank_decimation(self.bdec, self.adec, self.boct, self.aoct, floatdata, zis=self.zfs)
+		#y, zfs = octave_filter_bank(self.b_nodec, self.a_nodec, floatdata)
+		#dec = [1.]*len(y)
+		#y, zfs = octave_filter_bank(self.b_nodec, self.a_nodec, floatdata, zis=self.zfs)
+		#dec = [1.]*len(y)
 		
 		self.zfs = zfs
 		
