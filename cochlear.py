@@ -281,8 +281,6 @@ def main():
 	[boct, aoct, fi, flow, fhigh] = octave_filters_oneoctave(Nbands, BandsPerOctave)
 	y, dec, zfs = octave_filter_bank_decimation(bdec, adec, boct, aoct, impulse)
 
-	freqScale = fftfreq(N, 1./fs)
-	
 	figure()
 	
 	for yone, d in zip(y, dec):
