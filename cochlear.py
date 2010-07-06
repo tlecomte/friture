@@ -113,7 +113,9 @@ def octave_frequencies(Nbands, BandsPerOctave):
 def octave_filters(Nbands, BandsPerOctave):
 	# Bandpass Filter Generation
 	pbrip = .5	# Pass band ripple
-	sbrip = 80	# Stop band rejection
+	sbrip = 50	# Stop band rejection
+	#Filter order
+	order = 2
 
 	fi, f_low, f_high = octave_frequencies(Nbands, BandsPerOctave)
 
@@ -129,9 +131,6 @@ def octave_filters(Nbands, BandsPerOctave):
 	for w, wl, wh in zip(wi, w_low, w_high):
 		# normalized frequency vector
 		freq = [wl, wh]
-			
-		#Filter order
-		order = 2
 	
 		# could be another IIR filter
 		[b, a] = ellip(order, pbrip, sbrip, freq, btype='bandpass')
@@ -149,7 +148,9 @@ def octave_filters(Nbands, BandsPerOctave):
 def octave_filters_oneoctave(Nbands, BandsPerOctave):
 	# Bandpass Filter Generation
 	pbrip = .5	# Pass band ripple
-	sbrip = 80	# Stop band rejection
+	sbrip = 50	# Stop band rejection
+	#Filter order
+	order = 2
 
 	fi, f_low, f_high = octave_frequencies(Nbands, BandsPerOctave)
 
@@ -169,9 +170,6 @@ def octave_filters_oneoctave(Nbands, BandsPerOctave):
 	for w, wl, wh in zip(wi, w_low, w_high):
 		# normalized frequency vector
 		freq = [wl, wh]
-			
-		#Filter order
-		order = 2
 	
 		# could be another IIR filter
 		[b, a] = ellip(order, pbrip, sbrip, freq, btype='bandpass')
