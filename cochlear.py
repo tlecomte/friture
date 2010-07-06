@@ -284,10 +284,10 @@ def main():
 	xlim(fs/2000, fs)
 	ylim(-70, 10)
 	
-	Ndec = 6
+	Ndec = 3
 	fc = 0.5
 	# other possibilities
-	#(bdec, adec) = ellip(Ndec, 0.01, 80, fc)
+	#(bdec, adec) = ellip(Ndec, 0.05, 30, fc)
 	#print bdec
 	#(bdec, adec) = cheby1(Ndec, 0.05, fc)
 	(bdec, adec) = butter(Ndec, fc)
