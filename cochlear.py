@@ -181,16 +181,30 @@ def octave_filters_oneoctave(Nbands, BandsPerOctave):
 		
 	return [B, A, fi, f_low, f_high]
 
-def octave_filter_bank(forward, feedback, x):
+def octave_filter_bank(forward, feedback, x, zis=None):
 	# This function filters the waveform x with the array of filters
 	# specified by the forward and feedback parameters. Each row
 	# of the forward and feedback parameters are the parameters
 	# to the Matlab builtin function "filter".
 	Nbank = len(forward)
 	y = zeros((Nbank, len(x)))
+	
+	zfs = []
+	m = 0
+	y = []
+	
 	for i in range(0, Nbank):
-		y[i,:] = lfilter(forward[i], feedback[i], x)
-	return y
+		if zis == None:
+			zi = zeros(max(len(forward[i]), len(feedback[i]))-1) 
+		else:
+			zi = zis[m]
+			m += 1
+		filt, zf = lfilter(forward[i], feedback[i], x, zi=zi)
+		# zf can be reused to restart the filter
+		zfs += [zf]
+		y += [filt]
+		
+	return y, zfs
 
 # Note: we may have one filter in excess here : the low-pass filter for decimation
 # does approximately the same thing as the low-pass component of the highest band-pass
@@ -259,7 +273,7 @@ def main():
 	Nbands = 8*BandsPerOctave
 	
 	[B, A, fi, fl, fh] = octave_filters(Nbands, BandsPerOctave)
-	y = octave_filter_bank(B, A, impulse)
+	y, zfs = octave_filter_bank(B, A, impulse)
 	
 	response = 20.*log10(abs(fft(y)))
 	freqScale = fftfreq(N, 1./fs)
@@ -272,12 +286,12 @@ def main():
 	xlim(fs/2000, fs)
 	ylim(-70, 10)
 	
-	Ndec = 4
+	Ndec = 2
 	fc = 1.*0.5
 	# other possibilities
 	#(bdec, adec) = ellip(Ndec, 0.05, 80, fc)
-	(bdec, adec) = cheby1(Ndec, 0.05, fc)
-	#(bdec, adec) = butter(Ndec, fc)
+	#(bdec, adec) = cheby1(Ndec, 0.05, fc)
+	(bdec, adec) = butter(Ndec, fc)
 	[boct, aoct, fi, flow, fhigh] = octave_filters_oneoctave(Nbands, BandsPerOctave)
 	y, dec, zfs = octave_filter_bank_decimation(bdec, adec, boct, aoct, impulse)
 
