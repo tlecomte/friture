@@ -23,7 +23,8 @@ from histplot import HistPlot
 import audioproc # audio processing class
 import octavespectrum_settings # settings dialog
 from cochlear import *
-from scipy.signal import cheby1
+import cochlear
+from scipy.signal import cheby1, tf2zpk
 from ringbuffer import RingBuffer
 
 SMOOTH_DISPLAY_TIMER_PERIOD_MS = 25
@@ -174,7 +175,9 @@ class octave_filters():
 
 	def filter(self, floatdata):
 		#y, dec, zfs = octave_filter_bank_decimation(self.bdec, self.adec, self.boct, self.aoct, floatdata)
-		y, dec, zfs = octave_filter_bank_decimation(self.bdec, self.adec, self.boct, self.aoct, floatdata, zis=self.zfs)
+		#y, dec, zfs = octave_filter_bank_decimation(self.bdec, self.adec, self.boct, self.aoct, floatdata, zis=self.zfs)
+		y, zfs = octave_filter_bank(self.b_nodec, self.a_nodec, floatdata)
+		dec = [1.]*len(y)
 		
 		self.zfs = zfs
 		
@@ -185,6 +188,17 @@ class octave_filters():
 		self.nbands = 8*self.bandsperoctave
 		self.fi, self.flow, self.fhigh = octave_frequencies(self.nbands, self.bandsperoctave)
 		[self.boct, self.aoct, fi, flow, fhigh] = octave_filters_oneoctave(self.nbands, self.bandsperoctave)
+		
+		#z, p, k = tf2zpk(self.bdec, self.adec)
+		#print "poles", p, abs(p)**2
+		#print "zeros", z, abs(z)**2
+		#for b, a in zip(self.boct, self.aoct):
+			#z, p, k = tf2zpk(b, a)
+			#print "poles", p, abs(p)**2
+			#print "zeros", z, abs(z)**2
+			
+		[self.b_nodec, self.a_nodec, fi, fl, fh] = cochlear.octave_filters(self.nbands, self.bandsperoctave)
+		
 		f = self.fi
 		Rc = 12200.**2*f**2 / ((f**2 + 20.6**2)*(f**2 + 12200.**2))
 		Rb = 12200.**2*f**3 / ((f**2 + 20.6**2)*(f**2 + 12200.**2)*((f**2 + 158.5**2)**0.5))
