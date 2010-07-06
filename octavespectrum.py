@@ -106,10 +106,9 @@ class OctaveSpectrum_Widget(QtGui.QWidget):
 			self.bankbuffers = [RingBuffer() for bank in y]
 		
 		#push to the ring buffer
-		for bankbuffer, bankdata, dec in zip(self.bankbuffers, y, decs):
-			#print "bankdata", bankdata[::40]
+		for bankbuffer, bankdata in zip(self.bankbuffers, y):
 			bankbuffer.push(bankdata)
-			#print "bufferdata", bankbuffer.data(time*SAMPLING_RATE/dec)[::40]
+		
 		#compute the widget data
 		sp = [(bankbuffer.data(time*SAMPLING_RATE/dec)**2).mean() for bankbuffer, dec in zip(self.bankbuffers, decs)]
 		sp = array(sp)[::-1]
