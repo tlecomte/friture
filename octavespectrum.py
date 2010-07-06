@@ -163,10 +163,11 @@ class OctaveSpectrum_Widget(QtGui.QWidget):
 class octave_filters():
 	def __init__(self, bandsperoctave):
 		N = 4
+		fc = 0.8*0.5
 		# other possibilities
-		#(self.bdec, self.adec) = ellip(N, 0.5, 30, 0.8*0.5)
-		#(self.bdec, self.adec) = cheby1(N, 0.05, 0.8*0.5)
-		(self.bdec, self.adec) = butter(N, .8*0.5)
+		#(self.bdec, self.adec) = ellip(N, 0.05, 80, fc)
+		#(self.bdec, self.adec) = cheby1(N, 0.05, fc)
+		(self.bdec, self.adec) = butter(N, fc)
 		
 		self.zfs = None
 		
