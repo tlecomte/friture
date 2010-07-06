@@ -91,8 +91,8 @@ class OctaveSpectrum_Widget(QtGui.QWidget):
 		
 		# Note: this is largely suboptimal since the filter outputs are computed several times on the same signal...
 		
-		time = SMOOTH_DISPLAY_TIMER_PERIOD_MS/1000.
-		#time = 0.135 #FAST setting for a sound level meter
+		#time = SMOOTH_DISPLAY_TIMER_PERIOD_MS/1000.
+		time = 0.135 #FAST setting for a sound level meter
 		#time = 1. #SLOW setting for a sound level meter
 		
 		#get the fresh data

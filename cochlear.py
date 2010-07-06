@@ -113,7 +113,7 @@ def octave_frequencies(Nbands, BandsPerOctave):
 def octave_filters(Nbands, BandsPerOctave):
 	# Bandpass Filter Generation
 	pbrip = .5	# Pass band ripple
-	sbrip = 30	# Stop band rejection
+	sbrip = 80	# Stop band rejection
 
 	fi, f_low, f_high = octave_frequencies(Nbands, BandsPerOctave)
 
@@ -238,9 +238,10 @@ def octave_filter_bank_decimation(blow, alow, forward, feedback, x, zis=None):
 
 # main() is a test function
 def main():
-	from matplotlib.pyplot import semilogx, plot, show, xlim, ylim
+	from matplotlib.pyplot import semilogx, plot, show, xlim, ylim, figure
 	from numpy.fft import fft, fftfreq
 	from numpy import log10, linspace
+	from scipy.signal import cheby1, ellip, butter
 
 	N = 2048*2*2
 	fs = 44100.
@@ -251,19 +252,46 @@ def main():
 	impulse[0] = 1
 	#impulse = sin(linspace(0, 600*pi, N))
 
-	[ERBforward, ERBfeedback] = MakeERBFilters(fs, Nchannels, low_freq)
-	y = ERBFilterBank(ERBforward, ERBfeedback, impulse)
+	#[ERBforward, ERBfeedback] = MakeERBFilters(fs, Nchannels, low_freq)
+	#y = ERBFilterBank(ERBforward, ERBfeedback, impulse)
 
-	Nbands = 7
-	BandsPerOctave = 1
+	BandsPerOctave = 12
+	Nbands = 8*BandsPerOctave
+	
 	[B, A, fi, fl, fh] = octave_filters(Nbands, BandsPerOctave)
 	y = octave_filter_bank(B, A, impulse)
-
+	
 	response = 20.*log10(abs(fft(y)))
 	freqScale = fftfreq(N, 1./fs)
-
+	
+	figure()
+	
 	for i in range(0, response.shape[0]):
-			semilogx(freqScale[0:N/2],response[i, 0:N/2])
+		semilogx(freqScale[0:N/2],response[i, 0:N/2])
+		
+	xlim(fs/2000, fs)
+	ylim(-70, 10)
+	
+	Ndec = 4
+	fc = 1.*0.5
+	# other possibilities
+	#(bdec, adec) = ellip(Ndec, 0.05, 80, fc)
+	(bdec, adec) = cheby1(Ndec, 0.05, fc)
+	#(bdec, adec) = butter(Ndec, fc)
+	[boct, aoct, fi, flow, fhigh] = octave_filters_oneoctave(Nbands, BandsPerOctave)
+	y, dec, zfs = octave_filter_bank_decimation(bdec, adec, boct, aoct, impulse)
+
+	freqScale = fftfreq(N, 1./fs)
+	
+	figure()
+	
+	for yone, d in zip(y, dec):
+		response = 20.*log10(abs(fft(yone.repeat(d))))
+		semilogx(freqScale[0:N/2],response[0:N/2])
+	
+	#response = 20.*log10(abs(fft(y)))
+	freqScale = fftfreq(N, 1./fs)
+	
 	xlim(fs/2000, fs)
 	ylim(-70, 10)
 
