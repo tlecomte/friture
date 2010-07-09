@@ -24,7 +24,7 @@ import audioproc # audio processing class
 import octavespectrum_settings # settings dialog
 from cochlear import *
 import cochlear
-from scipy.signal import cheby1, tf2zpk
+from scipy.signal import cheby1, tf2zpk, firwin
 from ringbuffer import RingBuffer
 
 SMOOTH_DISPLAY_TIMER_PERIOD_MS = 25
@@ -168,6 +168,8 @@ class octave_filters():
 		#(self.bdec, self.adec) = ellip(N, 0.05, 80, fc)
 		#(self.bdec, self.adec) = cheby1(N, 0.05, fc)
 		(self.bdec, self.adec) = butter(N, fc)
+		#self.bdec = firwin(100, fc)
+		#self.adec = [1.]
 		
 		self.zfs = None
 		
