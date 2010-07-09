@@ -6,7 +6,7 @@ from scipy.misc import factorial
 import scipy
 scipy.factorial = factorial
 from scipy.signal import lfilter
-from scipy.signal.filter_design import ellip, butter
+from scipy.signal.filter_design import ellip, butter, firwin
 
 # bank of filters for any other kind of frequency scale
 # http://cobweb.ecn.purdue.edu/~malcolm/apple/tr35/PattersonsEar.pdf
@@ -191,12 +191,16 @@ def octave_filter_bank(forward, feedback, x, zis=None):
 	m = 0
 	y = []
 	
+	if zis == None:
+		zis = []
+		for j in range(0, Nbank/BandsPerOctave):
+			for i in range(0, BandsPerOctave)[::-1]:
+				zis += [zeros(max(len(forward[i]), len(feedback[i]))-1)] 
+			zis += [zeros(max(len(blow),len(alow))-1)]
+	
 	for i in range(0, Nbank):
-		if zis == None:
-			zi = zeros(max(len(forward[i]), len(feedback[i]))-1) 
-		else:
-			zi = zis[m]
-			m += 1
+		zi = zis[m]
+		m += 1
 		filt, zf = lfilter(forward[i], feedback[i], x, zi=zi)
 		# zf can be reused to restart the filter
 		zfs += [zf]
@@ -218,29 +222,32 @@ def octave_filter_bank_decimation(blow, alow, forward, feedback, x, zis=None):
 	y = []
 	dec = []
 	
+	#b1 = firwin(100, 0.5)
+	#x_dec = lfilter(b1, 1., x)
 	x_dec = x
 	
 	zfs = []
 	
 	m = 0
 	
+	if zis == None:
+		zis = []
+		for j in range(0, Nbank/BandsPerOctave):
+			for i in range(0, BandsPerOctave)[::-1]:
+				zis += [zeros(max(len(forward[i]), len(feedback[i]))-1)] 
+			zis += [zeros(max(len(blow),len(alow))-1)]
+	
 	for j in range(0, Nbank/BandsPerOctave):
 		for i in range(0, BandsPerOctave)[::-1]:
-			if zis == None:
-				zi = zeros(max(len(forward[i]), len(feedback[i]))-1) 
-			else:
-				zi = zis[m]
-				m += 1
+			zi = zis[m]
+			m += 1
 			filt, zf = lfilter(forward[i], feedback[i], x_dec, zi=zi)
 			# zf can be reused to restart the filter
 			zfs += [zf]
 			y += [filt]
 			dec += [2**j]
-		if zis == None:
-			zi = zeros(max(len(blow),len(alow))-1)
-		else:
-			zi = zis[m]
-			m += 1
+		zi = zis[m]
+		m += 1
 		x_dec, zf = lfilter(blow, alow, x_dec, zi=zi)
 		# zf can be reused to restart the filter
 		zfs += [zf]
