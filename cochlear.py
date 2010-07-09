@@ -188,7 +188,6 @@ def octave_filter_bank(forward, feedback, x, zis=None):
 	y = zeros((Nbank, len(x)))
 	
 	zfs = []
-	m = 0
 	y = []
 	
 	if zis == None:
@@ -199,9 +198,7 @@ def octave_filter_bank(forward, feedback, x, zis=None):
 			zis += [zeros(max(len(blow),len(alow))-1)]
 	
 	for i in range(0, Nbank):
-		zi = zis[m]
-		m += 1
-		filt, zf = lfilter(forward[i], feedback[i], x, zi=zi)
+		filt, zf = lfilter(forward[i], feedback[i], x, zi=zis[i])
 		# zf can be reused to restart the filter
 		zfs += [zf]
 		y += [filt]
@@ -228,8 +225,6 @@ def octave_filter_bank_decimation(blow, alow, forward, feedback, x, zis=None):
 	
 	zfs = []
 	
-	m = 0
-	
 	if zis == None:
 		zis = []
 		for j in range(0, Nbank/BandsPerOctave):
@@ -237,18 +232,18 @@ def octave_filter_bank_decimation(blow, alow, forward, feedback, x, zis=None):
 				zis += [zeros(max(len(forward[i]), len(feedback[i]))-1)] 
 			zis += [zeros(max(len(blow),len(alow))-1)]
 	
+	m = 0
+	
 	for j in range(0, Nbank/BandsPerOctave):
 		for i in range(0, BandsPerOctave)[::-1]:
-			zi = zis[m]
+			filt, zf = lfilter(forward[i], feedback[i], x_dec, zi=zis[m])
 			m += 1
-			filt, zf = lfilter(forward[i], feedback[i], x_dec, zi=zi)
 			# zf can be reused to restart the filter
 			zfs += [zf]
 			y += [filt]
 			dec += [2**j]
-		zi = zis[m]
+		x_dec, zf = lfilter(blow, alow, x_dec, zi=zis[m])
 		m += 1
-		x_dec, zf = lfilter(blow, alow, x_dec, zi=zi)
 		# zf can be reused to restart the filter
 		zfs += [zf]
 		x_dec = x_dec[::2]
