@@ -192,10 +192,8 @@ def octave_filter_bank(forward, feedback, x, zis=None):
 	
 	if zis == None:
 		zis = []
-		for j in range(0, Nbank/BandsPerOctave):
-			for i in range(0, BandsPerOctave)[::-1]:
-				zis += [zeros(max(len(forward[i]), len(feedback[i]))-1)] 
-			zis += [zeros(max(len(blow),len(alow))-1)]
+		for i in range(0, Nbank):
+			zis += [zeros(max(len(forward[i]), len(feedback[i]))-1)] 
 	
 	for i in range(0, Nbank):
 		filt, zf = lfilter(forward[i], feedback[i], x, zi=zis[i])
@@ -216,8 +214,8 @@ def octave_filter_bank_decimation(blow, alow, forward, feedback, x, zis=None):
 	BandsPerOctave = len(forward)
 	Nbank = 8*BandsPerOctave
 	
-	y = []
-	dec = []
+	y = [0.]*Nbank
+	dec = [0.]*Nbank
 	
 	#b1 = firwin(100, 0.5)
 	#x_dec = lfilter(b1, 1., x)
@@ -228,33 +226,39 @@ def octave_filter_bank_decimation(blow, alow, forward, feedback, x, zis=None):
 	if zis == None:
 		zis = []
 		for j in range(0, Nbank/BandsPerOctave):
-			for i in range(0, BandsPerOctave)[::-1]:
+			for i in range(0, BandsPerOctave):
 				zis += [zeros(max(len(forward[i]), len(feedback[i]))-1)] 
 			zis += [zeros(max(len(blow),len(alow))-1)]
 	
 	m = 0
+	k = Nbank - 1
 	
 	for j in range(0, Nbank/BandsPerOctave):
 		for i in range(0, BandsPerOctave)[::-1]:
 			filt, zf = lfilter(forward[i], feedback[i], x_dec, zi=zis[m])
+			#filt = lfilter(forward[i], feedback[i], x_dec)
 			m += 1
 			# zf can be reused to restart the filter
 			zfs += [zf]
-			y += [filt]
-			dec += [2**j]
+			#zfs += [0.]
+			y[k] = filt
+			dec[k] = 2**j
+			k -= 1
 		x_dec, zf = lfilter(blow, alow, x_dec, zi=zis[m])
+		#x_dec = lfilter(blow, alow, x_dec)
 		m += 1
 		# zf can be reused to restart the filter
 		zfs += [zf]
+		#zfs += [0.]
 		x_dec = x_dec[::2]
 	
 	return y, dec, zfs
 
 # main() is a test function
 def main():
-	from matplotlib.pyplot import semilogx, plot, show, xlim, ylim, figure, legend, subplot
+	from matplotlib.pyplot import semilogx, plot, show, xlim, ylim, figure, legend, subplot, bar
 	from numpy.fft import fft, fftfreq, fftshift, ifft
-	from numpy import log10, linspace, interp, angle
+	from numpy import log10, linspace, interp, angle, array
 	from scipy.signal import cheby1, ellip, butter, iirdesign, freqz, firwin
 
 	N = 2048*2*2
@@ -264,12 +268,13 @@ def main():
 
 	impulse = zeros(N)
 	impulse[N/2] = 1
-	#impulse = sin(linspace(0, 600*pi, N))
+	#f = 10000.
+	#impulse = sin(2*pi*f*arange(0, N/fs, 1./fs))
 
 	#[ERBforward, ERBfeedback] = MakeERBFilters(fs, Nchannels, low_freq)
 	#y = ERBFilterBank(ERBforward, ERBfeedback, impulse)
 
-	BandsPerOctave = 1
+	BandsPerOctave = 6
 	Nbands = 8*BandsPerOctave
 	
 	[B, A, fi, fl, fh] = octave_filters(Nbands, BandsPerOctave)
@@ -279,6 +284,7 @@ def main():
 	freqScale = fftfreq(N, 1./fs)
 	
 	figure()
+	subplot(211)
 	
 	for i in range(0, response.shape[0]):
 		semilogx(freqScale[0:N/2],response[i, 0:N/2])
@@ -286,18 +292,26 @@ def main():
 	xlim(fs/2000, fs)
 	ylim(-70, 10)
 	
+	subplot(212)
+	m = 0
+	for f in fi:
+		p = 10.*log10((y[m]**2).mean())
+		m += 1
+		semilogx(f, p, 'ko')
+	
 	Ndec = 3
 	fc = 0.5
 	# other possibilities
 	#(bdec, adec) = ellip(Ndec, 0.05, 30, fc)
 	#print bdec
 	#(bdec, adec) = cheby1(Ndec, 0.05, fc)
-	(bdec, adec) = butter(Ndec, fc)
-	#(bdec, adec) = iirdesign(0.5, 0.51, 0.01, 80, analog=0, ftype='ellip', output='ba')
-	#bdec = firwin(100, fc)
+	#(bdec, adec) = butter(Ndec, fc)
+	(bdec, adec) = iirdesign(0.48, 0.50, 0.05, 70, analog=0, ftype='ellip', output='ba')
+	#bdec = firwin(30, fc)
 	#adec = [1.]
 	
 	figure()
+	subplot(211)
 	
 	response = 20.*log10(abs(fft(impulse)))
 	plot(fftshift(freqScale), fftshift(response), label="impulse")
@@ -321,7 +335,7 @@ def main():
 	
 	legend(loc="lower left")
 	
-	figure()
+	subplot(212)
 	plot(range(0, len(impulse)), impulse, label="impulse")
 	plot(range(0, len(impulse)), y, label="lowpass")
 	plot(range(0, len(impulse)), ydec, label="lowpass + dec2 + repeat2")
@@ -333,14 +347,24 @@ def main():
 	y, dec, zfs = octave_filter_bank_decimation(bdec, adec, boct, aoct, impulse)
 
 	figure()
+	subplot(211)
 	
 	for yone, d in zip(y, dec):
 		response = 20.*log10(abs(fft(yone))*d)
 		freqScale = fftfreq(N/d, 1./(fs/d))
+		print freqScale[0:N/(2*d)].shape, response[0:N/(2*d)].shape, response.shape
 		semilogx(freqScale[0:N/(2*d)],response[0:N/(2*d)])
 	
 	xlim(fs/2000, fs)
 	ylim(-70, 10)
+	
+	subplot(212)
+	m = 0
+	for i in range(0, 8):
+		for f in fi:
+			p = 10.*log10((y[m]**2).mean())
+			semilogx(f/dec[m], p, 'ko')
+			m += 1
 
 	show()
 	

@@ -111,8 +111,9 @@ class OctaveSpectrum_Widget(QtGui.QWidget):
 			bankbuffer.push(bankdata)
 		
 		#compute the widget data
-		sp = [((dec*bankbuffer.data(time*SAMPLING_RATE/dec))**2).mean() for bankbuffer, dec in zip(self.bankbuffers, decs)]
-		sp = array(sp)[::-1]
+		#sp = [((dec*bankbuffer.data(time*SAMPLING_RATE/dec))**2).mean() for bankbuffer, dec in zip(self.bankbuffers, decs)]
+		sp = [((bankbuffer.data(time*SAMPLING_RATE/dec))**2).mean() for bankbuffer, dec in zip(self.bankbuffers, decs)]
+		sp = array(sp)
 		
 		#floatdata = self.audiobuffer.data(time*SAMPLING_RATE)
 		#y, dec = self.filters.filter(floatdata)
@@ -167,9 +168,9 @@ class octave_filters():
 		# other possibilities
 		#(self.bdec, self.adec) = ellip(N, 0.05, 80, fc)
 		#(self.bdec, self.adec) = cheby1(N, 0.05, fc)
-		(self.bdec, self.adec) = butter(N, fc)
-		#self.bdec = firwin(100, fc)
-		#self.adec = [1.]
+		#(self.bdec, self.adec) = butter(N, fc)
+		self.bdec = firwin(30, fc)
+		self.adec = [1.]
 		
 		self.zfs = None
 		
