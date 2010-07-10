@@ -90,8 +90,6 @@ class OctaveSpectrum_Widget(QtGui.QWidget):
 		if not self.isVisible():
 		    return
 		
-		# Note: this is largely suboptimal since the filter outputs are computed several times on the same signal...
-		
 		#time = SMOOTH_DISPLAY_TIMER_PERIOD_MS/1000.
 		time = 0.135 #FAST setting for a sound level meter
 		#time = 1. #SLOW setting for a sound level meter
@@ -115,6 +113,8 @@ class OctaveSpectrum_Widget(QtGui.QWidget):
 		sp = [((bankbuffer.data(time*SAMPLING_RATE/dec))**2).mean() for bankbuffer, dec in zip(self.bankbuffers, decs)]
 		sp = array(sp)
 		
+		# Note: the following is largely suboptimal since the filter outputs
+		# are computed several times on the same signal...
 		#floatdata = self.audiobuffer.data(time*SAMPLING_RATE)
 		#y, dec = self.filters.filter(floatdata)
 		#sp = [(bank**2).mean() for bank in y]
