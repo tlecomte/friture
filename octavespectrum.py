@@ -164,15 +164,10 @@ class OctaveSpectrum_Widget(QtGui.QWidget):
 
 class octave_filters():
 	def __init__(self, bandsperoctave):
-		N = 3
-		fc = 0.5
-		# other possibilities
-		#(self.bdec, self.adec) = ellip(N, 0.05, 80, fc)
-		#(self.bdec, self.adec) = cheby1(N, 0.05, fc)
-		#(self.bdec, self.adec) = butter(N, fc)
-		self.bdec = firwin(30, fc)
-		self.adec = [1.]
+		self.filters_params = load_filters_params()
 		
+		[self.bdec, self.adec] = self.filters_params['dec']
+				
 		self.zfs = None
 		
 		self.setbandsperoctave(bandsperoctave)
@@ -193,7 +188,7 @@ class octave_filters():
 		self.bandsperoctave = bandsperoctave
 		self.nbands = NOCTAVE*self.bandsperoctave
 		self.fi, self.flow, self.fhigh = octave_frequencies(self.nbands, self.bandsperoctave)
-		[self.boct, self.aoct, fi, flow, fhigh] = octave_filters_oneoctave(self.nbands, self.bandsperoctave)
+		[self.boct, self.aoct, fi, flow, fhigh] = self.filters_params['%d' %bandsperoctave] 
 		
 		#z, p, k = tf2zpk(self.bdec, self.adec)
 		#print "poles", p, abs(p)**2
@@ -203,7 +198,7 @@ class octave_filters():
 			#print "poles", p, abs(p)**2
 			#print "zeros", z, abs(z)**2
 			
-		[self.b_nodec, self.a_nodec, fi, fl, fh] = cochlear.octave_filters(self.nbands, self.bandsperoctave)
+		#[self.b_nodec, self.a_nodec, fi, fl, fh] = cochlear.octave_filters(self.nbands, self.bandsperoctave)
 		
 		f = self.fi
 		Rc = 12200.**2*f**2 / ((f**2 + 20.6**2)*(f**2 + 12200.**2))

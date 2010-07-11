@@ -288,6 +288,18 @@ def generate_filters_params():
 	#pickle.dump(selfref_list, output, -1)
 	output.close()
 
+def load_filters_params():
+	import pickle
+		
+	input = open('generated_filters.pkl', 'rb')
+	# Pickle dictionary using protocol 0.
+	params = pickle.load(input)
+	# Pickle the list using the highest protocol available.
+	#pickle.load(input, -1)
+	input.close()
+	
+	return params
+
 # main() is a test function
 def main():
 	from matplotlib.pyplot import semilogx, plot, show, xlim, ylim, figure, legend, subplot, bar
