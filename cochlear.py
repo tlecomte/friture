@@ -258,7 +258,7 @@ def octave_filter_bank_decimation(blow, alow, forward, feedback, x, zis=None):
 def main():
 	from matplotlib.pyplot import semilogx, plot, show, xlim, ylim, figure, legend, subplot, bar
 	from numpy.fft import fft, fftfreq, fftshift, ifft
-	from numpy import log10, linspace, interp, angle, array
+	from numpy import log10, linspace, interp, angle, array, concatenate
 	from scipy.signal import cheby1, ellip, butter, iirdesign, freqz, firwin
 
 	N = 2048*2*2
@@ -268,8 +268,8 @@ def main():
 
 	impulse = zeros(N)
 	impulse[N/2] = 1
-	#f = 21000.
-	#impulse = sin(2*pi*f*arange(0, N/fs, 1./fs))
+	f = 1000.
+	impulse = sin(2*pi*f*arange(0, N/fs, 1./fs))
 
 	#[ERBforward, ERBfeedback] = MakeERBFilters(fs, Nchannels, low_freq)
 	#y = ERBFilterBank(ERBforward, ERBfeedback, impulse)
@@ -345,6 +345,33 @@ def main():
 	
 	[boct, aoct, fi, flow, fhigh] = octave_filters_oneoctave(Nbands, BandsPerOctave)
 	y, dec, zfs = octave_filter_bank_decimation(bdec, adec, boct, aoct, impulse)
+
+	figure()
+	subplot(211)
+	
+	for yone, d in zip(y, dec):
+		response = 20.*log10(abs(fft(yone))*d)
+		freqScale = fftfreq(N/d, 1./(fs/d))
+		semilogx(freqScale[0:N/(2*d)],response[0:N/(2*d)])
+	
+	xlim(fs/2000, fs)
+	ylim(-70, 10)
+	
+	subplot(212)
+	m = 0
+	for i in range(0, 8):
+		for f in fi:
+			p = 10.*log10((y[m]**2).mean())
+			semilogx(f/dec[m], p, 'ko')
+			m += 1
+
+	[boct, aoct, fi, flow, fhigh] = octave_filters_oneoctave(Nbands, BandsPerOctave)
+	y1, dec, zfs = octave_filter_bank_decimation(bdec, adec, boct, aoct, impulse[0:N/2])
+	y2, dec, zfs = octave_filter_bank_decimation(bdec, adec, boct, aoct, impulse[N/2:], zis=zfs)	
+	
+	y = []
+	for y1one, y2one in zip(y1,y2):
+		y += [concatenate((y1one,y2one))]
 
 	figure()
 	subplot(211)
