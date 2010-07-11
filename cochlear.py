@@ -5,7 +5,7 @@ from numpy import pi, exp, arange, cos, sin, sqrt, zeros, ones, log, arange
 from scipy.misc import factorial
 import scipy
 scipy.factorial = factorial
-from scipy.signal import lfilter
+from scipy.signal import lfilter, cheby1, ellip, butter, iirdesign, freqz, firwin
 from scipy.signal.filter_design import ellip, butter, firwin
 
 # bank of filters for any other kind of frequency scale
@@ -256,12 +256,43 @@ def octave_filter_bank_decimation(blow, alow, forward, feedback, x, zis=None):
 	
 	return y, dec, zfs
 
+def generate_filters_params():
+	import pickle
+	
+	params = {}
+	
+	# generate the low-pass filter for decimation
+	Ndec = 3
+	fc = 0.5
+	# other possibilities
+	#(bdec, adec) = ellip(Ndec, 0.05, 30, fc)
+	#print bdec
+	#(bdec, adec) = cheby1(Ndec, 0.05, fc)
+	#(bdec, adec) = butter(Ndec, fc)
+	(bdec, adec) = iirdesign(0.48, 0.50, 0.05, 70, analog=0, ftype='ellip', output='ba')
+	#bdec = firwin(30, fc)
+	#adec = [1.]
+	
+	params['dec'] = [bdec, adec]
+	
+	#generate the octave filters
+	for BandsPerOctave in [1,3,6,12,24]:
+		Nbands = NOCTAVE*BandsPerOctave
+		[boct, aoct, fi, flow, fhigh] = octave_filters_oneoctave(Nbands, BandsPerOctave)
+		params['%d' %BandsPerOctave] = [boct, aoct, fi, flow, fhigh]
+	
+	output = open('generated_filters.pkl', 'wb')
+	# Pickle dictionary using protocol 0.
+	pickle.dump(params, output)
+	# Pickle the list using the highest protocol available.
+	#pickle.dump(selfref_list, output, -1)
+	output.close()
+
 # main() is a test function
 def main():
 	from matplotlib.pyplot import semilogx, plot, show, xlim, ylim, figure, legend, subplot, bar
 	from numpy.fft import fft, fftfreq, fftshift, ifft
 	from numpy import log10, linspace, interp, angle, array, concatenate
-	from scipy.signal import cheby1, ellip, butter, iirdesign, freqz, firwin
 
 	N = 2048*2*2
 	fs = 44100.
@@ -393,6 +424,8 @@ def main():
 			p = 10.*log10((y[m]**2).mean())
 			semilogx(f/dec[m], p, 'ko')
 			m += 1
+	
+	generate_filters_params()
 
 	show()
 	
