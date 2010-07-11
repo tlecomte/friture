@@ -76,11 +76,10 @@ class OctaveSpectrum_Widget(QtGui.QWidget):
 		
 		bandsperoctave = 3*2**(DEFAULT_BANDSPEROCTAVE-1) if DEFAULT_BANDSPEROCTAVE >= 1 else 1
 		self.filters = octave_filters(bandsperoctave)
+		self.bankbuffers = [RingBuffer() for band in range(0, bandsperoctave*NOCTAVE)]
 		
 		# initialize the settings dialog
 		self.settings_dialog = octavespectrum_settings.OctaveSpectrum_Settings_Dialog(self, self.logger)
-		
-		self.bankbuffers = []
 
 	# method
 	def set_buffer(self, buffer):
@@ -99,11 +98,6 @@ class OctaveSpectrum_Widget(QtGui.QWidget):
 		floatdata = self.audiobuffer.newdata()
 		#compute the filters' output
 		y, decs = self.filters.filter(floatdata)
-		
-		#recreate the ring buffer if necessary
-		if len(y) <> len(self.bankbuffers):
-			print "Recreating ring buffers"
-			self.bankbuffers = [RingBuffer() for bank in y]
 		
 		#push to the ring buffer
 		for bankbuffer, bankdata in zip(self.bankbuffers, y):
@@ -152,7 +146,9 @@ class OctaveSpectrum_Widget(QtGui.QWidget):
 
 	def setbandsperoctave(self, bandsperoctave):
 		self.filters.setbandsperoctave(bandsperoctave)
-
+		#recreate the ring buffers
+		self.bankbuffers = [RingBuffer() for band in range(0, bandsperoctave*NOCTAVE)]
+		
 	def settings_called(self, checked):
 		self.settings_dialog.show()
 	
