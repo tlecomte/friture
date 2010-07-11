@@ -226,35 +226,45 @@ def octave_filter_bank_decimation(blow, alow, forward, feedback, x, zis=None):
 	zfs = []
 	
 	if zis == None:
-		zis = []
-		for j in range(0, Nbank/BandsPerOctave):
-			for i in range(0, BandsPerOctave):
-				zis += [zeros(max(len(forward[i]), len(feedback[i]))-1)] 
-			zis += [zeros(max(len(blow),len(alow))-1)]
+		m = 0
+		k = Nbank - 1
 	
-	m = 0
-	k = Nbank - 1
-	
-	for j in range(0, Nbank/BandsPerOctave):
-		for i in range(0, BandsPerOctave)[::-1]:
-			filt, zf = lfilter(forward[i], feedback[i], x_dec, zi=zis[m])
-			#filt = lfilter(forward[i], feedback[i], x_dec)
+		for j in range(0, NOCTAVE):
+			for i in range(0, BandsPerOctave)[::-1]:
+				filt = lfilter(forward[i], feedback[i], x_dec)
+				m += 1
+				y[k] = filt
+				dec[k] = 2**j
+				k -= 1
+			x_dec = lfilter(blow, alow, x_dec)
+			m += 1
+			x_dec = x_dec[::2]
+		
+		return y, dec, None
+	else:
+		m = 0
+		k = Nbank - 1
+		
+		for j in range(0, NOCTAVE):
+			for i in range(0, BandsPerOctave)[::-1]:
+				filt, zf = lfilter(forward[i], feedback[i], x_dec, zi=zis[m])
+				#filt = lfilter(forward[i], feedback[i], x_dec)
+				m += 1
+				# zf can be reused to restart the filter
+				zfs += [zf]
+				#zfs += [0.]
+				y[k] = filt
+				dec[k] = 2**j
+				k -= 1
+			x_dec, zf = lfilter(blow, alow, x_dec, zi=zis[m])
+			#x_dec = lfilter(blow, alow, x_dec)
 			m += 1
 			# zf can be reused to restart the filter
 			zfs += [zf]
 			#zfs += [0.]
-			y[k] = filt
-			dec[k] = 2**j
-			k -= 1
-		x_dec, zf = lfilter(blow, alow, x_dec, zi=zis[m])
-		#x_dec = lfilter(blow, alow, x_dec)
-		m += 1
-		# zf can be reused to restart the filter
-		zfs += [zf]
-		#zfs += [0.]
-		x_dec = x_dec[::2]
-	
-	return y, dec, zfs
+			x_dec = x_dec[::2]
+		
+		return y, dec, zfs
 
 def generate_filters_params():
 	import pickle
