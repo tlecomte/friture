@@ -18,6 +18,8 @@ EarQ = 9.26449 # Glasberg and Moore Parameters
 minBW = 24.7
 order = 1.
 
+NOCTAVE = 8
+
 def frequencies(fs, numChannels, lowFreq):
 	channels = arange(0, numChannels)
 	cf = -(EarQ*minBW) + exp(channels*(-log(fs/2 + EarQ*minBW) + \
@@ -212,7 +214,7 @@ def octave_filter_bank_decimation(blow, alow, forward, feedback, x, zis=None):
 	# of the forward and feedback parameters are the parameters
 	# to the Matlab builtin function "filter".
 	BandsPerOctave = len(forward)
-	Nbank = 8*BandsPerOctave
+	Nbank = NOCTAVE*BandsPerOctave
 	
 	y = [0.]*Nbank
 	dec = [0.]*Nbank
@@ -269,13 +271,13 @@ def main():
 	impulse = zeros(N)
 	impulse[N/2] = 1
 	f = 1000.
-	impulse = sin(2*pi*f*arange(0, N/fs, 1./fs))
+	#impulse = sin(2*pi*f*arange(0, N/fs, 1./fs))
 
 	#[ERBforward, ERBfeedback] = MakeERBFilters(fs, Nchannels, low_freq)
 	#y = ERBFilterBank(ERBforward, ERBfeedback, impulse)
 
 	BandsPerOctave = 1
-	Nbands = 8*BandsPerOctave
+	Nbands = NOCTAVE*BandsPerOctave
 	
 	[B, A, fi, fl, fh] = octave_filters(Nbands, BandsPerOctave)
 	y, zfs = octave_filter_bank(B, A, impulse)
@@ -359,7 +361,7 @@ def main():
 	
 	subplot(212)
 	m = 0
-	for i in range(0, 8):
+	for i in range(0, NOCTAVE):
 		for f in fi:
 			p = 10.*log10((y[m]**2).mean())
 			semilogx(f/dec[m], p, 'ko')
@@ -386,7 +388,7 @@ def main():
 	
 	subplot(212)
 	m = 0
-	for i in range(0, 8):
+	for i in range(0, NOCTAVE):
 		for f in fi:
 			p = 10.*log10((y[m]**2).mean())
 			semilogx(f/dec[m], p, 'ko')

@@ -29,6 +29,7 @@ from ringbuffer import RingBuffer
 
 SMOOTH_DISPLAY_TIMER_PERIOD_MS = 25
 SAMPLING_RATE = 44100
+NOCTAVE = 8
 
 STYLESHEET = """
 QwtPlotCanvas {
@@ -190,7 +191,7 @@ class octave_filters():
 	
 	def setbandsperoctave(self, bandsperoctave):
 		self.bandsperoctave = bandsperoctave
-		self.nbands = 8*self.bandsperoctave
+		self.nbands = NOCTAVE*self.bandsperoctave
 		self.fi, self.flow, self.fhigh = octave_frequencies(self.nbands, self.bandsperoctave)
 		[self.boct, self.aoct, fi, flow, fhigh] = octave_filters_oneoctave(self.nbands, self.bandsperoctave)
 		
