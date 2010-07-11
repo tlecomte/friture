@@ -268,13 +268,13 @@ def main():
 
 	impulse = zeros(N)
 	impulse[N/2] = 1
-	#f = 10000.
+	#f = 21000.
 	#impulse = sin(2*pi*f*arange(0, N/fs, 1./fs))
 
 	#[ERBforward, ERBfeedback] = MakeERBFilters(fs, Nchannels, low_freq)
 	#y = ERBFilterBank(ERBforward, ERBfeedback, impulse)
 
-	BandsPerOctave = 6
+	BandsPerOctave = 1
 	Nbands = 8*BandsPerOctave
 	
 	[B, A, fi, fl, fh] = octave_filters(Nbands, BandsPerOctave)
@@ -352,7 +352,6 @@ def main():
 	for yone, d in zip(y, dec):
 		response = 20.*log10(abs(fft(yone))*d)
 		freqScale = fftfreq(N/d, 1./(fs/d))
-		print freqScale[0:N/(2*d)].shape, response[0:N/(2*d)].shape, response.shape
 		semilogx(freqScale[0:N/(2*d)],response[0:N/(2*d)])
 	
 	xlim(fs/2000, fs)
