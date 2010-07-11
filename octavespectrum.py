@@ -178,8 +178,8 @@ class octave_filters():
 		self.setbandsperoctave(bandsperoctave)
 
 	def filter(self, floatdata):
-		#y, dec, zfs = octave_filter_bank_decimation(self.bdec, self.adec, self.boct, self.aoct, floatdata)
-		y, dec, zfs = octave_filter_bank_decimation(self.bdec, self.adec, self.boct, self.aoct, floatdata, zis=self.zfs)
+		y, dec, zfs = octave_filter_bank_decimation(self.bdec, self.adec, self.boct, self.aoct, floatdata)
+		#y, dec, zfs = octave_filter_bank_decimation(self.bdec, self.adec, self.boct, self.aoct, floatdata, zis=self.zfs)
 		#y, zfs = octave_filter_bank(self.b_nodec, self.a_nodec, floatdata)
 		#dec = [1.]*len(y)
 		#y, zfs = octave_filter_bank(self.b_nodec, self.a_nodec, floatdata, zis=self.zfs)
