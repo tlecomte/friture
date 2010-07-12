@@ -28,18 +28,21 @@ class RingBuffer():
 
 	def push(self, floatdata):
 		# update the circular buffer
-		if len(floatdata) > self.buffer_length:
+		
+		l = len(floatdata)
+		
+		if l > self.buffer_length:
 			raise StandardError("buffer error")
 		
 		# first copy, always complete
-		self.buffer[self.offset : self.offset + len(floatdata)] = floatdata[:]
+		self.buffer[self.offset : self.offset + l] = floatdata[:]
 		# second copy, can be folded
-		direct = min(len(floatdata), self.buffer_length - self.offset)
-		folded = len(floatdata) - direct
+		direct = min(l, self.buffer_length - self.offset)
+		folded = l - direct
 		self.buffer[self.offset + self.buffer_length: self.offset + self.buffer_length + direct] = floatdata[0 : direct]
 		self.buffer[:folded] = floatdata[direct:]
 		
-		self.offset = int((self.offset + len(floatdata)) % self.buffer_length)
+		self.offset = int((self.offset + l) % self.buffer_length)
 
 	def data(self, length):
 		start = self.offset + self.buffer_length - length

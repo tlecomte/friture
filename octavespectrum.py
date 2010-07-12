@@ -101,11 +101,11 @@ class OctaveSpectrum_Widget(QtGui.QWidget):
 		
 		#push to the ring buffer
 		for bankbuffer, bankdata in zip(self.bankbuffers, y):
-			bankbuffer.push(bankdata)
+			bankbuffer.push(bankdata**2)
 		
 		#compute the widget data
-		#sp = [((dec*bankbuffer.data(time*SAMPLING_RATE/dec))**2).mean() for bankbuffer, dec in zip(self.bankbuffers, decs)]
-		sp = [((bankbuffer.data(time*SAMPLING_RATE/dec))**2).mean() for bankbuffer, dec in zip(self.bankbuffers, decs)]
+		#sp = [(dec*bankbuffer.data(time*SAMPLING_RATE/dec)).mean() for bankbuffer, dec in zip(self.bankbuffers, decs)]
+		sp = [bankbuffer.data(time*SAMPLING_RATE/dec).mean() for bankbuffer, dec in zip(self.bankbuffers, decs)]
 		sp = array(sp)
 		
 		# Note: the following is largely suboptimal since the filter outputs
@@ -148,7 +148,7 @@ class OctaveSpectrum_Widget(QtGui.QWidget):
 		self.filters.setbandsperoctave(bandsperoctave)
 		#recreate the ring buffers
 		self.bankbuffers = [RingBuffer() for band in range(0, bandsperoctave*NOCTAVE)]
-		
+
 	def settings_called(self, checked):
 		self.settings_dialog.show()
 	
