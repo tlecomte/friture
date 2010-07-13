@@ -319,7 +319,7 @@ class HistPlot(Qwt.QwtPlot):
 
 		# attach a grid
 		grid = Qwt.QwtPlotGrid()
-		grid.enableX(False)
+		grid.enableXMin(True)
 		grid.setMajPen(Qt.QPen(Qt.QPen(Qt.Qt.gray)))
 		grid.setMinPen(Qt.QPen(Qt.QPen(Qt.Qt.lightGray)))
 		grid.attach(self)
