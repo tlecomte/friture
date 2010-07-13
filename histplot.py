@@ -275,7 +275,7 @@ class HistogramPeakItem(Qwt.QwtPlotItem):
 		
 		#for i in range(iData.size()):
 		for flow, fhigh, peak in zip(self.fl, self.fh, self.peaks):
-			x1 = xMap.transform(flow)
+			x1 = xMap.transform(flow)+1
 			x2 = xMap.transform(fhigh)-1
 			y = yMap.transform(peak)
 			
