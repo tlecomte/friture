@@ -6,7 +6,9 @@ from glob import glob
 # to build an executable for Windows, run 'python setup.py py2exe'
 
 #include the QT svg plugin to render the icons
-data_files = [("imageformats", glob(r'C:\Python*\Lib\site-packages\PyQt4\plugins\imageformats\qsvg4.dll'))]
+#include the filter coefficients in the pickle file
+data_files = [("imageformats", glob(r'C:\Python*\Lib\site-packages\PyQt4\plugins\imageformats\qsvg4.dll')),\
+			  ("", glob("generated_filters.pkl"))]
 #exclude some python libraries that py2exe includes by error
 excludes = ["matplotlib","_ssl","Tkconstants","Tkinter","tcl"]
 #exclude dlls that py2exe includes by error
