@@ -262,16 +262,9 @@ class HistogramPeakItem(Qwt.QwtPlotItem):
 		return self.__color
 
 	def draw(self, painter, xMap, yMap, rect):
-		self.canvas_height = rect.height()
-		
-		color = QtGui.QColor(self.color())
-		factor = 125
-		#light = color.lighter(factor)
-		dark = color.darker(factor)
-
 		#horizontal line
 		painter.setBrush(Qt.Qt.NoBrush)
-		painter.setPen(Qt.QPen(dark, 2))
+		painter.setPen(Qt.QPen(self.color(), 2))
 		
 		#for i in range(iData.size()):
 		for flow, fhigh, peak in zip(self.fl, self.fh, self.peaks):
