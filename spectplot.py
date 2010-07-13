@@ -73,6 +73,7 @@ class SpectPlot(classplot.ClassPlot):
 		self.canvas().setPaintAttribute(Qwt.QwtPlotCanvas.PaintPacked, False)
 
 		self.setAxisScale(Qwt.QwtPlot.yLeft, -140., 0.)
+		self.curve.setBaseline(-140.)
 		xtitle = Qwt.QwtText('Frequency (Hz)')
 		xtitle.setFont(QtGui.QFont(8))
 		self.setAxisTitle(Qwt.QwtPlot.xBottom, xtitle)
@@ -117,6 +118,9 @@ class SpectPlot(classplot.ClassPlot):
 		self.peak = zeros((1,))
 		self.peakHold = 0
 		self.peakDecay = PEAK_DECAY_RATE
+		
+		# fill under the curve
+		self.curve.setBrush(Qt.QColor(Qt.Qt.red))
 		
 		self.cached_canvas = self.canvas()
 
@@ -205,6 +209,7 @@ class SpectPlot(classplot.ClassPlot):
 	
 	def setspecrange(self, min, max):
 		self.setAxisScale(Qwt.QwtPlot.yLeft, min, max)
+		self.curve.setBaseline(min)
 		self.needfullreplot = True
 	
 	def setweighting(self, weighting):
