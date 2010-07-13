@@ -110,7 +110,6 @@ class ImagePlot(Qwt.QwtPlot):
 		self.plotLayout().setAlignCanvasToScales(True)
 		# use custom labelling for frequencies
 		self.setAxisScaleDraw(Qwt.QwtPlot.yLeft, FreqScaleDraw())
-		self.setAxisScaleDraw(Qwt.QwtPlot.yRight, FreqScaleDraw())
 		# set axis titles
 		xtitle = Qwt.QwtText('Time (s)')
 		xtitle.setFont(QtGui.QFont(8))
@@ -120,12 +119,20 @@ class ImagePlot(Qwt.QwtPlot):
 		ytitle.setFont(QtGui.QFont(8))
 		self.setAxisTitle(Qwt.QwtPlot.yLeft, ytitle)
 		# self.setAxisTitle(Qwt.QwtPlot.yLeft, 'Frequency (Hz)')
-		self.enableAxis(Qwt.QwtPlot.yRight)
+		
 		# attach a plot image
 		self.plotImage = PlotImage(logger)
 		self.plotImage.attach(self)
 		self.setlinfreqscale()
 		self.setfreqrange(20., 20000.)
+		
+		self.rightAxis = self.axisWidget(Qwt.QwtPlot.yRight)
+		ctitle = Qwt.QwtText("PSD (dB A)")
+		ctitle.setFont(QtGui.QFont(8))
+		self.setAxisTitle(Qwt.QwtPlot.yRight, ctitle)
+		self.rightAxis.setColorBarEnabled(True)
+		self.enableAxis(Qwt.QwtPlot.yRight)
+		self.setspecrange(-140., 0.)
 
 		self.setAxisScale(Qwt.QwtPlot.xBottom, 0., 10.)
 		
@@ -163,14 +170,12 @@ class ImagePlot(Qwt.QwtPlot):
 		self.plotImage.erase()
 		self.logfreqscale = 0
 		self.setAxisScaleEngine(Qwt.QwtPlot.yLeft, Qwt.QwtLinearScaleEngine())
-		self.setAxisScaleEngine(Qwt.QwtPlot.yRight, Qwt.QwtLinearScaleEngine())
 		self.replot()
 
 	def setlog10freqscale(self):
 		self.plotImage.erase()
 		self.logfreqscale = 1
 		self.setAxisScaleEngine(Qwt.QwtPlot.yLeft, Qwt.QwtLog10ScaleEngine())
-		self.setAxisScaleEngine(Qwt.QwtPlot.yRight, Qwt.QwtLog10ScaleEngine())
 		self.replot()
 		
 	#def setlog2freqscale(self):
@@ -178,7 +183,6 @@ class ImagePlot(Qwt.QwtPlot):
 	#	self.logfreqscale = 2
 	#	print "Warning: Frequency scales are not implemented in the spectrogram"
 	#	self.setAxisScaleEngine(Qwt.QwtPlot.yLeft, Qwt.QwtLog10ScaleEngine())
-	#	self.setAxisScaleEngine(Qwt.QwtPlot.yRight, Qwt.QwtLog10ScaleEngine())
 	#	self.replot()
 
 	def settimerange(self, timerange_seconds):
@@ -189,9 +193,27 @@ class ImagePlot(Qwt.QwtPlot):
 	def setfreqrange(self, minfreq, maxfreq):
 		self.plotImage.setfreqrange(minfreq, maxfreq)
 		self.setAxisScale(Qwt.QwtPlot.yLeft, minfreq, maxfreq)
-		self.setAxisScale(Qwt.QwtPlot.yRight, minfreq, maxfreq)
 		self.replot()
-
+	
+	def setspecrange(self, spec_min, spec_max):
+		self.rightAxis.setColorMap(Qwt.QwtDoubleInterval(spec_min, spec_max), self.plotImage.canvasscaledspectrogram.colorMap)
+		self.setAxisScale(Qwt.QwtPlot.yRight, spec_min, spec_max)
+		self.replot()
+		
+	def setweighting(self, weighting):
+		if weighting is 0:
+			title = "PSD (dB)"
+		elif weighting is 1:
+			title = "PSD (dB A)"
+		elif weighting is 2:
+			title = "PSD (dB B)"
+		else:
+			title = "PSD (dB C)"
+		
+		ctitle = Qwt.QwtText(title)
+		ctitle.setFont(QtGui.QFont(8))
+		self.setAxisTitle(Qwt.QwtPlot.yRight, ctitle)
+	
 	def drawCanvas(self, painter):
 		t = QtCore.QTime()
 		t.start()

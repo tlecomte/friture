@@ -134,12 +134,15 @@ class Spectrogram_Widget(QtGui.QWidget):
 
 	def setmin(self, value):
 		self.spec_min = value
+		self.PlotZoneImage.setspecrange(self.spec_min, self.spec_max)
 	
 	def setmax(self, value):
 		self.spec_max = value
+		self.PlotZoneImage.setspecrange(self.spec_min, self.spec_max)
 	
 	def setweighting(self, weighting):
 		self.weighting = weighting
+		self.PlotZoneImage.setweighting(weighting)
 	
 	def settings_called(self, checked):
 		self.settings_dialog.show()
