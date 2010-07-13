@@ -117,8 +117,8 @@ class ControlBar(QtGui.QWidget):
 		self.comboBox_select = QtGui.QComboBox(self)
 		self.comboBox_select.addItem("Levels")
 		self.comboBox_select.addItem("Scope")
-		self.comboBox_select.addItem("Spectrum")
-		self.comboBox_select.addItem("Spectrogram")
+		self.comboBox_select.addItem("FFT Spectrum")
+		self.comboBox_select.addItem("2D Spectrogram")
 		self.comboBox_select.addItem("Octave Spectrum")
 		self.comboBox_select.setCurrentIndex(0)
 		
