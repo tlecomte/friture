@@ -22,9 +22,9 @@ from numpy import log10, where, linspace, array
 from histplot import HistPlot
 import audioproc # audio processing class
 import octavespectrum_settings # settings dialog
-from filter_design import octave_filter_bank_decimation, octave_frequencies
+from filter_design import load_filters_params, octave_filter_bank_decimation, octave_frequencies
+from scipy.signal import cheby1, tf2zpk, firwin
 from ringbuffer import RingBuffer
-import pickle
 
 SMOOTH_DISPLAY_TIMER_PERIOD_MS = 25
 SAMPLING_RATE = 44100
@@ -159,9 +159,7 @@ class OctaveSpectrum_Widget(QtGui.QWidget):
 
 class octave_filters():
 	def __init__(self, bandsperoctave):
-		input = open('generated_filters.pkl', 'rb')
-		self.filters_params = pickle.load(input)
-		input.close()
+		self.filters_params = load_filters_params()
 		
 		[self.bdec, self.adec] = self.filters_params['dec']
 				
