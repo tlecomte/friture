@@ -71,6 +71,7 @@ Section "SectionPrincipale" SEC01
   SetOutPath "$INSTDIR\imageformats"
   File "dist\imageformats\qsvg4.dll"
   SetOutPath "$INSTDIR"
+  File "dist\generated_filters.pkl"
   File "dist\library.zip"
   File "dist\numpy.core.multiarray.pyd"
   File "dist\numpy.core.scalarmath.pyd"
