@@ -102,7 +102,6 @@ Section "SectionPrincipale" SEC01
   File "dist\win32pdh.pyd"
   File "dist\win32pipe.pyd"
   File "dist\_ctypes.pyd"
-  File "dist\_hashlib.pyd"
   File "dist\_portaudio.pyd"
   File "dist\_psutil_mswindows.pyd"
   File "dist\_socket.pyd"
