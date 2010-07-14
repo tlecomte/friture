@@ -10,7 +10,7 @@ from glob import glob
 data_files = [("imageformats", glob(r'C:\Python*\Lib\site-packages\PyQt4\plugins\imageformats\qsvg4.dll')),\
 			  ("", glob("generated_filters.pkl"))]
 #exclude some python libraries that py2exe includes by error
-excludes = ["matplotlib","_ssl","Tkconstants","Tkinter","tcl","email","pyreadline"]
+excludes = ["matplotlib","_ssl","Tkconstants","Tkinter","tcl","email","pyreadline","nose"]
 #exclude dlls that py2exe includes by error
 dll_excludes = ["powrprof.dll"]
 #manually exclude python libraries that py2exe fails to detect
