@@ -17,10 +17,9 @@
 # You should have received a copy of the GNU General Public License
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt4 import QtGui, QtCore
-from numpy import log10, where, linspace, array
+from PyQt4 import QtGui
+from numpy import log10, array
 from histplot import HistPlot
-import audioproc # audio processing class
 import octavespectrum_settings # settings dialog
 from filter import load_filters_params, octave_filter_bank_decimation, octave_frequencies
 from ringbuffer import RingBuffer
@@ -64,10 +63,7 @@ class OctaveSpectrum_Widget(QtGui.QWidget):
 		self.gridLayout.addWidget(self.PlotZoneSpect, 0, 0, 1, 1)
 
 		self.setStyleSheet(STYLESHEET)
-		
-		# initialize the class instance that will do the fft
-		self.proc = audioproc.audioproc(self.logger)
-		
+				
 		self.spec_min = DEFAULT_SPEC_MIN
 		self.spec_max = DEFAULT_SPEC_MAX
 		self.weighting = DEFAULT_WEIGHTING
