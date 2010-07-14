@@ -12,10 +12,8 @@ data_files = [("imageformats", glob(r'C:\Python*\Lib\site-packages\PyQt4\plugins
 #exclude some python libraries that py2exe includes by error
 excludes = ["matplotlib","_ssl","Tkconstants","Tkinter","tcl","email","pyreadline","nose",\
 		    "doctest", "pdb", "difflib", "pydoc", "_hashlib", "bz2","httplib","cookielib","cookielib","urllib","urllib2","Image",\
-		    "pywin","optparse","zipfile","calendar","subprocess","compiler"]
-'_ssl',  # Exclude _ssl
-#"pywin", "pywin.debugger", "pywin.debugger.dbgcon",
-#"pywin.dialogs", "pywin.dialogs.list",
+		    "pywin","optparse","zipfile","calendar","subprocess","compiler",\
+		    "_imaging","_ssl"]
 #Note: unittest, inspect are needed by numpy
 #exclude dlls that py2exe includes by error
 dll_excludes = ["powrprof.dll"]
