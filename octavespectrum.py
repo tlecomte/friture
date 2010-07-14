@@ -22,8 +22,7 @@ from numpy import log10, where, linspace, array
 from histplot import HistPlot
 import audioproc # audio processing class
 import octavespectrum_settings # settings dialog
-from cochlear import *
-import cochlear
+from filter_design import *
 from scipy.signal import cheby1, tf2zpk, firwin
 from ringbuffer import RingBuffer
 
@@ -194,7 +193,7 @@ class octave_filters():
 			#print "poles", p, abs(p)**2
 			#print "zeros", z, abs(z)**2
 			
-		#[self.b_nodec, self.a_nodec, fi, fl, fh] = cochlear.octave_filters(self.nbands, self.bandsperoctave)
+		#[self.b_nodec, self.a_nodec, fi, fl, fh] = octave_filters(self.nbands, self.bandsperoctave)
 		
 		f = self.fi
 		Rc = 12200.**2*f**2 / ((f**2 + 20.6**2)*(f**2 + 12200.**2))
