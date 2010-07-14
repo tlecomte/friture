@@ -23,7 +23,6 @@ from histplot import HistPlot
 import audioproc # audio processing class
 import octavespectrum_settings # settings dialog
 from filter_design import load_filters_params, octave_filter_bank_decimation, octave_frequencies
-from scipy.signal import cheby1, tf2zpk, firwin
 from ringbuffer import RingBuffer
 
 SMOOTH_DISPLAY_TIMER_PERIOD_MS = 25
