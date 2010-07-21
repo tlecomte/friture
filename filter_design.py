@@ -5,8 +5,11 @@ from numpy import pi, exp, arange, cos, sin, sqrt, zeros, ones, log, arange
 from scipy.misc import factorial
 import scipy
 scipy.factorial = factorial
-from scipy.signal import lfilter, cheby1, ellip, butter, iirdesign, freqz, firwin
-from scipy.signal.filter_design import ellip, butter, firwin
+
+#importing from scipy.signal.signaltools and scipy.signal.filter_design instead of scipy.signal 
+#decreases dramatically the number of modules imported
+from scipy.signal.signaltools import lfilter
+from scipy.signal.filter_design import ellip, butter, firwin, freqz, iirdesign, cheby1
 
 # bank of filters for any other kind of frequency scale
 # http://cobweb.ecn.purdue.edu/~malcolm/apple/tr35/PattersonsEar.pdf
