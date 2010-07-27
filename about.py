@@ -20,6 +20,14 @@
 from PyQt4 import QtGui, QtCore
 import resource_rc
 
+aboutText = """
+<p> Friture is an application for real-time audio analysis.
+<p> Written in Python, using PyQt, PyQwt, PyAudio and SciPy.
+<p> License is GPLv3.
+<p> Homepage: <a href="http://www.github.com/tlecomte/friture">http://www.github.com/tlecomte/friture</a>
+<p> Send comments, ideas and bug reports to: <a href="mailto:timothee.lecomte@lpa.ens.fr">timothee.lecomte@lpa.ens.fr</a>
+"""
+
 class About_Dialog(QtGui.QDialog):
 	def __init__(self):
 		QtGui.QDialog.__init__(self)
@@ -48,13 +56,10 @@ class About_Dialog(QtGui.QDialog):
 		self.label_2.setObjectName("label_2")
 		self.horizontalLayout.addWidget(self.label_2)
 		self.label = QtGui.QLabel(self.aboutTab)
+		self.label.setOpenExternalLinks( True ) 
 		self.label.setObjectName("label")
-		aboutText = u"Friture is an application for real-time audio analysis.\n" \
-		"Written in Python\n" \
-		"License GPLv3\n" \
-		"By Timothee Lecomte\n" \
-		"Homepage: http://www.github.com/tlecomte/friture"
 		self.label.setText(aboutText)
+		
 		self.horizontalLayout.addWidget(self.label)
 		self.tabWidget.addTab(self.aboutTab, "About")
 		

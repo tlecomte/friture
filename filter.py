@@ -6,7 +6,11 @@ from scipy.misc import factorial
 import scipy
 scipy.factorial = factorial
 
-from scipy.signal import lfilter
+#importing lfilter from scipy.signal.signaltools instead of scipy.signal decreases
+#dramatically the number of modules imported (and decreases the size of the NSIS package...) 
+#FIXME: it should be possible to do better since lfilter itself is a dead simple wrapper for a C
+#function in scipy/signal/sigtoolsmodule.c
+from scipy.signal.signaltools import lfilter
 import pickle
 
 NOCTAVE = 8
