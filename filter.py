@@ -1,16 +1,21 @@
 # -*- coding: utf-8 -*-
-from numpy import arange, sqrt, zeros
+from numpy import arange, sqrt, zeros, isscalar
 # the three following lines are a workaround for a bug with scipy and py2exe
 # together. See http://www.pyinstaller.org/ticket/83 for reference.
-from scipy.misc import factorial
-import scipy
-scipy.factorial = factorial
+#from scipy.misc import factorial
+#import scipy
+#scipy.factorial = factorial
 
 #importing lfilter from scipy.signal.signaltools instead of scipy.signal decreases
 #dramatically the number of modules imported (and decreases the size of the NSIS package...) 
-#FIXME: it should be possible to do better since lfilter itself is a dead simple wrapper for a C
-#function in scipy/signal/sigtoolsmodule.c
-from scipy.signal.signaltools import lfilter
+#from scipy.signal.signaltools import lfilter
+#importint _linear_filter itself from sigtools is even better
+from scipy.signal.sigtools import _linear_filter
+
+#NOTE: by default scipy.signal.__init__.py imports all of its submodules
+#To decrease the py2exe distributions dramatically, these import lines can
+#be commented out !
+
 import pickle
 
 NOCTAVE = 8
@@ -138,3 +143,77 @@ def load_filters_params():
 	input.close()
 	
 	return params
+
+def lfilter(b, a, x, axis=-1, zi=None):
+    """
+    Filter data along one-dimension with an IIR or FIR filter.
+
+    Filter a data sequence, x, using a digital filter.  This works for many
+    fundamental data types (including Object type).  The filter is a direct
+    form II transposed implementation of the standard difference equation
+    (see Notes).
+
+    Parameters
+    ----------
+    b : array_like
+        The numerator coefficient vector in a 1-D sequence.
+    a : array_like
+        The denominator coefficient vector in a 1-D sequence.  If a[0]
+        is not 1, then both a and b are normalized by a[0].
+    x : array_like
+        An N-dimensional input array.
+    axis : int
+        The axis of the input data array along which to apply the
+        linear filter. The filter is applied to each subarray along
+        this axis (*Default* = -1)
+    zi : array_like (optional)
+        Initial conditions for the filter delays.  It is a vector
+        (or array of vectors for an N-dimensional input) of length
+        max(len(a),len(b))-1.  If zi=None or is not given then initial
+        rest is assumed.  SEE signal.lfiltic for more information.
+
+    Returns
+    -------
+    y : array
+        The output of the digital filter.
+    zf : array (optional)
+        If zi is None, this is not returned, otherwise, zf holds the
+        final filter delay values.
+
+    Notes
+    -----
+    The filter function is implemented as a direct II transposed structure.
+    This means that the filter implements
+
+    ::
+
+       a[0]*y[n] = b[0]*x[n] + b[1]*x[n-1] + ... + b[nb]*x[n-nb]
+                               - a[1]*y[n-1] - ... - a[na]*y[n-na]
+
+    using the following difference equations::
+
+         y[m] = b[0]*x[m] + z[0,m-1]
+         z[0,m] = b[1]*x[m] + z[1,m-1] - a[1]*y[m]
+         ...
+         z[n-3,m] = b[n-2]*x[m] + z[n-2,m-1] - a[n-2]*y[m]
+         z[n-2,m] = b[n-1]*x[m] - a[n-1]*y[m]
+
+    where m is the output sample number and n=max(len(a),len(b)) is the
+    model order.
+
+    The rational transfer function describing this filter in the
+    z-transform domain is::
+
+                             -1               -nb
+                 b[0] + b[1]z  + ... + b[nb] z
+         Y(z) = ---------------------------------- X(z)
+                             -1               -na
+                 a[0] + a[1]z  + ... + a[na] z
+
+    """
+    if isscalar(a):
+        a = [a]
+    if zi is None:
+        return _linear_filter(b, a, x, axis)
+    else:
+        return _linear_filter(b, a, x, axis, zi)
