@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 from numpy import arange, sqrt, zeros
-# the three following lines are a workaround for a bug with scipy and py2exe
+# the three following lines were a workaround for a bug with scipy and py2exe
 # together. See http://www.pyinstaller.org/ticket/83 for reference.
-from scipy.misc import factorial
-import scipy
-scipy.factorial = factorial
+#from scipy.misc import factorial
+#import scipy
+#scipy.factorial = factorial
 
 #importing lfilter from scipy.signal.signaltools instead of scipy.signal decreases
 #dramatically the number of modules imported (and decreases the size of the NSIS package...) 
