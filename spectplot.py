@@ -88,6 +88,7 @@ class SpectPlot(classplot.ClassPlot):
 		grid.enableXMin(True)
 		grid.setMajPen(Qt.QPen(Qt.QPen(Qt.Qt.gray)))
 		grid.setMinPen(Qt.QPen(Qt.QPen(Qt.Qt.lightGray)))
+		grid.setZ(1000.)
 		grid.attach(self)
 
 		self.xmax = 0
@@ -112,10 +113,12 @@ class SpectPlot(classplot.ClassPlot):
 		
 		# insert an additional curve for the peak
 		self.curve_peak = Qwt.QwtPlotCurve()
+		#self.curve_peak.setPen(Qt.QColor(0,0,255,0))
 		#self.curve_peak.setPen(QtGui.QPen(Qt.Qt.blue))
-		self.curve_peak.setPen(Qt.QColor(0,0,255,0))
+		self.curve_peak.setPen(QtGui.QPen(Qt.Qt.NoPen))
+		#self.curve_peak.setBrush(Qt.QColor(0,0,255,140))
+		self.curve_peak.setBrush(Qt.Qt.blue)
 		#self.curve_peak.setRenderHint(Qwt.QwtPlotItem.RenderAntialiased)
-		self.curve_peak.setBrush(Qt.QColor(0,0,255,140))
 		#self.curve_peak.setBaseline(-140.)
 		self.curve_peak.attach(self)
 		self.peak = zeros((1,))
@@ -123,8 +126,11 @@ class SpectPlot(classplot.ClassPlot):
 		self.peakDecay = PEAK_DECAY_RATE
 		
 		# fill under the curve
-		self.curve.setBrush(Qt.QColor(255,0,0,190))
-		self.curve.setPen(Qt.QColor(255,0,0,0))
+		#self.curve.setBrush(Qt.QColor(255,0,190))
+		self.curve.setBrush(Qt.Qt.red)
+		#self.curve.setPen(Qt.QColor(255,0,0,0))
+		#self.curve.setPen(QtGui.QPen(Qt.Qt.red))
+		self.curve.setPen(QtGui.QPen(Qt.Qt.NoPen))
 		#self.curve.setRenderHint(Qwt.QwtPlotItem.RenderAntialiased)
 		
 		self.cached_canvas = self.canvas()
