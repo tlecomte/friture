@@ -125,6 +125,14 @@ class HistogramItem(Qwt.QwtPlotItem):
 		
 		y0 = yMap.transform(self.baseline())
 		
+		# update the cached bar pixmap if necessary
+		x1 = xMap.transform(iData.interval(0).minValue())
+		x2 = xMap.transform(iData.interval(0).maxValue())-1
+		y2 = yMap.transform(iData.value(0))
+		rect = Qt.QRect(x1, y0, x2-x1, y2-y0)
+		if rect.width() < self.rect.width() - 1 or rect.width() > self.rect.width() + 1 or self.canvas_height <> self.rect.height():	
+			self.update_pixmap(rect)
+		
 		for i in range(iData.size()):
 			x1 = xMap.transform(iData.interval(i).minValue())
 			x2 = xMap.transform(iData.interval(i).maxValue())-1
@@ -214,9 +222,6 @@ class HistogramItem(Qwt.QwtPlotItem):
 	def drawBar(self, painter, orientation, rect):
 		# If width() < 0 the function swaps the left and right corners, and it swaps the top and bottom corners if height() < 0.
 		rect = rect.normalized()
-		
-		if rect.width() < self.rect.width() - 1 or rect.width() > self.rect.width() + 1 or self.canvas_height <> self.rect.height():	
-			self.update_pixmap(rect)
 		
 		if rect.width() == self.rect.width():
 			painter.drawPixmap(rect.left(), rect.top(), self.pixmap)
