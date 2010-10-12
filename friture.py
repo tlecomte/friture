@@ -409,10 +409,15 @@ if __name__ == "__main__":
 
 		p = cProfile.Profile()
 		p.run('app.exec_()')
+		
 		k = lsprofcalltree.KCacheGrind(p)
-		data = open('cachegrind.out.00000', 'w+')
+		data = open('cachegrind.out.00000', 'wb')
 		k.output(data)
 		data.close()
+
+		# alternative code with pyprof2calltree instead of lsprofcalltree
+		#import pyprof2calltree
+		#pyprof2calltree.convert(p.getstats(), "cachegrind.out.00000") # save
 		
 		sys.exit(0)
 	else:

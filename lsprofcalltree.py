@@ -75,12 +75,13 @@ class KCacheGrind(object):
         out_file = self.out_file
         code = subentry.code
         #print >> out_file, 'cob=%s' % (code.co_filename,)
-        print >> out_file, 'cfn=%s' % (label(code),)
         if isinstance(code, str):
             print >> out_file, 'cfi=~'
+            print >> out_file, 'cfn=%s' % (label(code),)
             print >> out_file, 'calls=%d 0' % (subentry.callcount,)
         else:
             print >> out_file, 'cfi=%s' % (code.co_filename,)
+            print >> out_file, 'cfn=%s' % (label(code),)
             print >> out_file, 'calls=%d %d' % (
                 subentry.callcount, code.co_firstlineno)
 
