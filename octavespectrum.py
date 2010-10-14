@@ -42,6 +42,7 @@ DEFAULT_SPEC_MIN = -140
 DEFAULT_SPEC_MAX = 0
 DEFAULT_WEIGHTING = 1 #A
 DEFAULT_BANDSPEROCTAVE = 0
+DEFAULT_RESPONSE_TIME = 0.125 # FAST
 
 class OctaveSpectrum_Widget(QtGui.QWidget):
 	def __init__(self, parent, logger = None):
@@ -67,6 +68,7 @@ class OctaveSpectrum_Widget(QtGui.QWidget):
 		self.spec_min = DEFAULT_SPEC_MIN
 		self.spec_max = DEFAULT_SPEC_MAX
 		self.weighting = DEFAULT_WEIGHTING
+		self.response_time = DEFAULT_RESPONSE_TIME
 		
 		bandsperoctave = 3*2**(DEFAULT_BANDSPEROCTAVE-1) if DEFAULT_BANDSPEROCTAVE >= 1 else 1
 		self.filters = octave_filters(bandsperoctave)
@@ -84,9 +86,11 @@ class OctaveSpectrum_Widget(QtGui.QWidget):
 		if not self.isVisible():
 		    return
 		
-		#time = SMOOTH_DISPLAY_TIMER_PERIOD_MS/1000.
-		time = 0.135 #FAST setting for a sound level meter
+		#time = SMOOTH_DISPLAY_TIMER_PERIOD_MS/1000. #DISPLAY
+		#time = 0.025 #IMPULSE setting for a sound level meter
+		#time = 0.125 #FAST setting for a sound level meter
 		#time = 1. #SLOW setting for a sound level meter
+		time = self.response_time
 		
 		#get the fresh data
 		floatdata = self.audiobuffer.newdata()
@@ -137,6 +141,9 @@ class OctaveSpectrum_Widget(QtGui.QWidget):
 	def setweighting(self, weighting):
 		self.weighting = weighting
 		self.PlotZoneSpect.setweighting(weighting)
+
+	def setresponsetime(self, response_time):
+		self.response_time = response_time
 
 	def setbandsperoctave(self, bandsperoctave):
 		self.filters.setbandsperoctave(bandsperoctave)
