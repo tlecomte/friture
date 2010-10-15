@@ -23,9 +23,6 @@ from spectplot import SpectPlot
 import audioproc # audio processing class
 import spectrum_settings # settings dialog
 
-SMOOTH_DISPLAY_TIMER_PERIOD_MS = 25
-SAMPLING_RATE = 44100
-
 STYLESHEET = """
 QwtPlotCanvas {
 	border: 1px solid gray;
@@ -36,12 +33,13 @@ QwtPlotCanvas {
 """
 
 # shared with spectrum_settings.py
-DEFAULT_FFT_SIZE = 7
+SAMPLING_RATE = 44100
+DEFAULT_FFT_SIZE = 7 #4096 points
 DEFAULT_FREQ_SCALE = 1 #log10
-DEFAULT_MAXFREQ = SAMPLING_RATE/2
+DEFAULT_MAXFREQ = 20000
 DEFAULT_MINFREQ = 20
-DEFAULT_SPEC_MIN = -140
-DEFAULT_SPEC_MAX = 0
+DEFAULT_SPEC_MIN = -100
+DEFAULT_SPEC_MAX = -20
 DEFAULT_WEIGHTING = 1 #A
 
 class Spectrum_Widget(QtGui.QWidget):
