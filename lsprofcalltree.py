@@ -16,8 +16,9 @@ def label(code):
     if isinstance(code, str):
         return ('~', 0, code)    # built-in functions ('~' sorts at the end)
     else:
-        return '%s %s:%d' % (code.co_name,
-                             code.co_filename,
+        return '%s%s %s:%d' % (code.co_name,
+                             str(code.co_varnames).translate(None,"\'"),
+                             code.co_filename.rsplit("/",1)[-1],
                              code.co_firstlineno)
 
 class KCacheGrind(object):
@@ -41,6 +42,34 @@ class KCacheGrind(object):
 
     def _entry(self, entry):
         out_file = self.out_file
+
+	#print "Entry:", entry
+	##print dir(entry)
+	#print "Code:", entry.code
+	##print dir(entry.code)
+	#print "InlineTime:", entry.inlinetime
+	#print "callcount:", entry.callcount
+	#print "calls:", entry.calls
+	#print "n_fields:", entry.n_fields
+	#print "n_sequence_fields:", entry.n_sequence_fields
+	#print "n_unnamed_fields:", entry.n_unnamed_fields
+	#print "reccallcount:", entry.reccallcount
+	#print "totaltime:", entry.totaltime
+	#if not isinstance(entry.code, str):
+		#print "FileName:", entry.code.co_filename
+		#print "FirstLine:", entry.code.co_firstlineno
+		#print "argcount:", entry.code.co_argcount
+		#print "cellvars:", entry.code.co_cellvars
+		#print "code:", entry.code.co_code
+		#print "consts:", entry.code.co_consts
+		#print "flags:", entry.code.co_flags
+		#print "freevars:", entry.code.co_freevars
+		#print "lnotab:", entry.code.co_lnotab
+		#print "name:", entry.code.co_name
+		#print "names:", entry.code.co_names
+		#print "nlocals:", entry.code.co_nlocals
+		#print "stacksize:", entry.code.co_stacksize
+		#print "varnames:", entry.code.co_varnames
 
         code = entry.code
         #print >> out_file, 'ob=%s' % (code.co_filename,)
