@@ -20,10 +20,11 @@
 from PyQt4 import QtGui, QtCore
 
 # shared with octavespectrum.py
-DEFAULT_SPEC_MIN = -140
-DEFAULT_SPEC_MAX = 0
+DEFAULT_SPEC_MIN = -80
+DEFAULT_SPEC_MAX = -20
 DEFAULT_WEIGHTING = 1 #A
-DEFAULT_BANDSPEROCTAVE = 0
+DEFAULT_BANDSPEROCTAVE = 3
+DEFAULT_BANDSPEROCTAVE_INDEX = 1
 DEFAULT_RESPONSE_TIME = 0.125 # FAST
 DEFAULT_RESPONSE_TIME_INDEX = 1 # FAST
 
@@ -45,7 +46,7 @@ class OctaveSpectrum_Settings_Dialog(QtGui.QDialog):
 		self.comboBox_bandsperoctave.addItem("6")
 		self.comboBox_bandsperoctave.addItem("12")
 		self.comboBox_bandsperoctave.addItem("24")
-		self.comboBox_bandsperoctave.setCurrentIndex(DEFAULT_BANDSPEROCTAVE)
+		self.comboBox_bandsperoctave.setCurrentIndex(DEFAULT_BANDSPEROCTAVE_INDEX)
 
 		self.spinBox_specmin = QtGui.QSpinBox(self)
 		self.spinBox_specmin.setKeyboardTracking(False)
@@ -122,7 +123,7 @@ class OctaveSpectrum_Settings_Dialog(QtGui.QDialog):
 
 	# method
 	def restoreState(self, settings):
-		(bandsPerOctave, ok) = settings.value("bandsPerOctave", DEFAULT_BANDSPEROCTAVE).toInt()
+		(bandsPerOctave, ok) = settings.value("bandsPerOctave", DEFAULT_BANDSPEROCTAVE_INDEX).toInt()
 		self.comboBox_bandsperoctave.setCurrentIndex(bandsPerOctave)
 		(colorMin, ok) = settings.value("Min", DEFAULT_SPEC_MIN).toInt()
 		self.spinBox_specmin.setValue(colorMin)

@@ -38,11 +38,13 @@ QwtPlotCanvas {
 """
 
 # shared with octavespectrum_settings.py
-DEFAULT_SPEC_MIN = -140
-DEFAULT_SPEC_MAX = 0
+DEFAULT_SPEC_MIN = -80
+DEFAULT_SPEC_MAX = -20
 DEFAULT_WEIGHTING = 1 #A
-DEFAULT_BANDSPEROCTAVE = 0
+DEFAULT_BANDSPEROCTAVE = 3
+DEFAULT_BANDSPEROCTAVE_INDEX = 1
 DEFAULT_RESPONSE_TIME = 0.125 # FAST
+DEFAULT_RESPONSE_TIME_INDEX = 1 # FAST
 
 class OctaveSpectrum_Widget(QtGui.QWidget):
 	def __init__(self, parent, logger = None):
@@ -70,9 +72,8 @@ class OctaveSpectrum_Widget(QtGui.QWidget):
 		self.weighting = DEFAULT_WEIGHTING
 		self.response_time = DEFAULT_RESPONSE_TIME
 		
-		bandsperoctave = 3*2**(DEFAULT_BANDSPEROCTAVE-1) if DEFAULT_BANDSPEROCTAVE >= 1 else 1
-		self.filters = octave_filters(bandsperoctave)
-		self.bankbuffers = [RingBuffer() for band in range(0, bandsperoctave*NOCTAVE)]
+		self.filters = octave_filters(DEFAULT_BANDSPEROCTAVE)
+		self.bankbuffers = [RingBuffer() for band in range(0, DEFAULT_BANDSPEROCTAVE*NOCTAVE)]
 		
 		# initialize the settings dialog
 		self.settings_dialog = octavespectrum_settings.OctaveSpectrum_Settings_Dialog(self, self.logger)
