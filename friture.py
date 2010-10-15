@@ -246,12 +246,11 @@ class Friture(QtGui.QMainWindow, ):
 				settings.endGroup()
 		else:
 			self.logger.push("First launch, display a default set of docks")
-			default_docknames = ["Dock 0, Dock 1, Dock 2"]
 			self.docks = []
-			self.docks += [Dock(self, self.logger, "Dock 0", type = 0)] #level
-			self.docks += [Dock(self, self.logger, "Dock 1", type = 1)] #scope
-			self.docks += [Dock(self, self.logger, "Dock 2", type = 3)] #spectrogram
-			self.docks += [Dock(self, self.logger, "Dock 3", type = 4)] #octave spectrum
+			self.docks += [Dock(self, self.logger, "Dock 0", type = 3)] #spectrogram
+			self.docks += [Dock(self, self.logger, "Dock 1", type = 4)] #octave spectrum
+			#self.docks += [Dock(self, self.logger, "Dock 2", type = 1)] #scope
+			#self.docks += [Dock(self, self.logger, "Dock 3", type = 0)] #level
 			for dock in self.docks:
 				self.addDockWidget(QtCore.Qt.TopDockWidgetArea, dock)
 
