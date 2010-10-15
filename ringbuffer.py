@@ -35,7 +35,7 @@ class RingBuffer():
 			raise StandardError("buffer error")
 		
 		# first copy, always complete
-		self.buffer[self.offset : self.offset + l] = floatdata[:]
+		self.buffer[self.offset : self.offset + l] = floatdata
 		# second copy, can be folded
 		direct = min(l, self.buffer_length - self.offset)
 		folded = l - direct
