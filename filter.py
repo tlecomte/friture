@@ -211,8 +211,8 @@ def lfilter(b, a, x, axis=-1, zi=None):
                  a[0] + a[1]z  + ... + a[na] z
 
     """
-    if isscalar(a):
-        a = [a]
+    #if isscalar(a):
+        #a = [a]
     if zi is None:
         return _linear_filter(b, a, x, axis)
     else:
