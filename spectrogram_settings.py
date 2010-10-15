@@ -22,7 +22,7 @@ from PyQt4 import QtGui, QtCore
 SAMPLING_RATE = 44100
 
 # shared with spectrogram.py
-DEFAULT_FFT_SIZE = 7
+DEFAULT_FFT_SIZE = 7 #4096 points
 DEFAULT_FREQ_SCALE = 1 #log10
 DEFAULT_MAXFREQ = SAMPLING_RATE/2
 DEFAULT_MINFREQ = 20
@@ -161,7 +161,7 @@ class Spectrogram_Settings_Dialog(QtGui.QDialog):
 		self.doubleSpinBox_timerange.setValue(timeRange)
 		(fft_size, ok) = settings.value("fftSize", DEFAULT_FFT_SIZE).toInt() # 7th index is 1024 points
 		self.comboBox_fftsize.setCurrentIndex(fft_size)
-		(freqscale, ok) = settings.value("freqScale", 0).toInt()
+		(freqscale, ok) = settings.value("freqScale", DEFAULT_FREQ_SCALE).toInt()
 		self.comboBox_freqscale.setCurrentIndex(freqscale)
 		(freqMin, ok) = settings.value("freqMin", DEFAULT_MINFREQ).toInt()
 		self.spinBox_minfreq.setValue(freqMin)
