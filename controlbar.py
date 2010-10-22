@@ -121,8 +121,10 @@ class ControlBar(QtGui.QWidget):
 		self.comboBox_select.addItem("2D Spectrogram")
 		self.comboBox_select.addItem("Octave Spectrum")
 		self.comboBox_select.setCurrentIndex(0)
+		self.comboBox_select.setToolTip("Select the type of audio widget")
 		
 		self.settingsButton = QtGui.QToolButton (self)
+		self.settingsButton.setToolTip("Customize the audio widget")
 				
 		settings_icon = QtGui.QIcon()
 		settings_icon.addPixmap(QtGui.QPixmap(":/dock-settings.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
