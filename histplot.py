@@ -20,7 +20,7 @@
 import classplot
 import PyQt4.Qwt5 as Qwt
 from PyQt4 import QtCore, Qt, QtGui
-from numpy import zeros, ones, log10, linspace, logspace, interp, log2, histogram
+from numpy import zeros, ones, log10, linspace, logspace, log2
 from log2_scale_engine import QwtLog10ScaleEngine
 import log2scale
 
@@ -129,7 +129,10 @@ class HistogramItem(Qwt.QwtPlotItem):
 		x1 = xMap.transform(iData.interval(0).minValue())
 		x2 = xMap.transform(iData.interval(0).maxValue())-1
 		y2 = yMap.transform(iData.value(0))
+		
 		rect = Qt.QRect(x1, y0, x2-x1, y2-y0)
+		# If width() < 0 the function swaps the left and right corners, and it swaps the top and bottom corners if height() < 0.
+		rect = rect.normalized()
 		if rect.width() < self.rect.width() - 1 or rect.width() > self.rect.width() + 1 or self.canvas_height <> self.rect.height():	
 			self.update_pixmap(rect)
 		
@@ -185,11 +188,25 @@ class HistogramItem(Qwt.QwtPlotItem):
 		painter = QtGui.QPainter(self.pixmap_l)
 		if rect.width() > 3:
 			self.drawBarDecoration(painter, r)
+			
+		r.setWidth(r.width() - 1)
+		self.pixmap_ll = QtGui.QPixmap(r.width()+1, r.height()+1)
+		self.pixmap_ll.fill(color)
+		painter = QtGui.QPainter(self.pixmap_ll)
+		if rect.width() > 3:
+			self.drawBarDecoration(painter, r)
 		
-		r.setWidth(r.width() + 2)
+		r.setWidth(r.width() + 3)
 		self.pixmap_h = QtGui.QPixmap(r.width()+1, r.height()+1)
 		self.pixmap_h.fill(color)
 		painter = QtGui.QPainter(self.pixmap_h)
+		if rect.width() > 3:
+			self.drawBarDecoration(painter, r)
+			
+		r.setWidth(r.width() + 1)
+		self.pixmap_hh = QtGui.QPixmap(r.width()+1, r.height()+1)
+		self.pixmap_hh.fill(color)
+		painter = QtGui.QPainter(self.pixmap_hh)
 		if rect.width() > 3:
 			self.drawBarDecoration(painter, r)
 		
@@ -229,8 +246,12 @@ class HistogramItem(Qwt.QwtPlotItem):
 			painter.drawPixmap(rect.left(), rect.top(), self.pixmap_h)
 		elif rect.width() == self.rect.width() - 1:
 			painter.drawPixmap(rect.left(), rect.top(), self.pixmap_l)
+		elif rect.width() == self.rect.width() + 2:
+			painter.drawPixmap(rect.left(), rect.top(), self.pixmap_hh)
+		elif rect.width() == self.rect.width() - 2:
+			painter.drawPixmap(rect.left(), rect.top(), self.pixmap_ll)
 		else:
-			raise StandardError("Histplot bar width error!!")
+			print "(Non-fatal) Histplot bar width error!!", rect.width(), self.rect.width()
 
 class HistogramPeakItem(Qwt.QwtPlotItem):
 
@@ -370,19 +391,14 @@ class HistPlot(Qwt.QwtPlot):
 		self.histogram.setColor(Qt.Qt.darkGreen)
 		self.histogram.setBaseline(-200.)
 		
-		numValues = 20
+		numValues = 2
 		intervals = []
 		values = Qwt.QwtArrayDouble(numValues)
 
-		import random
-
-		pos = 0.0
-		for i in range(numValues):
-			width = 5 + random.randint(0, 4)
-			value = random.randint(0, 99)
-			intervals.append(Qwt.QwtDoubleInterval(pos, pos+width))
-			values[i] = value
-			pos += width
+		pos = [0.1, 1., 10.]
+		for i in range(len(pos)-1):
+			intervals.append(Qwt.QwtDoubleInterval(pos[i], pos[i+1]))
+			values[i] = 1.
 
 		self.histogram.setData(Qwt.QwtIntervalData(intervals, values))
 		self.histogram.attach(self)
