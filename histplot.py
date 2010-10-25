@@ -391,6 +391,9 @@ class HistPlot(Qwt.QwtPlot):
 		
 		# set the size policy to "Preferred" to allow the widget to be shrinked under the default size, which is quite big
 		self.setSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Preferred)
+		
+		#need to replot here for the size Hints to be computed correctly (depending on axis scales...)
+		self.replot()
 
 	def setdata(self, fl, fh, y):
 		intervals = []

@@ -146,12 +146,13 @@ class ImagePlot(Qwt.QwtPlot):
                                Qwt.QwtPicker.ActiveOnly,
                                self.canvas())
 		
-		self.replot()
-		
 		self.cached_canvas = self.canvas()
 		
 		# set the size policy to "Preferred" to allow the widget to be shrinked under the default size, which is quite big
 		self.setSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Preferred)
+		
+		#need to replot here for the size Hints to be computed correctly (depending on axis scales...)
+		self.replot()
 
 	def addData(self, freq, xyzs):
 		self.plotImage.addData(freq, xyzs, self.logfreqscale)

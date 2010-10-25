@@ -85,6 +85,9 @@ class TimePlot(classplot.ClassPlot):
                                self.canvas())
 		
 		self.cached_canvas = self.canvas()
+		
+		#need to replot here for the size Hints to be computed correctly (depending on axis scales...)
+		self.replot()
 
 	def setdata(self, x, y):
 		if self.canvas_width <> self.cached_canvas.width():
