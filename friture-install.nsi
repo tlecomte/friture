@@ -104,7 +104,6 @@ Section -Post
   WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "Publisher" "${PRODUCT_PUBLISHER}"
 SectionEnd
 
-
 Function un.onUninstSuccess
   HideWindow
   MessageBox MB_ICONINFORMATION|MB_OK "$(^Name) a été désinstallé avec succès de votre ordinateur."
@@ -167,5 +166,9 @@ Section Uninstall
 
   DeleteRegKey ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}"
   DeleteRegKey HKLM "${PRODUCT_DIR_REGKEY}"
+  
+  MessageBox MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2 "Voulez-vous supprimer les réglages de Friture précédemment sauvegardés ?" IDNO +2
+  DeleteRegKey HKCU "Software\Friture"
+  
   SetAutoClose true
 SectionEnd
