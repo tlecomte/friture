@@ -66,12 +66,17 @@ class Spectrogram_Widget(QtGui.QWidget):
 		self.spec_min = DEFAULT_SPEC_MIN
 		self.spec_max = DEFAULT_SPEC_MAX
 		self.weighting = DEFAULT_WEIGHTING
-		self.PlotZoneImage.setlog10freqscale() #DEFAULT_FREQ_SCALE = 1 #log10
 		
 		self.spectrogram_timer_time = 0.
 		
 		self.timerange_s = DEFAULT_TIMERANGE
 		self.canvas_width = 100.
+		
+		self.PlotZoneImage.setlog10freqscale() #DEFAULT_FREQ_SCALE = 1 #log10
+		self.PlotZoneImage.setfreqrange(self.minfreq, self.maxfreq)
+		self.PlotZoneImage.setspecrange(self.spec_min, self.spec_max)
+		self.PlotZoneImage.setweighting(self.weighting)
+		self.PlotZoneImage.settimerange(self.timerange_s)
 		
 		# this timer is used to update the spectrogram widget, whose update period
 		# is fixed by the time scale and the width of the widget canvas
