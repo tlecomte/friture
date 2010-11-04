@@ -72,6 +72,9 @@ class OctaveSpectrum_Widget(QtGui.QWidget):
 		self.weighting = DEFAULT_WEIGHTING
 		self.response_time = DEFAULT_RESPONSE_TIME
 		
+		self.PlotZoneSpect.setspecrange(self.spec_min, self.spec_max)
+		self.PlotZoneSpect.setweighting(self.weighting)
+		
 		self.filters = octave_filters(DEFAULT_BANDSPEROCTAVE)
 		self.bankbuffers = [RingBuffer() for band in range(0, DEFAULT_BANDSPEROCTAVE*NOCTAVE)]
 		
