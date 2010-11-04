@@ -94,18 +94,6 @@ class Dock(QtGui.QDockWidget):
 	def settings_slot(self, checked):
 		self.audiowidget.settings_called(checked)
 
-	# slot
-	def undock_slot(self, checked):
-		self.setFloating(True)
-	
-	# slot
-	def dock_slot(self, checked):
-		self.setFloating(False)
-
-	# slot
-	def close_slot(self, checked):
-		self.close()
-
 	# method
 	def saveState(self, settings):
 		settings.setValue("type", self.type)
