@@ -39,6 +39,8 @@ class Dock(QtGui.QDockWidget):
 		self.connect(self.controlBar.comboBox_select, QtCore.SIGNAL('activated(int)'), self.widget_select)
 		self.connect(self.controlBar.settingsButton, QtCore.SIGNAL('clicked(bool)'), self.settings_slot)
 		
+		self.connect(self, QtCore.SIGNAL('closed'), self.parent.dock_closed)
+		
 		self.dockwidget = QtGui.QWidget(self)
 		self.layout = QtGui.QVBoxLayout(self.dockwidget)
 		self.layout.addWidget(self.controlBar)
@@ -49,6 +51,9 @@ class Dock(QtGui.QDockWidget):
 		
 		self.audiowidget = None
 		self.widget_select(type)
+
+	def closeEvent(self,event):
+		self.emit(QtCore.SIGNAL('closed'), self)
 
 	# slot
 	def widget_select(self, item):

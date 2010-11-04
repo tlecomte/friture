@@ -99,8 +99,6 @@ class Friture(QtGui.QMainWindow, ):
 	def __init__(self, logger):
 		QtGui.QMainWindow.__init__(self)
 
-		Ui_MainWindow.__init__(self)
-
 		# logger
 		self.logger = logger
 
@@ -193,13 +191,19 @@ class Friture(QtGui.QMainWindow, ):
 	
 	# slot
 	def new_dock_called(self):
-		# FIXME the dock objectName should be unique
-		index = len(self.docks)
+		# the dock objectName is unique
+		docknames = [dock.objectName() for dock in self.docks]
+		dockindexes = [int(str(name).partition(' ')[-1]) for name in docknames]
+		index = max(dockindexes)+1
 		name = "Dock %d" %index
 		new_dock = Dock(self, self.logger, name)
 		self.addDockWidget(QtCore.Qt.TopDockWidgetArea, new_dock)
 		
 		self.docks += [new_dock]
+	
+	#slot
+	def dock_closed(self, dock):
+		self.docks.remove(dock)
 	
 	# event handler
 	def closeEvent(self, event):
