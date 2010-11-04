@@ -21,7 +21,7 @@ from PyQt4 import QtGui
 from numpy import log10, array
 from histplot import HistPlot
 import octavespectrum_settings # settings dialog
-from filter import load_filters_params, octave_filter_bank_decimation, octave_frequencies
+from filter import load_filters_params, octave_filter_bank_decimation, octave_frequencies, lfilter
 from ringbuffer import RingBuffer
 
 SMOOTH_DISPLAY_TIMER_PERIOD_MS = 25
@@ -102,12 +102,30 @@ class OctaveSpectrum_Widget(QtGui.QWidget):
 		y, decs = self.filters.filter(floatdata)
 		
 		#push to the ring buffer
-		for bankbuffer, bankdata in zip(self.bankbuffers, y):
-			bankbuffer.push(bankdata**2)
+		#for bankbuffer, bankdata in zip(self.bankbuffers, y):
+		#	bankbuffer.push(bankdata**2)
 		
 		#compute the widget data
-		#sp = [(dec*bankbuffer.data(time*SAMPLING_RATE/dec)).mean() for bankbuffer, dec in zip(self.bankbuffers, decs)]
-		sp = [bankbuffer.data(time*SAMPLING_RATE/dec).mean() for bankbuffer, dec in zip(self.bankbuffers, decs)]
+		sp = []
+		for bankbuffer, bankdata, dec in zip(self.bankbuffers, y, decs):
+			#bankbuffer.push(bankdata**2)
+			
+			# an exponential smoothing filter is a simple IIR filter
+			# s_i = alpha*x_i + (1-alpha)*s_{i-1}
+			#we compute alpha so that the N most recent samples represent 100*w percent of the output
+			w = 0.65
+			N = time*SAMPLING_RATE/dec
+			alpha = 1. - (1.-w)**(1./(N+1))
+			#filter coefficient
+			forward = [alpha]
+			feedback = [1., -(1. - alpha)]
+			filt, zf = lfilter(forward, feedback, bankdata**2, zi=bankbuffer.data(1))
+			bankbuffer.push(filt)
+			sp += [bankbuffer.data(1)[0]]
+
+		#un-weighted moving average
+		#sp = [bankbuffer.data(time*SAMPLING_RATE/dec).mean() for bankbuffer, dec in zip(self.bankbuffers, decs)]
+		
 		sp = array(sp)
 		
 		# Note: the following is largely suboptimal since the filter outputs
