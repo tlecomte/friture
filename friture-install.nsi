@@ -35,7 +35,8 @@ SetCompressor lzma
 ; Instfiles page
 !insertmacro MUI_PAGE_INSTFILES
 ; Finish page
-!define MUI_FINISHPAGE_RUN "$INSTDIR\friture.exe"
+!define MUI_FINISHPAGE_RUN
+!define MUI_FINISHPAGE_RUN_FUNCTION RunFriture
 !insertmacro MUI_PAGE_FINISH
 
 ; Uninstaller pages
@@ -56,6 +57,11 @@ InstallDir "$PROGRAMFILES\Friture"
 InstallDirRegKey HKLM "${PRODUCT_DIR_REGKEY}" ""
 ShowInstDetails show
 ShowUnInstDetails show
+
+Function RunFriture
+SetOutPath "$INSTDIR"
+Exec "$INSTDIR\friture.exe"
+FunctionEnd
 
 Function .onInit
   !insertmacro MUI_LANGDLL_DISPLAY
