@@ -11,6 +11,8 @@ scipy.factorial = factorial
 from scipy.signal.signaltools import lfilter
 from scipy.signal.filter_design import ellip, butter, firwin, cheby1, iirdesign, freqz
 
+from filter import octave_frequencies, octave_filter_bank, octave_filter_bank_decimation
+
 # bank of filters for any other kind of frequency scale
 # http://cobweb.ecn.purdue.edu/~malcolm/apple/tr35/PattersonsEar.pdf
 # bandwidth of a cochlear channel as a function of center frequency
@@ -204,11 +206,15 @@ def main():
 	#[ERBforward, ERBfeedback] = MakeERBFilters(fs, Nchannels, low_freq)
 	#y = ERBFilterBank(ERBforward, ERBfeedback, impulse)
 
-	BandsPerOctave = 1
+	BandsPerOctave = 3
 	Nbands = NOCTAVE*BandsPerOctave
 	
 	[B, A, fi, fl, fh] = octave_filters(Nbands, BandsPerOctave)
 	y, zfs = octave_filter_bank(B, A, impulse)
+	print "Filter lengths without decimation"
+	for b, a in zip(B, A):
+		print len(b), len(a)
+	
 	
 	response = 20.*log10(abs(fft(y)))
 	freqScale = fftfreq(N, 1./fs)
@@ -275,6 +281,10 @@ def main():
 	
 	[boct, aoct, fi, flow, fhigh] = octave_filters_oneoctave(Nbands, BandsPerOctave)
 	y, dec, zfs = octave_filter_bank_decimation(bdec, adec, boct, aoct, impulse)
+	print "Filter lengths with decimation"
+	print len(bdec), len(adec)
+	for b, a in zip(boct, aoct):
+		print len(b), len(a)
 
 	figure()
 	subplot(211)
