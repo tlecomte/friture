@@ -18,11 +18,13 @@
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
 from PyQt4 import QtGui
-from numpy import log10, array
+from numpy import log10, array, arange
 from histplot import HistPlot
 import octavespectrum_settings # settings dialog
 from filter import load_filters_params, octave_filter_bank_decimation, octave_frequencies, lfilter
 from ringbuffer import RingBuffer
+
+from exp_smoothing_conv import pyx_exp_smoothed_value
 
 SMOOTH_DISPLAY_TIMER_PERIOD_MS = 25
 SAMPLING_RATE = 44100
@@ -76,7 +78,19 @@ class OctaveSpectrum_Widget(QtGui.QWidget):
 		self.PlotZoneSpect.setweighting(self.weighting)
 		
 		self.filters = octave_filters(DEFAULT_BANDSPEROCTAVE)
-		self.bankbuffers = [RingBuffer() for band in range(0, DEFAULT_BANDSPEROCTAVE*NOCTAVE)]
+		#self.bankbuffers = [RingBuffer() for band in range(0, DEFAULT_BANDSPEROCTAVE*NOCTAVE)]
+		self.dispbuffers = [0]*DEFAULT_BANDSPEROCTAVE*NOCTAVE
+		
+		# an exponential smoothing filter is a simple IIR filter
+		# s_i = alpha*x_i + (1-alpha)*s_{i-1}
+		#we compute alpha so that the N most recent samples represent 100*w percent of the output
+		w = 0.65
+		decs = self.filters.get_decs()
+		ns = [self.response_time*SAMPLING_RATE/dec for dec in decs]
+		Ns = [2*4096/dec for dec in decs]
+		self.alphas = [1. - (1.-w)**(1./(n+1)) for n in ns]
+		#print ns, Ns
+		self.kernels = self.compute_kernels(self.alphas, Ns)
 		
 		# initialize the settings dialog
 		self.settings_dialog = octavespectrum_settings.OctaveSpectrum_Settings_Dialog(self, self.logger)
@@ -85,43 +99,70 @@ class OctaveSpectrum_Widget(QtGui.QWidget):
 	def set_buffer(self, buffer):
 		self.audiobuffer = buffer
 
+	def compute_kernels(self, alphas, Ns):
+		kernels = []
+		for alpha, N in zip(alphas, Ns):
+			kernels += [(1.-alpha)**arange(N-1, -1, -1)]
+		return kernels
+
+	def get_kernel(self, kernel, N):
+		return 
+
+	def get_conv(self, kernel, data):
+		return kernel*data
+
+	def exp_smoothed_value(self, kernel, alpha, data, previous):
+		N = len(data)
+		if N == 0:
+			return previous
+		else:
+			value = alpha * (kernel[-N:]*data).sum() + previous*(1.-alpha)**N
+			return value
+	
 	# method
 	def update(self):
 		if not self.isVisible():
 		    return
 		
-		#time = SMOOTH_DISPLAY_TIMER_PERIOD_MS/1000. #DISPLAY
-		#time = 0.025 #IMPULSE setting for a sound level meter
-		#time = 0.125 #FAST setting for a sound level meter
-		#time = 1. #SLOW setting for a sound level meter
-		time = self.response_time
-		
 		#get the fresh data
 		floatdata = self.audiobuffer.newdata()
 		#compute the filters' output
-		y, decs = self.filters.filter(floatdata)
+		y, decs_unused = self.filters.filter(floatdata)
 		
 		#push to the ring buffer
 		#for bankbuffer, bankdata in zip(self.bankbuffers, y):
 		#	bankbuffer.push(bankdata**2)
 		
-		#compute the widget data
-		sp = []
-		for bankbuffer, bankdata, dec in zip(self.bankbuffers, y, decs):
+		#for bankbuffer, bankdata, dec in zip(self.bankbuffers, y, decs):
 			#bankbuffer.push(bankdata**2)
 			
-			# an exponential smoothing filter is a simple IIR filter
-			# s_i = alpha*x_i + (1-alpha)*s_{i-1}
-			#we compute alpha so that the N most recent samples represent 100*w percent of the output
-			w = 0.65
-			N = time*SAMPLING_RATE/dec
-			alpha = 1. - (1.-w)**(1./(N+1))
-			#filter coefficient
-			forward = [alpha]
-			feedback = [1., -(1. - alpha)]
-			filt, zf = lfilter(forward, feedback, bankdata**2, zi=bankbuffer.data(1))
-			bankbuffer.push(filt)
-			sp += [bankbuffer.data(1)[0]]
+			##an exponential smoothing filter is a simple IIR filter
+			##s_i = alpha*x_i + (1-alpha)*s_{i-1}
+			##we compute alpha so that the N most recent samples represent 100*w percent of the output
+			#w = 0.65
+			#N = time*SAMPLING_RATE/dec
+			#alpha = 1. - (1.-w)**(1./(N+1))
+			##filter coefficient
+			#forward = [alpha]
+			#feedback = [1., -(1. - alpha)]
+			#filt, zf = lfilter(forward, feedback, bankdata**2, zi=bankbuffer.data(1))
+			#bankbuffer.push(filt)
+			#sp += [bankbuffer.data(1)[0]]
+			
+			#bankbuffer.push(bankdata**2)
+			#sp += [self.exp_smoothed_value(time, dec, bankbuffer)]
+
+		#compute the widget data
+		sp = []
+		i = 0
+		for bankdata in y:
+			kernel = self.kernels[i]
+			alpha = self.alphas[i]
+			#value = self.exp_smoothed_value(kernel, alpha, bankdata**2, self.dispbuffers[i])
+			value = pyx_exp_smoothed_value(kernel, alpha, bankdata**2, self.dispbuffers[i])
+			self.dispbuffers[i] = value
+			sp += [value]
+			i = i + 1
 
 		#un-weighted moving average
 		#sp = [bankbuffer.data(time*SAMPLING_RATE/dec).mean() for bankbuffer, dec in zip(self.bankbuffers, decs)]
@@ -165,12 +206,39 @@ class OctaveSpectrum_Widget(QtGui.QWidget):
 		self.PlotZoneSpect.setweighting(weighting)
 
 	def setresponsetime(self, response_time):
+		#time = SMOOTH_DISPLAY_TIMER_PERIOD_MS/1000. #DISPLAY
+		#time = 0.025 #IMPULSE setting for a sound level meter
+		#time = 0.125 #FAST setting for a sound level meter
+		#time = 1. #SLOW setting for a sound level meter
 		self.response_time = response_time
+		
+		# an exponential smoothing filter is a simple IIR filter
+		# s_i = alpha*x_i + (1-alpha)*s_{i-1}
+		#we compute alpha so that the N most recent samples represent 100*w percent of the output
+		w = 0.65
+		decs = self.filters.get_decs()
+		ns = [self.response_time*SAMPLING_RATE/dec for dec in decs]
+		Ns = [2*4096/dec for dec in decs]
+		self.alphas = [1. - (1.-w)**(1./(n+1)) for n in ns]
+		#print ns, Ns
+		self.kernels = self.compute_kernels(self.alphas, Ns)
 
 	def setbandsperoctave(self, bandsperoctave):
 		self.filters.setbandsperoctave(bandsperoctave)
 		#recreate the ring buffers
-		self.bankbuffers = [RingBuffer() for band in range(0, bandsperoctave*NOCTAVE)]
+		#self.bankbuffers = [RingBuffer() for band in range(0, bandsperoctave*NOCTAVE)]
+		self.dispbuffers = [0]*bandsperoctave*NOCTAVE
+		
+		# an exponential smoothing filter is a simple IIR filter
+		# s_i = alpha*x_i + (1-alpha)*s_{i-1}
+		#we compute alpha so that the N most recent samples represent 100*w percent of the output
+		w = 0.65
+		decs = self.filters.get_decs()
+		ns = [self.response_time*SAMPLING_RATE/dec for dec in decs]
+		Ns = [2*4096/dec for dec in decs]
+		self.alphas = [1. - (1.-w)**(1./(n+1)) for n in ns]
+		#print ns, Ns
+		self.kernels = self.compute_kernels(self.alphas, Ns)
 
 	def settings_called(self, checked):
 		self.settings_dialog.show()
@@ -194,14 +262,18 @@ class octave_filters():
 	def filter(self, floatdata):
 		y, dec, zfs = octave_filter_bank_decimation(self.bdec, self.adec, self.boct, self.aoct, floatdata)
 		#y, dec, zfs = octave_filter_bank_decimation(self.bdec, self.adec, self.boct, self.aoct, floatdata, zis=self.zfs)
-		#y, zfs = octave_filter_bank(self.b_nodec, self.a_nodec, floatdata)
-		#dec = [1.]*len(y)
-		#y, zfs = octave_filter_bank(self.b_nodec, self.a_nodec, floatdata, zis=self.zfs)
-		#dec = [1.]*len(y)
+		#y, zfs = octave_filter_bank(self.b_nodec, self.a_nodec, floatdata); dec = [1.]*len(y)
+		#y, zfs = octave_filter_bank(self.b_nodec, self.a_nodec, floatdata, zis=self.zfs); dec = [1.]*len(y)
 		
 		self.zfs = zfs
 		
 		return y, dec
+	
+	def get_decs(self):
+		#decs = [1.]*self.nbands
+		decs = [2**j for j in range(0, NOCTAVE)[::-1] for i in range(0, self.bandsperoctave)]
+		
+		return decs
 	
 	def setbandsperoctave(self, bandsperoctave):
 		self.bandsperoctave = bandsperoctave
