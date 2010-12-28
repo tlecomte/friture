@@ -104,6 +104,7 @@ def octave_filter_bank_decimation(blow, alow, forward, feedback, x, zis=None):
 				y[k] = filt
 				dec[k] = 2**j
 				k -= 1
+			# utiliser un décimateur polyphase ici !!!
 			x_dec = lfilter(blow, alow, x_dec)
 			m += 1
 			x_dec = x_dec[::2]
@@ -124,6 +125,7 @@ def octave_filter_bank_decimation(blow, alow, forward, feedback, x, zis=None):
 				y[k] = filt
 				dec[k] = 2**j
 				k -= 1
+			# utiliser un décimateur polyphase ici !!!
 			x_dec, zf = lfilter(blow, alow, x_dec, zi=zis[m])
 			#x_dec = lfilter(blow, alow, x_dec)
 			m += 1
