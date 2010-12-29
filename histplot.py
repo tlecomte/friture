@@ -77,13 +77,25 @@ class HistogramItem(Qwt.QwtPlotItem):
 		self.setItemAttribute(Qwt.QwtPlotItem.Legend, True)
 		self.setZ(20.0)
 		
-		self.rect = QtCore.QRect()
-		self.canvas_height = 0
+		self.cached_bar_width = 1
+		self.canvas_height = 2
+		self.canvas_width = 2
+		self.need_transform = False
+		self.fl = [0.]
+		self.fh = [0.]
+		self.y = [0.]
+		self.y0 = 0.
 		
 		self.pixmap = QtGui.QPixmap()
 
-	def setData(self, data):
-		self.__data = data
+	def setData(self, fl, fh, y):
+		if len(self.y) <> len(y):
+			self.fl = fl
+			self.fh = fh
+			self.need_transform = True
+		
+		self.y = y
+		
 		self.itemChanged()
 
 	def data(self):
@@ -102,8 +114,7 @@ class HistogramItem(Qwt.QwtPlotItem):
 		if not result.isvalid():
 			return result
 		if self.testHistogramAttribute(HistogramItem.Xfy):
-			result = Qwt.QwtDoubleRect(result.y(), result.x(),
-									   result.height(), result.width())
+			result = Qwt.QwtDoubleRect(result.y(), result.x(), result.height(), result.width())
 			if result.left() > self.baseline():
 				result.setLeft(self.baseline())
 			elif result.right() < self.baseline():
@@ -119,29 +130,32 @@ class HistogramItem(Qwt.QwtPlotItem):
 		return Qwt.QwtPlotItem.PlotHistogram
 
 	def draw(self, painter, xMap, yMap, rect):
-		self.canvas_height = rect.height()
+		# update the cache according to possibly new canvas dimensions
+		h = rect.height()
+		if h <> self.canvas_height:
+			self.canvas_height = h
+			self.need_transform = True
+		w = rect.width()
+		if w < self.canvas_width - 1 or w > self.canvas_width + 1:
+			self.canvas_width = w
+			self.need_transform = True
 		
-		iData = self.data()
+		if self.need_transform:
+			self.x1 = [xMap.transform(flow) for flow in self.fl]
+			self.x2 = [xMap.transform(fhigh)-1 for fhigh in self.fh]
+			self.y0 = yMap.transform(self.baseline())
 		
-		y0 = yMap.transform(self.baseline())
-		
-		# update the cached bar pixmap if necessary
-		x1 = xMap.transform(iData.interval(0).minValue())
-		x2 = xMap.transform(iData.interval(0).maxValue())-1
-		y2 = yMap.transform(iData.value(0))
-		
-		rect = Qt.QRect(x1, y0, x2-x1, y2-y0)
-		# If width() < 0 the function swaps the left and right corners, and it swaps the top and bottom corners if height() < 0.
-		rect = rect.normalized()
-		if rect.width() < self.rect.width() - 1 or rect.width() > self.rect.width() + 1 or self.canvas_height <> self.rect.height():	
+			# update the cached bar pixmap if necessary
+			rect = Qt.QRect(self.x1[0], self.y0, self.x2[0] - self.x1[0], self.canvas_height)
+			# If width() < 0 the function swaps the left and right corners, and it swaps the top and bottom corners if height() < 0.
+			rect = rect.normalized()
 			self.update_pixmap(rect)
+			
+			self.need_transform = False
 		
-		for i in range(iData.size()):
-			x1 = xMap.transform(iData.interval(i).minValue())
-			x2 = xMap.transform(iData.interval(i).maxValue())-1
-			y2 = yMap.transform(iData.value(i))
-				
-			self.drawBar(painter, Qt.Qt.Vertical, Qt.QRect(x1, y0, x2-x1, y2-y0))
+		for x1, x2, y in zip(self.x1, self.x2, self.y):
+			y2 = yMap.transform(y)
+			self.drawBar(painter, Qt.Qt.Vertical, x2 - x1, x1, y2)
 
 	def setBaseline(self, reference):
 		if self.baseline() != reference:
@@ -168,11 +182,10 @@ class HistogramItem(Qwt.QwtPlotItem):
 	# For a dramatic speedup, the bars are cached instead of drawn from scratch each time
 	def update_pixmap(self, rect):
 		r = rect.translated(0,0)
-		r.setHeight(self.canvas_height)
 		r.moveLeft(0)
 		r.moveTop(0)
 		
-		self.rect = r.translated(0,0)
+		self.cached_bar_width = r.translated(0,0).width()
 		
 		color = QtGui.QColor(self.color())
 		
@@ -236,22 +249,19 @@ class HistogramItem(Qwt.QwtPlotItem):
 		painter.drawLine(r.right()+1, r.top()+1, r.right()+1, r.bottom())
 		painter.drawLine(r.right(), r.top()+2, r.right(), r.bottom()-1)
 		
-	def drawBar(self, painter, orientation, rect):
-		# If width() < 0 the function swaps the left and right corners, and it swaps the top and bottom corners if height() < 0.
-		rect = rect.normalized()
-		
-		if rect.width() == self.rect.width():
-			painter.drawPixmap(rect.left(), rect.top(), self.pixmap)
-		elif rect.width() == self.rect.width() + 1:
-			painter.drawPixmap(rect.left(), rect.top(), self.pixmap_h)
-		elif rect.width() == self.rect.width() - 1:
-			painter.drawPixmap(rect.left(), rect.top(), self.pixmap_l)
-		elif rect.width() == self.rect.width() + 2:
-			painter.drawPixmap(rect.left(), rect.top(), self.pixmap_hh)
-		elif rect.width() == self.rect.width() - 2:
-			painter.drawPixmap(rect.left(), rect.top(), self.pixmap_ll)
+	def drawBar(self, painter, orientation, width, left, top):
+		if width == self.cached_bar_width:
+			painter.drawPixmap(left, top, self.pixmap)
+		elif width == self.cached_bar_width + 1:
+			painter.drawPixmap(left, top, self.pixmap_h)
+		elif width == self.cached_bar_width - 1:
+			painter.drawPixmap(left, top, self.pixmap_l)
+		elif width == self.cached_bar_width + 2:
+			painter.drawPixmap(left, top, self.pixmap_hh)
+		elif width == self.cached_bar_width - 2:
+			painter.drawPixmap(left, top, self.pixmap_ll)
 		else:
-			print "(Non-fatal) Histplot bar width error!!", rect.width(), self.rect.width()
+			print "(Non-fatal) Histplot bar width error!!", width, self.cached_bar_width
 
 class HistogramPeakItem(Qwt.QwtPlotItem):
 
@@ -269,12 +279,17 @@ class HistogramPeakItem(Qwt.QwtPlotItem):
 		self.setItemAttribute(Qwt.QwtPlotItem.AutoScale, True)
 		self.setItemAttribute(Qwt.QwtPlotItem.Legend, True)
 		self.setZ(20.0)
+		#self.canvas_height = 2
+		self.canvas_width = 2
+		self.need_transform = False
 
 	def setData(self, fl, fh, peaks):
-		self.fl = fl
-		self.fh = fh
+		if len(self.peaks) <> len(peaks):
+			self.fl = fl
+			self.fh = fh
+			self.need_transform = True
+		
 		self.peaks = peaks
-		self.itemChanged()
 
 	def data(self):
 		return [self.fl, self.fh, self.peaks]
@@ -282,22 +297,30 @@ class HistogramPeakItem(Qwt.QwtPlotItem):
 	def setColor(self, color):
 		if self.__color != color:
 			self.__color = color
-			self.itemChanged()
 
 	def color(self):
 		return self.__color
 
 	def draw(self, painter, xMap, yMap, rect):
+		# update the cache according to possibly new canvas dimensions
+		#if rect.height() <> self.canvas_height:
+			#self.canvas_height = rect.height()
+		w = rect.width()
+		if w <> self.canvas_width:
+			self.canvas_width = w
+			self.need_transform = True
+		
+		if self.need_transform:
+			self.x1 = [xMap.transform(flow)+1 for flow in self.fl]
+			self.x2 = [xMap.transform(fhigh)-1 for fhigh in self.fh]
+			self.need_transform = False
+		
 		#horizontal line
 		painter.setBrush(Qt.Qt.NoBrush)
 		painter.setPen(Qt.QPen(self.color(), 2))
 		
-		#for i in range(iData.size()):
-		for flow, fhigh, peak in zip(self.fl, self.fh, self.peaks):
-			x1 = xMap.transform(flow)+1
-			x2 = xMap.transform(fhigh)-1
+		for x1, x2, peak in zip(self.x1, self.x2, self.peaks):
 			y = yMap.transform(peak)
-			
 			painter.drawLine(x1, y, x2, y)
 
 	def setBaseline(self, reference):
@@ -391,16 +414,8 @@ class HistPlot(Qwt.QwtPlot):
 		self.histogram.setColor(Qt.Qt.darkGreen)
 		self.histogram.setBaseline(-200.)
 		
-		numValues = 2
-		intervals = []
-		values = Qwt.QwtArrayDouble(numValues)
-
 		pos = [0.1, 1., 10.]
-		for i in range(len(pos)-1):
-			intervals.append(Qwt.QwtDoubleInterval(pos[i], pos[i+1]))
-			values[i] = 1.
-
-		self.histogram.setData(Qwt.QwtIntervalData(intervals, values))
+		self.histogram.setData(pos[:-1], pos[1:], pos[:-1])
 		self.histogram.attach(self)
 		
 		self.cached_canvas = self.canvas()
@@ -412,17 +427,7 @@ class HistPlot(Qwt.QwtPlot):
 		self.replot()
 
 	def setdata(self, fl, fh, y):
-		intervals = []
-		values = Qwt.QwtArrayDouble(len(y))
-		i = 0
-		
-		for flow, fhigh, value in zip(fl, fh, y):
-			interval = Qwt.QwtDoubleInterval(flow, fhigh)
-			intervals += [interval]
-			values[i] = value
-			i += 1
-		
-		self.histogram.setData(Qwt.QwtIntervalData(intervals, values))
+		self.histogram.setData(fl, fh, y)
 		
 		self.compute_peaks(y)
 		self.curve_peak.setData(fl, fh, self.peak)
