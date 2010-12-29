@@ -18,7 +18,9 @@
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
 import sys, os, platform
-from PyQt4 import QtGui, QtCore
+from PyQt4 import QtCore
+# specifically import from PyQt4.QtGui for startup time improvement :
+from PyQt4.QtGui import QMainWindow, QVBoxLayout, QErrorMessage, QApplication, QPixmap, QSplashScreen
 from Ui_friture import Ui_MainWindow
 from dock import Dock
 import about # About dialog
@@ -95,9 +97,9 @@ STYLESHEET = """
 #}
 #"""
 
-class Friture(QtGui.QMainWindow, ):
+class Friture(QMainWindow, ):
 	def __init__(self, logger):
-		QtGui.QMainWindow.__init__(self)
+		QMainWindow.__init__(self)
 
 		# logger
 		self.logger = logger
@@ -129,7 +131,7 @@ class Friture(QtGui.QMainWindow, ):
 		self.settings_dialog.comboBox_inputDevice.setCurrentIndex(current_stream)
 
 		self.centralwidget = CentralWidget(self.ui.centralwidget, self.logger, "central_widget", 3)
-		self.centralLayout = QtGui.QVBoxLayout(self.ui.centralwidget)
+		self.centralLayout = QVBoxLayout(self.ui.centralwidget)
 		self.centralLayout.setContentsMargins(0, 0, 0, 0)
 		self.centralLayout.addWidget(self.centralwidget)
 
@@ -338,7 +340,7 @@ class Friture(QtGui.QMainWindow, ):
 		if not success:
 			# Note: the error message is a child of the settings dialog, so that
 			# that dialog remains on top when the error message is closed
-			error_message = QtGui.QErrorMessage(self.settings_dialog)
+			error_message = QErrorMessage(self.settings_dialog)
 			error_message.setWindowTitle("Input device error")
 			error_message.showMessage("Impossible to use the selected device, reverting to the previous one")
 		
@@ -362,11 +364,11 @@ if __name__ == "__main__":
 		except:
 			print "Could not set the app model ID. If the plaftorm is older than Windows 7, this is normal."
 
-	app = QtGui.QApplication(sys.argv)
+	app = QApplication(sys.argv)
 
 	# Splash screen
-	pixmap = QtGui.QPixmap(":/splash.png")
-	splash = QtGui.QSplashScreen(pixmap)
+	pixmap = QPixmap(":/splash.png")
+	splash = QSplashScreen(pixmap)
 	splash.show()
 	splash.showMessage("Initializing the audio subsystem")
 	app.processEvents()
