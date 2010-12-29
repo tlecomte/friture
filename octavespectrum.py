@@ -153,16 +153,10 @@ class OctaveSpectrum_Widget(QtGui.QWidget):
 			#sp += [self.exp_smoothed_value(time, dec, bankbuffer)]
 
 		#compute the widget data
-		sp = []
-		i = 0
-		for bankdata in y:
-			kernel = self.kernels[i]
-			alpha = self.alphas[i]
-			#value = self.exp_smoothed_value(kernel, alpha, bankdata**2, self.dispbuffers[i])
-			value = pyx_exp_smoothed_value(kernel, alpha, bankdata**2, self.dispbuffers[i])
-			self.dispbuffers[i] = value
-			sp += [value]
-			i = i + 1
+		#sp = [self.exp_smoothed_value(kernel, alpha, bankdata**2, old) for bankdata, kernel, alpha, old in zip(y, self.kernels, self.alphas, self.dispbuffers)]
+		sp = [pyx_exp_smoothed_value(kernel, alpha, bankdata**2, old) for bankdata, kernel, alpha, old in zip(y, self.kernels, self.alphas, self.dispbuffers)] 
+		#store result for next computation
+		self.dispbuffers = sp
 
 		#un-weighted moving average
 		#sp = [bankbuffer.data(time*SAMPLING_RATE/dec).mean() for bankbuffer, dec in zip(self.bankbuffers, decs)]
