@@ -106,7 +106,8 @@ class Levels_Widget(QtGui.QWidget):
 		N = 4096
 		self.alpha = 1. - (1.-w)**(1./(n+1))
 		self.kernel = (1. - self.alpha)**(arange(0, N)[::-1])
-		self.old = 1e-30
+		self.old_rms = 1e-30
+		self.old_max = 1e-30
 
 	# method
 	def set_buffer(self, buffer):
@@ -117,19 +118,26 @@ class Levels_Widget(QtGui.QWidget):
 		if not self.isVisible():
 			return
 		
-		# boxcar
-		time = SMOOTH_DISPLAY_TIMER_PERIOD_MS/1000.
-		floatdata = self.audiobuffer.data(time*SAMPLING_RATE)
-		#value_rms = (floatdata**2).mean()
-		value_max = abs(floatdata).max()
-		# exponential smoothing
 		# get the fresh data
 		floatdata = self.audiobuffer.newdata()
-		value_rms = pyx_exp_smoothed_value(self.kernel, self.alpha, floatdata**2, self.old)
-		self.old = value_rms
+		
+		# boxcar
+		#time = SMOOTH_DISPLAY_TIMER_PERIOD_MS/1000.
+		#floatdata = self.audiobuffer.data(time*SAMPLING_RATE)
+		
+		if len(floatdata) > 0:
+			value_max = abs(floatdata).max()
+			if value_max < self.old_max:
+				self.old_max = self.old_max*0.9
+			else:
+				self.old_max = value_max
+		
+		# exponential smoothing
+		value_rms = pyx_exp_smoothed_value(self.kernel, self.alpha, floatdata**2, self.old_rms)
+		self.old_rms = value_rms
 		
 		level_rms = 10.*log10(value_rms*2. + 0.*1e-80) #*2. to get 0dB for a sine wave
-		level_max = 20.*log10(value_max + 0.*1e-80)
+		level_max = 20.*log10(self.old_max + 0.*1e-80)
 		self.label_rms.setText("%.01f" % level_rms)
 		self.label_peak.setText("%.01f" % level_max)
 		self.meter.setValue(0, level_rms)
