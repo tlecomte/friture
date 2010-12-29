@@ -18,10 +18,12 @@
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
 from PyQt4 import QtCore, QtGui
-from numpy import log10, abs
+from numpy import log10, abs, arange
 import levels_settings # settings dialog
 from qsynthmeter import qsynthMeter
 import audioproc
+
+from exp_smoothing_conv import pyx_exp_smoothed_value
 
 STYLESHEET = """
 qsynthMeter {
@@ -90,6 +92,21 @@ class Levels_Widget(QtGui.QWidget):
 		
 		# initialize the class instance that will do the fft
 		self.proc = audioproc.audioproc(self.logger)
+		
+		#time = SMOOTH_DISPLAY_TIMER_PERIOD_MS/1000. #DISPLAY
+		#time = 0.025 #IMPULSE setting for a sound level meter
+		#time = 0.125 #FAST setting for a sound level meter
+		#time = 1. #SLOW setting for a sound level meter
+		self.response_time = 0.125
+		# an exponential smoothing filter is a simple IIR filter
+		# s_i = alpha*x_i + (1-alpha)*s_{i-1}
+		#we compute alpha so that the N most recent samples represent 100*w percent of the output
+		w = 0.65
+		n = self.response_time*SAMPLING_RATE
+		N = 4096
+		self.alpha = 1. - (1.-w)**(1./(n+1))
+		self.kernel = (1. - self.alpha)**(arange(0, N)[::-1])
+		self.old = 1e-30
 
 	# method
 	def set_buffer(self, buffer):
@@ -100,13 +117,19 @@ class Levels_Widget(QtGui.QWidget):
 		if not self.isVisible():
 			return
 		
-		# for slower response, we need to implement a low-pass filter here. 
-		
+		# boxcar
 		time = SMOOTH_DISPLAY_TIMER_PERIOD_MS/1000.
 		floatdata = self.audiobuffer.data(time*SAMPLING_RATE)
+		#value_rms = (floatdata**2).mean()
+		value_max = abs(floatdata).max()
+		# exponential smoothing
+		# get the fresh data
+		floatdata = self.audiobuffer.newdata()
+		value_rms = pyx_exp_smoothed_value(self.kernel, self.alpha, floatdata**2, self.old)
+		self.old = value_rms
 		
-		level_rms = 10*log10((floatdata**2).sum()/len(floatdata)*2. + 0*1e-80) #*2. to get 0dB for a sine wave
-		level_max = 20*log10(abs(floatdata).max() + 0*1e-80)
+		level_rms = 10.*log10(value_rms*2. + 0.*1e-80) #*2. to get 0dB for a sine wave
+		level_max = 20.*log10(value_max + 0.*1e-80)
 		self.label_rms.setText("%.01f" % level_rms)
 		self.label_peak.setText("%.01f" % level_max)
 		self.meter.setValue(0, level_rms)
