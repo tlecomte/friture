@@ -27,7 +27,7 @@ QSYNTH_METER_MINDB = -70.
 
 # The decay rates (magic goes here :).
 # - value decay rate (faster)
-QSYNTH_METER_DECAY_RATE1 = 1.0 - 3E-2
+#QSYNTH_METER_DECAY_RATE1 = 1.0 - 3E-2
 # - peak decay rate (slower)
 QSYNTH_METER_DECAY_RATE2 = 1.0 - 3E-6
 
@@ -90,7 +90,7 @@ class qsynthMeterValue(QtGui.QFrame):
 		self.m_pMeter      = pMeter
 		self.m_fValue      = 0.0
 		self.m_iValue  = 0
-		self.m_fValueDecay = QSYNTH_METER_DECAY_RATE1
+		#self.m_fValueDecay = QSYNTH_METER_DECAY_RATE1
 		self.m_iPeak       = 0
 		self.m_iPeakHold   = 0
 		self.m_fPeakDecay  = QSYNTH_METER_DECAY_RATE2
@@ -123,11 +123,11 @@ class qsynthMeterValue(QtGui.QFrame):
 			dB = QSYNTH_METER_MAXDB
 
 		iValue = self.m_pMeter.iec_scale(dB)
-		if iValue < self.m_iValue:
-			iValue = int(self.m_fValueDecay * float(self.m_iValue))
-			self.m_fValueDecay *= self.m_fValueDecay
-		else:
-			self.m_fValueDecay = QSYNTH_METER_DECAY_RATE1
+		#if iValue < self.m_iValue:
+			#iValue = int(self.m_fValueDecay * float(self.m_iValue))
+			#self.m_fValueDecay *= self.m_fValueDecay
+		#else:
+			#self.m_fValueDecay = QSYNTH_METER_DECAY_RATE1
 
 		iPeak = self.m_iPeak
 		if iPeak < iValue:
@@ -300,7 +300,7 @@ class qsynthMeter(QtGui.QFrame):
 		else: # if (dB < 0.0)
 			fDef = (dB + 20.0) * 0.025 + 0.5
 
-		return int(fDef * self.m_fScale)
+		return fDef * self.m_fScale
 
 
 	def iec_level (self, iIndex):
