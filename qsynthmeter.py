@@ -138,7 +138,7 @@ class qsynthMeterValue(QtGui.QFrame):
 			while self.m_iPeakColor > self.m_pMeter.ColorOver and iPeak >= self.m_pMeter.iec_level(self.m_iPeakColor):
 				self.m_iPeakColor -= 1
 		elif self.m_iPeakHold + 1 > self.m_pMeter.peakFalloff():
-			iPeak = int(self.m_fPeakDecay * float(iPeak))
+			iPeak = self.m_fPeakDecay * float(iPeak)
 			if self.m_iPeak < iValue:
 				iPeak = iValue
 			else:
