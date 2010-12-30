@@ -20,7 +20,7 @@
 import classplot
 import PyQt4.Qwt5 as Qwt
 from PyQt4 import QtCore, Qt, QtGui
-from numpy import zeros, ones, log10, linspace, logspace, log2
+from numpy import zeros, ones, log10, linspace, logspace, log2, array
 from log2_scale_engine import QwtLog10ScaleEngine
 import log2scale
 
@@ -85,8 +85,9 @@ class HistogramItem(Qwt.QwtPlotItem):
 		self.fh = [0.]
 		self.y = [0.]
 		self.y0 = 0.
+		self.i = [0]
 		
-		self.pixmap = QtGui.QPixmap()
+		self.pixmaps = [QtGui.QPixmap()]
 
 	def setData(self, fl, fh, y):
 		if len(self.y) <> len(y):
@@ -140,22 +141,23 @@ class HistogramItem(Qwt.QwtPlotItem):
 			self.canvas_width = w
 			self.need_transform = True
 		
+		# update the cached pixmaps and coordinates if necessary
 		if self.need_transform:
 			self.x1 = [xMap.transform(flow) for flow in self.fl]
 			self.x2 = [xMap.transform(fhigh)-1 for fhigh in self.fh]
 			self.y0 = yMap.transform(self.baseline())
-		
-			# update the cached bar pixmap if necessary
-			rect = Qt.QRect(self.x1[0], self.y0, self.x2[0] - self.x1[0], self.canvas_height)
-			# If width() < 0 the function swaps the left and right corners, and it swaps the top and bottom corners if height() < 0.
-			rect = rect.normalized()
-			self.update_pixmap(rect)
+			
+			self.update_pixmap(self.x2[0] - self.x1[0], self.canvas_height)
+			self.i = list(array(self.x2) - array(self.x1) - (self.cached_bar_width - 2))
 			
 			self.need_transform = False
 		
-		for x1, x2, y in zip(self.x1, self.x2, self.y):
+		for x1, x2, y, i in zip(self.x1, self.x2, self.y, self.i):
 			y2 = yMap.transform(y)
-			self.drawBar(painter, Qt.Qt.Vertical, x2 - x1, x1, y2)
+			self.drawBar(painter, x1, y2, i)
+
+	def drawBar(self, painter, left, top, i):
+		painter.drawPixmap(left, top, self.pixmaps[i])
 
 	def setBaseline(self, reference):
 		if self.baseline() != reference:
@@ -180,50 +182,21 @@ class HistogramItem(Qwt.QwtPlotItem):
 		return bool(self.__attributes & attribute) 
 
 	# For a dramatic speedup, the bars are cached instead of drawn from scratch each time
-	def update_pixmap(self, rect):
-		r = rect.translated(0,0)
-		r.moveLeft(0)
-		r.moveTop(0)
-		
-		self.cached_bar_width = r.translated(0,0).width()
+	def update_pixmap(self, width, height):
+		self.cached_bar_width = width
 		
 		color = QtGui.QColor(self.color())
 		
-		self.pixmap = QtGui.QPixmap(r.width()+1, r.height()+1)
-		self.pixmap.fill(color)
-		painter = QtGui.QPainter(self.pixmap)
-		if rect.width() > 3:
-			self.drawBarDecoration(painter, r)
+		self.pixmaps = []
+		for w in range(width-2, width+3):
+			pixmap = QtGui.QPixmap(w+1, height+1)
+			pixmap.fill(color)
+			painter = QtGui.QPainter(pixmap)
+			if width > 3:
+				self.drawBarDecoration(painter, w, height)
+			self.pixmaps += [pixmap]
 		
-		r.setWidth(r.width() - 1)
-		self.pixmap_l = QtGui.QPixmap(r.width()+1, r.height()+1)
-		self.pixmap_l.fill(color)
-		painter = QtGui.QPainter(self.pixmap_l)
-		if rect.width() > 3:
-			self.drawBarDecoration(painter, r)
-			
-		r.setWidth(r.width() - 1)
-		self.pixmap_ll = QtGui.QPixmap(r.width()+1, r.height()+1)
-		self.pixmap_ll.fill(color)
-		painter = QtGui.QPainter(self.pixmap_ll)
-		if rect.width() > 3:
-			self.drawBarDecoration(painter, r)
-		
-		r.setWidth(r.width() + 3)
-		self.pixmap_h = QtGui.QPixmap(r.width()+1, r.height()+1)
-		self.pixmap_h.fill(color)
-		painter = QtGui.QPainter(self.pixmap_h)
-		if rect.width() > 3:
-			self.drawBarDecoration(painter, r)
-			
-		r.setWidth(r.width() + 1)
-		self.pixmap_hh = QtGui.QPixmap(r.width()+1, r.height()+1)
-		self.pixmap_hh.fill(color)
-		painter = QtGui.QPainter(self.pixmap_hh)
-		if rect.width() > 3:
-			self.drawBarDecoration(painter, r)
-		
-	def drawBarDecoration(self, painter, r):
+	def drawBarDecoration(self, painter, width, height):
 		color = QtGui.QColor(self.color())
 		factor = 125
 		light = color.lighter(factor)
@@ -231,37 +204,28 @@ class HistogramItem(Qwt.QwtPlotItem):
 		
 		painter.setBrush(Qt.Qt.NoBrush)
 
+		top = 0
+		bottom = height
+		left = 0
+		right = width - 1
+
 		#horizontal line
 		painter.setPen(Qt.QPen(light, 2))
-		painter.drawLine(r.left()+1, r.top()+2, r.right()+1, r.top()+2)
+		painter.drawLine(1, top+2, right+1, top+2)
 
 		#horizontal line
 		painter.setPen(Qt.QPen(dark, 2))
-		painter.drawLine(r.left()+1, r.bottom(), r.right()+1, r.bottom())
+		painter.drawLine(1, bottom, right+1, bottom)
 
 		#vertical line
 		painter.setPen(Qt.QPen(light, 1))
-		painter.drawLine(r.left(), r.top() + 1, r.left(), r.bottom())
-		painter.drawLine(r.left()+1, r.top()+2, r.left()+1, r.bottom()-1)
+		painter.drawLine(0, top + 1, 0, bottom)
+		painter.drawLine(1, top + 2, 1, bottom-1)
 		
 		#vertical line
 		painter.setPen(Qt.QPen(dark, 1))
-		painter.drawLine(r.right()+1, r.top()+1, r.right()+1, r.bottom())
-		painter.drawLine(r.right(), r.top()+2, r.right(), r.bottom()-1)
-		
-	def drawBar(self, painter, orientation, width, left, top):
-		if width == self.cached_bar_width:
-			painter.drawPixmap(left, top, self.pixmap)
-		elif width == self.cached_bar_width + 1:
-			painter.drawPixmap(left, top, self.pixmap_h)
-		elif width == self.cached_bar_width - 1:
-			painter.drawPixmap(left, top, self.pixmap_l)
-		elif width == self.cached_bar_width + 2:
-			painter.drawPixmap(left, top, self.pixmap_hh)
-		elif width == self.cached_bar_width - 2:
-			painter.drawPixmap(left, top, self.pixmap_ll)
-		else:
-			print "(Non-fatal) Histplot bar width error!!", width, self.cached_bar_width
+		painter.drawLine(right+1, top+1, right+1, bottom)
+		painter.drawLine(right, top+2, right, bottom-1)
 
 class HistogramPeakItem(Qwt.QwtPlotItem):
 
