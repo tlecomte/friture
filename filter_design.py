@@ -175,7 +175,7 @@ def generate_filters_params():
 	params['dec'] = [bdec, adec]
 	
 	#generate the octave filters
-	for BandsPerOctave in [1,3,6,12,24]:
+	for BandsPerOctave in [1,3,6,12,24,48,96]:
 		Nbands = NOCTAVE*BandsPerOctave
 		[boct, aoct, fi, flow, fhigh] = octave_filters_oneoctave(Nbands, BandsPerOctave)
 		params['%d' %BandsPerOctave] = [boct, aoct, fi, flow, fhigh]
@@ -206,7 +206,7 @@ def main():
 	#[ERBforward, ERBfeedback] = MakeERBFilters(fs, Nchannels, low_freq)
 	#y = ERBFilterBank(ERBforward, ERBfeedback, impulse)
 
-	BandsPerOctave = 3
+	BandsPerOctave = 24
 	Nbands = NOCTAVE*BandsPerOctave
 	
 	[B, A, fi, fl, fh] = octave_filters(Nbands, BandsPerOctave)
