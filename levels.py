@@ -100,7 +100,7 @@ class Levels_Widget(QtGui.QWidget):
 		self.response_time = 0.125
 		# an exponential smoothing filter is a simple IIR filter
 		# s_i = alpha*x_i + (1-alpha)*s_{i-1}
-		#we compute alpha so that the N most recent samples represent 100*w percent of the output
+		#we compute alpha so that the n most recent samples represent 100*w percent of the output
 		w = 0.65
 		n = self.response_time*SAMPLING_RATE
 		N = 4096
@@ -108,6 +108,9 @@ class Levels_Widget(QtGui.QWidget):
 		self.kernel = (1. - self.alpha)**(arange(0, N)[::-1])
 		self.old_rms = 1e-30
 		self.old_max = 1e-30
+		
+		n2 = self.response_time/(SMOOTH_DISPLAY_TIMER_PERIOD_MS/1000.)
+		self.alpha2 = 1. - (1.-w)**(1./(n2+1))
 
 	# method
 	def set_buffer(self, buffer):
@@ -121,18 +124,16 @@ class Levels_Widget(QtGui.QWidget):
 		# get the fresh data
 		floatdata = self.audiobuffer.newdata()
 		
-		# boxcar
-		#time = SMOOTH_DISPLAY_TIMER_PERIOD_MS/1000.
-		#floatdata = self.audiobuffer.data(time*SAMPLING_RATE)
-		
+		# exponential smoothing for max
 		if len(floatdata) > 0:
 			value_max = abs(floatdata).max()
-			if value_max < self.old_max:
-				self.old_max = self.old_max*0.9
-			else:
+			if value_max > self.old_max*(1.-self.alpha2):
 				self.old_max = value_max
+			else:
+				# exponential decrease
+				self.old_max = self.old_max*(1.-self.alpha2)
 		
-		# exponential smoothing
+		# exponential smoothing for RMS
 		value_rms = pyx_exp_smoothed_value(self.kernel, self.alpha, floatdata**2, self.old_rms)
 		self.old_rms = value_rms
 		
