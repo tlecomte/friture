@@ -3,6 +3,8 @@ from distutils.core import setup
 from distutils.extension import Extension
 from Cython.Distutils import build_ext
 from glob import glob
+import os
+import numpy
 
 try:
 	import py2exe
@@ -28,6 +30,12 @@ dll_excludes = ["powrprof.dll"]
 includes = ["sip", "PyQt4.QtSvg"]
 
 ext_modules = [Extension("exp_smoothing_conv", ["exp_smoothing_conv.pyx"])]
+
+if os.name == 'nt':
+	if os.environ.has_key('CPATH'):
+		os.environ['CPATH'] = os.environ['CPATH'] + numpy.get_include()
+	else:
+		os.environ['CPATH'] = numpy.get_include()
 
 setup(name = "Friture",
 	windows = [{"script":'friture.py', "icon_resources":[(1, "window-icon.ico")]}],
