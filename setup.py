@@ -25,7 +25,7 @@ excludes = ["matplotlib","_ssl","Tkconstants","Tkinter","tcl","email","pyreadlin
 		    "_imaging","_ssl"]
 #Note: unittest, inspect are needed by numpy
 #exclude dlls that py2exe includes by error
-dll_excludes = ["powrprof.dll"]
+dll_excludes = ["powrprof.dll", "msvcp90.dll"]
 #manually exclude python libraries that py2exe fails to detect
 includes = ["sip", "PyQt4.QtSvg"]
 
