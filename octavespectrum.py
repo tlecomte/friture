@@ -21,7 +21,7 @@ from PyQt4 import QtGui
 from numpy import log10, array, arange
 from histplot import HistPlot
 import octavespectrum_settings # settings dialog
-from filter import load_filters_params, octave_filter_bank, octave_filter_bank_decimation, octave_frequencies, lfilter
+from filter import load_filters_params, octave_filter_bank_decimation, octave_frequencies, lfilter
 from ringbuffer import RingBuffer
 
 from exp_smoothing_conv import pyx_exp_smoothed_value
@@ -218,7 +218,6 @@ class OctaveSpectrum_Widget(QtGui.QWidget):
 		self.kernels = self.compute_kernels(self.alphas, Ns)
 
 	def setbandsperoctave(self, bandsperoctave):
-		#bandsperoctave = 96
 		self.filters.setbandsperoctave(bandsperoctave)
 		#recreate the ring buffers
 		#self.bankbuffers = [RingBuffer() for band in range(0, bandsperoctave*NOCTAVE)]
@@ -274,8 +273,7 @@ class octave_filters():
 		self.bandsperoctave = bandsperoctave
 		self.nbands = NOCTAVE*self.bandsperoctave
 		self.fi, self.flow, self.fhigh = octave_frequencies(self.nbands, self.bandsperoctave)
-		[self.boct, self.aoct, fi, flow, fhigh] = self.filters_params['%d' %bandsperoctave]
-		[self.b_nodec, self.a_nodec, fi, flow, fhigh] = self.filters_params['nodec %d' %bandsperoctave] 
+		[self.boct, self.aoct, fi, flow, fhigh] = self.filters_params['%d' %bandsperoctave] 
 		
 		#z, p, k = tf2zpk(self.bdec, self.adec)
 		#print "poles", p, abs(p)**2
