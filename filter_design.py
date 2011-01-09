@@ -180,13 +180,6 @@ def generate_filters_params():
 		[boct, aoct, fi, flow, fhigh] = octave_filters_oneoctave(Nbands, BandsPerOctave)
 		params['%d' %BandsPerOctave] = [boct, aoct, fi, flow, fhigh]
 	
-	#generate the filters for non-decimating filters
-	for BandsPerOctave in [1,3,6,12,24,48,96]:
-		Nbands = NOCTAVE*BandsPerOctave
-		octave_filters(Nbands, BandsPerOctave)
-		[b, a, fi, flow, fhigh] = octave_filters(Nbands, BandsPerOctave)
-		params['nodec %d' %BandsPerOctave] = [b, a, fi, flow, fhigh]
-	
 	output = open('generated_filters.pkl', 'wb')
 	# Pickle dictionary using protocol 0.
 	pickle.dump(params, output)
