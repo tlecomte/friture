@@ -18,6 +18,11 @@ def pyx_exp_smoothed_value(np.ndarray[dtype_t, ndim=1] kernel, dtype_t alpha, np
 	cdef Py_ssize_t i
 	cdef dtype_t value, conv
 	
+	# as we disable the cython bounds checking, do it by ourselves
+	# it is absolutely needed as the kernel is not of infinite size !!
+	if N > Nk:
+		N = Nk
+	
 	if N == 0:
 		value = previous
 	else:
