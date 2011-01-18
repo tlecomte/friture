@@ -38,7 +38,11 @@ class CentralWidget(QtGui.QWidget):
 				
 		self.connect(self.controlBar.comboBox_select, QtCore.SIGNAL('activated(int)'), self.widget_select)
 		self.connect(self.controlBar.settingsButton, QtCore.SIGNAL('clicked(bool)'), self.settings_slot)
-			
+		
+		self.label = QtGui.QLabel(self)
+		self.label.setText(" Central dock ") # spaces before and after for nicer alignment
+		self.controlBar.layout.insertWidget(0, self.label)
+		
 		self.layout = QtGui.QVBoxLayout(self)
 		self.layout.addWidget(self.controlBar)
 		self.layout.setContentsMargins(0, 0, 0, 0)
