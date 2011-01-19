@@ -113,7 +113,8 @@ class SpectPlot(classplot.ClassPlot):
 		
 		# insert an additional curve for the peak
 		self.curve_peak = Qwt.QwtPlotCurve()
-		self.curve_peak.setPen(QtGui.QPen(Qt.Qt.blue))
+		#self.curve_peak.setPen(QtGui.QPen(Qt.Qt.blue))
+		self.curve_peak.setPen(Qt.QColor("#FF9000")) #dark orange
 		#self.curve_peak.setRenderHint(Qwt.QwtPlotItem.RenderAntialiased)
 		#self.curve_peak.setPen(QtGui.QPen(Qt.Qt.NoPen))
 		#self.curve_peak.setBrush(Qt.Qt.blue)
@@ -124,7 +125,8 @@ class SpectPlot(classplot.ClassPlot):
 		
 		# fill under the curve
 		#self.curve.setBrush(Qt.QColor(255,0,190))
-		self.curve.setBrush(Qt.Qt.red)
+		#self.curve.setBrush(Qt.Qt.red)
+		self.curve.setBrush(Qt.QColor("#057D9F")) #some sort of blue
 		#self.curve.setPen(Qt.QColor(255,0,0,0))
 		#self.curve.setPen(QtGui.QPen(Qt.Qt.red))
 		self.curve.setPen(QtGui.QPen(Qt.Qt.NoPen))
