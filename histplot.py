@@ -227,48 +227,31 @@ class HistogramItem(Qwt.QwtPlotItem):
 		painter.drawLine(right+1, top+1, right+1, bottom)
 		painter.drawLine(right, top+2, right, bottom-1)
 
-class HistogramPeakItem(Qwt.QwtPlotItem):
-
-	Auto = 0
-	Xfy = 1
-	
+class HistogramPeakBarItem(Qwt.QwtPlotItem):
 	def __init__(self, *args):
 		Qwt.QwtPlotItem.__init__(self, *args)
-		self.__attributes = HistogramItem.Auto
 		self.fl = [0.]
 		self.fh = [0.]
 		self.peaks = [0.]
-		self.__color = Qt.QColor()
-		self.__reference = 0.0
-		self.setItemAttribute(Qwt.QwtPlotItem.AutoScale, True)
-		self.setItemAttribute(Qwt.QwtPlotItem.Legend, True)
-		self.setZ(20.0)
+		self.palette_index = [0]
 		#self.canvas_height = 2
 		self.canvas_width = 2
 		self.need_transform = False
+		
+		self.palette = [Qt.QColor(255, gb, gb) for gb in range(0,256)]
 
-	def setData(self, fl, fh, peaks):
+	def setData(self, fl, fh, peaks, peaks_int):
 		if len(self.peaks) <> len(peaks):
 			self.fl = fl
 			self.fh = fh
 			self.need_transform = True
 		
 		self.peaks = peaks
-
-	def data(self):
-		return [self.fl, self.fh, self.peaks]
-
-	def setColor(self, color):
-		if self.__color != color:
-			self.__color = color
-
-	def color(self):
-		return self.__color
+		self.palette_index = (255*(1.-peaks_int)).astype(int)
 
 	def draw(self, painter, xMap, yMap, rect):
 		# update the cache according to possibly new canvas dimensions
-		#if rect.height() <> self.canvas_height:
-			#self.canvas_height = rect.height()
+		h = rect.height()
 		w = rect.width()
 		if w <> self.canvas_width:
 			self.canvas_width = w
@@ -278,36 +261,11 @@ class HistogramPeakItem(Qwt.QwtPlotItem):
 			self.x1 = [xMap.transform(flow)+1 for flow in self.fl]
 			self.x2 = [xMap.transform(fhigh)-1 for fhigh in self.fh]
 			self.need_transform = False
-		
-		#horizontal line
-		painter.setBrush(Qt.Qt.NoBrush)
-		painter.setPen(Qt.QPen(self.color(), 2))
-		
-		for x1, x2, peak in zip(self.x1, self.x2, self.peaks):
+
+		for x1, x2, peak, index in zip(self.x1, self.x2, self.peaks, self.palette_index):
 			y = yMap.transform(peak)
-			painter.drawLine(x1, y, x2, y)
+			painter.fillRect(x1-1, y, x2-x1+2, h, self.palette[index])
 
-	def setBaseline(self, reference):
-		if self.baseline() != reference:
-			self.__reference = reference
-			self.itemChanged()
-	
-	def baseline(self,):
-		return self.__reference
-
-	def setHistogramAttribute(self, attribute, on = True):
-		if self.testHistogramAttribute(attribute):
-			return
-
-		if on:
-			self.__attributes |= attribute
-		else:
-			self.__attributes &= ~attribute
-
-		self.itemChanged()
-
-	def testHistogramAttribute(self, attribute):
-		return bool(self.__attributes & attribute) 
 
 class HistPlot(Qwt.QwtPlot):
 	def __init__(self, parent, logger):
@@ -366,13 +324,12 @@ class HistPlot(Qwt.QwtPlot):
 							   Qwt.QwtPicker.ActiveOnly,
 							   self.canvas())
 		
-		# insert an additional curve for the peak
-		self.curve_peak = HistogramPeakItem()
-		self.curve_peak.setColor(Qt.Qt.blue)
-		self.curve_peak.attach(self)
+		# insert an additional plot item for the peak bar
+		self.bar_peak = HistogramPeakBarItem()
+		self.bar_peak.attach(self)
 		self.peak = zeros((1,))
-		self.peakHold = 0
-		self.peakDecay = PEAK_DECAY_RATE
+		self.peak_int = 0
+		self.peak_decay = PEAK_DECAY_RATE
 		
 		self.histogram = HistogramItem()
 		self.histogram.setColor(Qt.Qt.darkGreen)
@@ -394,7 +351,7 @@ class HistPlot(Qwt.QwtPlot):
 		self.histogram.setData(fl, fh, y)
 		
 		self.compute_peaks(y)
-		self.curve_peak.setData(fl, fh, self.peak)
+		self.bar_peak.setData(fl, fh, self.peak, self.peak_int)
 		
 		if self.needfullreplot:
 			self.needfullreplot = False
@@ -409,23 +366,22 @@ class HistPlot(Qwt.QwtPlot):
 		if len(self.peak) <> len(y):
 			y_ones = ones(y.shape)
 			self.peak = y_ones*(-500.)
-			self.peakHold = zeros(y.shape)
-			self.dBdecay = y_ones * 20. * log10(PEAK_DECAY_RATE)
+			self.peak_int = zeros(y.shape)
+			self.peak_decay = y_ones * 20. * log10(PEAK_DECAY_RATE) * 5000
 
 		mask1 = (self.peak < y)
-		mask2 = (-mask1) * (self.peakHold > (PEAK_FALLOFF_COUNT - 1.))
-		mask2_a = mask2 * (self.peak + self.dBdecay < y)
-		mask2_b = mask2 * (self.peak + self.dBdecay >= y)
+		mask2 = (-mask1)
+		mask2_a = mask2 * (self.peak_int < 0.2)
+		mask2_b = mask2 * (self.peak_int >= 0.2)
 
 		self.peak[mask1] = y[mask1]
-		self.peak[mask2_a] = y[mask2_a]
-		self.peak[mask2_b] = self.peak[mask2_b] + self.dBdecay[mask2_b]
+		self.peak[mask2_a] = self.peak[mask2_a] + self.peak_decay[mask2_a]
 		
-		self.dBdecay[mask1] = 20. * log10(PEAK_DECAY_RATE)
-		self.dBdecay[mask2_b] = 2 * self.dBdecay[mask2_b]
+		self.peak_decay[mask1] = 20. * log10(PEAK_DECAY_RATE) * 5000
+		self.peak_decay[mask2_a] += 20. * log10(PEAK_DECAY_RATE) * 5000
 		
-		self.peakHold[mask1] = 0
-		self.peakHold += 1
+		self.peak_int[mask1] = 1.
+		self.peak_int[mask2_b] *= 0.975
 	
 	def setspecrange(self, min, max):
 		self.setAxisScale(Qwt.QwtPlot.yLeft, min, max)
