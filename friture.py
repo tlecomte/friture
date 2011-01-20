@@ -31,19 +31,6 @@ import audiobackend # audio backend class
 from centralwidget import CentralWidget
 import psutil # for CPU usage monitoring
 
-#pyuic4 friture.ui > Ui_friture.py
-#pyrcc4 resource.qrc > resource_rc.py
-
-#had to install pyqwt from source
-#first : sudo ln -s libqwt-qt4.so libqwt.so
-#then, in the pyqwt configure subdirectory (for ubuntu jaunty):
-#python configure.py -Q ../qwt-5.1 -4 -L /usr/lib -I /usr/include/ --module-install-path=/usr/lib/python2.6/dist-packages/PyQt4/Qwt5
-#on lucid lynx:
-#python configure.py -Q ../qwt-5.2 -4 --module-install-path=/usr/lib/pymodules/python2.6/PyQt4/Qwt5
-
-#make
-#sudo make install
-
 # the sample rate below should be dynamic, taken from PyAudio/PortAudio
 SAMPLING_RATE = 44100
 

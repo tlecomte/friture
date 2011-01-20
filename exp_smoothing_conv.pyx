@@ -1,9 +1,7 @@
 import numpy as np
 cimport numpy as np
 
-# to build the module on linux:
-#cython exp_smoothing_conv.pyx
-#gcc -shared -pthread -fPIC -fwrapv -O2 -Wall -fno-strict-aliasing -I/usr/include/python2.6 -o exp_smoothing_conv.so exp_smoothing_conv.c
+# see INSTALL
 
 dtype = np.float64
 ctypedef np.float64_t dtype_t

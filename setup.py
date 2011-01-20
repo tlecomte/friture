@@ -11,8 +11,7 @@ try:
 except ImportError:
 	print "Cannot find py2exe"
 
-# to build an executable for Windows, run 'python setup.py py2exe'
-# to build the cython extension(s), run 'python setup.py build_ext --inplace'
+# see INSTALL file for details
 
 #include the QT svg plugin to render the icons
 #include the filter coefficients in the pickle file
