@@ -338,7 +338,7 @@ if __name__ == "__main__":
 	app = QApplication(sys.argv)
 
 	# Splash screen
-	pixmap = QPixmap(":/splash.png")
+	pixmap = QPixmap(":/images/splash.png")
 	splash = QSplashScreen(pixmap)
 	splash.show()
 	splash.showMessage("Initializing the audio subsystem")

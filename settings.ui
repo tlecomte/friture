@@ -14,8 +14,8 @@
    <string>Settings</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="resource.qrc">
-    <normaloff>:/tools.svg</normaloff>:/tools.svg</iconset>
+   <iconset resource="resources/friture.qrc">
+    <normaloff>:/images-src/tools.svg</normaloff>:/images-src/tools.svg</iconset>
   </property>
   <layout class="QFormLayout" name="formLayout">
    <property name="fieldGrowthPolicy">
@@ -34,7 +34,7 @@
   </layout>
  </widget>
  <resources>
-  <include location="resource.qrc"/>
+  <include location="resources/friture.qrc"/>
  </resources>
  <connections/>
 </ui>

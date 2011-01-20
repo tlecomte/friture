@@ -14,8 +14,8 @@
    <string>Friture</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="resource.qrc">
-    <normaloff>:/window-icon.svg</normaloff>:/window-icon.svg</iconset>
+   <iconset resource="resources/friture.qrc">
+    <normaloff>:/images-src/window-icon.svg</normaloff>:/images-src/window-icon.svg</iconset>
   </property>
   <widget class="QWidget" name="centralwidget">
    <property name="styleSheet">
@@ -48,12 +48,12 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="resource.qrc">
-     <normaloff>:/start.svg</normaloff>
-     <normalon>:/stop.svg</normalon>
-     <disabledon>:/stop.svg</disabledon>
-     <activeon>:/stop.svg</activeon>
-     <selectedon>:/stop.svg</selectedon>:/start.svg</iconset>
+    <iconset resource="resources/friture.qrc">
+     <normaloff>:/images-src/start.svg</normaloff>
+     <normalon>:/images-src/stop.svg</normalon>
+     <disabledon>:/images-src/stop.svg</disabledon>
+     <activeon>:/images-src/stop.svg</activeon>
+     <selectedon>:/images-src/stop.svg</selectedon>:/images-src/start.svg</iconset>
    </property>
    <property name="text">
     <string>Stop</string>
@@ -67,8 +67,8 @@
   </action>
   <action name="actionSettings">
    <property name="icon">
-    <iconset resource="resource.qrc">
-     <normaloff>:/tools.svg</normaloff>:/tools.svg</iconset>
+    <iconset resource="resources/friture.qrc">
+     <normaloff>:/images-src/tools.svg</normaloff>:/images-src/tools.svg</iconset>
    </property>
    <property name="text">
     <string>Settings</string>
@@ -79,8 +79,8 @@
   </action>
   <action name="actionAbout">
    <property name="icon">
-    <iconset resource="resource.qrc">
-     <normaloff>:/window-icon.svg</normaloff>:/window-icon.svg</iconset>
+    <iconset resource="resources/friture.qrc">
+     <normaloff>:/images-src/window-icon.svg</normaloff>:/images-src/window-icon.svg</iconset>
    </property>
    <property name="text">
     <string>About Friture</string>
@@ -88,8 +88,8 @@
   </action>
   <action name="actionNew_dock">
    <property name="icon">
-    <iconset resource="resource.qrc">
-     <normaloff>:/new-dock.svg</normaloff>:/new-dock.svg</iconset>
+    <iconset resource="resources/friture.qrc">
+     <normaloff>:/images-src/new-dock.svg</normaloff>:/images-src/new-dock.svg</iconset>
    </property>
    <property name="text">
     <string>New dock</string>
@@ -100,7 +100,7 @@
   </action>
  </widget>
  <resources>
-  <include location="resource.qrc"/>
+  <include location="resources/friture.qrc"/>
  </resources>
  <connections/>
 </ui>

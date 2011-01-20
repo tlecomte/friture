@@ -2,8 +2,8 @@
 
 # Form implementation generated from reading ui file 'friture.ui'
 #
-# Created: Fri Jul  2 15:12:57 2010
-#      by: PyQt4 UI code generator 4.7.2
+# Created: Thu Jan 20 15:43:47 2011
+#      by: PyQt4 UI code generator 4.7.4
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -14,7 +14,7 @@ class Ui_MainWindow(object):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(869, 573)
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap(":/window-icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap(":/images-src/window-icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         MainWindow.setWindowIcon(icon)
         self.centralwidget = QtGui.QWidget(MainWindow)
         self.centralwidget.setStyleSheet("None")
@@ -28,16 +28,16 @@ class Ui_MainWindow(object):
         self.actionStart.setCheckable(True)
         self.actionStart.setChecked(True)
         icon1 = QtGui.QIcon()
-        icon1.addPixmap(QtGui.QPixmap(":/start.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        icon1.addPixmap(QtGui.QPixmap(":/stop.svg"), QtGui.QIcon.Normal, QtGui.QIcon.On)
-        icon1.addPixmap(QtGui.QPixmap(":/stop.svg"), QtGui.QIcon.Active, QtGui.QIcon.On)
-        icon1.addPixmap(QtGui.QPixmap(":/stop.svg"), QtGui.QIcon.Selected, QtGui.QIcon.On)
-        icon1.addPixmap(QtGui.QPixmap(":/stop.svg"), QtGui.QIcon.Disabled, QtGui.QIcon.On)
+        icon1.addPixmap(QtGui.QPixmap(":/images-src/start.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon1.addPixmap(QtGui.QPixmap(":/images-src/stop.svg"), QtGui.QIcon.Normal, QtGui.QIcon.On)
+        icon1.addPixmap(QtGui.QPixmap(":/images-src/stop.svg"), QtGui.QIcon.Active, QtGui.QIcon.On)
+        icon1.addPixmap(QtGui.QPixmap(":/images-src/stop.svg"), QtGui.QIcon.Selected, QtGui.QIcon.On)
+        icon1.addPixmap(QtGui.QPixmap(":/images-src/stop.svg"), QtGui.QIcon.Disabled, QtGui.QIcon.On)
         self.actionStart.setIcon(icon1)
         self.actionStart.setObjectName("actionStart")
         self.actionSettings = QtGui.QAction(MainWindow)
         icon2 = QtGui.QIcon()
-        icon2.addPixmap(QtGui.QPixmap(":/tools.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon2.addPixmap(QtGui.QPixmap(":/images-src/tools.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.actionSettings.setIcon(icon2)
         self.actionSettings.setObjectName("actionSettings")
         self.actionAbout = QtGui.QAction(MainWindow)
@@ -45,7 +45,7 @@ class Ui_MainWindow(object):
         self.actionAbout.setObjectName("actionAbout")
         self.actionNew_dock = QtGui.QAction(MainWindow)
         icon3 = QtGui.QIcon()
-        icon3.addPixmap(QtGui.QPixmap(":/new-dock.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon3.addPixmap(QtGui.QPixmap(":/images-src/new-dock.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.actionNew_dock.setIcon(icon3)
         self.actionNew_dock.setObjectName("actionNew_dock")
         self.toolBar.addAction(self.actionStart)
@@ -68,4 +68,4 @@ class Ui_MainWindow(object):
         self.actionNew_dock.setText(QtGui.QApplication.translate("MainWindow", "New dock", None, QtGui.QApplication.UnicodeUTF8))
         self.actionNew_dock.setToolTip(QtGui.QApplication.translate("MainWindow", "Add a new dock to Friture window", None, QtGui.QApplication.UnicodeUTF8))
 
-import resource_rc
+import friture_rc

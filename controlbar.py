@@ -127,7 +127,7 @@ class ControlBar(QtGui.QWidget):
 		self.settingsButton.setToolTip("Customize the audio widget")
 				
 		settings_icon = QtGui.QIcon()
-		settings_icon.addPixmap(QtGui.QPixmap(":/dock-settings.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+		settings_icon.addPixmap(QtGui.QPixmap(":/images-src/dock-settings.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
 		self.settingsButton.setIcon(settings_icon)
 		
 		self.layout.addWidget(self.comboBox_select)

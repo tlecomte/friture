@@ -2,8 +2,8 @@
 
 # Form implementation generated from reading ui file 'settings.ui'
 #
-# Created: Fri Mar 26 17:48:29 2010
-#      by: PyQt4 UI code generator 4.7
+# Created: Thu Jan 20 15:46:09 2011
+#      by: PyQt4 UI code generator 4.7.4
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -14,7 +14,7 @@ class Ui_Settings_Dialog(object):
         Settings_Dialog.setObjectName("Settings_Dialog")
         Settings_Dialog.resize(257, 248)
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap(":/tools.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap(":/images-src/tools.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         Settings_Dialog.setWindowIcon(icon)
         self.formLayout = QtGui.QFormLayout(Settings_Dialog)
         self.formLayout.setFieldGrowthPolicy(QtGui.QFormLayout.ExpandingFieldsGrow)
@@ -33,4 +33,4 @@ class Ui_Settings_Dialog(object):
         Settings_Dialog.setWindowTitle(QtGui.QApplication.translate("Settings_Dialog", "Settings", None, QtGui.QApplication.UnicodeUTF8))
         self.label_3.setText(QtGui.QApplication.translate("Settings_Dialog", "Sound input", None, QtGui.QApplication.UnicodeUTF8))
 
-import resource_rc
+import friture_rc
