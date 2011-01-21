@@ -21,7 +21,7 @@ import classplot
 import PyQt4.Qwt5 as Qwt
 from PyQt4 import QtCore, Qt, QtGui
 from numpy import zeros, ones, log10, linspace, logspace, interp, log2, histogram
-from log2_scale_engine import QwtLog10ScaleEngine
+#from log2_scale_engine import QwtLog10ScaleEngine
 
 # The peak decay rates (magic goes here :).
 PEAK_DECAY_RATE = 1.0 - 3E-6
