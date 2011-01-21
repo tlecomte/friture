@@ -1,20 +1,20 @@
 <RCC>
   <qresource>
-    <file>new-dock.svg</file>
-    <file>dock-settings.svg</file>
-    <file>dock-dock.svg</file>
-    <file>dock-close.svg</file>
-    <file>about.svg</file>
-    <file>log.svg</file>
-    <file>dock-undock.svg</file>
-    <file>tools.svg</file>
-    <file>window-icon.svg</file>
-    <file>statistics.svg</file>
-    <file>spectrum.svg</file>
-    <file>scope.svg</file>
-    <file>levels.svg</file>
-    <file>stop.svg</file>
-    <file>start.svg</file>
-    <file>splash.png</file>
+    <file>images-src/new-dock.svg</file>
+    <file>images-src/dock-settings.svg</file>
+    <file>images-src/dock-dock.svg</file>
+    <file>images-src/dock-close.svg</file>
+    <file>images-src/about.svg</file>
+    <file>images-src/log.svg</file>
+    <file>images-src/dock-undock.svg</file>
+    <file>images-src/tools.svg</file>
+    <file>images-src/window-icon.svg</file>
+    <file>images-src/statistics.svg</file>
+    <file>images-src/spectrum.svg</file>
+    <file>images-src/scope.svg</file>
+    <file>images-src/levels.svg</file>
+    <file>images-src/stop.svg</file>
+    <file>images-src/start.svg</file>
+    <file>images/splash.png</file>
   </qresource>
 </RCC>
