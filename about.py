@@ -37,7 +37,7 @@ class About_Dialog(QtGui.QDialog):
 		self.setWindowTitle("About Friture")
 		
 		icon = QtGui.QIcon()
-		icon.addPixmap(QtGui.QPixmap(":/window-icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+		icon.addPixmap(QtGui.QPixmap(":/images-src/window-icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
 		self.setWindowIcon(icon)
 		self.verticalLayout = QtGui.QVBoxLayout(self)
 		self.verticalLayout.setObjectName("verticalLayout")
@@ -51,7 +51,7 @@ class About_Dialog(QtGui.QDialog):
 		self.label_2 = QtGui.QLabel(self.aboutTab)
 		self.label_2.setMinimumSize(QtCore.QSize(128, 128))
 		self.label_2.setMaximumSize(QtCore.QSize(128, 128))
-		self.label_2.setPixmap(QtGui.QPixmap(":/window-icon.svg"))
+		self.label_2.setPixmap(QtGui.QPixmap(":/images-src/window-icon.svg"))
 		self.label_2.setScaledContents(True)
 		self.label_2.setObjectName("label_2")
 		self.horizontalLayout.addWidget(self.label_2)
