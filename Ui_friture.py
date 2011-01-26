@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'friture.ui'
+# Form implementation generated from reading ui file 'ui/friture.ui'
 #
-# Created: Thu Jan 20 15:43:47 2011
+# Created: Wed Jan 26 10:01:38 2011
 #      by: PyQt4 UI code generator 4.7.4
 #
 # WARNING! All changes made in this file will be lost!

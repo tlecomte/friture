@@ -14,7 +14,7 @@
    <string>Settings</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="resources/friture.qrc">
+   <iconset resource="../resources/friture.qrc">
     <normaloff>:/images-src/tools.svg</normaloff>:/images-src/tools.svg</iconset>
   </property>
   <layout class="QFormLayout" name="formLayout">
@@ -34,7 +34,7 @@
   </layout>
  </widget>
  <resources>
-  <include location="resources/friture.qrc"/>
+  <include location="../resources/friture.qrc"/>
  </resources>
  <connections/>
 </ui>

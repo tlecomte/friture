@@ -6,8 +6,8 @@ Most of Friture code-base is written in Python. As such, it is interpreted and d
 UI and resource files
 ---------------------
 If friture.ui or resource.qrc are changed, the corresponding python files need to be rebuilt:
-	pyuic4 friture.ui > Ui_friture.py
-	pyuic4 settings.ui > Ui_settings.py
+	pyuic4 ui/friture.ui > Ui_friture.py
+	pyuic4 ui/settings.ui > Ui_settings.py
 	pyrcc4 resources/friture.qrc -o friture_rc.py
 
 Cython extension
