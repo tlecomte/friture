@@ -18,7 +18,7 @@
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
 from PyQt4 import QtGui, QtCore
-import friture_rc
+import friture.friture_rc
 
 aboutText = """
 <p> Friture is an application for real-time audio analysis.

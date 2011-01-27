@@ -18,7 +18,7 @@
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
 from PyQt4 import QtGui
-from ui_settings import Ui_Settings_Dialog
+from friture.ui_settings import Ui_Settings_Dialog
 
 class Settings_Dialog(QtGui.QDialog, Ui_Settings_Dialog):
 	def __init__(self):
