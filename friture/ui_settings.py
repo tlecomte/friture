@@ -33,4 +33,4 @@ class Ui_Settings_Dialog(object):
         Settings_Dialog.setWindowTitle(QtGui.QApplication.translate("Settings_Dialog", "Settings", None, QtGui.QApplication.UnicodeUTF8))
         self.label_3.setText(QtGui.QApplication.translate("Settings_Dialog", "Sound input", None, QtGui.QApplication.UnicodeUTF8))
 
-import friture_rc
+import friture.friture_rc
