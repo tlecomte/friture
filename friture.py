@@ -21,7 +21,7 @@ import sys, os, platform
 from PyQt4 import QtCore
 # specifically import from PyQt4.QtGui for startup time improvement :
 from PyQt4.QtGui import QMainWindow, QVBoxLayout, QErrorMessage, QApplication, QPixmap, QSplashScreen
-from Ui_friture import Ui_MainWindow
+from ui_friture import Ui_MainWindow
 from dock import Dock
 import about # About dialog
 import settings # Setting dialog
