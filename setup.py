@@ -37,7 +37,7 @@ if os.name == 'nt':
 		os.environ['CPATH'] = numpy.get_include()
 
 setup(name = "Friture",
-	windows = [{"script":'friture.py', "icon_resources":[(1, "window-icon.ico")]}],
+	windows = [{"script":'friture.py', "icon_resources":[(1, "friture.ico")]}],
 	options = {"py2exe":{"includes":includes, "excludes":excludes, "dll_excludes":dll_excludes}},
 	data_files=data_files,
 	cmdclass = {"build_ext": build_ext},
