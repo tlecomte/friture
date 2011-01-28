@@ -29,9 +29,13 @@ PyQwt
 -----
 In some cases (old versions in distribution repository), you may want to build PyQwt from source.
 In ubuntu, this can be done this way:
-First:
-	sudo ln -s libqwt-qt4.so libqwt.so
-Then, in the pyqwt configure subdirectory (for ubuntu lucid lynx):
-	python configure.py -Q ../qwt-5.2 -4 --module-install-path=/usr/lib/pymodules/python2.6/PyQt4/Qwt5
-	make
-	sudo make install
+	First:
+		sudo ln -s libqwt-qt4.so libqwt.so
+	Then, in the pyqwt configure subdirectory (for ubuntu lucid lynx):
+		python configure.py -Q ../qwt-5.2 -4 --module-install-path=/usr/lib/pymodules/python2.6/PyQt4/Qwt5
+		make
+		sudo make install
+Or, alternatively :
+	sudo apt-get build-dep python-qwt5-qt4
+	sudo apt-get -b source python-qwt5-qt4
+	sudo dpkg -i *.deb
