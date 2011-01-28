@@ -24,7 +24,7 @@ from PyQt4.QtGui import QMainWindow, QVBoxLayout, QErrorMessage, QApplication, Q
 from friture.ui_friture import Ui_MainWindow
 from dock import Dock
 from friture.about import About_Dialog # About dialog
-import settings # Setting dialog
+from friture.settings import Settings_Dialog # Setting dialog
 import logger # Logging class
 import audiobuffer # audio ring buffer class
 import audiobackend # audio backend class
@@ -76,7 +76,7 @@ class Friture(QMainWindow, ):
 		self.ui = Ui_MainWindow()
 		self.ui.setupUi(self)
 		
-		self.settings_dialog = settings.Settings_Dialog()
+		self.settings_dialog = Settings_Dialog()
 		self.about_dialog = About_Dialog()
 		
 		self.chunk_number = 0
