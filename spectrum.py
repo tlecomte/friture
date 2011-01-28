@@ -20,7 +20,7 @@
 from PyQt4 import QtGui, QtCore
 from numpy import log10, where, linspace
 from spectplot import SpectPlot
-import audioproc # audio processing class
+from friture.audioproc import audioproc # audio processing class
 import spectrum_settings # settings dialog
 
 STYLESHEET = """
@@ -64,7 +64,7 @@ class Spectrum_Widget(QtGui.QWidget):
 		self.setStyleSheet(STYLESHEET)
 		
 		# initialize the class instance that will do the fft
-		self.proc = audioproc.audioproc(self.logger)
+		self.proc = audioproc(self.logger)
 		
 		self.maxfreq = DEFAULT_MAXFREQ
 		self.minfreq = DEFAULT_MINFREQ

@@ -20,7 +20,7 @@
 from PyQt4 import QtGui, QtCore
 from numpy import log10, where, linspace
 from imageplot import ImagePlot
-import audioproc # audio processing class
+from friture.audioproc import audioproc # audio processing class
 import spectrogram_settings # settings dialog
 
 SMOOTH_DISPLAY_TIMER_PERIOD_MS = 25
@@ -58,7 +58,7 @@ class Spectrogram_Widget(QtGui.QWidget):
 		self.audiobuffer = None
 		
 		# initialize the class instance that will do the fft
-		self.proc = audioproc.audioproc(self.logger)
+		self.proc = audioproc(self.logger)
 
 		self.maxfreq = DEFAULT_MAXFREQ
 		self.minfreq = DEFAULT_MINFREQ

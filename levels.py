@@ -21,7 +21,7 @@ from PyQt4 import QtCore, QtGui
 from numpy import log10, abs, arange
 import levels_settings # settings dialog
 from qsynthmeter import qsynthMeter
-import audioproc
+from friture.audioproc import audioproc
 
 from exp_smoothing_conv import pyx_exp_smoothed_value
 
@@ -91,7 +91,7 @@ class Levels_Widget(QtGui.QWidget):
 		self.settings_dialog = levels_settings.Levels_Settings_Dialog(self, self.logger)
 		
 		# initialize the class instance that will do the fft
-		self.proc = audioproc.audioproc(self.logger)
+		self.proc = audioproc(self.logger)
 		
 		#time = SMOOTH_DISPLAY_TIMER_PERIOD_MS/1000. #DISPLAY
 		#time = 0.025 #IMPULSE setting for a sound level meter
