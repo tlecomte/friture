@@ -23,7 +23,7 @@ from spectrum import Spectrum_Widget
 from spectrogram import Spectrogram_Widget
 from octavespectrum import OctaveSpectrum_Widget
 from scope import Scope_Widget
-from controlbar import ControlBar
+from friture.controlbar import ControlBar
 
 class CentralWidget(QtGui.QWidget):
 	def __init__(self, parent, logger, name, type = 0):
