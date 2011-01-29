@@ -4,10 +4,10 @@
 
 ; HM NIS Edit Wizard helper defines
 !define PRODUCT_NAME "Friture"
-; We should define a version somehow
 !define /date PRODUCT_VERSION "%Y/%m/%d"
 !define PRODUCT_PUBLISHER "Timothée Lecomte"
-!define PRODUCT_WEB_SITE "http://wiki.github.com/tlecomte/friture/"
+!define PRODUCT_DESCRIPTION "Real-time audio visualizations"
+!define PRODUCT_WEB_SITE "http://tlecomte.github.com/friture/"
 !define PRODUCT_DIR_REGKEY "Software\Microsoft\Windows\CurrentVersion\App Paths\friture.exe"
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
 !define PRODUCT_UNINST_ROOT_KEY "HKLM"
@@ -60,6 +60,15 @@ InstallDir "$PROGRAMFILES\Friture"
 InstallDirRegKey HKLM "${PRODUCT_DIR_REGKEY}" ""
 ShowInstDetails show
 ShowUnInstDetails show
+
+; Adds info to installer
+VIProductVersion "0.0.0.0"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductName" "${PRODUCT_NAME}"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "Comments" "${PRODUCT_DESCRIPTION}"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "CompanyName" "${PRODUCT_PUBLISHER}"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "LegalCopyright" "© ${PRODUCT_PUBLISHER} under the GNU GPLv3."
+VIAddVersionKey /LANG=${LANG_ENGLISH} "FileDescription" "Installation for ${PRODUCT_NAME}"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "FileVersion" "${PRODUCT_VERSION}"
 
 Function RunFriture
 ; This will set the working directory properly,
@@ -127,53 +136,13 @@ Function un.onInit
 FunctionEnd
 
 Section Uninstall
-  Delete "$INSTDIR\uninst.exe"
-  Delete "$INSTDIR\_socket.pyd"
-  Delete "$INSTDIR\_portaudio.pyd"
-  Delete "$INSTDIR\_multiprocessing.pyd"
-  Delete "$INSTDIR\_hashlib.pyd"
-  Delete "$INSTDIR\_ctypes.pyd"
-  Delete "$INSTDIR\win32pdh.pyd"
-  Delete "$INSTDIR\win32evtlog.pyd"
-  Delete "$INSTDIR\win32api.pyd"
-  Delete "$INSTDIR\w9xpopen.exe"
-  Delete "$INSTDIR\unicodedata.pyd"
-  Delete "$INSTDIR\sip.pyd"
-  Delete "$INSTDIR\sgmlop.pyd"
-  Delete "$INSTDIR\select.pyd"
-  Delete "$INSTDIR\QtSvg4.dll"
-  Delete "$INSTDIR\QtGui4.dll"
-  Delete "$INSTDIR\QtCore4.dll"
-  Delete "$INSTDIR\pywintypes26.dll"
-  Delete "$INSTDIR\python26.dll"
-  Delete "$INSTDIR\PyQt4.Qwt5.Qwt.pyd"
-  Delete "$INSTDIR\PyQt4.QtSvg.pyd"
-  Delete "$INSTDIR\PyQt4.QtGui.pyd"
-  Delete "$INSTDIR\PyQt4.QtCore.pyd"
-  Delete "$INSTDIR\PyQt4.Qt.pyd"
-  Delete "$INSTDIR\pyexpat.pyd"
-  Delete "$INSTDIR\numpy.random.mtrand.pyd"
-  Delete "$INSTDIR\numpy.linalg.lapack_lite.pyd"
-  Delete "$INSTDIR\numpy.lib._compiled_base.pyd"
-  Delete "$INSTDIR\numpy.fft.fftpack_lite.pyd"
-  Delete "$INSTDIR\numpy.core._sort.pyd"
-  Delete "$INSTDIR\numpy.core._dotblas.pyd"
-  Delete "$INSTDIR\numpy.core.umath.pyd"
-  Delete "$INSTDIR\numpy.core.scalarmath.pyd"
-  Delete "$INSTDIR\numpy.core.multiarray.pyd"
-  Delete "$INSTDIR\library.zip"
-  Delete "$INSTDIR\imageformats\qsvg4.dll"
-  Delete "$INSTDIR\friture.exe"
-  Delete "$INSTDIR\bz2.pyd"
-  Delete "$INSTDIR\scipy*.pyd"
+  RMDir /r "$INSTDIR"
 
   Delete "$SMPROGRAMS\Friture\Uninstall.lnk"
   Delete "$DESKTOP\Friture.lnk"
   Delete "$SMPROGRAMS\Friture\Friture.lnk"
 
   RMDir "$SMPROGRAMS\Friture"
-  RMDir "$INSTDIR\imageformats"
-  RMDir "$INSTDIR"
 
   DeleteRegKey ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}"
   DeleteRegKey HKLM "${PRODUCT_DIR_REGKEY}"
