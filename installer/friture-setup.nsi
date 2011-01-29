@@ -4,7 +4,8 @@
 
 ; HM NIS Edit Wizard helper defines
 !define PRODUCT_NAME "Friture"
-!define PRODUCT_VERSION "beta"
+; We should define a version somehow
+!define /date PRODUCT_VERSION "%Y/%m/%d"
 !define PRODUCT_PUBLISHER "Timothée Lecomte"
 !define PRODUCT_WEB_SITE "http://wiki.github.com/tlecomte/friture/"
 !define PRODUCT_DIR_REGKEY "Software\Microsoft\Windows\CurrentVersion\App Paths\friture.exe"
