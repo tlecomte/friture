@@ -21,7 +21,7 @@ from PyQt4 import QtGui, QtCore
 from numpy import log10, where, linspace
 from spectplot import SpectPlot
 from friture.audioproc import audioproc # audio processing class
-import spectrum_settings # settings dialog
+from friture.spectrum_settings import Spectrum_Settings_Dialog # settings dialog
 
 STYLESHEET = """
 QwtPlotCanvas {
@@ -79,7 +79,7 @@ class Spectrum_Widget(QtGui.QWidget):
 		self.PlotZoneSpect.setweighting(self.weighting)
 		
 		# initialize the settings dialog
-		self.settings_dialog = spectrum_settings.Spectrum_Settings_Dialog(self, self.logger)
+		self.settings_dialog = Spectrum_Settings_Dialog(self, self.logger)
 
 	# method
 	def set_buffer(self, buffer):
