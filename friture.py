@@ -25,7 +25,7 @@ from friture.ui_friture import Ui_MainWindow
 from dock import Dock
 from friture.about import About_Dialog # About dialog
 from friture.settings import Settings_Dialog # Setting dialog
-import logger # Logging class
+from friture.logger import Logger # Logging class
 from friture.audiobuffer import AudioBuffer # audio ring buffer class
 from friture.audiobackend import AudioBackend# audio backend class
 from centralwidget import CentralWidget
@@ -351,7 +351,7 @@ if __name__ == "__main__":
 	app.setStyleSheet(STYLESHEET)
 	
 	# Logger class
-	logger = logger.Logger()
+	logger = Logger()
 	
 	window = Friture(logger)
 	window.show()
