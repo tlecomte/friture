@@ -26,7 +26,7 @@ from dock import Dock
 from friture.about import About_Dialog # About dialog
 from friture.settings import Settings_Dialog # Setting dialog
 import logger # Logging class
-import audiobuffer # audio ring buffer class
+from friture.audiobuffer import AudioBuffer # audio ring buffer class
 from friture.audiobackend import AudioBackend# audio backend class
 from centralwidget import CentralWidget
 import psutil # for CPU usage monitoring
@@ -86,7 +86,7 @@ class Friture(QMainWindow, ):
 		self.cpu_percent = 0.
 
 		# Initialize the audio data ring buffer
-		self.audiobuffer = audiobuffer.AudioBuffer()
+		self.audiobuffer = AudioBuffer()
 
 		# Initialize the audio backend
 		self.audiobackend = AudioBackend(self.logger)
