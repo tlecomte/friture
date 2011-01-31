@@ -18,11 +18,11 @@
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
 from PyQt4 import QtGui, QtCore
-from levels import Levels_Widget
-from spectrum import Spectrum_Widget
-from spectrogram import Spectrogram_Widget
-from octavespectrum import OctaveSpectrum_Widget
-from scope import Scope_Widget
+from friture.levels import Levels_Widget
+from friture.spectrum import Spectrum_Widget
+from friture.spectrogram import Spectrogram_Widget
+from friture.octavespectrum import OctaveSpectrum_Widget
+from friture.scope import Scope_Widget
 from friture.controlbar import ControlBar
 
 class CentralWidget(QtGui.QWidget):
