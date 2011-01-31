@@ -20,7 +20,7 @@
 from PyQt4 import QtGui
 from numpy import log10, where, linspace, sign
 from friture.timeplot import TimePlot
-import scope_settings # settings dialog
+from friture.scope_settings import Scope_Settings_Dialog # settings dialog
 
 SMOOTH_DISPLAY_TIMER_PERIOD_MS = 25
 SAMPLING_RATE = 44100
@@ -55,7 +55,7 @@ class Scope_Widget(QtGui.QWidget):
 		
 		self.setStyleSheet(STYLESHEET)
 
-		self.settings_dialog = scope_settings.Scope_Settings_Dialog(self, self.logger)
+		self.settings_dialog = Scope_Settings_Dialog(self, self.logger)
 
 	# method
 	def set_buffer(self, buffer):
