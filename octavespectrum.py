@@ -22,7 +22,6 @@ from numpy import log10, array, arange
 from histplot import HistPlot
 from friture.octavespectrum_settings import OctaveSpectrum_Settings_Dialog # settings dialog
 from filter import load_filters_params, octave_filter_bank_decimation, octave_frequencies, lfilter
-from ringbuffer import RingBuffer
 
 from exp_smoothing_conv import pyx_exp_smoothed_value
 

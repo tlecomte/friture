@@ -19,7 +19,7 @@
 
 from PyQt4 import QtCore
 from numpy import floor, int16, fromstring
-from ringbuffer import RingBuffer
+from friture.ringbuffer import RingBuffer
 
 FRAMES_PER_BUFFER = 1024
 
