@@ -19,7 +19,7 @@
 
 from PyQt4 import QtCore, QtGui
 from numpy import log10, abs, arange
-import levels_settings # settings dialog
+from friture.levels_settings import Levels_Settings_Dialog # settings dialog
 from qsynthmeter import qsynthMeter
 from friture.audioproc import audioproc
 
@@ -88,7 +88,7 @@ class Levels_Widget(QtGui.QWidget):
 		self.audiobuffer = None
 		
 		# initialize the settings dialog
-		self.settings_dialog = levels_settings.Levels_Settings_Dialog(self, self.logger)
+		self.settings_dialog = Levels_Settings_Dialog(self, self.logger)
 		
 		# initialize the class instance that will do the fft
 		self.proc = audioproc(self.logger)
