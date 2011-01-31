@@ -22,13 +22,13 @@ from PyQt4 import QtCore
 # specifically import from PyQt4.QtGui for startup time improvement :
 from PyQt4.QtGui import QMainWindow, QVBoxLayout, QErrorMessage, QApplication, QPixmap, QSplashScreen
 from friture.ui_friture import Ui_MainWindow
-from dock import Dock
+from friture.dock import Dock
 from friture.about import About_Dialog # About dialog
 from friture.settings import Settings_Dialog # Setting dialog
 from friture.logger import Logger # Logging class
 from friture.audiobuffer import AudioBuffer # audio ring buffer class
 from friture.audiobackend import AudioBackend# audio backend class
-from centralwidget import CentralWidget
+from friture.centralwidget import CentralWidget
 import psutil # for CPU usage monitoring
 
 # the sample rate below should be dynamic, taken from PyAudio/PortAudio
