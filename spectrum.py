@@ -19,7 +19,7 @@
 
 from PyQt4 import QtGui, QtCore
 from numpy import log10, where, linspace
-from spectplot import SpectPlot
+from friture.spectplot import SpectPlot
 from friture.audioproc import audioproc # audio processing class
 from friture.spectrum_settings import Spectrum_Settings_Dialog # settings dialog
 
