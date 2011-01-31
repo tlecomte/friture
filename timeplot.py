@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
-import classplot
+from friture.classplot import ClassPlot
 import PyQt4.Qwt5 as Qwt
 from PyQt4 import QtCore, Qt, QtGui
 from numpy import log10, interp, linspace
@@ -44,9 +44,9 @@ class picker(Qwt.QwtPlotPicker):
 		  	   	   label.draw(painter, textRect)
 		  	   	   painter.restore()
 
-class TimePlot(classplot.ClassPlot):
+class TimePlot(ClassPlot):
 	def __init__(self, parent, logger):
-		classplot.ClassPlot.__init__(self)
+		ClassPlot.__init__(self)
 
 		# store the logger instance
 		self.logger = logger
@@ -105,7 +105,7 @@ class TimePlot(classplot.ClassPlot):
 			needfullreplot = True
 
 		y_interp = interp(self.xscaled, x_ms, y)
-		classplot.ClassPlot.setdata(self, self.xscaled, y_interp)
+		ClassPlot.setdata(self, self.xscaled, y_interp)
 
 		if needfullreplot:
 			self.replot()

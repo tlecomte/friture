@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
-import classplot
+from friture.classplot import ClassPlot
 import PyQt4.Qwt5 as Qwt
 from PyQt4 import QtCore, Qt, QtGui
 from numpy import zeros, ones, log10, linspace, logspace, interp, log2, histogram
@@ -61,9 +61,9 @@ class picker(Qwt.QwtPlotPicker):
 		  	   	   label.draw(painter, textRect)
 		  	   	   painter.restore()
 
-class SpectPlot(classplot.ClassPlot):
+class SpectPlot(ClassPlot):
 	def __init__(self, parent, logger):
-		classplot.ClassPlot.__init__(self)
+		ClassPlot.__init__(self)
 
 		# store the logger instance
 		self.logger = logger
@@ -157,7 +157,7 @@ class SpectPlot(classplot.ClassPlot):
 		#y_interp = histogram(upsampled_freq, bins=self.xscaled, normed=False, weights=upsampled_xyzs, new=None)[0]
 		#y_interp /= upsampling
                 
-		classplot.ClassPlot.setdata(self, self.xscaled, y_interp)
+		ClassPlot.setdata(self, self.xscaled, y_interp)
 
                 self.compute_peaks(y_interp)
 		self.curve_peak.setData(self.xscaled, self.peak)
