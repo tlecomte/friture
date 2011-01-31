@@ -20,7 +20,7 @@
 from PyQt4 import QtCore, QtGui
 from numpy import log10, abs, arange
 from friture.levels_settings import Levels_Settings_Dialog # settings dialog
-from qsynthmeter import qsynthMeter
+from friture.qsynthmeter import qsynthMeter
 from friture.audioproc import audioproc
 
 from exp_smoothing_conv import pyx_exp_smoothed_value
