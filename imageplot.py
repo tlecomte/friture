@@ -19,7 +19,7 @@
 
 import PyQt4.Qwt5 as Qwt
 from PyQt4 import QtCore, QtGui, Qt
-from spectrogram_image import CanvasScaledSpectrogram
+from friture.spectrogram_image import CanvasScaledSpectrogram
 
 class FreqScaleDraw(Qwt.QwtScaleDraw):
 	def __init__(self, *args):
