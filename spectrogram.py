@@ -21,7 +21,7 @@ from PyQt4 import QtGui, QtCore
 from numpy import log10, where, linspace
 from imageplot import ImagePlot
 from friture.audioproc import audioproc # audio processing class
-import spectrogram_settings # settings dialog
+from friture.spectrogram_settings import Spectrogram_Settings_Dialog# settings dialog
 
 SMOOTH_DISPLAY_TIMER_PERIOD_MS = 25
 SAMPLING_RATE = 44100
@@ -85,7 +85,7 @@ class Spectrogram_Widget(QtGui.QWidget):
 		self.timer.setInterval(self.period_ms) # variable timing
 		
 		# initialize the settings dialog
-		self.settings_dialog = spectrogram_settings.Spectrogram_Settings_Dialog(self, self.logger)
+		self.settings_dialog = Spectrogram_Settings_Dialog(self, self.logger)
 		
 		# timer ticks
 		self.connect(self.timer, QtCore.SIGNAL('timeout()'), self.timer_slot)
