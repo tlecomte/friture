@@ -19,7 +19,7 @@
 
 from PyQt4 import QtGui
 from numpy import log10, where, linspace, sign
-from timeplot import TimePlot
+from friture.timeplot import TimePlot
 import scope_settings # settings dialog
 
 SMOOTH_DISPLAY_TIMER_PERIOD_MS = 25
