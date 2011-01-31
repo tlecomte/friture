@@ -20,7 +20,7 @@
 from PyQt4 import QtGui
 from numpy import log10, array, arange
 from histplot import HistPlot
-import octavespectrum_settings # settings dialog
+from friture.octavespectrum_settings import OctaveSpectrum_Settings_Dialog # settings dialog
 from filter import load_filters_params, octave_filter_bank_decimation, octave_frequencies, lfilter
 from ringbuffer import RingBuffer
 
@@ -93,7 +93,7 @@ class OctaveSpectrum_Widget(QtGui.QWidget):
 		self.kernels = self.compute_kernels(self.alphas, Ns)
 		
 		# initialize the settings dialog
-		self.settings_dialog = octavespectrum_settings.OctaveSpectrum_Settings_Dialog(self, self.logger)
+		self.settings_dialog = OctaveSpectrum_Settings_Dialog(self, self.logger)
 
 	# method
 	def set_buffer(self, buffer):
