@@ -157,6 +157,7 @@ def octave_filters_oneoctave(Nbands, BandsPerOctave):
 
 def generate_filters_params():
 	import pickle
+	import os
 	
 	params = {}
 	
@@ -180,7 +181,10 @@ def generate_filters_params():
 		[boct, aoct, fi, flow, fhigh] = octave_filters_oneoctave(Nbands, BandsPerOctave)
 		params['%d' %BandsPerOctave] = [boct, aoct, fi, flow, fhigh]
 	
-	output = open('generated_filters.pkl', 'wb')
+	path = os.path.dirname(__file__)
+	fname = os.path.join(path, 'generated_filters.pkl')
+
+	output = open(fname, 'wb')
 	# Pickle dictionary using protocol 0.
 	pickle.dump(params, output)
 	# Pickle the list using the highest protocol available.
