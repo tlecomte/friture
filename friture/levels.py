@@ -23,7 +23,7 @@ from friture.levels_settings import Levels_Settings_Dialog # settings dialog
 from friture.qsynthmeter import qsynthMeter
 from friture.audioproc import audioproc
 
-from exp_smoothing_conv import pyx_exp_smoothed_value
+from friture.exp_smoothing_conv import pyx_exp_smoothed_value
 
 STYLESHEET = """
 qsynthMeter {

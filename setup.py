@@ -28,7 +28,7 @@ dll_excludes = ["powrprof.dll", "msvcp90.dll"]
 #manually exclude python libraries that py2exe fails to detect
 includes = ["sip", "PyQt4.QtSvg"]
 
-ext_modules = [Extension("exp_smoothing_conv", ["exp_smoothing_conv.pyx"])]
+ext_modules = [Extension("friture.exp_smoothing_conv", ["friture/extension/exp_smoothing_conv.pyx"])]
 
 if os.name == 'nt':
 	if os.environ.has_key('CPATH'):

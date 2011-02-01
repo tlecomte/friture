@@ -23,7 +23,7 @@ from friture.histplot import HistPlot
 from friture.octavespectrum_settings import OctaveSpectrum_Settings_Dialog # settings dialog
 from friture.filter import load_filters_params, octave_filter_bank_decimation, octave_frequencies, lfilter
 
-from exp_smoothing_conv import pyx_exp_smoothed_value
+from friture.exp_smoothing_conv import pyx_exp_smoothed_value
 
 SMOOTH_DISPLAY_TIMER_PERIOD_MS = 25
 SAMPLING_RATE = 44100
