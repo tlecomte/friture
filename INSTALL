@@ -18,6 +18,11 @@ Alternatively, to build the 'exp_smoothing_conv' extension manually on Linux, yo
 	cython exp_smoothing_conv.pyx
 	gcc -shared -pthread -fPIC -fwrapv -O2 -Wall -fno-strict-aliasing -I/usr/include/python2.6 -o exp_smoothing_conv.so exp_smoothing_conv.c
 
+Filters parameters
+------------------
+The filters parameters are precomputed in a file called 'generated_filters.pkl'. To rebuild this file,
+run the script named 'filter_design.py'.
+
 Windows executable
 ------------------
 To build an executable for Windows, with the python interpreter included, run:
