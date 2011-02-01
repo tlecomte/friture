@@ -17,6 +17,7 @@ from scipy.signal.sigtools import _linear_filter
 #be commented out !
 
 import pickle
+import os.path
 
 NOCTAVE = 8
 
@@ -137,7 +138,10 @@ def octave_filter_bank_decimation(blow, alow, forward, feedback, x, zis=None):
 		return y, dec, zfs
 
 def load_filters_params():
-	input = open('generated_filters.pkl', 'rb')
+	path = os.path.dirname(__file__)
+	fname = os.path.join(path, 'generated_filters.pkl')
+	
+	input = open(fname, 'rb')
 	# Pickle dictionary using protocol 0.
 	params = pickle.load(input)
 	# Pickle the list using the highest protocol available.
