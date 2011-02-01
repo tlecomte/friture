@@ -21,7 +21,7 @@ from PyQt4 import QtGui
 from numpy import log10, array, arange
 from friture.histplot import HistPlot
 from friture.octavespectrum_settings import OctaveSpectrum_Settings_Dialog # settings dialog
-from filter import load_filters_params, octave_filter_bank_decimation, octave_frequencies, lfilter
+from friture.filter import load_filters_params, octave_filter_bank_decimation, octave_frequencies, lfilter
 
 from exp_smoothing_conv import pyx_exp_smoothed_value
 

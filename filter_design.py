@@ -11,7 +11,7 @@ scipy.factorial = factorial
 from scipy.signal.signaltools import lfilter
 from scipy.signal.filter_design import ellip, butter, firwin, cheby1, iirdesign, freqz
 
-from filter import octave_frequencies, octave_filter_bank, octave_filter_bank_decimation
+from friture.filter import octave_frequencies, octave_filter_bank, octave_filter_bank_decimation
 
 # bank of filters for any other kind of frequency scale
 # http://cobweb.ecn.purdue.edu/~malcolm/apple/tr35/PattersonsEar.pdf
