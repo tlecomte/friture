@@ -1,7 +1,7 @@
 Friture
 =======
 
-**Friture** is an application to display real-time visualisations of live audio data. It provides level meters, scope, spectrum or spectrogram.
+**Friture** is an application to display real-time visualizations of live audio data. It provides level meters, scope, spectrum or spectrogram.
 
 This program can be useful for educational purposes, or to analyze the audio response of a hall, etc.
 
