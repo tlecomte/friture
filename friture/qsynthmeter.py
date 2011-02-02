@@ -101,9 +101,6 @@ class qsynthMeterValue(QtGui.QFrame):
 		self.setMinimumWidth(12)
 		self.setBackgroundRole(QtGui.QPalette.NoRole)
 
-		self.setFrameShape(QtGui.QFrame.StyledPanel)
-		self.setFrameShadow(QtGui.QFrame.Sunken)
-
 	# Reset peak holder.
 	def peakReset(self):
 		self.m_iPeak = 0
