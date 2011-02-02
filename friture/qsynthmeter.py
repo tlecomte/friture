@@ -173,7 +173,7 @@ class qsynthMeterValue(QtGui.QFrame):
 
 		if 1: #CONFIG_GRADIENT
 			painter.drawPixmap(0, h - self.m_iValue,
-				self.m_pMeter.pixmap(), 0, h - self.m_iValue, w, self.m_iValue)
+				self.m_pMeter.pixmap(), 0, h - self.m_iValue, w, self.m_iValue + 1)
 	  	else:
 			y = self.m_iValue
 
