@@ -98,22 +98,22 @@ class Friture(QMainWindow, ):
 		current_stream = self.audiobackend.get_current_stream()
 		self.settings_dialog.comboBox_inputDevice.setCurrentIndex(current_stream)
 
-		self.centralwidget = CentralWidget(self.ui.centralwidget, self.logger, "central_widget", 3)
-		self.centralLayout = QVBoxLayout(self.ui.centralwidget)
-		self.centralLayout.setContentsMargins(0, 0, 0, 0)
-		self.centralLayout.addWidget(self.centralwidget)
-
 		# this timer is used to update widgets that just need to display as fast as they can
 		self.display_timer = QtCore.QTimer()
 		self.display_timer.setInterval(SMOOTH_DISPLAY_TIMER_PERIOD_MS) # constant timing
 
-		# timer ticks
-		self.connect(self.display_timer, QtCore.SIGNAL('timeout()'), self.update_buffer)
-		self.connect(self.display_timer, QtCore.SIGNAL('timeout()'), self.statistics)
-		
 		# slow timer
 		self.slow_timer = QtCore.QTimer()
 		self.slow_timer.setInterval(1000) # constant timing
+
+		self.centralwidget = CentralWidget(self.ui.centralwidget, self.logger, "central_widget", 0)
+		self.centralLayout = QVBoxLayout(self.ui.centralwidget)
+		self.centralLayout.setContentsMargins(0, 0, 0, 0)
+		self.centralLayout.addWidget(self.centralwidget)
+
+		# timer ticks
+		self.connect(self.display_timer, QtCore.SIGNAL('timeout()'), self.update_buffer)
+		self.connect(self.display_timer, QtCore.SIGNAL('timeout()'), self.statistics)
 
 		# timer ticks
 		self.connect(self.slow_timer, QtCore.SIGNAL('timeout()'), self.get_cpu_percent)
