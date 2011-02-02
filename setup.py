@@ -6,35 +6,43 @@ from glob import glob
 import os
 import numpy
 
+py2exe_build = True
 try:
 	import py2exe
 except ImportError:
 	print "Cannot find py2exe"
+	py2exe_build = False
 
 # see INSTALL file for details
 
-#include the QT svg plugin to render the icons
-#include the filter coefficients in the pickle file
-data_files = [("imageformats", glob(r'C:\Python*\Lib\site-packages\PyQt4\plugins\imageformats\qsvg4.dll')),\
-			  ("", glob("generated_filters.pkl"))]
-#exclude some python libraries that py2exe includes by error
-excludes = ["matplotlib","_ssl","Tkconstants","Tkinter","tcl","email","pyreadline","nose",\
-		    "doctest", "pdb", "difflib", "pydoc", "_hashlib", "bz2","httplib","cookielib","cookielib","urllib","urllib2","Image",\
-		    "pywin","optparse","zipfile","calendar","subprocess","compiler",\
-		    "_imaging","_ssl"]
-#Note: unittest, inspect are needed by numpy
-#exclude dlls that py2exe includes by error
-dll_excludes = ["powrprof.dll", "msvcp90.dll"]
-#manually exclude python libraries that py2exe fails to detect
-includes = ["sip", "PyQt4.QtSvg"]
+data_files = []
+excludes = []
+dll_excludes = []
+includes = []
+
+if py2exe_build:
+	#include the QT svg plugin to render the icons
+	#include the filter coefficients in the pickle file
+	data_files += [("imageformats", glob(r'C:\Python*\Lib\site-packages\PyQt4\plugins\imageformats\qsvg4.dll')),\
+				("", glob("generated_filters.pkl"))]
+	#exclude some python libraries that py2exe includes by error
+	excludes += ["matplotlib","_ssl","Tkconstants","Tkinter","tcl","email","pyreadline","nose",\
+			"doctest", "pdb", "difflib", "pydoc", "_hashlib", "bz2","httplib","cookielib","cookielib","urllib","urllib2","Image",\
+			"pywin","optparse","zipfile","calendar","subprocess","compiler",\
+			"_imaging","_ssl"]
+	#Note: unittest, inspect are needed by numpy
+	#exclude dlls that py2exe includes by error
+	dll_excludes += ["powrprof.dll", "msvcp90.dll"]
+	#manually exclude python libraries that py2exe fails to detect
+	includes += ["sip", "PyQt4.QtSvg"]
+
+	if os.name == 'nt':
+		if os.environ.has_key('CPATH'):
+			os.environ['CPATH'] = os.environ['CPATH'] + numpy.get_include()
+		else:
+			os.environ['CPATH'] = numpy.get_include()
 
 ext_modules = [Extension("friture.exp_smoothing_conv", ["friture/extension/exp_smoothing_conv.pyx"])]
-
-if os.name == 'nt':
-	if os.environ.has_key('CPATH'):
-		os.environ['CPATH'] = os.environ['CPATH'] + numpy.get_include()
-	else:
-		os.environ['CPATH'] = numpy.get_include()
 
 setup(name = "friture",
 	version = '0.1',
