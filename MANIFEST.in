@@ -1,0 +1,7 @@
+include COPYING.txt
+include INSTALL.txt
+include PROFILING.txt
+include README.md
+include TODO.txt
+include friture.py
+include friture/generated_filters.pkl

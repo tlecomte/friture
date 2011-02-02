@@ -36,10 +36,43 @@ if os.name == 'nt':
 	else:
 		os.environ['CPATH'] = numpy.get_include()
 
-setup(name = "Friture",
+setup(name = "friture",
+	version = '0.1',
+	description = 'Real-time visualization of live audio data',
+	long_description = """\
+Friture
+-------
+
+Friture is an application to display real-time visualization of live audio data.
+
+This program can be useful for educational purposes, or to analyze the audio response of a hall, etc.
+
+The name *friture* is a french word for *frying*, also used for *noise* in a sound.
+""",
+	license = "GNU GENERAL PUBLIC LICENSE",
+	author = 'Timothée Lecomte',
+	author_email = 'lecomte.timothee@gmail.com',
+	url='http://tlecomte.github.com/friture/',
+	keywords = ["audio", "spectrum", "spectrogram"],
+	classifiers = [
+	"Programming Language :: Python",
+	"Programming Language :: Python :: 3",
+	"Programming Language :: Cython",
+	"Development Status :: 4 - Beta",
+	"Environment :: MacOS X",
+	"Environment :: Win32 (MS Windows)",
+	"Environment :: X11 Applications :: Qt",
+	"Intended Audience :: End Users/Desktop",
+	"License :: OSI Approved :: GNU General Public License (GPL)",
+	"Operating System :: OS Independent",
+	"Topic :: Multimedia :: Sound/Audio :: Analysis",
+	"Topic :: Multimedia :: Sound/Audio :: Speech"
+	],
+	packages = ['friture'],
+	scripts = ['scripts/friture'],
 	windows = [{"script":'friture.py', "icon_resources":[(1, "friture.ico")]}],
 	options = {"py2exe":{"includes":includes, "excludes":excludes, "dll_excludes":dll_excludes}},
-	data_files=data_files,
+	data_files = data_files,
 	cmdclass = {"build_ext": build_ext},
-	ext_modules = ext_modules
+	ext_modules = ext_modules,
 	)
