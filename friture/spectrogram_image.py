@@ -41,7 +41,7 @@ class CanvasScaledSpectrogram(QtCore.QObject):
 		self.pixmap = QtGui.QPixmap(2*self.canvas_width,  self.canvas_height)
 		#print "pixmap info : hasAlpha =", self.pixmap.hasAlpha(), ", depth =", self.pixmap.depth(), ", default depth =", self.pixmap.defaultDepth()
 		self.pixmap.fill(QtGui.QColor("black"))
-		self.painter = QtGui.QPainter(self.pixmap)
+		self.painter = QtGui.QPainter()
 		self.offset = 0
 		# prepare a custom colormap black->blue->green->yellow->red->white
 		self.colorMap = Qwt.QwtLinearColorMap(Qt.Qt.black, Qt.Qt.white)
@@ -54,20 +54,11 @@ class CanvasScaledSpectrogram(QtCore.QObject):
 		self.time = QtCore.QTime()
 		self.time.start()
 		#self.logfile = open("latency_log.txt",'w')
-		
-	def __del__(self):
-		# delete painter and the associated pixmap in the correct order
-		del self.painter
-		del self.pixmap
-		#self.logfile.close()
 
 	def erase(self):
 		#self.fullspectrogram = numpy.zeros((self.canvas_height, self.time_bin_number(), 4), dtype = numpy.uint8)
-		del self.painter
-		del self.pixmap
 		self.pixmap = QtGui.QPixmap(2*self.canvas_width,  self.canvas_height)
 		self.pixmap.fill(QtGui.QColor("black"))
-		self.painter = QtGui.QPainter(self.pixmap)
 		self.offset = 0
 
 	def time_bin_number(self):
@@ -153,8 +144,12 @@ class CanvasScaledSpectrogram(QtCore.QObject):
 		myimage = self.prepare_image(byteString, xyzs_buffer.shape[0])
 
 		self.offset = (self.offset + 1) % self.canvas_width
+		
+		self.painter.begin(self.pixmap)
 		self.painter.drawImage(self.offset, 0, myimage)
 		self.painter.drawImage(self.offset + self.canvas_width, 0, myimage)
+		self.painter.end()
+		
 		# reinitialize current_total
 		self.current_total = 0.
 		
