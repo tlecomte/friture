@@ -139,8 +139,14 @@ class Levels_Widget(QtGui.QWidget):
 		
 		level_rms = 10.*log10(value_rms*2. + 0.*1e-80) #*2. to get 0dB for a sine wave
 		level_max = 20.*log10(self.old_max + 0.*1e-80)
-		self.label_rms.setText("%.01f" % level_rms)
-		self.label_peak.setText("%.01f" % level_max)
+		if level_rms > -150.:
+			self.label_rms.setText("%.01f" % level_rms)
+		else:
+			self.label_rms.setText("-Inf")
+		if level_max > -150.:
+			self.label_peak.setText("%.01f" % level_max)
+		else:
+			self.label_peak.setText("-Inf")
 		self.meter.setValue(0, level_rms)
 		self.meter.setValue(1, level_max)
 		
