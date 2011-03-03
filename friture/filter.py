@@ -137,19 +137,6 @@ def octave_filter_bank_decimation(blow, alow, forward, feedback, x, zis=None):
 		
 		return y, dec, zfs
 
-def load_filters_params():
-	path = os.path.dirname(__file__)
-	fname = os.path.join(path, 'generated_filters.pkl')
-	
-	input = open(fname, 'rb')
-	# Pickle dictionary using protocol 0.
-	params = pickle.load(input)
-	# Pickle the list using the highest protocol available.
-	#pickle.load(input, -1)
-	input.close()
-	
-	return params
-
 def lfilter(b, a, x, axis=-1, zi=None):
     """
     Filter data along one-dimension with an IIR or FIR filter.

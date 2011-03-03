@@ -21,9 +21,11 @@ from PyQt4 import QtGui
 from numpy import log10, array, arange
 from friture.histplot import HistPlot
 from friture.octavespectrum_settings import OctaveSpectrum_Settings_Dialog # settings dialog
-from friture.filter import load_filters_params, octave_filter_bank_decimation, octave_frequencies, lfilter
+from friture.filter import octave_filter_bank_decimation, octave_frequencies, lfilter
 
 from friture.exp_smoothing_conv import pyx_exp_smoothed_value
+
+from friture import generated_filters
 
 SMOOTH_DISPLAY_TIMER_PERIOD_MS = 25
 SAMPLING_RATE = 44100
@@ -244,9 +246,7 @@ class OctaveSpectrum_Widget(QtGui.QWidget):
 
 class octave_filters():
 	def __init__(self, bandsperoctave):
-		self.filters_params = load_filters_params()
-		
-		[self.bdec, self.adec] = self.filters_params['dec']
+		[self.bdec, self.adec] = generated_filters.params['dec']
 				
 		self.zfs = None
 		
@@ -272,7 +272,7 @@ class octave_filters():
 		self.bandsperoctave = bandsperoctave
 		self.nbands = NOCTAVE*self.bandsperoctave
 		self.fi, self.flow, self.fhigh = octave_frequencies(self.nbands, self.bandsperoctave)
-		[self.boct, self.aoct, fi, flow, fhigh] = self.filters_params['%d' %bandsperoctave] 
+		[self.boct, self.aoct, fi, flow, fhigh] = generated_filters.params['%d' %bandsperoctave] 
 		
 		#z, p, k = tf2zpk(self.bdec, self.adec)
 		#print "poles", p, abs(p)**2

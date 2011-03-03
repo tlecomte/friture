@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from numpy import pi, exp, arange, cos, sin, sqrt, zeros, ones, log, arange
+from numpy import pi, exp, arange, cos, sin, sqrt, zeros, ones, log, arange, set_printoptions
 # the three following lines are a workaround for a bug with scipy and py2exe
 # together. See http://www.pyinstaller.org/ticket/83 for reference.
 from scipy.misc import factorial
@@ -159,7 +159,6 @@ def octave_filters_oneoctave(Nbands, BandsPerOctave):
 	return [B, A, fi, f_low, f_high]
 
 def generate_filters_params():
-	import pickle
 	import os
 	
 	params = {}
@@ -176,22 +175,26 @@ def generate_filters_params():
 	#bdec = firwin(30, fc)
 	#adec = [1.]
 	
+	set_printoptions(precision=24)
+    
 	params['dec'] = [bdec, adec]
-	
+    
 	#generate the octave filters
 	for BandsPerOctave in [1,3,6,12,24]:
 		Nbands = NOCTAVE*BandsPerOctave
 		[boct, aoct, fi, flow, fhigh] = octave_filters_oneoctave(Nbands, BandsPerOctave)
 		params['%d' %BandsPerOctave] = [boct, aoct, fi, flow, fhigh]
-	
+    
+	out = """\
+# Filters parameters generated from filter_design.py
+from numpy import array
+params = %s
+""" %repr(params)
+    
 	path = os.path.dirname(__file__)
-	fname = os.path.join(path, 'generated_filters.pkl')
-
-	output = open(fname, 'wb')
-	# Pickle dictionary using protocol 0.
-	pickle.dump(params, output)
-	# Pickle the list using the highest protocol available.
-	#pickle.dump(selfref_list, output, -1)
+	fname = os.path.join(path, 'generated_filters.py')
+	output = open(fname,'w')
+	output.write(out)
 	output.close()
 
 # main() is a test function
