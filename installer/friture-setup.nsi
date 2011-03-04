@@ -32,7 +32,7 @@ SetCompressor lzma
 ; Welcome page
 !insertmacro MUI_PAGE_WELCOME
 ; License page
-!insertmacro MUI_PAGE_LICENSE "${PROJECT_PATH}\COPYING"
+!insertmacro MUI_PAGE_LICENSE "${PROJECT_PATH}\COPYING.txt"
 ; Directory page
 !insertmacro MUI_PAGE_DIRECTORY
 ; Instfiles page
@@ -87,9 +87,9 @@ Section "SectionPrincipale" SEC01
   File "${PROJECT_PATH}\dist\*.dll"
   File "${PROJECT_PATH}\dist\friture.exe"
   File "${PROJECT_PATH}\dist\w9xpopen.exe"
-  File "${PROJECT_PATH}\COPYING"
-  File "${PROJECT_PATH}\README"
-  File "${PROJECT_PATH}\TODO"
+  File "${PROJECT_PATH}\COPYING.txt"
+  File "${PROJECT_PATH}\README.md"
+  File "${PROJECT_PATH}\TODO.txt"
 SectionEnd
 
 Section MSVC
