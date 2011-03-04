@@ -38,8 +38,7 @@ SetCompressor lzma
 ; Instfiles page
 !insertmacro MUI_PAGE_INSTFILES
 ; Finish page
-!define MUI_FINISHPAGE_RUN
-!define MUI_FINISHPAGE_RUN_FUNCTION RunFriture
+!define MUI_FINISHPAGE_RUN "$INSTDIR\friture.exe"
 !insertmacro MUI_PAGE_FINISH
 
 ; Uninstaller pages
@@ -69,13 +68,6 @@ VIAddVersionKey /LANG=${LANG_ENGLISH} "CompanyName" "${PRODUCT_PUBLISHER}"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "LegalCopyright" "© ${PRODUCT_PUBLISHER} under the GNU GPLv3."
 VIAddVersionKey /LANG=${LANG_ENGLISH} "FileDescription" "Installation for ${PRODUCT_NAME}"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "FileVersion" "${PRODUCT_VERSION}"
-
-Function RunFriture
-; This will set the working directory properly,
-; otherwise the exe would not start.
-SetOutPath "$INSTDIR"
-Exec "$INSTDIR\friture.exe"
-FunctionEnd
 
 Function .onInit
   !insertmacro MUI_LANGDLL_DISPLAY
