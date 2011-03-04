@@ -90,7 +90,6 @@ Section "SectionPrincipale" SEC01
   SetOutPath "$INSTDIR\imageformats"
   File "${PROJECT_PATH}\dist\imageformats\qsvg4.dll"
   SetOutPath "$INSTDIR"
-  File "${PROJECT_PATH}\dist\generated_filters.pkl"
   File "${PROJECT_PATH}\dist\library.zip"
   File "${PROJECT_PATH}\dist\*.pyd"
   File "${PROJECT_PATH}\dist\*.dll"
