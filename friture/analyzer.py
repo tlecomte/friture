@@ -276,26 +276,9 @@ class Friture(QMainWindow, ):
 		    return
 		    
 		label = "Chunk #%d\n"\
-		"FFT period : %.01f ms\n"\
-		"Spectrogram timer period : %.01f ms\n"\
-		"Spectrogram computation: %.02f ms\n"\
 		"Audio buffer retrieval: %.02f ms\n"\
-		"Levels painting: %.02f ms and %.02f ms\n"\
-		"Scope painting: %.02f ms\n"\
-		"Spectrum painting: %.02f ms\n"\
-		"Spectrogram painting: %.02f ms\n"\
 		"Global CPU usage: %d %%"\
-		% (self.chunk_number,
-		0,#self.ui.spectrum.fft_size*1000./SAMPLING_RATE,
-		0,#self.ui.spectrogram.period_ms,
-		0,#self.ui.spectrogram.spectrogram_timer_time,
-		self.buffer_timer_time,
-		0,#self.ui.levels.meter.m_ppValues[0].paint_time,
-		0,#self.ui.levels.meter.m_ppValues[1].paint_time,
-		0,#self.ui.scope.PlotZoneUp.paint_time,
-		0,#self.ui.spectrum.PlotZoneSpect.paint_time,
-		0,#self.ui.spectrogram.PlotZoneImage.paint_time)
-		self.cpu_percent)
+		% (self.chunk_number, self.buffer_timer_time, self.cpu_percent)
 		
 		self.about_dialog.LabelStats.setText(label)
 
