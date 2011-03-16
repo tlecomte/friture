@@ -78,7 +78,7 @@ The name *friture* is a french word for *frying*, also used for *noise* in a sou
 	],
 	packages = ['friture'],
 	scripts = ['scripts/friture'],
-	windows = [{"script":'friture.py', "icon_resources":[(1, "friture.ico")]}],
+	windows = [{"script":'friture.py', "icon_resources":[(1, "resources/images/friture.ico")]}],
 	options = {"py2exe":{"includes":includes, "excludes":excludes, "dll_excludes":dll_excludes}},
 	data_files = data_files,
 	cmdclass = {"build_ext": build_ext},
