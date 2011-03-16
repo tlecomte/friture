@@ -26,6 +26,7 @@ aboutText = """
 <p> License is GPLv3.
 <p> Homepage: <a href="http://www.github.com/tlecomte/friture">http://www.github.com/tlecomte/friture</a>
 <p> Send comments, ideas and bug reports to: <a href="mailto:lecomte.timothee@gmail.com">lecomte.timothee@gmail.com</a>
+<p> Splash screen photo credit: <a href="http://www.flickr.com/photos/visual_dichotomy/3623619145/">visual.dichotomy</a> (CC BY 2.0)
 """
 
 class About_Dialog(QtGui.QDialog):
