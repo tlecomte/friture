@@ -5,7 +5,7 @@
 ; HM NIS Edit Wizard helper defines
 !define PRODUCT_NAME "Friture"
 !define /date PRODUCT_VERSION "%Y/%m/%d"
-!define PRODUCT_PUBLISHER "Timothée Lecomte"
+!define PRODUCT_PUBLISHER "Timoth�e Lecomte"
 !define PRODUCT_DESCRIPTION "Real-time audio visualizations"
 !define PRODUCT_WEB_SITE "http://tlecomte.github.com/friture/"
 !define PRODUCT_DIR_REGKEY "Software\Microsoft\Windows\CurrentVersion\App Paths\friture.exe"
@@ -16,40 +16,40 @@
 
 SetCompressor lzma
 
-; MUI 1.67 compatible ------
-!include "MUI.nsh"
+!include "MUI2.nsh"
 
 ; MUI Settings
+
+; show a message box with a warning when the user wants to close the installer
 !define MUI_ABORTWARNING
-!define MUI_ICON "${NSISDIR}\Contrib\Graphics\Icons\modern-install.ico"
-!define MUI_UNICON "${NSISDIR}\Contrib\Graphics\Icons\modern-uninstall.ico"
+; same for uninstaller
+!define MUI_UNABORTWARNING
 
 ; Language Selection Dialog Settings
 !define MUI_LANGDLL_REGISTRY_ROOT "${PRODUCT_UNINST_ROOT_KEY}"
 !define MUI_LANGDLL_REGISTRY_KEY "${PRODUCT_UNINST_KEY}"
 !define MUI_LANGDLL_REGISTRY_VALUENAME "NSIS:Language"
 
-; Welcome page
+; Installer pages
 !insertmacro MUI_PAGE_WELCOME
-; License page
 !insertmacro MUI_PAGE_LICENSE "${PROJECT_PATH}\COPYING.txt"
-; Directory page
 !insertmacro MUI_PAGE_DIRECTORY
-; Instfiles page
 !insertmacro MUI_PAGE_INSTFILES
-; Finish page
+; offer to run the program when exiting
 !define MUI_FINISHPAGE_RUN "$INSTDIR\friture.exe"
 !insertmacro MUI_PAGE_FINISH
 
 ; Uninstaller pages
+!insertmacro MUI_UNPAGE_CONFIRM
 !insertmacro MUI_UNPAGE_INSTFILES
+!insertmacro MUI_UNPAGE_FINISH
 
 ; Language files
 !insertmacro MUI_LANGUAGE "English"
 !insertmacro MUI_LANGUAGE "French"
 
-; Reserve files
-!insertmacro MUI_RESERVEFILE_INSTALLOPTIONS
+; Reserve files (won't be compressed with the rest, to start faster)
+!insertmacro MUI_RESERVEFILE_LANGDLL ;Language selection dialog
 
 ; MUI end ------
 
@@ -65,10 +65,11 @@ VIProductVersion "0.0.0.0"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductName" "${PRODUCT_NAME}"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "Comments" "${PRODUCT_DESCRIPTION}"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "CompanyName" "${PRODUCT_PUBLISHER}"
-VIAddVersionKey /LANG=${LANG_ENGLISH} "LegalCopyright" "© ${PRODUCT_PUBLISHER} under the GNU GPLv3."
+VIAddVersionKey /LANG=${LANG_ENGLISH} "LegalCopyright" "� ${PRODUCT_PUBLISHER} under the GNU GPLv3."
 VIAddVersionKey /LANG=${LANG_ENGLISH} "FileDescription" "Installation for ${PRODUCT_NAME}"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "FileVersion" "${PRODUCT_VERSION}"
 
+; display a language selection dialog
 Function .onInit
   !insertmacro MUI_LANGDLL_DISPLAY
 FunctionEnd
@@ -115,16 +116,13 @@ Section -Post
   WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "Publisher" "${PRODUCT_PUBLISHER}"
 SectionEnd
 
-Function un.onUninstSuccess
-  HideWindow
-  MessageBox MB_ICONINFORMATION|MB_OK "$(^Name) a été désinstallé avec succès de votre ordinateur."
+Function un.onInit
+  ; use the language of the installer
+  !insertmacro MUI_UNGETLANGUAGE
 FunctionEnd
 
-Function un.onInit
-!insertmacro MUI_UNGETLANGUAGE
-  MessageBox MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2 "Êtes-vous certains de vouloir désinstaller totalement $(^Name) et tous ses composants ?" IDYES +2
-  Abort
-FunctionEnd
+LangString STR_remove_settings ${LANG_ENGLISH} "Do you want to remove Friture saved settings ?"
+LangString STR_remove_settings ${LANG_FRENCH} "Voulez-vous supprimer les r�glages de Friture pr�c�demment sauvegard�s ?"
 
 Section Uninstall
   RMDir /r "$INSTDIR"
@@ -138,7 +136,7 @@ Section Uninstall
   DeleteRegKey ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}"
   DeleteRegKey HKLM "${PRODUCT_DIR_REGKEY}"
   
-  MessageBox MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2 "Voulez-vous supprimer les réglages de Friture précédemment sauvegardés ?" IDNO +2
+  MessageBox MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2 $(STR_remove_settings) IDNO +2
   DeleteRegKey HKCU "Software\Friture"
   
   SetAutoClose true
