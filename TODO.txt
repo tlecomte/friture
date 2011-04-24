@@ -4,7 +4,9 @@ Improvements :
 - Code : continue profiling (why do python and Xorg take so much CPU while profiling shows that most of the time is pent being idle ?)
 - Code : comments in the code
 - Code/Maths : constant-Q-transform for efficient and precise logarithmic spectrogram
+- Code/Maths : **or** adaptive frequency resolution in the fft spectrum and spectrogram
 - Code : replace QwtColorMap with QLinearGradient to remove a dependancy on Qwt
+- Code/Graphics : use the nicer histogram from octave spectrum fot the fft spectrum
 
 Features :
 - Code : overlapping fft windows for smoother spectrograms
@@ -18,4 +20,3 @@ Bugfixes :
 - code : when there is no input, audio data goes to 0., and log spectrum goes to -Inf,
  which seems to slow down computations enormously.
 - code : the device info from portaudio reports a low input latency (max 46 ms), but after opening the stream, it is reported to be 139 ms. Why ?
-- code : the level meter seems to have unexpeted quantization
