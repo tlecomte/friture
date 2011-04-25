@@ -356,7 +356,7 @@ def main():
 		import cProfile
 		import pstats
 		
-		cProfile.run('app.exec_()',filename="friture.cprof")
+		cProfile.runctx('app.exec_()', globals(), locals(), filename="friture.cprof")
 		
 		stats = pstats.Stats("friture.cprof")
 		stats.strip_dirs().sort_stats('time').print_stats(20)
