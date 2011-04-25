@@ -14,7 +14,7 @@
    width="128"
    height="128"
    id="svg4895"
-   inkscape:version="0.47 r22583"
+   inkscape:version="0.48.1 "
    sodipodi:docname="new-dock.svg">
   <metadata
      id="metadata78">
@@ -24,7 +24,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -37,15 +37,15 @@
      guidetolerance="10"
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
-     inkscape:window-width="1440"
-     inkscape:window-height="849"
+     inkscape:window-width="1024"
+     inkscape:window-height="578"
      id="namedview76"
      showgrid="false"
      inkscape:zoom="1.859375"
-     inkscape:cx="-37.378151"
+     inkscape:cx="-129.88235"
      inkscape:cy="58.890756"
-     inkscape:window-x="-4"
-     inkscape:window-y="-3"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
      inkscape:window-maximized="1"
      inkscape:current-layer="svg4895" />
   <defs
@@ -262,7 +262,8 @@
      d="m 78.521008,17.210085 a 66.15126,66.15126 0 1 1 -132.30252,0 66.15126,66.15126 0 1 1 132.30252,0 z"
      transform="matrix(0.94351636,0,0,0.94351636,52.32894,47.762003)" />
   <path
-     style="fill:#ffffff;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-     d="m 51.078125,14.515625 0,36.59375 -36.5625,0 0,25.8125 36.5625,0 0,36.562505 25.8125,0 0,-36.562505 36.593755,0 0,-25.8125 -36.593755,0 0,-36.59375 -25.8125,0 z"
-     id="rect2909" />
+     style="fill:#ffffff;fill-rule:nonzero;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+     d="m 51.078125,14.515625 c 0,12.197917 0,24.395833 0,36.59375 -12.1875,0 -24.375,0 -36.5625,0 0,8.604167 0,17.208333 0,25.8125 12.1875,0 24.375,0 36.5625,0 0,12.187502 0,24.375005 0,36.562505 8.604167,0 17.208333,0 25.8125,0 0,-12.1875 0,-24.375003 0,-36.562505 12.197918,0 24.395835,0 36.593755,0 0,-8.604167 0,-17.208333 0,-25.8125 -12.19792,0 -24.395837,0 -36.593755,0 0,-12.197917 0,-24.395833 0,-36.59375 -8.604167,0 -17.208333,0 -25.8125,0 z"
+     id="rect2909"
+     inkscape:connector-curvature="0" />
 </svg>
