@@ -147,12 +147,20 @@ class HistogramItem(Qwt.QwtPlotItem):
 			self.y0 = yMap.transform(self.baseline())
 			
 			self.update_pixmap(self.x2[0] - self.x1[0], self.canvas_height)
-			self.i = list(array(self.x2) - array(self.x1) - (self.cached_bar_width - 2))
+			self.i = list(array(self.x2) - array(self.x1) - (self.cached_bar_width - 2))   
+
+			# [p1,p2] = [bottom pixel index, top pixel index]
+			# [s1,s2] = [bottom value, top value]
+			self.p1 = yMap.p1()
+			self.p2 = yMap.p2()
+			self.s1 = yMap.s1()
+			self.s2 = yMap.s2()
 			
 			self.need_transform = False
-		
-		for x1, x2, y, i in zip(self.x1, self.x2, self.y, self.i):
-			y2 = yMap.transform(y)
+
+		y = (self.p1 - self.p2) * (self.y - self.s2)/(self.s1 - self.s2) + self.p2
+  
+		for x1, x2, y2, i in zip(self.x1, self.x2, y, self.i):
 			self.drawBar(painter, x1, y2, i)
 
 	def drawBar(self, painter, left, top, i):
@@ -259,11 +267,20 @@ class HistogramPeakBarItem(Qwt.QwtPlotItem):
 		if self.need_transform:
 			self.x1 = [xMap.transform(flow)+1 for flow in self.fl]
 			self.x2 = [xMap.transform(fhigh)-1 for fhigh in self.fh]
+   
+			# [p1,p2] = [bottom pixel index, top pixel index]
+			# [s1,s2] = [bottom value, top value]
+			self.p1 = yMap.p1()
+			self.p2 = yMap.p2()
+			self.s1 = yMap.s1()
+			self.s2 = yMap.s2()   
+
 			self.need_transform = False
 
-		for x1, x2, peak, index in zip(self.x1, self.x2, self.peaks, self.palette_index):
-			y = yMap.transform(peak)
-			painter.fillRect(x1-1, y, x2-x1+2, h, self.palette[index])
+		peaks = (self.p1 - self.p2) * (self.peaks - self.s2)/(self.s1 - self.s2) + self.p2
+
+		for x1, x2, peak, index in zip(self.x1, self.x2, peaks, self.palette_index):
+			painter.fillRect(x1-1, peak, x2-x1+2, h, self.palette[index])
 
 
 class HistPlot(Qwt.QwtPlot):
