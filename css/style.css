@@ -64,3 +64,12 @@ hr {
     padding-top:30px;
     font-style: italic;
 }
+
+p.latest-version {
+    margin-top: 0;
+    border: 1px solid #FC0;
+    background: #FFC;
+    padding: .5em;
+    font-weight: bold;
+    font-size: 1.15em;
+}
