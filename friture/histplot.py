@@ -82,9 +82,11 @@ class HistogramItem(Qwt.QwtPlotItem):
 		self.need_transform = False
 		self.fl = [0.]
 		self.fh = [0.]
-		self.y = [0.]
+		self.y = array([0.])
 		self.y0 = 0.
 		self.i = [0]
+  		self.transform_slope = 1.
+		self.transform_origin = 0.
 		
 		self.pixmaps = [QtGui.QPixmap()]
 
@@ -94,7 +96,7 @@ class HistogramItem(Qwt.QwtPlotItem):
 			self.fh = fh
 			self.need_transform = True
 		
-		self.y = y
+		self.y = array(y)
 		
 		self.itemChanged()
 
@@ -151,14 +153,13 @@ class HistogramItem(Qwt.QwtPlotItem):
 
 			# [p1,p2] = [bottom pixel index, top pixel index]
 			# [s1,s2] = [bottom value, top value]
-			self.p1 = yMap.p1()
-			self.p2 = yMap.p2()
-			self.s1 = yMap.s1()
-			self.s2 = yMap.s2()
+   			if yMap.s2() - yMap.s1() <> 0.:
+                                      self.transform_slope = (yMap.p1() - yMap.p2())/(yMap.s1() - yMap.s2())
+                                      self.transform_origin = - yMap.s2() * (yMap.p1() - yMap.p2())/(yMap.s1() - yMap.s2()) + yMap.p2()                                      
 			
 			self.need_transform = False
 
-		y = (self.p1 - self.p2) * (self.y - self.s2)/(self.s1 - self.s2) + self.p2
+		y = self.transform_slope * self.y + self.transform_origin
   
 		for x1, x2, y2, i in zip(self.x1, self.x2, y, self.i):
 			self.drawBar(painter, x1, y2, i)
@@ -239,11 +240,13 @@ class HistogramPeakBarItem(Qwt.QwtPlotItem):
 		Qwt.QwtPlotItem.__init__(self, *args)
 		self.fl = [0.]
 		self.fh = [0.]
-		self.peaks = [0.]
+		self.peaks = array([0.])
 		self.palette_index = [0]
 		#self.canvas_height = 2
 		self.canvas_width = 2
 		self.need_transform = False
+		self.transform_slope = 1.
+		self.transform_origin = 0.
 		
 		self.palette = [Qt.QColor(255, gb, gb) for gb in range(0,256)]
 
@@ -270,15 +273,14 @@ class HistogramPeakBarItem(Qwt.QwtPlotItem):
    
 			# [p1,p2] = [bottom pixel index, top pixel index]
 			# [s1,s2] = [bottom value, top value]
-			self.p1 = yMap.p1()
-			self.p2 = yMap.p2()
-			self.s1 = yMap.s1()
-			self.s2 = yMap.s2()   
-
+   			if yMap.s2() - yMap.s1() <> 0.:
+                                      self.transform_slope = (yMap.p1() - yMap.p2())/(yMap.s1() - yMap.s2())
+                                      self.transform_origin = - yMap.s2() * (yMap.p1() - yMap.p2())/(yMap.s1() - yMap.s2()) + yMap.p2()                                      
+			
 			self.need_transform = False
 
-		peaks = (self.p1 - self.p2) * (self.peaks - self.s2)/(self.s1 - self.s2) + self.p2
-
+		peaks = self.transform_slope * self.peaks + self.transform_origin
+  
 		for x1, x2, peak, index in zip(self.x1, self.x2, peaks, self.palette_index):
 			painter.fillRect(x1-1, peak, x2-x1+2, h, self.palette[index])
 
