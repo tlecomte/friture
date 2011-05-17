@@ -43,7 +43,6 @@ class Window(QtGui.QWidget):
 
         self.verticalScale = Qwt.QwtScaleWidget(self)
         self.verticalScale.setTitle("PSD (dB)")
-        #self.qwtScale.setScaleDraw(self.qwtScaleDraw)
         self.verticalScale.setScaleDiv(self.verticalScaleEngine.transformation(),
                                   self.verticalScaleEngine.divideScale(0., 100., 8, 5))
 
@@ -58,23 +57,28 @@ class Window(QtGui.QWidget):
         #self.horizontalScale.setBorderDist(0,0)
         self.horizontalScale.setSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Preferred)
 
-        mainLayout = QtGui.QGridLayout()
-        mainLayout.addWidget(self.verticalScale, 0, 0)
-        mainLayout.addWidget(self.glWidget, 0, 1)
-        mainLayout.addWidget(self.xSlider, 0, 2)
-        mainLayout.addWidget(self.ySlider, 0, 3)
-        mainLayout.addWidget(self.zSlider, 0, 4)
-        mainLayout.addWidget(self.horizontalScale, 1, 1)
-        self.setLayout(mainLayout)
-        
         left = self.horizontalScale.getBorderDistHint()[0]
         right = self.horizontalScale.getBorderDistHint()[1]
         top = self.verticalScale.getBorderDistHint()[0]
         bottom = self.verticalScale.getBorderDistHint()[1]
-        
-        print left, top, right, bottom
-        #QSpacerItem::QSpacerItem ( int w, int h, QSizePolicy::Policy hPolicy = QSizePolicy::Minimum, QSizePolicy::Policy vPolicy = QSizePolicy::Minimum )
 
+        plotLayout = QtGui.QGridLayout()
+        plotLayout.setSpacing(0)
+        plotLayout.addWidget(self.verticalScale, 0, 0, 3, 1)
+        plotLayout.addWidget(self.glWidget, 1, 2)
+        plotLayout.addWidget(self.horizontalScale, 3, 1, 1, 3)
+        plotLayout.setRowMinimumHeight(0, top)
+        plotLayout.setRowMinimumHeight(2, bottom-1)
+        plotLayout.setColumnMinimumWidth(1, left)
+        plotLayout.setColumnMinimumWidth(3, right)
+        
+        mainLayout = QtGui.QGridLayout()
+        mainLayout.addLayout(plotLayout, 0, 0)
+        mainLayout.addWidget(self.xSlider, 0, 1)
+        mainLayout.addWidget(self.ySlider, 0, 2)
+        mainLayout.addWidget(self.zSlider, 0, 3)
+        self.setLayout(mainLayout)
+        
         self.xSlider.setValue(15 * 16)
         self.ySlider.setValue(345 * 16)
         self.zSlider.setValue(0 * 16)
