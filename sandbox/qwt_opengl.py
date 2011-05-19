@@ -17,6 +17,8 @@ except ImportError:
             "PyOpenGL must be installed to run this example.")
     sys.exit(1)
 
+from numpy import *
+from numpy.random import *
 
 class Window(QtGui.QWidget):
     def __init__(self):
@@ -147,29 +149,70 @@ class GLWidget(QtOpenGL.QGLWidget):
 	#self.qglClearColor(QtCore.Qt.blue)
         self.object = self.makeObject()
         GL.glShadeModel(GL.GL_FLAT)
+        GL.glDepthFunc(GL.GL_LESS)                # The Type Of Depth Test To Do
         GL.glEnable(GL.GL_DEPTH_TEST)
+        GL.glMatrixMode(GL.GL_PROJECTION)
+        GL.glLoadIdentity()
         #GL.glEnable(GL.GL_CULL_FACE)
 
     def paintGL(self):
-        # Clear The Screen And The Depth Buffer
-        GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT)
-        # Reset The View
+#        # Clear The Screen And The Depth Buffer
+#        GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT)
+#        # Reset The View
         GL.glLoadIdentity()
-        # Move Into The Screen 10.0 Units
+#        # Move Into The Screen 10.0 Units
         GL.glTranslated(0.0, 0.0, -10.0)
-        GL.glRotated(self.xRot / 16.0, 1.0, 0.0, 0.0)
-        GL.glRotated(self.yRot / 16.0, 0.0, 1.0, 0.0)
-        GL.glRotated(self.zRot / 16.0, 0.0, 0.0, 1.0)
-        GL.glCallList(self.object)
-        self.qglColor( QtCore.Qt.white )
-        GL.glBegin(GL.GL_TRIANGLES) # Drawing Using Triangles
-        GL.glVertex3f( 0.0, 1.0, 0.0) # Top
-        GL.glVertex3f(-1.0,-1.0, 0.0) # Bottom Left
-        GL.glVertex3f( 1.0,-1.0, 0.0) # Bottom Right
-        GL.glEnd() # Finished Drawing The Triangle
+#        GL.glRotated(self.xRot / 16.0, 1.0, 0.0, 0.0)
+#        GL.glRotated(self.yRot / 16.0, 0.0, 1.0, 0.0)
+#        GL.glRotated(self.zRot / 16.0, 0.0, 0.0, 1.0)
+#        GL.glCallList(self.object)
+#        self.qglColor( QtCore.Qt.white )
+#        GL.glBegin(GL.GL_TRIANGLES) # Drawing Using Triangles
+#        GL.glVertex3f( 0.0, 1.0, 0.0) # Top
+#        GL.glVertex3f(-1.0,-1.0, 0.0) # Bottom Left
+#        GL.glVertex3f( 1.0,-1.0, 0.0) # Bottom Right
+#        GL.glEnd() # Finished Drawing The Triangle
 
-        #pbuffer = QtOpenGL.QGLPixelBuffer(QtCore.QSize(512, 512), self.format())
-
+        n = 1000
+        
+        w = 0.002
+        h = 1.
+        x = -1. + arange(n)*w
+        y = (random(n)-0.5)*0.3 - 0.5
+        
+        vertex = zeros((n,4,2))
+        vertex[:,0,0] = x
+        vertex[:,0,1] = y + h
+        vertex[:,1,0] = x + w
+        vertex[:,1,1] = y + h
+        vertex[:,2,0] = x + w
+        vertex[:,2,1] = y
+        vertex[:,3,0] = x
+        vertex[:,3,1] = y
+            
+        c = random(n)
+        
+        color = ones((n,4,3))
+        color[:,0,1] = c
+        color[:,1,1] = c
+        color[:,2,1] = c
+        color[:,3,1] = c
+        color[:,0,2] = c
+        color[:,1,2] = c
+        color[:,2,2] = c
+        color[:,3,2] = c
+        
+        GL.glVertexPointerd(vertex)
+        GL.glColorPointerd(color)
+        GL.glEnableClientState(GL.GL_VERTEX_ARRAY)
+        GL.glEnableClientState(GL.GL_COLOR_ARRAY)
+        
+        GL.glClearColor(1, 1, 1, 0)
+        GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT)
+        #GL.glOrtho(-1, 1, -1, 1, -1, 1)
+        #GL.glDisable(GL.GL_LIGHTING)
+        GL.glDrawArrays(GL.GL_QUADS, 0, 4*n)
+        #GL.glEnable(GL.GL_LIGHTING)
 
     def resizeGL(self, width, height):
         side = min(width, height)
