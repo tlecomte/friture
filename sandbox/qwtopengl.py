@@ -4,7 +4,6 @@
 """PyQt4 port of the opengl/hellogl example from Qt v4.x"""
 
 import sys
-import math
 
 from PyQt4 import QtCore, QtGui, QtOpenGL
 import PyQt4.Qwt5 as Qwt
@@ -17,12 +16,48 @@ except ImportError:
             "PyOpenGL must be installed to run this example.")
     sys.exit(1)
 
-from numpy import *
-from numpy.random import *
+from numpy import arange, zeros, ones
+from numpy.random import random
 
 class Window(QtGui.QWidget):
     def __init__(self):
         super(Window, self).__init__()
+
+        self.glPlotWidget = GLPlotWidget()
+
+        plotLayout = QtGui.QGridLayout()
+        plotLayout.addWidget(self.glPlotWidget, 0, 0)
+        self.setLayout(plotLayout)
+
+        self.setWindowTitle("Hello Qwt Numpy GL")
+
+        self.i = 0
+
+        self.animator = QtCore.QTimer()
+        self.animator.setInterval(0)
+        self.animator.timeout.connect(self.updatedata)
+        self.animator.start()
+
+    def updatedata(self):
+        n = 1000
+        
+        w = 0.002
+        h = 1.
+        x = -1. + arange(n)*w
+        y = (random(n)-0.5)*0.3 - 0.5
+        
+        c = random(n)
+        
+        self.glPlotWidget.setQuadData(x, y, w, h, c)
+        
+        self.i += 1
+        if self.i % 25 == 0:
+            print self.i
+
+
+class GLPlotWidget(QtGui.QWidget):
+    def __init__(self):
+        super(GLPlotWidget, self).__init__()
 
         self.glWidget = GLWidget()
 
@@ -62,24 +97,25 @@ class Window(QtGui.QWidget):
         
         self.setLayout(plotLayout)
 
-        self.setWindowTitle("Hello Qwt Numpy GL")
+    def setlogfreqscale(self):
+        return
 
-        self.i = 0
+    def setfreqrange(self, minfreq, maxfreq):
+        return
 
-        self.animator = QtCore.QTimer()
-        self.animator.setInterval(0)
-        self.animator.timeout.connect(self.updatedata)
-        self.animator.start()
-
-    def updatedata(self):
-        self.n = 1000
+    def setspecrange(self, spec_min, spec_max):
+        return
+    
+    def setweighting(self, weighting):
+        return
+    
+    def setdata(self, freq, db_spectrogram):
+        return
         
-        w = 0.002
-        h = 1.
-        x = -1. + arange(self.n)*w
-        y = (random(self.n)-0.5)*0.3 - 0.5
-        
-        vertex = zeros((self.n,4,2))
+    def setQuadData(self, x, y, w, h, colors):
+        n = x.shape[0]
+    
+        vertex = zeros((n,4,2))
         vertex[:,0,0] = x
         vertex[:,0,1] = y + h
         vertex[:,1,0] = x + w
@@ -88,24 +124,19 @@ class Window(QtGui.QWidget):
         vertex[:,2,1] = y
         vertex[:,3,0] = x
         vertex[:,3,1] = y
-            
-        c = random(self.n)
-        
-        color = ones((self.n,4,3))
-        color[:,0,1] = c
-        color[:,1,1] = c
-        color[:,2,1] = c
-        color[:,3,1] = c
-        color[:,0,2] = c
-        color[:,1,2] = c
-        color[:,2,2] = c
-        color[:,3,2] = c
+
+        color = ones((n,4,3))
+        color[:,0,1] = colors
+        color[:,1,1] = colors
+        color[:,2,1] = colors
+        color[:,3,1] = colors
+        color[:,0,2] = colors
+        color[:,1,2] = colors
+        color[:,2,2] = colors
+        color[:,3,2] = colors
         
         self.glWidget.setQuadData(vertex, color)
-        
-        self.i += 1
-        if self.i % 25 == 0:
-            print self.i
+
 
 class GLWidget(QtOpenGL.QGLWidget):
     def __init__(self, parent=None):
