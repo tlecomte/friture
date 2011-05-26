@@ -34,7 +34,7 @@ if py2exe_build:
 	#exclude dlls that py2exe includes by error
 	dll_excludes += ["powrprof.dll", "msvcp90.dll"]
 	#manually include python libraries that py2exe fails to detect
-	includes += ["sip", "PyQt4.QtSvg"]
+	includes += ["sip", "PyQt4.QtSvg", "PyQt4.QtXml"]
 
 	if os.name == 'nt':
 		if os.environ.has_key('CPATH'):
