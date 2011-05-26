@@ -23,8 +23,7 @@ includes = []
 if py2exe_build:
 	#include the QT svg plugin to render the icons
 	#include the filter coefficients in the pickle file
-	data_files += [("imageformats", glob(r'C:\Python*\Lib\site-packages\PyQt4\plugins\imageformats\qsvg4.dll')),\
-				("", glob("generated_filters.pkl"))]
+	data_files += [("imageformats", glob(r'C:\Python*\Lib\site-packages\PyQt4\plugins\imageformats\qsvg4.dll'))]
 	#exclude some python libraries that py2exe includes by error
 	excludes += ["matplotlib","_ssl","Tkconstants","Tkinter","tcl","email","pyreadline","nose",\
 			"doctest", "pdb", "difflib", "pydoc", "_hashlib", "bz2","httplib","cookielib","cookielib","urllib","urllib2","Image",\
