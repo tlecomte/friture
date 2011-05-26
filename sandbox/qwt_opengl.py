@@ -64,18 +64,54 @@ class Window(QtGui.QWidget):
 
         self.setWindowTitle("Hello Qwt Numpy GL")
 
+        self.i = 0
+
+        self.animator = QtCore.QTimer()
+        self.animator.setInterval(0)
+        self.animator.timeout.connect(self.updatedata)
+        self.animator.start()
+
+    def updatedata(self):
+        self.n = 1000
+        
+        w = 0.002
+        h = 1.
+        x = -1. + arange(self.n)*w
+        y = (random(self.n)-0.5)*0.3 - 0.5
+        
+        vertex = zeros((self.n,4,2))
+        vertex[:,0,0] = x
+        vertex[:,0,1] = y + h
+        vertex[:,1,0] = x + w
+        vertex[:,1,1] = y + h
+        vertex[:,2,0] = x + w
+        vertex[:,2,1] = y
+        vertex[:,3,0] = x
+        vertex[:,3,1] = y
+            
+        c = random(self.n)
+        
+        color = ones((self.n,4,3))
+        color[:,0,1] = c
+        color[:,1,1] = c
+        color[:,2,1] = c
+        color[:,3,1] = c
+        color[:,0,2] = c
+        color[:,1,2] = c
+        color[:,2,2] = c
+        color[:,3,2] = c
+        
+        self.glWidget.setQuadData(vertex, color)
+        
+        self.i += 1
+        if self.i % 25 == 0:
+            print self.i
+
 class GLWidget(QtOpenGL.QGLWidget):
     def __init__(self, parent=None):
         super(GLWidget, self).__init__(parent)
 
-        self.i = 0
-
         self.lastPos = QtCore.QPoint()
-        
-        self.animator = QtCore.QTimer()
-        self.animator.setInterval(0)
-        self.animator.timeout.connect(self.updateGL)
-        self.animator.start()
 
     def minimumSizeHint(self):
         return QtCore.QSize(50, 50)
@@ -91,56 +127,28 @@ class GLWidget(QtOpenGL.QGLWidget):
         GL.glLoadIdentity()
         #GL.glEnable(GL.GL_CULL_FACE)
 
+    def setQuadData(self, vertices, colors):
+        self.n = vertices.shape[0]
+        
+        GL.glVertexPointerd(vertices)
+        GL.glColorPointerd(colors)
+        GL.glEnableClientState(GL.GL_VERTEX_ARRAY)
+        GL.glEnableClientState(GL.GL_COLOR_ARRAY)
+        
+        self.updateGL()
+
     def paintGL(self):
         # Clear The Screen And The Depth Buffer
         #GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT)
         # Reset The View
         GL.glLoadIdentity()
-
-        n = 1000
-        
-        w = 0.002
-        h = 1.
-        x = -1. + arange(n)*w
-        y = (random(n)-0.5)*0.3 - 0.5
-        
-        vertex = zeros((n,4,2))
-        vertex[:,0,0] = x
-        vertex[:,0,1] = y + h
-        vertex[:,1,0] = x + w
-        vertex[:,1,1] = y + h
-        vertex[:,2,0] = x + w
-        vertex[:,2,1] = y
-        vertex[:,3,0] = x
-        vertex[:,3,1] = y
-            
-        c = random(n)
-        
-        color = ones((n,4,3))
-        color[:,0,1] = c
-        color[:,1,1] = c
-        color[:,2,1] = c
-        color[:,3,1] = c
-        color[:,0,2] = c
-        color[:,1,2] = c
-        color[:,2,2] = c
-        color[:,3,2] = c
-        
-        GL.glVertexPointerd(vertex)
-        GL.glColorPointerd(color)
-        GL.glEnableClientState(GL.GL_VERTEX_ARRAY)
-        GL.glEnableClientState(GL.GL_COLOR_ARRAY)
         
         GL.glClearColor(1, 1, 1, 0)
         GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT)
         #GL.glOrtho(-1, 1, -1, 1, -1, 1)
         #GL.glDisable(GL.GL_LIGHTING)
-        GL.glDrawArrays(GL.GL_QUADS, 0, 4*n)
+        GL.glDrawArrays(GL.GL_QUADS, 0, 4*self.n)
         #GL.glEnable(GL.GL_LIGHTING)
-        
-        self.i += 1
-        if self.i % 25 == 0:
-            print self.i
 
     def resizeGL(self, width, height):
         side = min(width, height)
@@ -148,7 +156,6 @@ class GLWidget(QtOpenGL.QGLWidget):
             return
         
         GL.glViewport(0, 0, width, height)
-
         GL.glMatrixMode(GL.GL_PROJECTION)
         GL.glLoadIdentity()
 
