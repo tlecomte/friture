@@ -56,7 +56,7 @@ class Window(QtGui.QWidget):
 
 
 class GLPlotWidget(QtGui.QWidget):
-    def __init__(self):
+    def __init__(self, parent=None, logger=None):
         super(GLPlotWidget, self).__init__()
 
         self.glWidget = GLWidget()
@@ -110,7 +110,10 @@ class GLPlotWidget(QtGui.QWidget):
         return
     
     def setdata(self, freq, db_spectrogram):
-        return
+        print len(freq), self.width(), self.height()
+        
+        c = zeros(len(freq)-1)
+        self.setQuadData(freq[:-1], freq[1:] - freq[:-1], db_spectrogram[:-1], self.height(), c)
         
     def setQuadData(self, x, y, w, h, colors):
         n = x.shape[0]
@@ -143,6 +146,8 @@ class GLWidget(QtOpenGL.QGLWidget):
         super(GLWidget, self).__init__(parent)
 
         self.lastPos = QtCore.QPoint()
+        
+        self.n = 0
 
     def minimumSizeHint(self):
         return QtCore.QSize(50, 50)
