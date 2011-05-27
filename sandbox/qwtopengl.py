@@ -60,13 +60,18 @@ class GLPlotWidget(QtGui.QWidget):
         super(GLPlotWidget, self).__init__()
 
         self.glWidget = GLWidget()
+        
+        self.xmin = 0.
+        self.xmax = 1.
+        self.ymin = 0.
+        self.ymax = 1.
 
         self.verticalScaleEngine = Qwt.QwtLinearScaleEngine()
 
         self.verticalScale = Qwt.QwtScaleWidget(self)
         self.verticalScale.setTitle("PSD (dB)")
         self.verticalScale.setScaleDiv(self.verticalScaleEngine.transformation(),
-                                  self.verticalScaleEngine.divideScale(0., 100., 8, 5))
+                                  self.verticalScaleEngine.divideScale(self.ymin, self.ymax, 8, 5))
         self.verticalScale.setMargin(0)
 
         self.horizontalScaleEngine = Qwt.QwtLinearScaleEngine()
@@ -74,7 +79,7 @@ class GLPlotWidget(QtGui.QWidget):
         self.horizontalScale = Qwt.QwtScaleWidget(self)
         self.horizontalScale.setTitle("Frequency (Hz)")
         self.horizontalScale.setScaleDiv(self.horizontalScaleEngine.transformation(),
-                                  self.horizontalScaleEngine.divideScale(0., 100., 8, 5))
+                                  self.horizontalScaleEngine.divideScale(self.xmin, self.xmax, 8, 5))
         self.horizontalScale.setAlignment(Qwt.QwtScaleDraw.BottomScale)
         self.horizontalScale.setMargin(0)
         #self.horizontalScale.setBorderDist(0,0)
@@ -97,23 +102,41 @@ class GLPlotWidget(QtGui.QWidget):
         
         self.setLayout(plotLayout)
 
+    def setlinfreqscale(self):
+        self.horizontalScaleEngine = Qwt.QwtLinearScaleEngine()
+        self.horizontalScale.setScaleDiv(self.horizontalScaleEngine.transformation(),
+                                  self.horizontalScaleEngine.divideScale(self.xmin, self.xmax, 8, 5))
+
     def setlogfreqscale(self):
-        return
+        self.horizontalScaleEngine = Qwt.QwtLog10ScaleEngine()
+        self.horizontalScale.setScaleDiv(self.horizontalScaleEngine.transformation(),
+                                  self.horizontalScaleEngine.divideScale(self.xmin, self.xmax, 8, 5))
 
     def setfreqrange(self, minfreq, maxfreq):
-        return
+        self.xmin = minfreq
+        self.xmax = maxfreq
+        self.horizontalScale.setScaleDiv(self.horizontalScaleEngine.transformation(),
+                                  self.horizontalScaleEngine.divideScale(self.xmin, self.xmax, 8, 5))
 
     def setspecrange(self, spec_min, spec_max):
-        return
+        self.ymin = spec_min
+        self.ymax = spec_max
+        self.verticalScale.setScaleDiv(self.verticalScaleEngine.transformation(),
+                                  self.verticalScaleEngine.divideScale(self.ymin, self.ymax, 8, 5))
     
     def setweighting(self, weighting):
         return
     
     def setdata(self, freq, db_spectrogram):
-        print len(freq), self.width(), self.height()
+        #print len(freq), self.width(), self.height()
+        
+        #transformed_freq = self.horizontalScaleEngine.transformation().xForm(freq, self.xmin, self.xmax, 0., self.glWidget.width())
+        transformed_freq = (freq - self.xmin)*2./(self.xmax - self.xmin) - 1.
+        #transformed_db = self.verticalScaleEngine.transformation().xForm(db_spectrogram, self.ymin, self.ymax, 0., self.glWidget.height())
+        transformed_db = (db_spectrogram - self.ymin)*2./(self.ymax - self.ymin) - 1.
         
         c = zeros(len(freq)-1)
-        self.setQuadData(freq[:-1], freq[1:] - freq[:-1], db_spectrogram[:-1], self.height(), c)
+        self.setQuadData(transformed_freq[:-1], transformed_db[:-1], transformed_freq[1:] - transformed_freq[:-1], 2., c)
         
     def setQuadData(self, x, y, w, h, colors):
         n = x.shape[0]
