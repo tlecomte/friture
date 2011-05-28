@@ -5,7 +5,7 @@
 
 import sys
 
-from PyQt4 import QtCore, QtGui, QtOpenGL
+from PyQt4 import QtCore, QtGui, QtOpenGL, Qt
 import PyQt4.Qwt5 as Qwt
 
 try:
@@ -16,8 +16,13 @@ except ImportError:
             "PyOpenGL must be installed to run this example.")
     sys.exit(1)
 
-from numpy import arange, zeros, ones, log10
+from numpy import arange, zeros, ones, log10, ones, hstack
 from numpy.random import random
+
+# The peak decay rates (magic goes here :).
+PEAK_DECAY_RATE = 1.0 - 3E-6
+# Number of cycles the peak stays on hold before fall-off.
+PEAK_FALLOFF_COUNT = 32 # default : 16
 
 class Window(QtGui.QWidget):
     def __init__(self):
@@ -65,6 +70,10 @@ class GLPlotWidget(QtGui.QWidget):
         self.xmax = 1.
         self.ymin = 0.
         self.ymax = 1.
+        
+        self.peak = zeros((1,))
+        self.peak_int = 0
+        self.peak_decay = PEAK_DECAY_RATE
 
         self.verticalScaleEngine = Qwt.QwtLinearScaleEngine()
 
@@ -74,6 +83,7 @@ class GLPlotWidget(QtGui.QWidget):
                                   self.verticalScaleEngine.divideScale(self.ymin, self.ymax, 8, 5))
         self.verticalScale.setMargin(0)
 
+        self.logx = False
         self.horizontalScaleEngine = Qwt.QwtLinearScaleEngine()
 
         self.horizontalScale = Qwt.QwtScaleWidget(self)
@@ -103,11 +113,13 @@ class GLPlotWidget(QtGui.QWidget):
         self.setLayout(plotLayout)
 
     def setlinfreqscale(self):
+        self.logx = False
         self.horizontalScaleEngine = Qwt.QwtLinearScaleEngine()
         self.horizontalScale.setScaleDiv(self.horizontalScaleEngine.transformation(),
                                   self.horizontalScaleEngine.divideScale(self.xmin, self.xmax, 8, 5))
 
     def setlogfreqscale(self):
+        self.logx = True
         self.horizontalScaleEngine = Qwt.QwtLog10ScaleEngine()
         self.horizontalScale.setScaleDiv(self.horizontalScaleEngine.transformation(),
                                   self.horizontalScaleEngine.divideScale(self.xmin, self.xmax, 8, 5))
@@ -127,32 +139,73 @@ class GLPlotWidget(QtGui.QWidget):
     def setweighting(self, weighting):
         return
     
-    def setdata(self, freq, db_spectrogram):
-        #print len(freq), self.width(), self.height()
-        
-        #transformed_freq = self.horizontalScaleEngine.transformation().xForm(freq, self.xmin, self.xmax, 0., self.glWidget.width())
-        #transformed_freq = (freq - self.xmin)*2./(self.xmax - self.xmin) - 1.
-        
-        x1 = zeros(freq.shape)
-        x2 = zeros(freq.shape)
-        x1[0] = 0
-        x1[1:] = (freq[1:] + freq[:-1])/2.
+    def setdata(self, x, y):
+        x1 = zeros(x.shape)
+        x2 = zeros(x.shape)
+        x1[0] = 1e-10
+        x1[1:] = (x[1:] + x[:-1])/2.
         x2[:-1] = x1[1:]
         x2[-1] = 22050.
         
-        #transformed_x1 = (x1 - self.xmin)*2./(self.xmax - self.xmin) - 1.
-        #transformed_x2 = (x2 - self.xmin)*2./(self.xmax - self.xmin) - 1.
-        
-        transformed_x1 = (log10(x1/self.xmin))*2./(log10(self.xmax/self.xmin)) - 1.
-        transformed_x2 = (log10(x2/self.xmin))*2./(log10(self.xmax/self.xmin)) - 1.
+        if self.logx:
+            transformed_x1 = (log10(x1/self.xmin))*2./(log10(self.xmax/self.xmin)) - 1.
+            transformed_x2 = (log10(x2/self.xmin))*2./(log10(self.xmax/self.xmin)) - 1.    
+        else:
+            transformed_x1 = (x1 - self.xmin)*2./(self.xmax - self.xmin) - 1.
+            transformed_x2 = (x2 - self.xmin)*2./(self.xmax - self.xmin) - 1.
         
         #transformed_db = self.verticalScaleEngine.transformation().xForm(db_spectrogram, self.ymin, self.ymax, 0., self.glWidget.height())
-        transformed_db = (db_spectrogram - self.ymin)*2./(self.ymax - self.ymin) - 1.
+        transformed_y = (y - self.ymin)*2./(self.ymax - self.ymin) - 1.
+
+        self.compute_peaks(transformed_y)
         
-        c = zeros(freq.shape)
-        self.setQuadData(transformed_x1, transformed_db - 2., transformed_x2 - transformed_x1, 2., c)
+        Ones = ones(x.shape)
         
-    def setQuadData(self, x, y, w, h, colors):
+        x1_with_peaks = hstack((transformed_x1, transformed_x1))
+        x2_with_peaks = hstack((transformed_x2, transformed_x2))
+        y_with_peaks = hstack((transformed_y, self.peak))
+        r_with_peaks = hstack((0.*Ones, 1.*Ones))
+        g_with_peaks = hstack((0.5*Ones, 1. - self.peak_int))
+        b_with_peaks = hstack((0.*Ones, 1. - self.peak_int))
+        
+        color = QtGui.QColor(Qt.Qt.darkGreen)
+        print color.red(), color.green(), color.blue()
+        
+        #self.setQuadData(transformed_x1, transformed_y - 2., transformed_x2 - transformed_x1, 2., c)
+        self.setQuadData(x1_with_peaks, y_with_peaks - 2., x2_with_peaks - x1_with_peaks, 2., r_with_peaks, g_with_peaks, b_with_peaks)
+        
+        #xMajorTick = self.horizontalScaleEngine.divideScale(self.xmin, self.xmax, 8, 5).ticks(2)
+        #xMinorTick = self.horizontalScaleEngine.divideScale(self.xmin, self.xmax, 8, 5).ticks(0)
+        
+        # TODO :
+        # - major/minor X/Y grid
+        # - gradient styled background
+        # - fix margins around the canvas
+        # - pixel mean when band size < pixel size (mean != banding, on purpose)
+        # - optimize if further needed, but last point should be more than enough !
+
+    def compute_peaks(self, y):
+        if len(self.peak) <> len(y):
+            y_ones = ones(y.shape)
+            self.peak = y_ones*(-500.)
+            self.peak_int = zeros(y.shape)
+            self.peak_decay = y_ones * 20. * log10(PEAK_DECAY_RATE) * 5000
+
+        mask1 = (self.peak < y)
+        mask2 = (-mask1)
+        mask2_a = mask2 * (self.peak_int < 0.2)
+        mask2_b = mask2 * (self.peak_int >= 0.2)
+
+        self.peak[mask1] = y[mask1]
+        self.peak[mask2_a] = self.peak[mask2_a] + self.peak_decay[mask2_a]
+		
+        self.peak_decay[mask1] = 20. * log10(PEAK_DECAY_RATE) * 5000
+        self.peak_decay[mask2_a] += 20. * log10(PEAK_DECAY_RATE) * 5000
+
+        self.peak_int[mask1] = 1.
+        self.peak_int[mask2_b] *= 0.975
+  
+    def setQuadData(self, x, y, w, h, r, g, b):
         n = x.shape[0]
     
         vertex = zeros((n,4,2))
@@ -165,15 +218,19 @@ class GLPlotWidget(QtGui.QWidget):
         vertex[:,3,0] = x
         vertex[:,3,1] = y
 
-        color = ones((n,4,3))
-        color[:,0,1] = colors
-        color[:,1,1] = colors
-        color[:,2,1] = colors
-        color[:,3,1] = colors
-        color[:,0,2] = colors
-        color[:,1,2] = colors
-        color[:,2,2] = colors
-        color[:,3,2] = colors
+        color = zeros((n,4,3))
+        color[:,0,0] = r
+        color[:,1,0] = r
+        color[:,2,0] = r
+        color[:,3,0] = r
+        color[:,0,1] = g
+        color[:,1,1] = g
+        color[:,2,1] = g
+        color[:,3,1] = g
+        color[:,0,2] = b
+        color[:,1,2] = b
+        color[:,2,2] = b
+        color[:,3,2] = b
         
         self.glWidget.setQuadData(vertex, color)
 
