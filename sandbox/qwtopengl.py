@@ -16,7 +16,7 @@ except ImportError:
             "PyOpenGL must be installed to run this example.")
     sys.exit(1)
 
-from numpy import arange, zeros, ones
+from numpy import arange, zeros, ones, log10
 from numpy.random import random
 
 class Window(QtGui.QWidget):
@@ -131,12 +131,26 @@ class GLPlotWidget(QtGui.QWidget):
         #print len(freq), self.width(), self.height()
         
         #transformed_freq = self.horizontalScaleEngine.transformation().xForm(freq, self.xmin, self.xmax, 0., self.glWidget.width())
-        transformed_freq = (freq - self.xmin)*2./(self.xmax - self.xmin) - 1.
+        #transformed_freq = (freq - self.xmin)*2./(self.xmax - self.xmin) - 1.
+        
+        x1 = zeros(freq.shape)
+        x2 = zeros(freq.shape)
+        x1[0] = 0
+        x1[1:] = (freq[1:] + freq[:-1])/2.
+        x2[:-1] = x1[1:]
+        x2[-1] = 22050.
+        
+        #transformed_x1 = (x1 - self.xmin)*2./(self.xmax - self.xmin) - 1.
+        #transformed_x2 = (x2 - self.xmin)*2./(self.xmax - self.xmin) - 1.
+        
+        transformed_x1 = (log10(x1/self.xmin))*2./(log10(self.xmax/self.xmin)) - 1.
+        transformed_x2 = (log10(x2/self.xmin))*2./(log10(self.xmax/self.xmin)) - 1.
+        
         #transformed_db = self.verticalScaleEngine.transformation().xForm(db_spectrogram, self.ymin, self.ymax, 0., self.glWidget.height())
         transformed_db = (db_spectrogram - self.ymin)*2./(self.ymax - self.ymin) - 1.
         
-        c = zeros(len(freq)-1)
-        self.setQuadData(transformed_freq[:-1], transformed_db[:-1], transformed_freq[1:] - transformed_freq[:-1], 2., c)
+        c = zeros(freq.shape)
+        self.setQuadData(transformed_x1, transformed_db - 2., transformed_x2 - transformed_x1, 2., c)
         
     def setQuadData(self, x, y, w, h, colors):
         n = x.shape[0]
