@@ -184,8 +184,8 @@ class GLPlotWidget(QtGui.QWidget):
         self.setQuadData(x1_with_peaks, y_with_peaks - 2., x2_with_peaks - x1_with_peaks, 2., r_with_peaks, g_with_peaks, b_with_peaks)
         
         # TODO :
-        # - major/minor X/Y grid
-        # - gradient styled background, and border
+        # - major/minor X/Y grid : finish correct alignment
+        # - border
         # - pixel mean when band size < pixel size (mean != banding, on purpose)
         # - optimize if further needed, but last point should be more than enough !
 
