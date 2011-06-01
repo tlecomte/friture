@@ -16,7 +16,7 @@ except ImportError:
             "PyOpenGL must be installed to run this example.")
     sys.exit(1)
 
-from numpy import arange, zeros, ones, log10, ones, hstack
+from numpy import arange, zeros, ones, log10, ones, hstack, array
 from numpy.random import random
 
 # The peak decay rates (magic goes here :).
@@ -81,7 +81,7 @@ class GLPlotWidget(QtGui.QWidget):
         self.verticalScale.setTitle("PSD (dB)")
         self.verticalScale.setScaleDiv(self.verticalScaleEngine.transformation(),
                                   self.verticalScaleEngine.divideScale(self.ymin, self.ymax, 8, 5))
-        self.verticalScale.setMargin(0)
+        self.verticalScale.setMargin(2)
 
         self.logx = False
         self.horizontalScaleEngine = Qwt.QwtLinearScaleEngine()
@@ -91,24 +91,27 @@ class GLPlotWidget(QtGui.QWidget):
         self.horizontalScale.setScaleDiv(self.horizontalScaleEngine.transformation(),
                                   self.horizontalScaleEngine.divideScale(self.xmin, self.xmax, 8, 5))
         self.horizontalScale.setAlignment(Qwt.QwtScaleDraw.BottomScale)
-        self.horizontalScale.setMargin(0)
+        self.horizontalScale.setMargin(2)
         #self.horizontalScale.setBorderDist(0,0)
         self.horizontalScale.setSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Preferred)
 
-        left = self.horizontalScale.getBorderDistHint()[0]
-        right = self.horizontalScale.getBorderDistHint()[1]
-        top = self.verticalScale.getBorderDistHint()[0]
-        bottom = self.verticalScale.getBorderDistHint()[1]
+        #left = self.horizontalScale.getBorderDistHint()[0]
+        #right = self.horizontalScale.getBorderDistHint()[1]
+        #top = self.verticalScale.getBorderDistHint()[0]
+        #bottom = self.verticalScale.getBorderDistHint()[1]
 
         plotLayout = QtGui.QGridLayout()
         plotLayout.setSpacing(0)
-        plotLayout.addWidget(self.verticalScale, 0, 0, 3, 1)
-        plotLayout.addWidget(self.glWidget, 1, 2)
-        plotLayout.addWidget(self.horizontalScale, 3, 1, 1, 3)
-        plotLayout.setRowMinimumHeight(0, top)
-        plotLayout.setRowMinimumHeight(2, bottom-1)
-        plotLayout.setColumnMinimumWidth(1, left)
-        plotLayout.setColumnMinimumWidth(3, right)
+        #plotLayout.addWidget(self.verticalScale, 0, 0, 3, 1)
+        plotLayout.addWidget(self.verticalScale, 0, 0)
+        #plotLayout.addWidget(self.glWidget, 1, 2)
+        plotLayout.addWidget(self.glWidget, 0, 1)
+        #plotLayout.addWidget(self.horizontalScale, 3, 1, 1, 3)
+        plotLayout.addWidget(self.horizontalScale, 1, 1)
+        #plotLayout.setRowMinimumHeight(0, top)
+        #plotLayout.setRowMinimumHeight(2, bottom-1)
+        #plotLayout.setColumnMinimumWidth(1, left)
+        #plotLayout.setColumnMinimumWidth(3, right)
         
         self.setLayout(plotLayout)
 
@@ -138,6 +141,15 @@ class GLPlotWidget(QtGui.QWidget):
     
     def setweighting(self, weighting):
         return
+        
+    def xtransform(self, x):
+        if self.logx:
+            return (log10(x/self.xmin))*2./(log10(self.xmax/self.xmin)) - 1.
+        else:
+            return (x - self.xmin)*2./(self.xmax - self.xmin) - 1.
+
+    def ytransform(self, y):
+        return (y - self.ymin)*2./(self.ymax - self.ymin) - 1.
     
     def setdata(self, x, y):
         x1 = zeros(x.shape)
@@ -147,15 +159,13 @@ class GLPlotWidget(QtGui.QWidget):
         x2[:-1] = x1[1:]
         x2[-1] = 22050.
         
-        if self.logx:
-            transformed_x1 = (log10(x1/self.xmin))*2./(log10(self.xmax/self.xmin)) - 1.
-            transformed_x2 = (log10(x2/self.xmin))*2./(log10(self.xmax/self.xmin)) - 1.    
-        else:
-            transformed_x1 = (x1 - self.xmin)*2./(self.xmax - self.xmin) - 1.
-            transformed_x2 = (x2 - self.xmin)*2./(self.xmax - self.xmin) - 1.
+        transformed_x1 = self.xtransform(x1)
+        transformed_x2 = self.xtransform(x2)
         
-        #transformed_db = self.verticalScaleEngine.transformation().xForm(db_spectrogram, self.ymin, self.ymax, 0., self.glWidget.height())
-        transformed_y = (y - self.ymin)*2./(self.ymax - self.ymin) - 1.
+        #w = transformed_x2 - transformed_x1
+        #w<0.5
+        
+        transformed_y = self.ytransform(y)
 
         self.compute_peaks(transformed_y)
         
@@ -163,24 +173,19 @@ class GLPlotWidget(QtGui.QWidget):
         
         x1_with_peaks = hstack((transformed_x1, transformed_x1))
         x2_with_peaks = hstack((transformed_x2, transformed_x2))
-        y_with_peaks = hstack((transformed_y, self.peak))
-        r_with_peaks = hstack((0.*Ones, 1.*Ones))
-        g_with_peaks = hstack((0.5*Ones, 1. - self.peak_int))
-        b_with_peaks = hstack((0.*Ones, 1. - self.peak_int))
+        y_with_peaks = hstack((self.peak, transformed_y))
+        r_with_peaks = hstack((1.*Ones, 0.*Ones))
+        g_with_peaks = hstack((1. - self.peak_int, 0.5*Ones))
+        b_with_peaks = hstack((1. - self.peak_int, 0.*Ones))
         
-        color = QtGui.QColor(Qt.Qt.darkGreen)
-        print color.red(), color.green(), color.blue()
+        #color = QtGui.QColor(Qt.Qt.darkGreen)
         
         #self.setQuadData(transformed_x1, transformed_y - 2., transformed_x2 - transformed_x1, 2., c)
         self.setQuadData(x1_with_peaks, y_with_peaks - 2., x2_with_peaks - x1_with_peaks, 2., r_with_peaks, g_with_peaks, b_with_peaks)
         
-        #xMajorTick = self.horizontalScaleEngine.divideScale(self.xmin, self.xmax, 8, 5).ticks(2)
-        #xMinorTick = self.horizontalScaleEngine.divideScale(self.xmin, self.xmax, 8, 5).ticks(0)
-        
         # TODO :
         # - major/minor X/Y grid
-        # - gradient styled background
-        # - fix margins around the canvas
+        # - gradient styled background, and border
         # - pixel mean when band size < pixel size (mean != banding, on purpose)
         # - optimize if further needed, but last point should be more than enough !
 
@@ -206,6 +211,24 @@ class GLPlotWidget(QtGui.QWidget):
         self.peak_int[mask2_b] *= 0.975
   
     def setQuadData(self, x, y, w, h, r, g, b):
+        verticalDists = self.verticalScale.getBorderDistHint()
+        horizontalDists = self.horizontalScale.getBorderDistHint()
+        print verticalDists, horizontalDists     
+        
+        xMajorTick = self.horizontalScaleEngine.divideScale(self.xmin, self.xmax, 8, 5).ticks(2)
+        xMinorTick = self.horizontalScaleEngine.divideScale(self.xmin, self.xmax, 8, 5).ticks(0)
+        yMajorTick = self.verticalScaleEngine.divideScale(self.ymin, self.ymax, 8, 5).ticks(2)
+        yMinorTick = self.verticalScaleEngine.divideScale(self.ymin, self.ymax, 8, 5).ticks(0)        
+        
+        self.glWidget.setGrid(self.xtransform(array(xMajorTick)),
+                              self.xtransform(array(xMinorTick)),
+                              self.ytransform(array(yMajorTick)),
+                              self.ytransform(array(yMinorTick))
+                              )
+        
+        # draw the grid here
+        #vertex[0,0,0] = 
+        
         n = x.shape[0]
     
         vertex = zeros((n,4,2))
@@ -250,9 +273,9 @@ class GLWidget(QtOpenGL.QGLWidget):
         return QtCore.QSize(400, 400)
 
     def initializeGL(self):
-        GL.glShadeModel(GL.GL_FLAT)
-        GL.glDepthFunc(GL.GL_LESS) # The Type Of Depth Test To Do
-        GL.glEnable(GL.GL_DEPTH_TEST)
+        GL.glShadeModel(GL.GL_SMOOTH) # for gradient rendering
+        #GL.glDepthFunc(GL.GL_LESS) # The Type Of Depth Test To Do
+        GL.glDisable(GL.GL_DEPTH_TEST) # we do 2D, we need no depth test !
         GL.glMatrixMode(GL.GL_PROJECTION)
         GL.glLoadIdentity()
         #GL.glEnable(GL.GL_CULL_FACE)
@@ -267,15 +290,58 @@ class GLWidget(QtOpenGL.QGLWidget):
         
         self.updateGL()
 
+    def setGrid(self, xMajorTick, xMinorTick, yMajorTick, yMinorTick):
+        self.xMajorTick = xMajorTick
+        self.xMinorTick = xMinorTick
+        self.yMajorTick = yMajorTick
+        self.yMinorTick = yMinorTick
+
     def paintGL(self):
-        # Clear The Screen And The Depth Buffer
-        #GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT)
         # Reset The View
         GL.glLoadIdentity()
         
         GL.glClearColor(1, 1, 1, 0)
-        GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT)
-        #GL.glOrtho(-1, 1, -1, 1, -1, 1)
+        # Clear The Screen And The Depth Buffer
+        GL.glClear(GL.GL_COLOR_BUFFER_BIT) # | GL.GL_DEPTH_BUFFER_BIT)
+        GL.glOrtho(-1, 1, -1, 1, 0, 1)   
+        
+        GL.glBegin(GL.GL_QUADS)
+        GL.glColor3f(0.8, 0.8, 0.8)
+        GL.glVertex2d(-1,1)
+        GL.glVertex2d(1,1)
+        GL.glColor3f(1, 1, 1)
+        GL.glVertex2d(1,0)
+        GL.glVertex2d(-1,0)
+        GL.glEnd()
+        
+        self.qglColor(QtGui.QColor(Qt.Qt.gray))
+        for x in self.xMajorTick:        
+            GL.glBegin(GL.GL_LINES)
+            GL.glVertex2f(x, -1)
+            GL.glVertex2f(x, 1)
+            GL.glEnd()
+        
+        self.qglColor(QtGui.QColor(Qt.Qt.lightGray))
+        for x in self.xMinorTick:        
+            GL.glBegin(GL.GL_LINES)
+            GL.glVertex2f(x, -1)
+            GL.glVertex2f(x, 1)
+            GL.glEnd()
+            
+        self.qglColor(QtGui.QColor(Qt.Qt.gray))
+        for y in self.yMajorTick:        
+            GL.glBegin(GL.GL_LINES)
+            GL.glVertex2f(-1, y)
+            GL.glVertex2f(1, y)
+            GL.glEnd()
+        
+        #GL.glColor3f(0.5, 0.5, 0.5)
+        #for y in self.yMinorTick:        
+        #    GL.glBegin(GL.GL_LINES)
+        #    GL.glVertex2f(-1, y)
+        #    GL.glVertex2f(1, y)
+        #    GL.glEnd()        
+        
         #GL.glDisable(GL.GL_LIGHTING)
         GL.glDrawArrays(GL.GL_QUADS, 0, 4*self.n)
         #GL.glEnable(GL.GL_LIGHTING)
