@@ -144,12 +144,12 @@ class GLPlotWidget(QtGui.QWidget):
         
     def xtransform(self, x):
         if self.logx:
-            return (log10(x/self.xmin))*2./(log10(self.xmax/self.xmin)) - 1.
+            return (log10(x/self.xmin))*self.glWidget.width()/(log10(self.xmax/self.xmin))
         else:
-            return (x - self.xmin)*2./(self.xmax - self.xmin) - 1.
+            return (x - self.xmin)*self.glWidget.width()/(self.xmax - self.xmin)
 
     def ytransform(self, y):
-        return (y - self.ymin)*2./(self.ymax - self.ymin) - 1.
+        return (y - self.ymin)*self.glWidget.height()/(self.ymax - self.ymin)
     
     def setdata(self, x, y):
         x1 = zeros(x.shape)
@@ -181,7 +181,7 @@ class GLPlotWidget(QtGui.QWidget):
         #color = QtGui.QColor(Qt.Qt.darkGreen)
         
         #self.setQuadData(transformed_x1, transformed_y - 2., transformed_x2 - transformed_x1, 2., c)
-        self.setQuadData(x1_with_peaks, y_with_peaks - 2., x2_with_peaks - x1_with_peaks, 2., r_with_peaks, g_with_peaks, b_with_peaks)
+        self.setQuadData(x1_with_peaks, y_with_peaks - self.glWidget.height(), x2_with_peaks - x1_with_peaks, self.glWidget.height(), r_with_peaks, g_with_peaks, b_with_peaks)
         
         # TODO :
         # - major/minor X/Y grid : finish correct alignment
@@ -303,43 +303,46 @@ class GLWidget(QtOpenGL.QGLWidget):
         GL.glClearColor(1, 1, 1, 0)
         # Clear The Screen And The Depth Buffer
         GL.glClear(GL.GL_COLOR_BUFFER_BIT) # | GL.GL_DEPTH_BUFFER_BIT)
-        GL.glOrtho(-1, 1, -1, 1, 0, 1)   
+        
+        w = self.width()
+        h = self.height()
+        GL.glOrtho(0, w, 0, h, 0, 1)   
         
         GL.glBegin(GL.GL_QUADS)
-        GL.glColor3f(0.8, 0.8, 0.8)
-        GL.glVertex2d(-1,1)
-        GL.glVertex2d(1,1)
+        GL.glColor3f(0.9, 0.9, 0.9)
+        GL.glVertex2d(0, h)
+        GL.glVertex2d(w, h)
         GL.glColor3f(1, 1, 1)
-        GL.glVertex2d(1,0)
-        GL.glVertex2d(-1,0)
+        GL.glVertex2d(w, 0)
+        GL.glVertex2d(0, 0)
         GL.glEnd()
         
         self.qglColor(QtGui.QColor(Qt.Qt.gray))
         for x in self.xMajorTick:        
             GL.glBegin(GL.GL_LINES)
-            GL.glVertex2f(x, -1)
-            GL.glVertex2f(x, 1)
+            GL.glVertex2f(x, 0)
+            GL.glVertex2f(x, h)
             GL.glEnd()
         
         self.qglColor(QtGui.QColor(Qt.Qt.lightGray))
         for x in self.xMinorTick:        
             GL.glBegin(GL.GL_LINES)
-            GL.glVertex2f(x, -1)
-            GL.glVertex2f(x, 1)
+            GL.glVertex2f(x, 0)
+            GL.glVertex2f(x, h)
             GL.glEnd()
             
         self.qglColor(QtGui.QColor(Qt.Qt.gray))
         for y in self.yMajorTick:        
             GL.glBegin(GL.GL_LINES)
-            GL.glVertex2f(-1, y)
-            GL.glVertex2f(1, y)
+            GL.glVertex2f(0, y)
+            GL.glVertex2f(w, y)
             GL.glEnd()
         
         #GL.glColor3f(0.5, 0.5, 0.5)
         #for y in self.yMinorTick:        
         #    GL.glBegin(GL.GL_LINES)
-        #    GL.glVertex2f(-1, y)
-        #    GL.glVertex2f(1, y)
+        #    GL.glVertex2f(0, y)
+        #    GL.glVertex2f(w, y)
         #    GL.glEnd()        
         
         #GL.glDisable(GL.GL_LIGHTING)
