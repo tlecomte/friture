@@ -143,13 +143,20 @@ class GLPlotWidget(QtGui.QWidget):
         return
         
     def xtransform(self, x):
+        verticalDists = self.verticalScale.getBorderDistHint()
+        horizontalDists = self.horizontalScale.getBorderDistHint()
+        self.topDist = verticalDists[0]
+        self.bottomDist = verticalDists[1]
+        self.leftDist = horizontalDists[0]
+        self.rightDist = horizontalDists[1]
+        
         if self.logx:
-            return (log10(x/self.xmin))*self.glWidget.width()/(log10(self.xmax/self.xmin))
+            return (log10(x/self.xmin))*(self.glWidget.width() - self.leftDist - self.rightDist)/(log10(self.xmax/self.xmin)) + self.leftDist
         else:
-            return (x - self.xmin)*self.glWidget.width()/(self.xmax - self.xmin)
+            return (x - self.xmin)*(self.glWidget.width() - self.leftDist - self.rightDist)/(self.xmax - self.xmin) + self.leftDist
 
     def ytransform(self, y):
-        return (y - self.ymin)*self.glWidget.height()/(self.ymax - self.ymin)
+        return (y - self.ymin)*(self.glWidget.height() - self.topDist - self.bottomDist)/(self.ymax - self.ymin) + self.bottomDist - 1
     
     def setdata(self, x, y):
         x1 = zeros(x.shape)
@@ -184,8 +191,8 @@ class GLPlotWidget(QtGui.QWidget):
         self.setQuadData(x1_with_peaks, y_with_peaks - self.glWidget.height(), x2_with_peaks - x1_with_peaks, self.glWidget.height(), r_with_peaks, g_with_peaks, b_with_peaks)
         
         # TODO :
-        # - major/minor X/Y grid : finish correct alignment
-        # - border
+        # - picker : special mouse cursor, H anc V rulers, text (QPainter job ?)
+        # - Fix resizing
         # - pixel mean when band size < pixel size (mean != banding, on purpose)
         # - optimize if further needed, but last point should be more than enough !
 
@@ -211,10 +218,6 @@ class GLPlotWidget(QtGui.QWidget):
         self.peak_int[mask2_b] *= 0.975
   
     def setQuadData(self, x, y, w, h, r, g, b):
-        verticalDists = self.verticalScale.getBorderDistHint()
-        horizontalDists = self.horizontalScale.getBorderDistHint()
-        print verticalDists, horizontalDists     
-        
         xMajorTick = self.horizontalScaleEngine.divideScale(self.xmin, self.xmax, 8, 5).ticks(2)
         xMinorTick = self.horizontalScaleEngine.divideScale(self.xmin, self.xmax, 8, 5).ticks(0)
         yMajorTick = self.verticalScaleEngine.divideScale(self.ymin, self.ymax, 8, 5).ticks(2)
@@ -307,15 +310,43 @@ class GLWidget(QtOpenGL.QGLWidget):
         w = self.width()
         h = self.height()
         GL.glOrtho(0, w, 0, h, 0, 1)   
+        # Displacement trick for exact pixelization
+        GL.glTranslatef(0.375, 0.375, 0)
         
+        self.drawBackground()
+        
+        self.drawGrid()
+        
+        #GL.glDisable(GL.GL_LIGHTING)
+        GL.glDrawArrays(GL.GL_QUADS, 0, 4*self.n)
+        #GL.glEnable(GL.GL_LIGHTING)
+        
+        self.drawBorder()
+
+    def resizeGL(self, width, height):
+        side = min(width, height)
+        if side < 0:
+            return
+        
+        GL.glViewport(0, 0, width, height)
+        GL.glMatrixMode(GL.GL_PROJECTION)
+        GL.glLoadIdentity()
+
+    def drawBackground(self):
+        w = self.width()
+        h = self.height()
         GL.glBegin(GL.GL_QUADS)
-        GL.glColor3f(0.9, 0.9, 0.9)
+        GL.glColor3f(0.85, 0.85, 0.85)
         GL.glVertex2d(0, h)
         GL.glVertex2d(w, h)
         GL.glColor3f(1, 1, 1)
         GL.glVertex2d(w, 0)
         GL.glVertex2d(0, 0)
         GL.glEnd()
+
+    def drawGrid(self):
+        w = self.width()
+        h = self.height()
         
         self.qglColor(QtGui.QColor(Qt.Qt.gray))
         for x in self.xMajorTick:        
@@ -343,20 +374,18 @@ class GLWidget(QtOpenGL.QGLWidget):
         #    GL.glBegin(GL.GL_LINES)
         #    GL.glVertex2f(0, y)
         #    GL.glVertex2f(w, y)
-        #    GL.glEnd()        
-        
-        #GL.glDisable(GL.GL_LIGHTING)
-        GL.glDrawArrays(GL.GL_QUADS, 0, 4*self.n)
-        #GL.glEnable(GL.GL_LIGHTING)
+        #    GL.glEnd() 
 
-    def resizeGL(self, width, height):
-        side = min(width, height)
-        if side < 0:
-            return
-        
-        GL.glViewport(0, 0, width, height)
-        GL.glMatrixMode(GL.GL_PROJECTION)
-        GL.glLoadIdentity()
+    def drawBorder(self):
+        w = self.width()
+        h = self.height()
+        self.qglColor(QtGui.QColor(Qt.Qt.gray))
+        GL.glBegin(GL.GL_LINE_LOOP)
+        GL.glVertex2f(0, 0)
+        GL.glVertex2f(0, h-1)
+        GL.glVertex2f(w, h-1)
+        GL.glVertex2f(w, 0)
+        GL.glEnd()
 
     def mousePressEvent(self, event):
         self.lastPos = event.pos()
