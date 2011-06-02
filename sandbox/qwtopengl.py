@@ -16,7 +16,7 @@ except ImportError:
             "PyOpenGL must be installed to run this example.")
     sys.exit(1)
 
-from numpy import arange, zeros, ones, log10, ones, hstack, array
+from numpy import arange, zeros, ones, log10, hstack, array, log2, floor, mean, where
 from numpy.random import random
 
 # The peak decay rates (magic goes here :).
@@ -77,6 +77,8 @@ class GLPlotWidget(QtGui.QWidget):
         self.x1 = array([])
         self.x2 = array([])
         self.y = array([])
+        
+        self.needtransform = False
 
         self.verticalScaleEngine = Qwt.QwtLinearScaleEngine()
 
@@ -178,29 +180,96 @@ class GLPlotWidget(QtGui.QWidget):
         x2[:-1] = x1[1:]
         x2[-1] = 22050.
         
+        if len(x1) <> len(self.x1):
+            self.needtransform = True
+            # save data for resizing
+            self.x1 = x1
+            self.x2 = x2
+        
         # save data for resizing
-        self.x1 = x1
-        self.x2 = x2
         self.y = y
-
-        self.compute_peaks(y)
         
         self.draw()
         
         # TODO :
-        # - pixel mean when band size < pixel size (mean != banding, on purpose)
         # - optimize if further needed, but last point should be more than enough !
 
+    def tree_rebin(self, x1, x2, y):
+        if len(x2) == 0:
+            # enf of recursion !
+            return x1, x2, y            
+        
+        n0 = max(where(x2 - x1 >= 0.5)[0])
+        
+        # leave untouched those that span more than half a pixel
+        y0 = y[:n0]
+        x1_0 = x1[:n0]
+        x2_0 = x2[:n0]
+        
+        # decimate the rest
+        y2 = y[n0:]
+        
+        new_len = len(y2)//2
+        rest = len(y2) - new_len*2
+        
+        if rest > 0:
+            y2 = y2[:-rest]
+
+        y2.shape = (new_len, 2)
+        y2 = mean(y2, axis = 1)
+        
+        if rest > 0:
+            x1_2 = x1[n0:-rest:2]
+        else:
+            x1_2 = x1[n0::2]
+        x2_2 = x2[n0+1::2]
+        
+        # recursive !!
+        x1_2, x2_2, y2 = self.tree_rebin(x1_2, x2_2, y2)
+        
+        y = hstack((y0, y2))
+        x1 = hstack((x1_0, x1_2))
+        x2 = hstack((x2_0, x2_2))
+        
+        return x1, x2, y
+
     def draw(self):
-        transformed_x1 = self.xtransform(self.x1)
-        transformed_x2 = self.xtransform(self.x2)
-        transformed_y = self.ytransform(self.y)
-        transformed_peak = self.ytransform(self.peak)
+        if self.needtransform:
+            # transform the coordinates only when needed
+            self.transformed_x1 = self.xtransform(self.x1)
+            self.transformed_x2 = self.xtransform(self.x2)
+            self.needtransform = False
         
-        Ones = ones(self.x1.shape)
+        x1 = self.transformed_x1
+        x2 = self.transformed_x2
         
-        x1_with_peaks = hstack((transformed_x1, transformed_x1))
-        x2_with_peaks = hstack((transformed_x2, transformed_x2))
+        if self.logx:
+            x1, x2, y = self.tree_rebin(x1, x2, self.y)
+            print len(y), len(self.y)
+        else:
+            n = floor(1./(x2[2] - x1[1]))
+            if n>0:
+                new_len = len(self.y)//n
+                rest = len(self.y) - new_len*n
+                
+                new_y = self.y[:-rest]
+                new_y.shape = (new_len, n)
+                y = mean(new_y, axis = 1)
+                
+                x1 = x1[:-rest:n]
+                x2 = x2[n::n]
+            else:
+                y = self.y
+
+        self.compute_peaks(y)
+        
+        transformed_y = self.ytransform(y)                
+        transformed_peak = self.ytransform(self.peak)        
+        
+        Ones = ones(x1.shape)
+        
+        x1_with_peaks = hstack((x1, x1))
+        x2_with_peaks = hstack((x2, x2))
         y_with_peaks = hstack((transformed_peak, transformed_y))
         r_with_peaks = hstack((1.*Ones, 0.*Ones))
         g_with_peaks = hstack((1. - self.peak_int, 0.5*Ones))
@@ -210,6 +279,7 @@ class GLPlotWidget(QtGui.QWidget):
 
     # redraw when the widget is resized to update coordinates transformations
     def resizeEvent(self, event):
+        self.needtransform = True
         self.draw()
         
     def compute_peaks(self, y):
