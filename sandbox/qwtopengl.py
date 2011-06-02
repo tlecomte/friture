@@ -179,7 +179,7 @@ class GLPlotWidget(QtGui.QWidget):
         self.draw()
         
         # TODO :
-        # - picker : special mouse cursor, H anc V rulers, text (QPainter job ?)
+        # - picker : tracker text (QPainter job ?)
         # - pixel mean when band size < pixel size (mean != banding, on purpose)
         # - optimize if further needed, but last point should be more than enough !
 
@@ -281,6 +281,10 @@ class GLWidget(QtOpenGL.QGLWidget):
         self.xMinorTick = array([])
         self.yMajorTick = array([])
         self.yMinorTick = array([])
+
+        self.ruler = False
+        self.mousex = 0
+        self.mousey = 0
         
         # use a cross cursor to easily select a point on the graph
         self.setCursor(Qt.Qt.CrossCursor)
@@ -336,6 +340,8 @@ class GLWidget(QtOpenGL.QGLWidget):
         #GL.glDisable(GL.GL_LIGHTING)
         GL.glDrawArrays(GL.GL_QUADS, 0, 4*self.n)
         #GL.glEnable(GL.GL_LIGHTING)
+        
+        self.drawRuler()        
         
         self.drawBorder()
 
@@ -403,17 +409,36 @@ class GLWidget(QtOpenGL.QGLWidget):
         GL.glVertex2f(w, 0)
         GL.glEnd()
 
+    def drawRuler(self):
+        if self.ruler:
+            w = self.width()
+            h = self.height()
+            self.qglColor(QtGui.QColor(Qt.Qt.black))
+            GL.glBegin(GL.GL_LINES)
+            GL.glVertex2f(self.mousex, 0)
+            GL.glVertex2f(self.mousex, h)
+            GL.glVertex2f(0, h - self.mousey)
+            GL.glVertex2f(w, h - self.mousey)
+            GL.glEnd()
+
     def mousePressEvent(self, event):
         self.lastPos = event.pos()
+        self.ruler = True
+
+    def mouseReleaseEvent(self, event):
+        self.ruler = False
 
     def mouseMoveEvent(self, event):
         #dx = event.x() - self.lastPos.x()
         #dy = event.y() - self.lastPos.y()
 
         if event.buttons() & QtCore.Qt.LeftButton:
-            print "left"
-        elif event.buttons() & QtCore.Qt.RightButton:
-            print "right"
+            print event.x(), event.y()
+            self.mousex = event.x()
+            self.mousey = event.y()
+            
+        #elif event.buttons() & QtCore.Qt.RightButton:
+        #    print "right"
 
         self.lastPos = event.pos()
 
