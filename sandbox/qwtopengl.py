@@ -216,7 +216,7 @@ class GLPlotWidget(QtGui.QWidget):
             y2 = y2[:-rest]
 
         y2.shape = (new_len, 2)
-        y2 = mean(y2, axis = 1)
+        y2 = (y2[:,0] + y2[:,1])*0.5
         
         if rest > 0:
             x1_2 = x1[n0:-rest:2]
@@ -238,6 +238,17 @@ class GLPlotWidget(QtGui.QWidget):
             # transform the coordinates only when needed
             self.transformed_x1 = self.xtransform(self.x1)
             self.transformed_x2 = self.xtransform(self.x2)
+            
+            xMajorTick = self.horizontalScaleEngine.divideScale(self.xmin, self.xmax, 8, 5).ticks(2)
+            xMinorTick = self.horizontalScaleEngine.divideScale(self.xmin, self.xmax, 8, 5).ticks(0)
+            yMajorTick = self.verticalScaleEngine.divideScale(self.ymin, self.ymax, 8, 5).ticks(2)
+            yMinorTick = self.verticalScaleEngine.divideScale(self.ymin, self.ymax, 8, 5).ticks(0)                
+            self.glWidget.setGrid(self.xtransform(array(xMajorTick)),
+                                  self.xtransform(array(xMinorTick)),
+                                  self.ytransform(array(yMajorTick)),
+                                  self.ytransform(array(yMinorTick))
+                                  )
+
             self.needtransform = False
         
         x1 = self.transformed_x1
@@ -245,7 +256,6 @@ class GLPlotWidget(QtGui.QWidget):
         
         if self.logx:
             x1, x2, y = self.tree_rebin(x1, x2, self.y)
-            print len(y), len(self.y)
         else:
             n = floor(1./(x2[2] - x1[1]))
             if n>0:
@@ -304,17 +314,6 @@ class GLPlotWidget(QtGui.QWidget):
         self.peak_int[mask2_b] *= 0.975
   
     def setQuadData(self, x, y, w, h, r, g, b):
-        xMajorTick = self.horizontalScaleEngine.divideScale(self.xmin, self.xmax, 8, 5).ticks(2)
-        xMinorTick = self.horizontalScaleEngine.divideScale(self.xmin, self.xmax, 8, 5).ticks(0)
-        yMajorTick = self.verticalScaleEngine.divideScale(self.ymin, self.ymax, 8, 5).ticks(2)
-        yMinorTick = self.verticalScaleEngine.divideScale(self.ymin, self.ymax, 8, 5).ticks(0)        
-        
-        self.glWidget.setGrid(self.xtransform(array(xMajorTick)),
-                              self.xtransform(array(xMinorTick)),
-                              self.ytransform(array(yMajorTick)),
-                              self.ytransform(array(yMinorTick))
-                              )
-        
         # draw the grid here
         #vertex[0,0,0] = 
         
