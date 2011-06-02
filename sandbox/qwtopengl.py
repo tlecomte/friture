@@ -193,6 +193,7 @@ class GLPlotWidget(QtGui.QWidget):
         
         # TODO :
         # - optimize if further needed, but last point should be more than enough !
+        # takes twice more time than before...
 
     def tree_rebin(self, x1, x2, y):
         if len(x2) == 0:
@@ -583,6 +584,7 @@ class GLWidget(QtOpenGL.QGLWidget):
         if event.buttons() & QtCore.Qt.LeftButton:
             self.mousex = event.x()
             self.mousey = event.y()
+            self.update()
             
         #elif event.buttons() & QtCore.Qt.RightButton:
         #    print "right"
