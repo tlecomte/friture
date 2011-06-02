@@ -366,15 +366,16 @@ class GLWidget(QtOpenGL.QGLWidget):
         GL.glMatrixMode(GL.GL_PROJECTION)
         GL.glPopMatrix()
 
-        self.drawTrackerText()
+        painter = QtGui.QPainter(self)
+        self.drawTrackerText(painter)
+        painter.end()
 
     def drawDataQuads(self):
         #GL.glDisable(GL.GL_LIGHTING)
         GL.glDrawArrays(GL.GL_QUADS, 0, 4*self.n)
         #GL.glEnable(GL.GL_LIGHTING)    
     
-    def drawTrackerText(self):
-        painter = QtGui.QPainter(self)        
+    def drawTrackerText(self, painter): 
         if self.ruler:
             painter.setRenderHint(QtGui.QPainter.Antialiasing)
             
@@ -406,7 +407,6 @@ class GLWidget(QtOpenGL.QGLWidget):
             
             painter.setPen(Qt.Qt.black)
             painter.drawText(rect, Qt.Qt.AlignLeft, text)
-        painter.end()
 
 #	def drawTracker(self, painter):
 #		textRect = self.trackerRect(painter.font())
