@@ -192,6 +192,7 @@ class GLPlotWidget(QtGui.QWidget):
         self.draw()
         
         # TODO :
+        # - Fix peaks loss when resizing
         # - optimize if further needed, but last point should be more than enough !
         # takes twice more time than before...
 
