@@ -64,7 +64,7 @@ class GLPlotWidget(QtGui.QWidget):
     def __init__(self, parent=None, logger=None):
         super(GLPlotWidget, self).__init__()
 
-        self.glWidget = GLWidget()
+        self.glWidget = GLWidget(self)
         
         self.xmin = 0.
         self.xmax = 1.
@@ -154,12 +154,21 @@ class GLPlotWidget(QtGui.QWidget):
         self.rightDist = horizontalDists[1]
         
         if self.logx:
-            return (log10(x/self.xmin))*(self.glWidget.width() - self.leftDist - self.rightDist)/(log10(self.xmax/self.xmin)) + self.leftDist
+            return (log10(x/self.xmin))*(self.glWidget.width() - self.leftDist - self.rightDist)/log10(self.xmax/self.xmin) + self.leftDist
         else:
             return (x - self.xmin)*(self.glWidget.width() - self.leftDist - self.rightDist)/(self.xmax - self.xmin) + self.leftDist
 
+    def inverseXTransform(self, x):
+        if self.logx:
+            return 10**((x - self.leftDist)*log10(self.xmax/self.xmin)/(self.glWidget.width() - self.leftDist - self.rightDist))*self.xmin
+        else:
+            return (x - self.leftDist)*(self.xmax - self.xmin)/(self.glWidget.width() - self.leftDist - self.rightDist) + self.xmin
+
     def ytransform(self, y):
         return (y - self.ymin)*(self.glWidget.height() - self.topDist - self.bottomDist)/(self.ymax - self.ymin) + self.bottomDist - 1
+    
+    def inverseYTransform(self, y):
+        return (y + 1. - self.bottomDist)*(self.ymax - self.ymin)/(self.glWidget.height() - self.topDist - self.bottomDist) + self.ymin
     
     def setdata(self, x, y):        
         x1 = zeros(x.shape)
@@ -179,7 +188,6 @@ class GLPlotWidget(QtGui.QWidget):
         self.draw()
         
         # TODO :
-        # - picker : tracker text (QPainter job ?)
         # - pixel mean when band size < pixel size (mean != banding, on purpose)
         # - optimize if further needed, but last point should be more than enough !
 
@@ -270,8 +278,10 @@ class GLPlotWidget(QtGui.QWidget):
 
 
 class GLWidget(QtOpenGL.QGLWidget):
-    def __init__(self, parent=None):
+    def __init__(self, parent):
         super(GLWidget, self).__init__(parent)
+        
+        self.parent = parent
 
         self.lastPos = QtCore.QPoint()
         
@@ -288,6 +298,10 @@ class GLWidget(QtOpenGL.QGLWidget):
         
         # use a cross cursor to easily select a point on the graph
         self.setCursor(Qt.Qt.CrossCursor)
+        
+        # instruct OpenGL not to paint a background for the widget
+        # when QPainter.begin() is called.
+        self.setAutoFillBackground(False)
 
     def minimumSizeHint(self):
         return QtCore.QSize(50, 50)
@@ -311,7 +325,7 @@ class GLWidget(QtOpenGL.QGLWidget):
         GL.glEnableClientState(GL.GL_VERTEX_ARRAY)
         GL.glEnableClientState(GL.GL_COLOR_ARRAY)
         
-        self.updateGL()
+        self.update()
 
     def setGrid(self, xMajorTick, xMinorTick, yMajorTick, yMinorTick):
         self.xMajorTick = xMajorTick
@@ -319,7 +333,13 @@ class GLWidget(QtOpenGL.QGLWidget):
         self.yMajorTick = yMajorTick
         self.yMinorTick = yMinorTick
 
-    def paintGL(self):
+    #def paintGL(self):
+    def paintEvent(self, event):
+        self.makeCurrent()
+        
+        GL.glMatrixMode(GL.GL_PROJECTION)
+        GL.glPushMatrix()        
+        
         # Reset The View
         GL.glLoadIdentity()
         
@@ -344,6 +364,60 @@ class GLWidget(QtOpenGL.QGLWidget):
         self.drawRuler()        
         
         self.drawBorder()
+        
+        GL.glMatrixMode(GL.GL_PROJECTION)
+        GL.glPopMatrix()
+
+        self.drawTrackerText()
+    
+    def drawTrackerText(self):
+        painter = QtGui.QPainter(self)        
+        if self.ruler:
+            painter.setRenderHint(QtGui.QPainter.Antialiasing)
+            
+            x = self.parent.inverseXTransform(self.mousex)
+            y = self.parent.inverseYTransform(self.height() - self.mousey)
+            text = "%d Hz, %.1f dB" %(x, y)
+            
+            # compute tracker bounding rect
+            painter.setPen(Qt.Qt.black)
+            rect = painter.boundingRect(QtCore.QRect(self.mousex, self.mousey, 0, 0), Qt.Qt.AlignLeft, text)
+            
+            # small offset so that it does not touch the rulers
+            rect.translate(4, -( rect.height() + 4))
+            
+            # avoid crossing the top and right borders
+            dx = - max(rect.x() + rect.width() - self.width(), 0)
+            dy = - min(rect.y(), 0)
+            rect.translate(dx, dy)
+            
+            # avoid crossing the left and bottom borders
+            dx = - min(rect.x(), 0)
+            dy = - max(rect.y() + rect.height() - self.height(), 0)
+            rect.translate(dx, dy)
+            
+            # draw a white background
+            painter.setPen(Qt.Qt.NoPen)
+            painter.setBrush(Qt.Qt.white)
+            painter.drawRect(rect)
+            
+            painter.setPen(Qt.Qt.black)
+            painter.drawText(rect, Qt.Qt.AlignLeft, text)
+        painter.end()
+
+#	def drawTracker(self, painter):
+#		textRect = self.trackerRect(painter.font())
+#		if not textRect.isEmpty():
+#		  	   label = self.trackerText(self.trackerPosition())
+#		  	   if not label.isEmpty():
+#		  	   	   painter.save()
+#		  	   	   painter.setPen(Qt.Qt.NoPen)
+#		  	   	   painter.setBrush(Qt.Qt.white)
+#		  	   	   painter.drawRect(textRect)
+#		  	   	   painter.setPen(Qt.Qt.black)
+#		  	   	   #painter->setRenderHint(QPainter::TextAntialiasing, false);
+#		  	   	   label.draw(painter, textRect)
+#		  	   	   painter.restore()
 
     def resizeGL(self, width, height):
         side = min(width, height)
@@ -423,6 +497,8 @@ class GLWidget(QtOpenGL.QGLWidget):
 
     def mousePressEvent(self, event):
         self.lastPos = event.pos()
+        self.mousex = event.x()
+        self.mousey = event.y()
         self.ruler = True
 
     def mouseReleaseEvent(self, event):
@@ -433,7 +509,6 @@ class GLWidget(QtOpenGL.QGLWidget):
         #dy = event.y() - self.lastPos.y()
 
         if event.buttons() & QtCore.Qt.LeftButton:
-            print event.x(), event.y()
             self.mousex = event.x()
             self.mousey = event.y()
             
