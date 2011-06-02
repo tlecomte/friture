@@ -74,6 +74,9 @@ class GLPlotWidget(QtGui.QWidget):
         self.peak = zeros((1,))
         self.peak_int = 0
         self.peak_decay = PEAK_DECAY_RATE
+        self.x1 = array([])
+        self.x2 = array([])
+        self.y = array([])
 
         self.verticalScaleEngine = Qwt.QwtLinearScaleEngine()
 
@@ -158,7 +161,7 @@ class GLPlotWidget(QtGui.QWidget):
     def ytransform(self, y):
         return (y - self.ymin)*(self.glWidget.height() - self.topDist - self.bottomDist)/(self.ymax - self.ymin) + self.bottomDist - 1
     
-    def setdata(self, x, y):
+    def setdata(self, x, y):        
         x1 = zeros(x.shape)
         x2 = zeros(x.shape)
         x1[0] = 1e-10
@@ -166,36 +169,41 @@ class GLPlotWidget(QtGui.QWidget):
         x2[:-1] = x1[1:]
         x2[-1] = 22050.
         
-        transformed_x1 = self.xtransform(x1)
-        transformed_x2 = self.xtransform(x2)
-        
-        #w = transformed_x2 - transformed_x1
-        #w<0.5
-        
-        transformed_y = self.ytransform(y)
+        # save data for resizing
+        self.x1 = x1
+        self.x2 = x2
+        self.y = y
 
-        self.compute_peaks(transformed_y)
+        self.compute_peaks(y)
         
-        Ones = ones(x.shape)
+        self.draw()
+        
+        # TODO :
+        # - picker : special mouse cursor, H anc V rulers, text (QPainter job ?)
+        # - pixel mean when band size < pixel size (mean != banding, on purpose)
+        # - optimize if further needed, but last point should be more than enough !
+
+    def draw(self):
+        transformed_x1 = self.xtransform(self.x1)
+        transformed_x2 = self.xtransform(self.x2)
+        transformed_y = self.ytransform(self.y)
+        transformed_peak = self.ytransform(self.peak)
+        
+        Ones = ones(self.x1.shape)
         
         x1_with_peaks = hstack((transformed_x1, transformed_x1))
         x2_with_peaks = hstack((transformed_x2, transformed_x2))
-        y_with_peaks = hstack((self.peak, transformed_y))
+        y_with_peaks = hstack((transformed_peak, transformed_y))
         r_with_peaks = hstack((1.*Ones, 0.*Ones))
         g_with_peaks = hstack((1. - self.peak_int, 0.5*Ones))
         b_with_peaks = hstack((1. - self.peak_int, 0.*Ones))
         
-        #color = QtGui.QColor(Qt.Qt.darkGreen)
-        
-        #self.setQuadData(transformed_x1, transformed_y - 2., transformed_x2 - transformed_x1, 2., c)
         self.setQuadData(x1_with_peaks, y_with_peaks - self.glWidget.height(), x2_with_peaks - x1_with_peaks, self.glWidget.height(), r_with_peaks, g_with_peaks, b_with_peaks)
-        
-        # TODO :
-        # - picker : special mouse cursor, H anc V rulers, text (QPainter job ?)
-        # - Fix resizing
-        # - pixel mean when band size < pixel size (mean != banding, on purpose)
-        # - optimize if further needed, but last point should be more than enough !
 
+    # redraw when the widget is resized to update coordinates transformations
+    def resizeEvent(self, event):
+        self.draw()
+        
     def compute_peaks(self, y):
         if len(self.peak) <> len(y):
             y_ones = ones(y.shape)
@@ -268,6 +276,11 @@ class GLWidget(QtOpenGL.QGLWidget):
         self.lastPos = QtCore.QPoint()
         
         self.n = 0
+        
+        self.xMajorTick = array([])
+        self.xMinorTick = array([])
+        self.yMajorTick = array([])
+        self.yMinorTick = array([])
 
     def minimumSizeHint(self):
         return QtCore.QSize(50, 50)
