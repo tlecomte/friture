@@ -343,8 +343,8 @@ class GLWidget(QtOpenGL.QGLWidget):
         # Reset The View
         GL.glLoadIdentity()
         
-        GL.glClearColor(1, 1, 1, 0)
         # Clear The Screen And The Depth Buffer
+        GL.glClearColor(1, 1, 1, 0)
         GL.glClear(GL.GL_COLOR_BUFFER_BIT) # | GL.GL_DEPTH_BUFFER_BIT)
         
         w = self.width()
@@ -357,9 +357,7 @@ class GLWidget(QtOpenGL.QGLWidget):
         
         self.drawGrid()
         
-        #GL.glDisable(GL.GL_LIGHTING)
-        GL.glDrawArrays(GL.GL_QUADS, 0, 4*self.n)
-        #GL.glEnable(GL.GL_LIGHTING)
+        self.drawDataQuads()
         
         self.drawRuler()        
         
@@ -369,6 +367,11 @@ class GLWidget(QtOpenGL.QGLWidget):
         GL.glPopMatrix()
 
         self.drawTrackerText()
+
+    def drawDataQuads(self):
+        #GL.glDisable(GL.GL_LIGHTING)
+        GL.glDrawArrays(GL.GL_QUADS, 0, 4*self.n)
+        #GL.glEnable(GL.GL_LIGHTING)    
     
     def drawTrackerText(self):
         painter = QtGui.QPainter(self)        
