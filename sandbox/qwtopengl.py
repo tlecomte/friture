@@ -281,6 +281,9 @@ class GLWidget(QtOpenGL.QGLWidget):
         self.xMinorTick = array([])
         self.yMajorTick = array([])
         self.yMinorTick = array([])
+        
+        # use a cross cursor to easily select a point on the graph
+        self.setCursor(Qt.Qt.CrossCursor)
 
     def minimumSizeHint(self):
         return QtCore.QSize(50, 50)
