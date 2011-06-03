@@ -66,17 +66,24 @@ class GLPlotWidget(QtGui.QWidget):
 
         self.glWidget = GLWidget(self)
         
-        self.xmin = 0.
+        self.xmin = 0.1
         self.xmax = 1.
-        self.ymin = 0.
+        self.ymin = 0.1
         self.ymax = 1.
         
-        self.peak = zeros((1,))
-        self.peak_int = 0
+        self.peak = zeros((3,))
+        self.peak_int = zeros((3,))
         self.peak_decay = PEAK_DECAY_RATE
-        self.x1 = array([])
-        self.x2 = array([])
-        self.y = array([])
+        self.x1 = array([0.1, 0.5, 1.])
+        self.x2 = array([0.5, 1., 2.])
+        self.y = array([0., 0., 0.])
+        self.transformed_x1 = self.x1
+        self.transformed_x2 = self.x2
+        
+        self.topDist = 0
+        self.bottomDist = 0
+        self.leftDist = 0
+        self.rightDist = 0
         
         self.needtransform = False
 
@@ -124,28 +131,49 @@ class GLPlotWidget(QtGui.QWidget):
         self.logx = False
         self.horizontalScaleEngine = Qwt.QwtLinearScaleEngine()
         self.horizontalScale.setScaleDiv(self.horizontalScaleEngine.transformation(),
-                                  self.horizontalScaleEngine.divideScale(self.xmin, self.xmax, 8, 5))
+                                         self.horizontalScaleEngine.divideScale(self.xmin, self.xmax, 8, 5))
+        self.needtransform = True
+        self.draw()
 
     def setlogfreqscale(self):
         self.logx = True
         self.horizontalScaleEngine = Qwt.QwtLog10ScaleEngine()
         self.horizontalScale.setScaleDiv(self.horizontalScaleEngine.transformation(),
-                                  self.horizontalScaleEngine.divideScale(self.xmin, self.xmax, 8, 5))
+                                         self.horizontalScaleEngine.divideScale(self.xmin, self.xmax, 8, 5))
+        self.needtransform = True
+        self.draw() 
 
     def setfreqrange(self, minfreq, maxfreq):
         self.xmin = minfreq
         self.xmax = maxfreq
         self.horizontalScale.setScaleDiv(self.horizontalScaleEngine.transformation(),
                                   self.horizontalScaleEngine.divideScale(self.xmin, self.xmax, 8, 5))
+        self.needtransform = True
+        self.draw()
 
     def setspecrange(self, spec_min, spec_max):
         self.ymin = spec_min
         self.ymax = spec_max
         self.verticalScale.setScaleDiv(self.verticalScaleEngine.transformation(),
                                   self.verticalScaleEngine.divideScale(self.ymin, self.ymax, 8, 5))
+        self.needtransform = True        
+        self.draw()
     
     def setweighting(self, weighting):
-        return
+        if weighting is 0:
+            title = "PSD (dB)"
+        elif weighting is 1:
+            title = "PSD (dB A)"
+        elif weighting is 2:
+            title = "PSD (dB B)"
+        else:
+            title = "PSD (dB C)"
+        
+        ytitle = Qwt.QwtText(title)
+        ytitle.setFont(QtGui.QFont(8))
+        self.verticalScale.setTitle(ytitle)
+        self.needtransform = True
+        self.draw()
         
     def xtransform(self, x):
         verticalDists = self.verticalScale.getBorderDistHint()
@@ -195,6 +223,8 @@ class GLPlotWidget(QtGui.QWidget):
         # - Fix peaks loss when resizing
         # - optimize if further needed, but last point should be more than enough !
         # takes twice more time than before...
+        # idea to decrease tree_rebin : compute the factors once with the recursion
+        # when needTransform, then use them for each y
 
     def tree_rebin(self, x1, x2, y):
         if len(x2) == 0:
@@ -258,6 +288,16 @@ class GLPlotWidget(QtGui.QWidget):
         
         if self.logx:
             x1, x2, y = self.tree_rebin(x1, x2, self.y)
+            
+#            n = []        
+#            i = 0
+#            n_i = where(x2 - x1 >= 0.5/2**i)[0]
+#            while len(n_i) > 0:
+#                n += [max(n_i)]
+#                i += 1
+#                n_i = where(x2 - x1 >= 0.5/2**i)[0]
+#
+#            print n
         else:
             n = floor(1./(x2[2] - x1[1]))
             if n>0:
@@ -373,6 +413,8 @@ class GLWidget(QtOpenGL.QGLWidget):
         # instruct OpenGL not to paint a background for the widget
         # when QPainter.begin() is called.
         self.setAutoFillBackground(False)
+        
+        self.gl_initialized = False
 
     def minimumSizeHint(self):
         return QtCore.QSize(50, 50)
@@ -387,16 +429,19 @@ class GLWidget(QtOpenGL.QGLWidget):
         GL.glMatrixMode(GL.GL_PROJECTION)
         GL.glLoadIdentity()
         #GL.glEnable(GL.GL_CULL_FACE)
+        
+        self.gl_initialized = True
 
     def setQuadData(self, vertices, colors):
-        self.n = vertices.shape[0]
-        
-        GL.glVertexPointerd(vertices)
-        GL.glColorPointerd(colors)
-        GL.glEnableClientState(GL.GL_VERTEX_ARRAY)
-        GL.glEnableClientState(GL.GL_COLOR_ARRAY)
-        
-        self.update()
+        if self.gl_initialized:
+            self.n = vertices.shape[0]
+            
+            GL.glVertexPointerd(vertices)
+            GL.glColorPointerd(colors)
+            GL.glEnableClientState(GL.GL_VERTEX_ARRAY)
+            GL.glEnableClientState(GL.GL_COLOR_ARRAY)
+            
+            self.update()
 
     def setGrid(self, xMajorTick, xMinorTick, yMajorTick, yMinorTick):
         self.xMajorTick = xMajorTick
