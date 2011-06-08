@@ -601,8 +601,8 @@ class GLWidget(QtOpenGL.QGLWidget):
         GL.glBegin(GL.GL_LINE_LOOP)
         GL.glVertex2f(0, 0)
         GL.glVertex2f(0, h-1)
-        GL.glVertex2f(w, h-1)
-        GL.glVertex2f(w, 0)
+        GL.glVertex2f(w-1, h-1)
+        GL.glVertex2f(w-1, 0)
         GL.glEnd()
 
     def drawRuler(self):
