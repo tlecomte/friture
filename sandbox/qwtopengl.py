@@ -90,7 +90,9 @@ class GLPlotWidget(QtGui.QWidget):
         self.verticalScaleEngine = Qwt.QwtLinearScaleEngine()
 
         self.verticalScale = Qwt.QwtScaleWidget(self)
-        self.verticalScale.setTitle("PSD (dB)")
+        vtitle = Qwt.QwtText("PSD (dB)")
+        vtitle.setFont(QtGui.QFont(8))
+        self.verticalScale.setTitle(vtitle)
         self.verticalScale.setScaleDiv(self.verticalScaleEngine.transformation(),
                                   self.verticalScaleEngine.divideScale(self.ymin, self.ymax, 8, 5))
         self.verticalScale.setMargin(2)
@@ -99,7 +101,9 @@ class GLPlotWidget(QtGui.QWidget):
         self.horizontalScaleEngine = Qwt.QwtLinearScaleEngine()
 
         self.horizontalScale = Qwt.QwtScaleWidget(self)
-        self.horizontalScale.setTitle("Frequency (Hz)")
+        htitle = Qwt.QwtText("Frequency (Hz)")
+        htitle.setFont(QtGui.QFont(8))
+        self.horizontalScale.setTitle(htitle)
         self.horizontalScale.setScaleDiv(self.horizontalScaleEngine.transformation(),
                                   self.horizontalScaleEngine.divideScale(self.xmin, self.xmax, 8, 5))
         self.horizontalScale.setAlignment(Qwt.QwtScaleDraw.BottomScale)
