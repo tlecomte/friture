@@ -16,49 +16,12 @@ except ImportError:
             "PyOpenGL must be installed to run this example.")
     sys.exit(1)
 
-from numpy import arange, zeros, ones, log10, hstack, array, log2, floor, mean, where
-from numpy.random import random
+from numpy import zeros, ones, log10, hstack, array, floor, mean, where
 
 # The peak decay rates (magic goes here :).
 PEAK_DECAY_RATE = 1.0 - 3E-6
 # Number of cycles the peak stays on hold before fall-off.
 PEAK_FALLOFF_COUNT = 32 # default : 16
-
-class Window(QtGui.QWidget):
-    def __init__(self):
-        super(Window, self).__init__()
-
-        self.glPlotWidget = GLPlotWidget()
-
-        plotLayout = QtGui.QGridLayout()
-        plotLayout.addWidget(self.glPlotWidget, 0, 0)
-        self.setLayout(plotLayout)
-
-        self.setWindowTitle("Hello Qwt Numpy GL")
-
-        self.i = 0
-
-        self.animator = QtCore.QTimer()
-        self.animator.setInterval(0)
-        self.animator.timeout.connect(self.updatedata)
-        self.animator.start()
-
-    def updatedata(self):
-        n = 1000
-        
-        w = 0.002
-        h = 1.
-        x = -1. + arange(n)*w
-        y = (random(n)-0.5)*0.3 - 0.5
-        
-        c = random(n)
-        
-        self.glPlotWidget.setQuadData(x, y, w, h, c)
-        
-        self.i += 1
-        if self.i % 25 == 0:
-            print self.i
-
 
 class GLPlotWidget(QtGui.QWidget):
     def __init__(self, parent=None, logger=None):
@@ -108,27 +71,14 @@ class GLPlotWidget(QtGui.QWidget):
                                   self.horizontalScaleEngine.divideScale(self.xmin, self.xmax, 8, 5))
         self.horizontalScale.setAlignment(Qwt.QwtScaleDraw.BottomScale)
         self.horizontalScale.setMargin(2)
-        #self.horizontalScale.setBorderDist(0,0)
         self.horizontalScale.setSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Preferred)
-
-        #left = self.horizontalScale.getBorderDistHint()[0]
-        #right = self.horizontalScale.getBorderDistHint()[1]
-        #top = self.verticalScale.getBorderDistHint()[0]
-        #bottom = self.verticalScale.getBorderDistHint()[1]
 
         plotLayout = QtGui.QGridLayout()
         plotLayout.setSpacing(0)
         plotLayout.setContentsMargins(0, 0, 0, 0)
-        #plotLayout.addWidget(self.verticalScale, 0, 0, 3, 1)
         plotLayout.addWidget(self.verticalScale, 0, 0)
-        #plotLayout.addWidget(self.glWidget, 1, 2)
         plotLayout.addWidget(self.glWidget, 0, 1)
-        #plotLayout.addWidget(self.horizontalScale, 3, 1, 1, 3)
         plotLayout.addWidget(self.horizontalScale, 1, 1)
-        #plotLayout.setRowMinimumHeight(0, top)
-        #plotLayout.setRowMinimumHeight(2, bottom-1)
-        #plotLayout.setColumnMinimumWidth(1, left)
-        #plotLayout.setColumnMinimumWidth(3, right)
         
         self.setLayout(plotLayout)
 
@@ -226,8 +176,7 @@ class GLPlotWidget(QtGui.QWidget):
         
         # TODO :
         # - Fix peaks loss when resizing
-        # - optimize if further needed, but last point should be more than enough !
-        # takes twice more time than before...
+        # - optimize if further needed
 
     def pre_tree_rebin(self, x1, x2):
         if len(x2) == 0:
@@ -527,20 +476,6 @@ class GLWidget(QtOpenGL.QGLWidget):
             painter.setPen(Qt.Qt.black)
             painter.drawText(rect, Qt.Qt.AlignLeft, text)
 
-#	def drawTracker(self, painter):
-#		textRect = self.trackerRect(painter.font())
-#		if not textRect.isEmpty():
-#		  	   label = self.trackerText(self.trackerPosition())
-#		  	   if not label.isEmpty():
-#		  	   	   painter.save()
-#		  	   	   painter.setPen(Qt.Qt.NoPen)
-#		  	   	   painter.setBrush(Qt.Qt.white)
-#		  	   	   painter.drawRect(textRect)
-#		  	   	   painter.setPen(Qt.Qt.black)
-#		  	   	   #painter->setRenderHint(QPainter::TextAntialiasing, false);
-#		  	   	   label.draw(painter, textRect)
-#		  	   	   painter.restore()
-
     def resizeGL(self, width, height):
         side = min(width, height)
         if side < 0:
@@ -627,23 +562,8 @@ class GLWidget(QtOpenGL.QGLWidget):
         self.ruler = False
 
     def mouseMoveEvent(self, event):
-        #dx = event.x() - self.lastPos.x()
-        #dy = event.y() - self.lastPos.y()
-
         if event.buttons() & QtCore.Qt.LeftButton:
             self.mousex = event.x()
             self.mousey = event.y()
             self.update()
-            
-        #elif event.buttons() & QtCore.Qt.RightButton:
-        #    print "right"
 
-        self.lastPos = event.pos()
-
-
-if __name__ == '__main__':
-
-    app = QtGui.QApplication(sys.argv)
-    window = Window()
-    window.show()
-    sys.exit(app.exec_())
