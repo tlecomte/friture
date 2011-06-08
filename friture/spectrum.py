@@ -23,6 +23,8 @@ from friture.spectplot import SpectPlot
 from friture.audioproc import audioproc # audio processing class
 from friture.spectrum_settings import Spectrum_Settings_Dialog # settings dialog
 
+from friture.qwtopenglplot import GLPlotWidget
+
 STYLESHEET = """
 QwtPlotCanvas {
 	border: 1px solid gray;
@@ -57,7 +59,8 @@ class Spectrum_Widget(QtGui.QWidget):
 		self.setObjectName("Spectrum_Widget")
 		self.gridLayout = QtGui.QGridLayout(self)
 		self.gridLayout.setObjectName("gridLayout")
-		self.PlotZoneSpect = SpectPlot(self, self.logger)
+		#self.PlotZoneSpect = SpectPlot(self, self.logger)
+  		self.PlotZoneSpect = GLPlotWidget(self, self.logger)
 		self.PlotZoneSpect.setObjectName("PlotZoneSpect")
 		self.gridLayout.addWidget(self.PlotZoneSpect, 0, 0, 1, 1)
 
@@ -106,6 +109,8 @@ class Spectrum_Widget(QtGui.QWidget):
 		else:
 			w = C
 		
+                       # the log operation and the weighting could be deffered
+                       # to the post-weedening !
 		db_spectrogram = 20*log10(sp + epsilon) + w
 		self.PlotZoneSpect.setdata(freq, db_spectrogram)
 
