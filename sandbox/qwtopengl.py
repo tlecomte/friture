@@ -118,6 +118,7 @@ class GLPlotWidget(QtGui.QWidget):
 
         plotLayout = QtGui.QGridLayout()
         plotLayout.setSpacing(0)
+        plotLayout.setContentsMargins(0, 0, 0, 0)
         #plotLayout.addWidget(self.verticalScale, 0, 0, 3, 1)
         plotLayout.addWidget(self.verticalScale, 0, 0)
         #plotLayout.addWidget(self.glWidget, 1, 2)
