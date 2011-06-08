@@ -290,23 +290,12 @@ class GLPlotWidget(QtGui.QWidget):
 
             self.needtransform = False
         
+        # for easier reading
         x1 = self.transformed_x1
         x2 = self.transformed_x2
         
         if self.logx:
             y = self.tree_rebin(self.y, self.n)
-            
-            #x1, x2, y = self.tree_rebin(x1, x2, self.y)
-            
-#            n = []        
-#            i = 0
-#            n_i = where(x2 - x1 >= 0.5/2**i)[0]
-#            while len(n_i) > 0:
-#                n += [max(n_i)]
-#                i += 1
-#                n_i = where(x2 - x1 >= 0.5/2**i)[0]
-#
-#            print n
         else:
             n = floor(1./(x2[2] - x1[1]))
             if n>0:
