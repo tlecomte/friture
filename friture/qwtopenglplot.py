@@ -493,8 +493,8 @@ class GLWidget(QtOpenGL.QGLWidget):
         GL.glVertex2d(0, h)
         GL.glVertex2d(w, h)
         GL.glColor3f(1, 1, 1)
-        GL.glVertex2d(w, 0)
-        GL.glVertex2d(0, 0)
+        GL.glVertex2d(w, h/2)
+        GL.glVertex2d(0, h/2)
         GL.glEnd()
 
     def drawGrid(self):
