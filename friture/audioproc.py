@@ -44,16 +44,18 @@ class audioproc():
 			self.maxfreq = maxfreq
 			decimation = SAMPLING_RATE / (2*maxfreq)
 			self.decimation = 2**(floor(log2(decimation)))
+			self.logger.push("audioproc: will decimate %d times" % self.decimation)
 		
 		if self.decimation < 1:
 			self.decimation = 1
 		
-		samples.shape = len(samples)/self.decimation, self.decimation			
-		#the full way
-		#samples = samples.mean(axis=1)
-		#the simplest way
-		samples = samples[:,0]
-		
+ 		if self.decimation > 1:                     
+			samples.shape = len(samples)/self.decimation, self.decimation			
+			#the full way
+			#samples = samples.mean(axis=1)
+			#the simplest way
+			samples = samples[:,0]
+  
 		#uncomment the following to disable the decimation altogether
 		#decimation = 1
 
@@ -75,6 +77,7 @@ class audioproc():
 			n = arange(0, N)
 			# Hann window : better frequency resolution than the rectangular window
 			self.window = 0.5*(1. - cos(2*pi*n/(N-1)))
+			self.logger.push("audioproc: updating window")
 		
 		# FFT for a linear transformation in frequency scale
 		fft = rfft(samples*self.window)
