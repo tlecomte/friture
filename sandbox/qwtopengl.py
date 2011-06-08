@@ -73,7 +73,7 @@ class GLPlotWidget(QtGui.QWidget):
         
         self.peak = zeros((3,))
         self.peak_int = zeros((3,))
-        self.peak_decay = PEAK_DECAY_RATE
+        self.peak_decay = ones((3,))*PEAK_DECAY_RATE
         self.x1 = array([0.1, 0.5, 1.])
         self.x2 = array([0.5, 1., 2.])
         self.y = array([0., 0., 0.])
@@ -223,53 +223,60 @@ class GLPlotWidget(QtGui.QWidget):
         # - Fix peaks loss when resizing
         # - optimize if further needed, but last point should be more than enough !
         # takes twice more time than before...
-        # idea to decrease tree_rebin : compute the factors once with the recursion
-        # when needTransform, then use them for each y
 
-    def tree_rebin(self, x1, x2, y):
+    def pre_tree_rebin(self, x1, x2):
         if len(x2) == 0:
             # enf of recursion !
-            return x1, x2, y            
+            return x1, x2, 0
         
         n0 = max(where(x2 - x1 >= 0.5)[0])
         
-        # leave untouched those that span more than half a pixel
-        y0 = y[:n0]
+        # leave untouched the frequency bins that span more than half a pixel
+        # and first make sure that what will be left can be decimated by two
+        rest = len(x2) - n0 - ((len(x2) - n0)//2)*2
+        
+        n0 += rest
+        
         x1_0 = x1[:n0]
         x2_0 = x2[:n0]
         
         # decimate the rest
-        y2 = y[n0:]
-        
-        new_len = len(y2)//2
-        rest = len(y2) - new_len*2
-        
-        if rest > 0:
-            y2 = y2[:-rest]
-
-        y2.shape = (new_len, 2)
-        y2 = (y2[:,0] + y2[:,1])*0.5
-        
-        if rest > 0:
-            x1_2 = x1[n0:-rest:2]
-        else:
-            x1_2 = x1[n0::2]
-        x2_2 = x2[n0+1::2]
+        x1_2 = x1[n0::2]
+        x2_2 = x2[n0 + 1::2]
         
         # recursive !!
-        x1_2, x2_2, y2 = self.tree_rebin(x1_2, x2_2, y2)
+        x1_2, x2_2, n2 = self.pre_tree_rebin(x1_2, x2_2)
         
-        y = hstack((y0, y2))
+        if n2 == 0.:
+            n = [n0]
+        else:
+            n = [n0] + [i*2 + n0 for i in n2]
+            
         x1 = hstack((x1_0, x1_2))
         x2 = hstack((x2_0, x2_2))
         
-        return x1, x2, y
+        return x1, x2, n
+
+    def tree_rebin(self, y, ns):
+        i = 0
+        y2 = array([])        
+        for i in range(len(ns)-1):
+            y3 = y[ns[i]:ns[i+1]]
+            y3.shape = (len(y3)/2**i, 2**i)
+            y3 = mean(y3, axis=1)
+            #y3 = (y3[::2] + y3[1::2])*0.5
+            y2 = hstack((y2, y3))
+        
+        return y2
 
     def draw(self):
         if self.needtransform:
             # transform the coordinates only when needed
-            self.transformed_x1 = self.xtransform(self.x1)
-            self.transformed_x2 = self.xtransform(self.x2)
+            x1 = self.xtransform(self.x1)
+            x2 = self.xtransform(self.x2)
+            
+            self.transformed_x1, self.transformed_x2, n = self.pre_tree_rebin(x1, x2)
+            self.n = [0] + n
             
             xMajorTick = self.horizontalScaleEngine.divideScale(self.xmin, self.xmax, 8, 5).ticks(2)
             xMinorTick = self.horizontalScaleEngine.divideScale(self.xmin, self.xmax, 8, 5).ticks(0)
@@ -287,7 +294,9 @@ class GLPlotWidget(QtGui.QWidget):
         x2 = self.transformed_x2
         
         if self.logx:
-            x1, x2, y = self.tree_rebin(x1, x2, self.y)
+            y = self.tree_rebin(self.y, self.n)
+            
+            #x1, x2, y = self.tree_rebin(x1, x2, self.y)
             
 #            n = []        
 #            i = 0
