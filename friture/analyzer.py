@@ -90,13 +90,23 @@ class Friture(QMainWindow, ):
 
 		# Initialize the audio backend
 		self.audiobackend = AudioBackend(self.logger)
-		
-		streams = self.audiobackend.get_readable_stream_list()
-		for stream in streams:
-			self.settings_dialog.comboBox_inputDevice.addItem(stream)
+   
+		devices = self.audiobackend.get_readable_devices_list()
+		for device in devices:
+			self.settings_dialog.comboBox_inputDevice.addItem(device)
 
-		current_stream = self.audiobackend.get_current_stream()
-		self.settings_dialog.comboBox_inputDevice.setCurrentIndex(current_stream)
+		channels = self.audiobackend.get_readable_current_channels()
+		for channel in channels:
+			self.settings_dialog.comboBox_firstChannel.addItem(channel)
+			self.settings_dialog.comboBox_secondChannel.addItem(channel)
+
+		current_device = self.audiobackend.get_readable_current_device()
+		self.settings_dialog.comboBox_inputDevice.setCurrentIndex(current_device)
+
+		first_channel = self.audiobackend.get_current_first_channel()
+		self.settings_dialog.comboBox_firstChannel.setCurrentIndex(first_channel)
+		second_channel = self.audiobackend.get_current_second_channel()
+		self.settings_dialog.comboBox_secondChannel.setCurrentIndex(second_channel)
 
 		# this timer is used to update widgets that just need to display as fast as they can
 		self.display_timer = QtCore.QTimer()
@@ -126,6 +136,9 @@ class Friture(QMainWindow, ):
 		
 		# settings signals
 		self.connect(self.settings_dialog.comboBox_inputDevice, QtCore.SIGNAL('currentIndexChanged(int)'), self.input_device_changed)
+  		self.connect(self.settings_dialog.comboBox_firstChannel, QtCore.SIGNAL('currentIndexChanged(int)'), self.first_channel_changed)
+		self.connect(self.settings_dialog.comboBox_secondChannel, QtCore.SIGNAL('currentIndexChanged(int)'), self.second_channel_changed)
+		self.connect(self.settings_dialog.inputTypeButtonGroup, QtCore.SIGNAL('buttonClicked(QAbstractButton*)'), self.input_type_changed)
 
 		# log change
 		self.connect(self.logger, QtCore.SIGNAL('logChanged'), self.log_changed)
@@ -261,9 +274,8 @@ class Friture(QMainWindow, ):
 
 	# slot
 	def update_buffer(self):
-		channel = self.audiobackend.get_current_stream_channel()
-		nchannels = self.audiobackend.get_current_stream_nchannels()
-		(chunks, t) = self.audiobuffer.update(self.audiobackend.stream, channel, nchannels)
+     		(chunks, t, newpoints) = self.audiobackend.update(self.audiobuffer.ringbuffer)
+     		self.audiobuffer.set_newdata(newpoints)
 		self.chunk_number += chunks
 		self.buffer_timer_time = (95.*self.buffer_timer_time + 5.*t)/100.
 
@@ -287,7 +299,7 @@ class Friture(QMainWindow, ):
 		self.display_timer.stop()
 		self.ui.actionStart.setChecked(False)
 		
-		success, index = self.audiobackend.select_input_stream(index)
+		success, index = self.audiobackend.select_input_device(index)
 		
 		self.settings_dialog.comboBox_inputDevice.setCurrentIndex(index)
 		
@@ -296,10 +308,65 @@ class Friture(QMainWindow, ):
 			# that dialog remains on top when the error message is closed
 			error_message = QErrorMessage(self.settings_dialog)
 			error_message.setWindowTitle("Input device error")
-			error_message.showMessage("Impossible to use the selected device, reverting to the previous one")
+			error_message.showMessage("Impossible to use the selected input device, reverting to the previous one")
+		
+		# reset the channels
+		first_channel = self.audiobackend.get_current_first_channel()
+		self.settings_dialog.comboBox_firstChannel.setCurrentIndex(first_channel)
+		second_channel = self.audiobackend.get_current_second_channel()
+		self.settings_dialog.comboBox_secondChannel.setCurrentIndex(second_channel)  
+  
+		self.display_timer.start()
+		self.ui.actionStart.setChecked(True)
+
+	# slot
+	def first_channel_changed(self, index):
+		self.display_timer.stop()
+		self.ui.actionStart.setChecked(False)
+		
+		success, index = self.audiobackend.select_first_channel(index)
+		
+		self.settings_dialog.comboBox_firstChannel.setCurrentIndex(index)
+		
+		if not success:
+			# Note: the error message is a child of the settings dialog, so that
+			# that dialog remains on top when the error message is closed
+			error_message = QErrorMessage(self.settings_dialog)
+			error_message.setWindowTitle("Input device error")
+			error_message.showMessage("Impossible to use the selected channel as the first channel, reverting to the previous one")
 		
 		self.display_timer.start()
 		self.ui.actionStart.setChecked(True)
+
+	# slot
+	def second_channel_changed(self, index):
+		self.display_timer.stop()
+		self.ui.actionStart.setChecked(False)
+		
+		success, index = self.audiobackend.select_second_channel(index)
+		
+		self.settings_dialog.comboBox_secondChannel.setCurrentIndex(index)
+		
+		if not success:
+			# Note: the error message is a child of the settings dialog, so that
+			# that dialog remains on top when the error message is closed
+			error_message = QErrorMessage(self.settings_dialog)
+			error_message.setWindowTitle("Input device error")
+			error_message.showMessage("Impossible to use the selected channel as the second channel, reverting to the previous one")
+		
+		self.display_timer.start()
+		self.ui.actionStart.setChecked(True)
+
+	# slot
+	def input_type_changed(self, button):
+                if button.objectName() == 'radioButton_duo':
+                    self.settings_dialog.groupBox_second.setEnabled(True)
+                    self.audiobackend.set_duo_input()
+                    self.logger.push("Switching to difference between two inputs")
+                else:
+                    self.settings_dialog.groupBox_second.setEnabled(False)
+                    self.audiobackend.set_single_input()
+                    self.logger.push("Switching to single input")
 
 def main():
 	if platform.system() == "Windows":
