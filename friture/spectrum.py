@@ -95,10 +95,13 @@ class Spectrum_Widget(QtGui.QWidget):
 		
 		floatdata = self.audiobuffer.data(self.fft_size)
 
-		# for now, take the first channel only
-		floatdata = floatdata[0,:]
+		# first channel
+		sp1, freq, A, B, C = self.proc.analyzelive(floatdata[0,:], self.fft_size, self.maxfreq)
 
-		sp, freq, A, B, C = self.proc.analyzelive(floatdata, self.fft_size, self.maxfreq)
+		if floatdata.shape[0] > 1:
+			# second channel for comparison
+			sp2, freq, A, B, C  = self.proc.analyzelive(floatdata[1,:], self.fft_size, self.maxfreq)
+
 		#sp, freq = self.proc.analyzelive_cochlear(floatdata, 50, minfreq, maxfreq)
 		# scale the db spectrum from [- spec_range db ... 0 db] > [0..1]
 		#print freq[len(freq)/6], A[len(freq)/6]
@@ -112,10 +115,14 @@ class Spectrum_Widget(QtGui.QWidget):
 			w = B
 		else:
 			w = C
-		
-                       # the log operation and the weighting could be deffered
-                       # to the post-weedening !
-		db_spectrogram = 20*log10(sp + epsilon) + w
+
+	           # the log operation and the weighting could be deffered
+	           # to the post-weedening !		
+		if floatdata.shape[0] == 1:
+			db_spectrogram = 20*log10(sp1 + epsilon) + w
+		else:
+			db_spectrogram = 20*log10(sp2 + epsilon) - 20*log10(sp1 + epsilon)
+
 		self.PlotZoneSpect.setdata(freq, db_spectrogram)
 
 	def setminfreq(self, freq):
