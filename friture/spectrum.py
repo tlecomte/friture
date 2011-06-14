@@ -94,6 +94,10 @@ class Spectrum_Widget(QtGui.QWidget):
 		    return
 		
 		floatdata = self.audiobuffer.data(self.fft_size)
+
+		# for now, take the first channel only
+		floatdata = floatdata[0,:]
+
 		sp, freq, A, B, C = self.proc.analyzelive(floatdata, self.fft_size, self.maxfreq)
 		#sp, freq = self.proc.analyzelive_cochlear(floatdata, 50, minfreq, maxfreq)
 		# scale the db spectrum from [- spec_range db ... 0 db] > [0..1]

@@ -19,7 +19,7 @@
 
 from PyQt4 import QtCore
 from pyaudio import PyAudio, paInt16
-from numpy import floor, int16, fromstring
+from numpy import floor, int16, fromstring, vstack
 
 # the sample rate below should be dynamic, taken from PyAudio/PortAudio
 SAMPLING_RATE = 44100
@@ -246,8 +246,10 @@ class AudioBackend(QtCore.QObject):
 				break
 			floatdata = fromstring(rawdata, int16)[channel::nchannels]/(2.**(16-1))
 			if self.duo_input:                            			
-                                       # difference measurements
-                                       floatdata -= fromstring(rawdata, int16)[channel_2::nchannels]/(2.**(16-1))
+                                       floatdata2 = fromstring(rawdata, int16)[channel_2::nchannels]/(2.**(16-1))
+                                       floatdata = vstack((floatdata, floatdata2))
+			else:   
+                                       floatdata.shape = (1, FRAMES_PER_BUFFER)
 			
 			# update the circular buffer
 			ringbuffer.push(floatdata)

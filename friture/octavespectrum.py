@@ -127,6 +127,10 @@ class OctaveSpectrum_Widget(QtGui.QWidget):
 		
 		#get the fresh data
 		floatdata = self.audiobuffer.newdata()
+
+		# for now, take the first channel only
+		floatdata = floatdata[0,:]
+
 		#compute the filters' output
 		y, decs_unused = self.filters.filter(floatdata)
 		

@@ -123,6 +123,9 @@ class Levels_Widget(QtGui.QWidget):
 		
 		# get the fresh data
 		floatdata = self.audiobuffer.newdata()
+  
+		# for now, take the first channel only
+		floatdata = floatdata[0,:]
 		
 		# exponential smoothing for max
 		if len(floatdata) > 0:

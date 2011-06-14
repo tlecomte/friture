@@ -69,6 +69,10 @@ class Scope_Widget(QtGui.QWidget):
 		time = SMOOTH_DISPLAY_TIMER_PERIOD_MS/1000.
 		#basic trigger capability on leading edge
 		floatdata = self.audiobuffer.data(time*SAMPLING_RATE)
+
+		# for now, take the first channel only
+		floatdata = floatdata[0,:]
+
 		max = floatdata.max()
 		trigger_level = max*2./3.
 		trigger_pos = where((floatdata[:-1] < trigger_level)*(floatdata[1:] >= trigger_level))[0]

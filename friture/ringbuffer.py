@@ -23,28 +23,35 @@ class RingBuffer():
 	def __init__(self):
 		# FIXME the buffer length could be made dynamic based on the needs
 		self.buffer_length = 100000.
-		self.buffer = zeros(2*self.buffer_length)
+		self.buffer = zeros((1, 2*self.buffer_length))
 		self.offset = 0
 
 	def push(self, floatdata):
 		# update the circular buffer
 		
-		l = len(floatdata)
+		dim = floatdata.shape[0]
+		l = floatdata.shape[1]
+		print l, dim
+
+		if dim <> self.buffer.shape[0]:
+			# switched from single to dual channels or vice versa  
+			self.buffer = zeros((dim, 2*self.buffer_length))
+			self.offset = 0
 		
 		if l > self.buffer_length:
 			raise StandardError("buffer error")
 		
 		# first copy, always complete
-		self.buffer[self.offset : self.offset + l] = floatdata
+		self.buffer[:, self.offset : self.offset + l] = floatdata[:,:]
 		# second copy, can be folded
 		direct = min(l, self.buffer_length - self.offset)
 		folded = l - direct
-		self.buffer[self.offset + self.buffer_length: self.offset + self.buffer_length + direct] = floatdata[0 : direct]
-		self.buffer[:folded] = floatdata[direct:]
+		self.buffer[:, self.offset + self.buffer_length: self.offset + self.buffer_length + direct] = floatdata[:, 0 : direct]
+		self.buffer[:, :folded] = floatdata[:,direct:]
 		
 		self.offset = int((self.offset + l) % self.buffer_length)
 
 	def data(self, length):
 		start = self.offset + self.buffer_length - length
 		stop = self.offset + self.buffer_length
-		return self.buffer[start : stop]
+		return self.buffer[:, start : stop]

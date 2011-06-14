@@ -108,6 +108,10 @@ class Spectrogram_Widget(QtGui.QWidget):
 		
 		# FIXME We should allow here for more intelligent transforms, especially when the log freq scale is selected
 		floatdata = self.audiobuffer.data(self.fft_size)
+
+		# for now, take the first channel only
+		floatdata = floatdata[0,:]
+
 		sp, freq, A, B, C = self.proc.analyzelive(floatdata, self.fft_size, self.maxfreq)
 		# scale the db spectrum from [- spec_range db ... 0 db] > [0..1]
 		epsilon = 1e-30
