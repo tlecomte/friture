@@ -70,7 +70,11 @@ class Scope_Widget(QtGui.QWidget):
 		#basic trigger capability on leading edge
 		floatdata = self.audiobuffer.data(time*SAMPLING_RATE)
 
-		# for now, take the first channel only
+		twoChannels = False
+		if floatdata.shape[0] > 1:
+			twoChannels = True
+
+		# trigger on the first channel only
 		floatdata = floatdata[0,:]
 
 		max = floatdata.max()
@@ -81,16 +85,25 @@ class Scope_Widget(QtGui.QWidget):
 		else:
 			shift = 0
 		floatdata = self.audiobuffer.data(time*SAMPLING_RATE + shift)
-		floatdata = floatdata[0 : time*SAMPLING_RATE]
-		y = floatdata[::-1] - floatdata.mean()
+		floatdata = floatdata[:, 0 : time*SAMPLING_RATE]
+  
+		y = floatdata[0,::-1] #- floatdata.mean()
+ 		if twoChannels:
+			y2 = floatdata[1,::-1] #- floatdata.mean()
 		
 		dBscope = False
 		if dBscope:
 		    dBmin = -50.
 		    y = sign(y)*(20*log10(abs(y))).clip(dBmin, 0.)/(-dBmin) + sign(y)*1.
+ 		    if twoChannels:
+			 y2 = sign(y2)*(20*log10(abs(y2))).clip(dBmin, 0.)/(-dBmin) + sign(y2)*1.
 	
-		time = linspace(0., len(floatdata)/float(SAMPLING_RATE), len(floatdata))
-		self.PlotZoneUp.setdata(time, y)
+		time = linspace(0., len(y)/float(SAMPLING_RATE), len(y))
+		
+ 		if twoChannels:
+			self.PlotZoneUp.setdataTwoChannels(time, y, y2)
+ 		else:
+			self.PlotZoneUp.setdata(time, y)
 
 	# slot
 	def settings_called(self, checked):

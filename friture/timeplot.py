@@ -75,6 +75,14 @@ class TimePlot(ClassPlot):
 		self.paint_time = 0.
 		
 		self.canvas_width = 0
+  
+		self.dual_channel = False
+  
+  		# insert a few curves
+		self.curve2 = Qwt.QwtPlotCurve()
+		self.curve2.setPen(QtGui.QPen(Qt.Qt.blue))
+		#self.curve.setRenderHint(Qwt.QwtPlotItem.RenderAntialiased)
+		#self.curve2.attach(self)
 		
 		# picker used to display coordinates when clicking on the canvas
 		self.picker = picker(Qwt.QwtPlot.xBottom,
@@ -94,7 +102,11 @@ class TimePlot(ClassPlot):
 			self.logger.push("timeplot : changed canvas width")
 			self.canvas_width = self.cached_canvas.width()
 			self.update_xscale()
-		
+
+		if self.dual_channel:
+			self.dual_channel = False
+			self.curve2.detach()
+
 		x_ms =  1e3*x
 		needfullreplot = False
 		if self.xmax <> x_ms[-1]:
@@ -106,6 +118,38 @@ class TimePlot(ClassPlot):
 
 		y_interp = interp(self.xscaled, x_ms, y)
 		ClassPlot.setdata(self, self.xscaled, y_interp)
+
+		if needfullreplot:
+			self.replot()
+		else:
+			# self.replot() would call updateAxes() which is dead slow (probably because it
+			# computes label sizes); instead, let's just ask Qt to repaint the canvas next time
+			# This works because we disable the cache
+			self.cached_canvas.update()
+
+	def setdataTwoChannels(self, x, y, y2):
+		if self.canvas_width <> self.cached_canvas.width():
+			self.logger.push("timeplot : changed canvas width")
+			self.canvas_width = self.cached_canvas.width()
+			self.update_xscale()
+
+		if not self.dual_channel:
+			self.dual_channel = True
+			self.curve2.attach(self)
+		
+		x_ms =  1e3*x
+		needfullreplot = False
+		if self.xmax <> x_ms[-1]:
+			self.logger.push("timeplot : changing x scale")
+			self.xmax = x_ms[-1]
+			self.setAxisScale(Qwt.QwtPlot.xBottom, 0., self.xmax)
+			self.update_xscale()
+			needfullreplot = True
+
+		y_interp = interp(self.xscaled, x_ms, y)
+  		y_interp2 = interp(self.xscaled, x_ms, y2)
+		ClassPlot.setdata(self, self.xscaled, y_interp)
+		self.curve2.setData(self.xscaled, y_interp2)
 
 		if needfullreplot:
 			self.replot()
