@@ -106,11 +106,17 @@ class Levels_Widget(QtGui.QWidget):
 		N = 4096
 		self.alpha = 1. - (1.-w)**(1./(n+1))
 		self.kernel = (1. - self.alpha)**(arange(0, N)[::-1])
+		# first channel
 		self.old_rms = 1e-30
 		self.old_max = 1e-30
+		# second channel
+		self.old_rms_2 = 1e-30
+		self.old_max_2 = 1e-30
 		
 		n2 = self.response_time/(SMOOTH_DISPLAY_TIMER_PERIOD_MS/1000.)
 		self.alpha2 = 1. - (1.-w)**(1./(n2+1))
+  
+		self.two_channels = False
 
 	# method
 	def set_buffer(self, buffer):
@@ -123,35 +129,82 @@ class Levels_Widget(QtGui.QWidget):
 		
 		# get the fresh data
 		floatdata = self.audiobuffer.newdata()
-  
-		# for now, take the first channel only
-		floatdata = floatdata[0,:]
+
+		if floatdata.shape[0] > 1 and self.two_channels == False:
+			self.meter.setPortCount(4)
+			self.two_channels = True
+		elif floatdata.shape[0] == 1 and self.two_channels == True:
+			self.meter.setPortCount(2)
+			self.two_channels = False
+
+		# first channel
+		y1 = floatdata[0,:]
 		
 		# exponential smoothing for max
-		if len(floatdata) > 0:
-			value_max = abs(floatdata).max()
+		if len(y1) > 0:
+			value_max = abs(y1).max()
 			if value_max > self.old_max*(1.-self.alpha2):
 				self.old_max = value_max
 			else:
 				# exponential decrease
-				self.old_max = self.old_max*(1.-self.alpha2)
+				self.old_max *= (1.-self.alpha2)
 		
 		# exponential smoothing for RMS
-		value_rms = pyx_exp_smoothed_value(self.kernel, self.alpha, floatdata**2, self.old_rms)
+		value_rms = pyx_exp_smoothed_value(self.kernel, self.alpha, y1**2, self.old_rms)
 		self.old_rms = value_rms
 		
 		level_rms = 10.*log10(value_rms*2. + 0.*1e-80) #*2. to get 0dB for a sine wave
 		level_max = 20.*log10(self.old_max + 0.*1e-80)
 		if level_rms > -150.:
-			self.label_rms.setText("%.01f" % level_rms)
+			string_rms = "%.01f" % level_rms
 		else:
-			self.label_rms.setText("-Inf")
+			string_rms = "-Inf"
 		if level_max > -150.:
-			self.label_peak.setText("%.01f" % level_max)
+			string_peak = "%.01f" % level_max
 		else:
-			self.label_peak.setText("-Inf")
-		self.meter.setValue(0, level_rms)
-		self.meter.setValue(1, level_max)
+			string_peak = "-Inf"
+
+		if not self.two_channels:
+			self.meter.setValue(0, level_rms)
+			self.meter.setValue(1, level_max)
+			self.label_rms.setText(string_rms)
+			self.label_peak.setText(string_peak)
+
+		if self.two_channels:
+			# second channel
+			y2 = floatdata[1,:]
+		
+			# exponential smoothing for max
+			if len(y2) > 0:
+				value_max = abs(y2).max()
+				if value_max > self.old_max_2*(1.-self.alpha2):
+					self.old_max_2 = value_max
+				else:
+					# exponential decrease
+					self.old_max_2 *= (1.-self.alpha2)
+			
+			# exponential smoothing for RMS
+			value_rms = pyx_exp_smoothed_value(self.kernel, self.alpha, y2**2, self.old_rms_2)
+			self.old_rms_2 = value_rms
+			
+			level_rms_2 = 10.*log10(value_rms*2. + 0.*1e-80) #*2. to get 0dB for a sine wave
+			level_max_2 = 20.*log10(self.old_max_2 + 0.*1e-80)
+			if level_rms_2 > -150.:
+				string_rms_2 = "%.01f" % level_rms_2
+			else:
+				string_rms_2 = "-Inf"
+			if level_max > -150.:
+				string_peak_2 = "%.01f" % level_max_2
+			else:
+				string_peak_2 = "-Inf"
+
+			#self.meter.m_iPortCount = 3
+			self.meter.setValue(0, level_rms)
+			self.meter.setValue(1, level_rms_2)
+			self.meter.setValue(2, level_max)
+			self.meter.setValue(3, level_max_2)
+			self.label_rms.setText("Ch1:\n%s\n\nCh2:\n%s" %(string_rms, string_rms_2))
+			self.label_peak.setText("Ch1:\n%s\n\nCh2:\n%s" %(string_peak, string_peak_2))
 		
 		if 0:
 			fft_size = time*SAMPLING_RATE #1024

@@ -251,16 +251,31 @@ class qsynthMeter(QtGui.QFrame):
 		self.m_colors[self.ColorBack] = QtGui.QColor( 20, 40, 20)
 		self.m_colors[self.ColorFore] = QtGui.QColor( 80, 80, 80)
 
+		self.setBackgroundRole(QtGui.QPalette.NoRole)
+
 		self.m_pHBoxLayout = QtGui.QHBoxLayout()
 		self.m_pHBoxLayout.setMargin(0)
 		self.m_pHBoxLayout.setSpacing(0)
 		self.setLayout(self.m_pHBoxLayout)
 
-		self.setBackgroundRole(QtGui.QPalette.NoRole)
+		self.build()
 
-		if self.m_iPortCount > 0:
-			if self.m_iPortCount > 1:
-				self.m_iScaleCount -= 1
+		self.setSizePolicy(
+			QtGui.QSizePolicy(QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding))
+
+	# build the widget layout depending on the port count.
+	def build(self):
+		while self.m_pHBoxLayout.count() > 0:
+			item = self.m_pHBoxLayout.takeAt(0)
+			if not item:
+				continue
+
+			w = item.widget()
+			if w:
+				w.deleteLater()
+
+		if self.m_iPortCount > 0 and self.m_iPortCount < 4:
+			self.m_iScaleCount = 1
 			self.m_ppValues = []
 			self.m_ppScales = []
 			for iPort in range(0, self.m_iPortCount):
@@ -269,14 +284,25 @@ class qsynthMeter(QtGui.QFrame):
 				if iPort < self.m_iScaleCount:
 					self.m_ppScales += [qsynthMeterScale(self)]
 					self.m_pHBoxLayout.addWidget(self.m_ppScales[iPort])
-			self.setMinimumSize(16 * self.m_iPortCount + 16 * (self.m_iPortCount-1), 120)
-			self.setMaximumWidth(16 * self.m_iPortCount + 16 * (self.m_iPortCount-1))
+			self.setMinimumSize(16 * self.m_iPortCount + 16 * self.m_iScaleCount, 120)
+			self.setMaximumWidth(16 * self.m_iPortCount + 16 * self.m_iScaleCount)
+		elif self.m_iPortCount >= 4:
+			self.m_iScaleCount = 1
+			self.m_ppValues = []
+			self.m_ppScales = []
+			for iPort in range(0, self.m_iPortCount):
+				self.m_ppValues += [qsynthMeterValue(self)]
+				self.m_pHBoxLayout.addWidget(self.m_ppValues[iPort])
+				if iPort == 1:
+					self.m_ppScales += [qsynthMeterScale(self)]
+					self.m_pHBoxLayout.addWidget(self.m_ppScales[-1])
+				if iPort % 2 == 0:
+					self.m_pHBoxLayout.addSpacing(1)
+			self.setMinimumSize(16 * self.m_iPortCount + 16 * self.m_iScaleCount, 120)
+			self.setMaximumWidth(16 * self.m_iPortCount + 16 * self.m_iScaleCount)
 		else:
 			self.setMinimumSize(2, 120)
 			self.setMaximumWidth(4)
-
-		self.setSizePolicy(
-			QtGui.QSizePolicy(QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding))
 
 	# Child widget accessors.
 	def iec_scale (self, dB ):
@@ -307,6 +333,9 @@ class qsynthMeter(QtGui.QFrame):
 	def portCount (self):
 		return self.m_iPortCount
 
+	def setPortCount (self, count):
+		self.m_iPortCount = count
+    		self.build()
 
 	# Peak falloff mode setting.
 	def setPeakFalloff ( self, iPeakFalloff ):
