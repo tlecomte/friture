@@ -78,11 +78,16 @@ class TimePlot(ClassPlot):
   
 		self.dual_channel = False
   
-  		# insert a few curves
-		self.curve2 = Qwt.QwtPlotCurve()
+  		# insert an additional curve for the second channel
+  		# (ClassPlot already has one by default)
+		self.curve2 = Qwt.QwtPlotCurve("Ch2")
 		self.curve2.setPen(QtGui.QPen(Qt.Qt.blue))
 		#self.curve.setRenderHint(Qwt.QwtPlotItem.RenderAntialiased)
 		#self.curve2.attach(self)
+
+  		# gives an appropriate title to the first curve
+  		# (for the legend)
+		self.curve.setTitle("Ch1")
 		
 		# picker used to display coordinates when clicking on the canvas
 		self.picker = picker(Qwt.QwtPlot.xBottom,
@@ -106,6 +111,9 @@ class TimePlot(ClassPlot):
 		if self.dual_channel:
 			self.dual_channel = False
 			self.curve2.detach()
+  			# disable the legend
+  			# (useless when one channel is active)
+			self.insertLegend(None, Qwt.QwtPlot.RightLegend)
 
 		x_ms =  1e3*x
 		needfullreplot = False
@@ -136,6 +144,9 @@ class TimePlot(ClassPlot):
 		if not self.dual_channel:
 			self.dual_channel = True
 			self.curve2.attach(self)
+  			# enable the legend
+  			# (to discrimate between the two channels)
+			self.insertLegend(Qwt.QwtLegend(), Qwt.QwtPlot.RightLegend)
 		
 		x_ms =  1e3*x
 		needfullreplot = False
