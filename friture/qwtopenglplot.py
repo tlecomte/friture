@@ -291,7 +291,11 @@ class GLPlotWidget(QtGui.QWidget):
         g_with_peaks = hstack((1. - self.peak_int, 0.5*Ones_shaded))
         b_with_peaks = hstack((1. - self.peak_int, 0.*Ones))
         
-        self.setQuadData(x1_with_peaks, y_with_peaks - self.glWidget.height(), x2_with_peaks - x1_with_peaks, self.glWidget.height(), r_with_peaks, g_with_peaks, b_with_peaks)
+        # use the following commented line for dual channel response measurement
+        #baseline = self.ytransform(0.)
+        # use the following line for single channel analysis
+        baseline = 0.
+        self.setQuadData(x1_with_peaks, y_with_peaks, x2_with_peaks - x1_with_peaks, baseline, r_with_peaks, g_with_peaks, b_with_peaks)
 
     # redraw when the widget is resized to update coordinates transformations
     def resizeEvent(self, event):
@@ -319,9 +323,9 @@ class GLPlotWidget(QtGui.QWidget):
         self.peak_int[mask1] = 1.
         self.peak_int[mask2_b] *= 0.975
   
-    def setQuadData(self, x, y, w, h, r, g, b):
-        # draw the grid here
-        #vertex[0,0,0] = 
+    def setQuadData(self, x, y, w, baseline, r, g, b):
+        h = y - baseline
+        y -= h
         
         n = x.shape[0]
     
