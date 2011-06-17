@@ -229,8 +229,12 @@ class GLPlotWidget(QtGui.QWidget):
             x1 = self.xtransform(self.x1)
             x2 = self.xtransform(self.x2)
             
-            self.transformed_x1, self.transformed_x2, n = self.pre_tree_rebin(x1, x2)
-            self.n = [0] + n
+            if self.logx:
+                self.transformed_x1, self.transformed_x2, n = self.pre_tree_rebin(x1, x2)
+                self.n = [0] + n
+            else:
+                self.transformed_x1 = x1
+                self.transformed_x2 = x2
             
             xMajorTick = self.horizontalScaleEngine.divideScale(self.xmin, self.xmax, 8, 5).ticks(2)
             xMinorTick = self.horizontalScaleEngine.divideScale(self.xmin, self.xmax, 8, 5).ticks(0)
