@@ -27,3 +27,26 @@ class Settings_Dialog(QtGui.QDialog, Ui_Settings_Dialog):
 		
 		# Setup the user interface
 		self.setupUi(self)
+
+	# method
+	def saveState(self, settings):
+		# for the input device, we search by name instead of index, since
+		# we do not know if the device order stays the same between sessions
+  		settings.setValue("deviceName", self.comboBox_inputDevice.currentText())
+		settings.setValue("firstChannel", self.comboBox_firstChannel.currentIndex())
+		settings.setValue("secondChannel", self.comboBox_secondChannel.currentIndex())
+		settings.setValue("duoInput", self.inputTypeButtonGroup.checkedId())
+
+	# method
+	def restoreState(self, settings):
+		device_name = settings.value("deviceName", "").toString()
+		id = self.comboBox_inputDevice.findText(device_name)
+  		# change the device only if it exists in the device list
+		if id >= 0:
+			self.comboBox_inputDevice.setCurrentIndex(id)
+			(channel, ok) = settings.value("firstChannel", 0).toInt()
+			self.comboBox_firstChannel.setCurrentIndex(channel)
+			(channel, ok) = settings.value("secondChannel", 0).toInt()
+			self.comboBox_secondChannel.setCurrentIndex(channel)
+			(duo_input_id, ok) = settings.value("duoInput", 0).toInt()
+			self.inputTypeButtonGroup.button(duo_input_id).setChecked(True)

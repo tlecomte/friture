@@ -138,7 +138,8 @@ class Friture(QMainWindow, ):
 		self.connect(self.settings_dialog.comboBox_inputDevice, QtCore.SIGNAL('currentIndexChanged(int)'), self.input_device_changed)
   		self.connect(self.settings_dialog.comboBox_firstChannel, QtCore.SIGNAL('currentIndexChanged(int)'), self.first_channel_changed)
 		self.connect(self.settings_dialog.comboBox_secondChannel, QtCore.SIGNAL('currentIndexChanged(int)'), self.second_channel_changed)
-		self.connect(self.settings_dialog.inputTypeButtonGroup, QtCore.SIGNAL('buttonClicked(QAbstractButton*)'), self.input_type_changed)
+		self.connect(self.settings_dialog.radioButton_single, QtCore.SIGNAL('toggled(bool)'), self.single_input_type_selected)
+		self.connect(self.settings_dialog.radioButton_duo, QtCore.SIGNAL('toggled(bool)'), self.duo_input_type_selected)
 
 		# log change
 		self.connect(self.logger, QtCore.SIGNAL('logChanged'), self.log_changed)
@@ -219,6 +220,10 @@ class Friture(QMainWindow, ):
 		windowState = self.saveState()
 		settings.setValue("windowState", windowState)
 		settings.endGroup()
+
+		settings.beginGroup("AudioBackend")
+		self.settings_dialog.saveState(settings)
+		settings.endGroup()
 	
 	# method
 	def restoreAppState(self):
@@ -253,6 +258,10 @@ class Friture(QMainWindow, ):
 		settings.beginGroup("MainWindow")
 		self.restoreGeometry(settings.value("windowGeometry").toByteArray())
 		self.restoreState(settings.value("windowState").toByteArray())
+		settings.endGroup()
+  
+  		settings.beginGroup("AudioBackend")
+		self.settings_dialog.restoreState(settings)
 		settings.endGroup()
 
 	# slot
@@ -296,7 +305,6 @@ class Friture(QMainWindow, ):
 
 	# slot
 	def input_device_changed(self, index):
-		self.display_timer.stop()
 		self.ui.actionStart.setChecked(False)
 		
 		success, index = self.audiobackend.select_input_device(index)
@@ -316,12 +324,10 @@ class Friture(QMainWindow, ):
 		second_channel = self.audiobackend.get_current_second_channel()
 		self.settings_dialog.comboBox_secondChannel.setCurrentIndex(second_channel)  
   
-		self.display_timer.start()
 		self.ui.actionStart.setChecked(True)
 
 	# slot
 	def first_channel_changed(self, index):
-		self.display_timer.stop()
 		self.ui.actionStart.setChecked(False)
 		
 		success, index = self.audiobackend.select_first_channel(index)
@@ -335,12 +341,10 @@ class Friture(QMainWindow, ):
 			error_message.setWindowTitle("Input device error")
 			error_message.showMessage("Impossible to use the selected channel as the first channel, reverting to the previous one")
 		
-		self.display_timer.start()
 		self.ui.actionStart.setChecked(True)
 
 	# slot
 	def second_channel_changed(self, index):
-		self.display_timer.stop()
 		self.ui.actionStart.setChecked(False)
 		
 		success, index = self.audiobackend.select_second_channel(index)
@@ -354,19 +358,21 @@ class Friture(QMainWindow, ):
 			error_message.setWindowTitle("Input device error")
 			error_message.showMessage("Impossible to use the selected channel as the second channel, reverting to the previous one")
 		
-		self.display_timer.start()
 		self.ui.actionStart.setChecked(True)
 
 	# slot
-	def input_type_changed(self, button):
-                if button.objectName() == 'radioButton_duo':
-                    self.settings_dialog.groupBox_second.setEnabled(True)
-                    self.audiobackend.set_duo_input()
-                    self.logger.push("Switching to difference between two inputs")
-                else:
+	def single_input_type_selected(self, checked):
+                if checked:
                     self.settings_dialog.groupBox_second.setEnabled(False)
                     self.audiobackend.set_single_input()
                     self.logger.push("Switching to single input")
+
+	# slot
+	def duo_input_type_selected(self, checked):
+                if checked:
+                    self.settings_dialog.groupBox_second.setEnabled(True)
+                    self.audiobackend.set_duo_input()
+                    self.logger.push("Switching to difference between two inputs")
 
 def main():
 	if platform.system() == "Windows":
