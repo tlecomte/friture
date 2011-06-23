@@ -30,8 +30,8 @@ aboutText = """
 """
 
 class About_Dialog(QtGui.QDialog):
-	def __init__(self):
-		QtGui.QDialog.__init__(self)
+	def __init__(self, parent):
+		QtGui.QDialog.__init__(self, parent)
 		
 		self.setObjectName("About_Dialog")
 		self.resize(400, 300)
