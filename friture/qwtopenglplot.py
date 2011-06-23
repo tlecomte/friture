@@ -325,7 +325,7 @@ class GLPlotWidget(QtGui.QWidget):
   
     def setQuadData(self, x, y, w, baseline, r, g, b):
         h = y - baseline
-        y -= h
+        y = baseline
         
         n = x.shape[0]
     
