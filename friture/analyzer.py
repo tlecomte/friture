@@ -76,7 +76,7 @@ class Friture(QMainWindow, ):
 		self.ui = Ui_MainWindow()
 		self.ui.setupUi(self)
 		
-		self.settings_dialog = Settings_Dialog()
+		self.settings_dialog = Settings_Dialog(self)
 		self.about_dialog = About_Dialog()
 		
 		self.chunk_number = 0

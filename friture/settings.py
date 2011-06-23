@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2009 Timothée Lecomte
+# Copyright (C) 2009 TimothÃ©e Lecomte
 
 # This file is part of Friture.
 #
@@ -21,8 +21,8 @@ from PyQt4 import QtGui
 from friture.ui_settings import Ui_Settings_Dialog
 
 class Settings_Dialog(QtGui.QDialog, Ui_Settings_Dialog):
-	def __init__(self):
-		QtGui.QDialog.__init__(self)
+	def __init__(self, parent):
+		QtGui.QDialog.__init__(self, parent)
 		Ui_Settings_Dialog.__init__(self)
 		
 		# Setup the user interface
