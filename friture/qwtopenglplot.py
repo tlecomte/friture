@@ -455,6 +455,10 @@ class GLWidget(QtOpenGL.QGLWidget):
         painter.end()
 
     def drawDataQuads(self):
+        # TODO: instead of Arrays, VBOs should be used here, as a large part of
+        # the data does not have to be modified on every call (x coordinates,
+        # green colored quads)
+        
         #GL.glDisable(GL.GL_LIGHTING)
         GL.glDrawArrays(GL.GL_QUADS, 0, 4*self.n)
         #GL.glEnable(GL.GL_LIGHTING)    
