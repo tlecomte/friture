@@ -459,6 +459,9 @@ class GLWidget(QtOpenGL.QGLWidget):
         # the data does not have to be modified on every call (x coordinates,
         # green colored quads)
         
+        # TODO: If the arrays could be drawn as SHORTs istead of FLOATs, it
+        # could also be dramatically faster
+        
         #GL.glDisable(GL.GL_LIGHTING)
         GL.glDrawArrays(GL.GL_QUADS, 0, 4*self.n)
         #GL.glEnable(GL.GL_LIGHTING)    
