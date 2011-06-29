@@ -81,7 +81,7 @@
        <item>
         <widget class="QRadioButton" name="radioButton_duo">
          <property name="text">
-          <string>Difference between two channels</string>
+          <string>Two channels</string>
          </property>
          <attribute name="buttonGroup">
           <string>inputTypeButtonGroup</string>
@@ -135,6 +135,38 @@
       </layout>
      </item>
     </layout>
+   </item>
+   <item>
+    <widget class="QLabel" name="label_delay">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="text">
+      <string>Choose a time delay for difference measurement between the two channels (second minus first):</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QDoubleSpinBox" name="doubleSpinBox_delay">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="suffix">
+      <string> ms</string>
+     </property>
+     <property name="decimals">
+      <number>2</number>
+     </property>
+     <property name="minimum">
+      <double>-10000.000000000000000</double>
+     </property>
+     <property name="maximum">
+      <double>10000.000000000000000</double>
+     </property>
+     <property name="singleStep">
+      <double>100.000000000000000</double>
+     </property>
+    </widget>
    </item>
    <item>
     <spacer name="verticalSpacer_2">

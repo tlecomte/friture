@@ -54,3 +54,8 @@ class RingBuffer():
 		start = self.offset + self.buffer_length - length
 		stop = self.offset + self.buffer_length
 		return self.buffer[:, start : stop]
+
+	def data_older(self, length, delay_samples):
+		start = self.offset + self.buffer_length - length - delay_samples
+		stop = self.offset + self.buffer_length - delay_samples
+		return self.buffer[:, start : stop]

@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui/settings.ui'
 #
-# Created: Fri Jun 10 22:39:20 2011
+# Created: Wed Jun 29 22:32:23 2011
 #      by: PyQt4 UI code generator 4.8.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -75,6 +75,18 @@ class Ui_Settings_Dialog(object):
         self.verticalLayout_4.addWidget(self.groupBox_second)
         self.horizontalLayout.addLayout(self.verticalLayout_4)
         self.verticalLayout_5.addLayout(self.horizontalLayout)
+        self.label_delay = QtGui.QLabel(Settings_Dialog)
+        self.label_delay.setEnabled(False)
+        self.label_delay.setObjectName(_fromUtf8("label_delay"))
+        self.verticalLayout_5.addWidget(self.label_delay)
+        self.doubleSpinBox_delay = QtGui.QDoubleSpinBox(Settings_Dialog)
+        self.doubleSpinBox_delay.setEnabled(False)
+        self.doubleSpinBox_delay.setDecimals(2)
+        self.doubleSpinBox_delay.setMinimum(-10000.0)
+        self.doubleSpinBox_delay.setMaximum(10000.0)
+        self.doubleSpinBox_delay.setSingleStep(100.0)
+        self.doubleSpinBox_delay.setObjectName(_fromUtf8("doubleSpinBox_delay"))
+        self.verticalLayout_5.addWidget(self.doubleSpinBox_delay)
         spacerItem3 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
         self.verticalLayout_5.addItem(spacerItem3)
 
@@ -86,8 +98,10 @@ class Ui_Settings_Dialog(object):
         self.label_inputType_2.setText(QtGui.QApplication.translate("Settings_Dialog", "Select the input device :", None, QtGui.QApplication.UnicodeUTF8))
         self.label_inputType.setText(QtGui.QApplication.translate("Settings_Dialog", "Select the type of input :", None, QtGui.QApplication.UnicodeUTF8))
         self.radioButton_single.setText(QtGui.QApplication.translate("Settings_Dialog", "Single channel", None, QtGui.QApplication.UnicodeUTF8))
-        self.radioButton_duo.setText(QtGui.QApplication.translate("Settings_Dialog", "Difference between two channels", None, QtGui.QApplication.UnicodeUTF8))
+        self.radioButton_duo.setText(QtGui.QApplication.translate("Settings_Dialog", "Two channels", None, QtGui.QApplication.UnicodeUTF8))
         self.groupBox_first.setTitle(QtGui.QApplication.translate("Settings_Dialog", "First channel", None, QtGui.QApplication.UnicodeUTF8))
         self.groupBox_second.setTitle(QtGui.QApplication.translate("Settings_Dialog", "Second channel", None, QtGui.QApplication.UnicodeUTF8))
+        self.label_delay.setText(QtGui.QApplication.translate("Settings_Dialog", "Choose a time delay for difference measurement between the two channels (second minus first):", None, QtGui.QApplication.UnicodeUTF8))
+        self.doubleSpinBox_delay.setSuffix(QtGui.QApplication.translate("Settings_Dialog", " ms", None, QtGui.QApplication.UnicodeUTF8))
 
 import friture_rc

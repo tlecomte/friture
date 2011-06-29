@@ -140,6 +140,7 @@ class Friture(QMainWindow, ):
 		self.connect(self.settings_dialog.comboBox_secondChannel, QtCore.SIGNAL('currentIndexChanged(int)'), self.second_channel_changed)
 		self.connect(self.settings_dialog.radioButton_single, QtCore.SIGNAL('toggled(bool)'), self.single_input_type_selected)
 		self.connect(self.settings_dialog.radioButton_duo, QtCore.SIGNAL('toggled(bool)'), self.duo_input_type_selected)
+		self.connect(self.settings_dialog.doubleSpinBox_delay, QtCore.SIGNAL('valueChanged(double)'), self.delay_changed)
 
 		# log change
 		self.connect(self.logger, QtCore.SIGNAL('logChanged'), self.log_changed)
@@ -364,6 +365,8 @@ class Friture(QMainWindow, ):
 	def single_input_type_selected(self, checked):
                 if checked:
                     self.settings_dialog.groupBox_second.setEnabled(False)
+                    self.settings_dialog.label_delay.setEnabled(False)
+                    self.settings_dialog.doubleSpinBox_delay.setEnabled(False)
                     self.audiobackend.set_single_input()
                     self.logger.push("Switching to single input")
 
@@ -371,8 +374,16 @@ class Friture(QMainWindow, ):
 	def duo_input_type_selected(self, checked):
                 if checked:
                     self.settings_dialog.groupBox_second.setEnabled(True)
+                    self.settings_dialog.label_delay.setEnabled(True)
+                    self.settings_dialog.doubleSpinBox_delay.setEnabled(True)
                     self.audiobackend.set_duo_input()
                     self.logger.push("Switching to difference between two inputs")
+
+	# slot
+	def delay_changed(self, delay_ms):
+                    self.delay_ms = delay_ms
+                    self.logger.push("Delay changed to %f" %delay_ms)
+                    self.audiobuffer.set_delay_ms(delay_ms)
 
 def main():
 	if platform.system() == "Windows":

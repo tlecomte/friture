@@ -100,7 +100,11 @@ class Spectrum_Widget(QtGui.QWidget):
 
 		if floatdata.shape[0] > 1:
 			# second channel for comparison
-			sp2, freq, A, B, C  = self.proc.analyzelive(floatdata[1,:], self.fft_size, self.maxfreq)
+			sp2, freq, A, B, C  = self.proc.analyzelive(floatdata[1,:], self.fft_size, self.maxfreq)   
+
+			floatdata_delayed = self.audiobuffer.data_delayed(self.fft_size)
+			sp1, freq, A, B, C  = self.proc.analyzelive(floatdata_delayed[0,:], self.fft_size, self.maxfreq)   
+   
 
 		#sp, freq = self.proc.analyzelive_cochlear(floatdata, 50, minfreq, maxfreq)
 		# scale the db spectrum from [- spec_range db ... 0 db] > [0..1]
