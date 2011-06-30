@@ -72,8 +72,11 @@ class SpectPlot(ClassPlot):
 		self.canvas().setPaintAttribute(Qwt.QwtPlotCanvas.PaintCached, False)
 		self.canvas().setPaintAttribute(Qwt.QwtPlotCanvas.PaintPacked, False)
 
-		self.setAxisScale(Qwt.QwtPlot.yLeft, -140., 0.)
-		self.curve.setBaseline(-140.)
+		self.ymin = -140.
+		self.setAxisScale(Qwt.QwtPlot.yLeft, self.ymin, 0.)
+		self.baseline_transformed = False
+		self.baseline = 0.
+		self.curve.setBaseline(self.ymin)
 		xtitle = Qwt.QwtText('Frequency (Hz)')
 		xtitle.setFont(QtGui.QFont(8))
 		self.setAxisTitle(Qwt.QwtPlot.xBottom, xtitle)
@@ -223,8 +226,13 @@ class SpectPlot(ClassPlot):
 		self.needfullreplot = True
 	
 	def setspecrange(self, min, max):
+		self.ymin = min
 		self.setAxisScale(Qwt.QwtPlot.yLeft, min, max)
-		self.curve.setBaseline(min)
+		if self.baseline_transformed:
+			self.curve.setBaseline(self.baseline)
+		else:
+			# FIXME
+			self.curve.setBaseline(min)
 		self.needfullreplot = True
 	
 	def setweighting(self, weighting):
@@ -243,7 +251,16 @@ class SpectPlot(ClassPlot):
 
 	def set_peaks_enabled(self, enabled):
 		self.peaks_enabled = enabled
-	
+
+	def set_baseline_displayUnits(self, baseline):
+		# FIXME
+		self.baseline_transformed = False
+		self.curve.setBaseline(self.ymin)
+
+	def set_baseline_dataUnits(self, baseline):
+		self.baseline_transformed = True
+		self.curve.setBaseline(baseline)
+
 	def drawCanvas(self, painter):
 		t = QtCore.QTime()
 		t.start()

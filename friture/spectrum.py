@@ -81,6 +81,7 @@ class Spectrum_Widget(QtGui.QWidget):
 		self.PlotZoneSpect.setspecrange(self.spec_min, self.spec_max)
 		self.PlotZoneSpect.setweighting(self.weighting)
 		self.PlotZoneSpect.set_peaks_enabled(True)
+		self.PlotZoneSpect.set_baseline_displayUnits(0.)
 		
 		# initialize the settings dialog
 		self.settings_dialog = Spectrum_Settings_Dialog(self, self.logger)

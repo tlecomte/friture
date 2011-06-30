@@ -46,6 +46,9 @@ class GLPlotWidget(QtGui.QWidget):
         self.transformed_x1 = self.x1
         self.transformed_x2 = self.x2
         
+        self.baseline_transformed = False
+        self.baseline = 0.
+        
         self.topDist = 0
         self.bottomDist = 0
         self.leftDist = 0
@@ -135,7 +138,15 @@ class GLPlotWidget(QtGui.QWidget):
     
     def set_peaks_enabled(self, enabled):
         self.peaks_enabled = enabled
-        
+    
+    def set_baseline_displayUnits(self, baseline):
+        self.baseline_transformed = False
+        self.baseline = baseline
+
+    def set_baseline_dataUnits(self, baseline):
+        self.baseline_transformed = True
+        self.baseline = baseline
+    
     def xtransform(self, x):
         verticalDists = self.verticalScale.getBorderDistHint()
         horizontalDists = self.horizontalScale.getBorderDistHint()
@@ -307,10 +318,12 @@ class GLPlotWidget(QtGui.QWidget):
             g_with_peaks = 0.5*Ones_shaded
             b_with_peaks = 0.*Ones
         
-        # use the following commented line for dual channel response measurement
-        #baseline = self.ytransform(0.)
-        # use the following line for single channel analysis
-        baseline = 0.
+        if self.baseline_transformed:
+            # used for dual channel response measurement
+            baseline = self.ytransform(self.baseline)
+        else:
+            # used for single channel analysis
+            baseline = self.baseline
         self.setQuadData(x1_with_peaks, y_with_peaks, x2_with_peaks - x1_with_peaks, baseline, r_with_peaks, g_with_peaks, b_with_peaks)
 
     # redraw when the widget is resized to update coordinates transformations
