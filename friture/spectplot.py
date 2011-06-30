@@ -122,6 +122,7 @@ class SpectPlot(ClassPlot):
 		self.peak = zeros((1,))
 		self.peakHold = 0
 		self.peakDecay = PEAK_DECAY_RATE
+		self.peaks_enabled = True
 		
 		# fill under the curve
 		#self.curve.setBrush(Qt.QColor(255,0,190))
@@ -151,7 +152,7 @@ class SpectPlot(ClassPlot):
 		
 		y_interp = interp(self.xscaled, x, y)
                 
-                #upsampling = 10.
+		#upsampling = 10.
 		#upsampled_freq = linspace(x.min(), x.max(), len(x)*upsampling)
 		#upsampled_xyzs = y.repeat(upsampling)
 		#y_interp = histogram(upsampled_freq, bins=self.xscaled, normed=False, weights=upsampled_xyzs, new=None)[0]
@@ -159,8 +160,9 @@ class SpectPlot(ClassPlot):
                 
 		ClassPlot.setdata(self, self.xscaled, y_interp)
 
-                self.compute_peaks(y_interp)
-		self.curve_peak.setData(self.xscaled, self.peak)
+		if self.peaks_enabled:
+			self.compute_peaks(y_interp)
+			self.curve_peak.setData(self.xscaled, self.peak)
 		
 		if self.needfullreplot:
 			self.needfullreplot = False
@@ -238,6 +240,9 @@ class SpectPlot(ClassPlot):
 		ytitle = Qwt.QwtText(title)
 		ytitle.setFont(QtGui.QFont(8))
 		self.setAxisTitle(Qwt.QwtPlot.yLeft, ytitle)
+
+	def set_peaks_enabled(self, enabled):
+		self.peaks_enabled = enabled
 	
 	def drawCanvas(self, painter):
 		t = QtCore.QTime()

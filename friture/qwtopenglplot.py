@@ -34,12 +34,15 @@ class GLPlotWidget(QtGui.QWidget):
         self.ymin = 0.1
         self.ymax = 1.
         
+        self.peaks_enabled = True
         self.peak = zeros((3,))
         self.peak_int = zeros((3,))
         self.peak_decay = ones((3,))*PEAK_DECAY_RATE
+        
         self.x1 = array([0.1, 0.5, 1.])
         self.x2 = array([0.5, 1., 2.])
         self.y = array([0., 0., 0.])
+        
         self.transformed_x1 = self.x1
         self.transformed_x2 = self.x2
         
@@ -129,6 +132,9 @@ class GLPlotWidget(QtGui.QWidget):
         self.verticalScale.setTitle(ytitle)
         self.needtransform = True
         self.draw()
+    
+    def set_peaks_enabled(self, enabled):
+        self.peaks_enabled = enabled
         
     def xtransform(self, x):
         verticalDists = self.verticalScale.getBorderDistHint()
@@ -269,10 +275,10 @@ class GLPlotWidget(QtGui.QWidget):
             else:
                 y = self.y
 
-        self.compute_peaks(y)
+        if self.peaks_enabled:
+            self.compute_peaks(y)
         
-        transformed_y = self.ytransform(y)                
-        transformed_peak = self.ytransform(self.peak)        
+        transformed_y = self.ytransform(y)
         
         Ones = ones(x1.shape)
         Ones_shaded = Ones #.copy()
@@ -282,14 +288,24 @@ class GLPlotWidget(QtGui.QWidget):
         #w = x2 - x1
         #i = where(w<1.)[0]
         #if len(i)>0:
-        #    Ones_shaded[:i[0]:2] = 1.2        
+        #    Ones_shaded[:i[0]:2] = 1.2            
         
-        x1_with_peaks = hstack((x1, x1))
-        x2_with_peaks = hstack((x2, x2))
-        y_with_peaks = hstack((transformed_peak, transformed_y))
-        r_with_peaks = hstack((1.*Ones, 0.*Ones))
-        g_with_peaks = hstack((1. - self.peak_int, 0.5*Ones_shaded))
-        b_with_peaks = hstack((1. - self.peak_int, 0.*Ones))
+        if self.peaks_enabled:
+            transformed_peak = self.ytransform(self.peak)        
+        
+            x1_with_peaks = hstack((x1, x1))
+            x2_with_peaks = hstack((x2, x2))
+            y_with_peaks = hstack((transformed_peak, transformed_y))
+            r_with_peaks = hstack((1.*Ones, 0.*Ones))
+            g_with_peaks = hstack((1. - self.peak_int, 0.5*Ones_shaded))
+            b_with_peaks = hstack((1. - self.peak_int, 0.*Ones))
+        else:
+            x1_with_peaks = x1
+            x2_with_peaks = x2
+            y_with_peaks = transformed_y
+            r_with_peaks = 0.*Ones
+            g_with_peaks = 0.5*Ones_shaded
+            b_with_peaks = 0.*Ones
         
         # use the following commented line for dual channel response measurement
         #baseline = self.ytransform(0.)
