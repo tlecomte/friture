@@ -39,6 +39,12 @@ class Spectrum_Settings_Dialog(QtGui.QDialog):
 		self.setWindowTitle("Spectrum settings")
 		
 		self.formLayout = QtGui.QFormLayout(self)
+
+		self.comboBox_dual_channel = QtGui.QComboBox(self)
+		self.comboBox_dual_channel.setObjectName("dual")
+		self.comboBox_dual_channel.addItem("Single-channel")
+		self.comboBox_dual_channel.addItem("Dual-channel")
+		self.comboBox_dual_channel.setCurrentIndex(0)
 		
 		self.comboBox_fftsize = QtGui.QComboBox(self)
 		self.comboBox_fftsize.setObjectName("comboBox_fftsize")
@@ -100,6 +106,7 @@ class Spectrum_Settings_Dialog(QtGui.QDialog):
 		self.comboBox_weighting.addItem("C")
 		self.comboBox_weighting.setCurrentIndex(DEFAULT_WEIGHTING)
 
+		self.formLayout.addRow("Measurement type:", self.comboBox_dual_channel)
 		self.formLayout.addRow("FFT Size:", self.comboBox_fftsize)
 		self.formLayout.addRow("Frequency scale:", self.comboBox_freqscale)
 		self.formLayout.addRow("Min frequency:", self.spinBox_minfreq)
@@ -110,6 +117,7 @@ class Spectrum_Settings_Dialog(QtGui.QDialog):
 		
 		self.setLayout(self.formLayout)
 
+		self.connect(self.comboBox_dual_channel, QtCore.SIGNAL('currentIndexChanged(int)'), self.dualchannelchanged)
 		self.connect(self.comboBox_fftsize, QtCore.SIGNAL('currentIndexChanged(int)'), self.fftsizechanged)
 		self.connect(self.comboBox_freqscale, QtCore.SIGNAL('currentIndexChanged(int)'), self.freqscalechanged)
 		self.connect(self.spinBox_minfreq, QtCore.SIGNAL('valueChanged(int)'), self.parent.setminfreq)
@@ -117,6 +125,13 @@ class Spectrum_Settings_Dialog(QtGui.QDialog):
 		self.connect(self.spinBox_specmin, QtCore.SIGNAL('valueChanged(int)'), self.parent.setmin)
 		self.connect(self.spinBox_specmax, QtCore.SIGNAL('valueChanged(int)'), self.parent.setmax)
 		self.connect(self.comboBox_weighting, QtCore.SIGNAL('currentIndexChanged(int)'), self.parent.setweighting)
+
+	# slot
+	def dualchannelchanged(self, index):
+		if index == 0:
+			self.parent.setdualchannels(False)
+		else:
+			self.parent.setdualchannels(True)
 
 	# slot
 	def fftsizechanged(self, index):

@@ -75,6 +75,7 @@ class Spectrum_Widget(QtGui.QWidget):
 		self.spec_min = DEFAULT_SPEC_MIN
 		self.spec_max = DEFAULT_SPEC_MAX
 		self.weighting = DEFAULT_WEIGHTING
+		self.dual_channels = False
 		
 		self.PlotZoneSpect.setlogfreqscale() #DEFAULT_FREQ_SCALE = 1 #log10
 		self.PlotZoneSpect.setfreqrange(self.minfreq, self.maxfreq)
@@ -100,13 +101,12 @@ class Spectrum_Widget(QtGui.QWidget):
 		# first channel
 		sp1, freq, A, B, C = self.proc.analyzelive(floatdata[0,:], self.fft_size, self.maxfreq)
 
-		if floatdata.shape[0] > 1:
+		if self.dual_channels and floatdata.shape[0] > 1:
 			# second channel for comparison
 			sp2, freq, A, B, C  = self.proc.analyzelive(floatdata[1,:], self.fft_size, self.maxfreq)   
 
 			floatdata_delayed = self.audiobuffer.data_delayed(self.fft_size)
 			sp1, freq, A, B, C  = self.proc.analyzelive(floatdata_delayed[0,:], self.fft_size, self.maxfreq)   
-   
 
 		#sp, freq = self.proc.analyzelive_cochlear(floatdata, 50, minfreq, maxfreq)
 		# scale the db spectrum from [- spec_range db ... 0 db] > [0..1]
@@ -124,10 +124,10 @@ class Spectrum_Widget(QtGui.QWidget):
 
 	           # the log operation and the weighting could be deffered
 	           # to the post-weedening !		
-		if floatdata.shape[0] == 1:
-			db_spectrogram = 20*log10(sp1 + epsilon) + w
-		else:
+		if self.dual_channels and floatdata.shape[0] > 1:
 			db_spectrogram = 20*log10(sp2 + epsilon) - 20*log10(sp1 + epsilon)
+		else:
+			db_spectrogram = 20*log10(sp1 + epsilon) + w
 
 		self.PlotZoneSpect.setdata(freq, db_spectrogram)
 
@@ -153,6 +153,15 @@ class Spectrum_Widget(QtGui.QWidget):
 	def setweighting(self, weighting):
 		self.weighting = weighting
 		self.PlotZoneSpect.setweighting(weighting)
+
+	def setdualchannels(self, dual_enabled):
+		self.dual_channels = dual_enabled
+		if dual_enabled:
+			self.PlotZoneSpect.set_peaks_enabled(False)
+			self.PlotZoneSpect.set_baseline_dataUnits(0.)
+		else:
+			self.PlotZoneSpect.set_peaks_enabled(True)
+			self.PlotZoneSpect.set_baseline_displayUnits(0.)
 
 	def settings_called(self, checked):
 		self.settings_dialog.show()
