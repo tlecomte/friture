@@ -21,8 +21,8 @@ from numpy import zeros
 
 class RingBuffer():
 	def __init__(self):
-		# FIXME the buffer length could be made dynamic based on the needs
-		self.buffer_length = 100000.
+		# buffer length is dynamic based on the needs
+		self.buffer_length = 10000.
 		self.buffer = zeros((1, 2*self.buffer_length))
 		self.offset = 0
 
@@ -38,7 +38,10 @@ class RingBuffer():
 			self.offset = 0
 		
 		if l > self.buffer_length:
-			raise StandardError("buffer error")
+                                  # let the buffer grow according to our needs
+                                  self.buffer_length = l
+                                  self.buffer = zeros((1, 2*self.buffer_length))
+                                  self.offset = 0                                  
 		
 		# first copy, always complete
 		self.buffer[:, self.offset : self.offset + l] = floatdata[:,:]
@@ -51,11 +54,23 @@ class RingBuffer():
 		self.offset = int((self.offset + l) % self.buffer_length)
 
 	def data(self, length):
+		if length > self.buffer_length:
+                                  # let the buffer grow according to our needs
+                                  self.buffer_length = length
+                                  self.buffer = zeros((1, 2*self.buffer_length))
+                                  self.offset = 0                                  
+
 		start = self.offset + self.buffer_length - length
 		stop = self.offset + self.buffer_length
 		return self.buffer[:, start : stop]
 
-	def data_older(self, length, delay_samples):
+	def data_older(self, length, delay_samples):     
+		if length + delay_samples > self.buffer_length:
+                                  # let the buffer grow according to our needs
+                                  self.buffer_length = length + delay_samples
+                                  self.buffer = zeros((1, 2*self.buffer_length))
+                                  self.offset = 0                                  
+		
 		start = self.offset + self.buffer_length - length - delay_samples
 		stop = self.offset + self.buffer_length - delay_samples
 		return self.buffer[:, start : stop]
