@@ -393,7 +393,8 @@ class GLWidget(QtOpenGL.QGLWidget):
 
         self.lastPos = QtCore.QPoint()
         
-        self.n = 0
+        self.vertices = array([])
+        self.colors = array([])
         
         self.xMajorTick = array([])
         self.xMinorTick = array([])
@@ -410,8 +411,6 @@ class GLWidget(QtOpenGL.QGLWidget):
         # instruct OpenGL not to paint a background for the widget
         # when QPainter.begin() is called.
         self.setAutoFillBackground(False)
-        
-        self.gl_initialized = False
 
     def minimumSizeHint(self):
         return QtCore.QSize(50, 50)
@@ -420,25 +419,13 @@ class GLWidget(QtOpenGL.QGLWidget):
         return QtCore.QSize(400, 400)
 
     def initializeGL(self):
-        GL.glShadeModel(GL.GL_SMOOTH) # for gradient rendering
-        #GL.glDepthFunc(GL.GL_LESS) # The Type Of Depth Test To Do
-        GL.glDisable(GL.GL_DEPTH_TEST) # we do 2D, we need no depth test !
-        GL.glMatrixMode(GL.GL_PROJECTION)
-        GL.glLoadIdentity()
-        #GL.glEnable(GL.GL_CULL_FACE)
-        
-        self.gl_initialized = True
+        return
 
     def setQuadData(self, vertices, colors):
-        if self.gl_initialized:
-            self.n = vertices.shape[0]
-            
-            GL.glVertexPointerd(vertices)
-            GL.glColorPointerd(colors)
-            GL.glEnableClientState(GL.GL_VERTEX_ARRAY)
-            GL.glEnableClientState(GL.GL_COLOR_ARRAY)
-            
-            self.update()
+        self.vertices = vertices
+        self.colors = colors 
+
+        self.update()
 
     def setGrid(self, xMajorTick, xMinorTick, yMajorTick, yMinorTick):
         self.xMajorTick = xMajorTick
@@ -453,28 +440,28 @@ class GLWidget(QtOpenGL.QGLWidget):
         GL.glMatrixMode(GL.GL_PROJECTION)
         GL.glPushMatrix()        
         
-        # Reset The View
-        GL.glLoadIdentity()
+        GL.glShadeModel(GL.GL_SMOOTH) # for gradient rendering
+        #GL.glDepthFunc(GL.GL_LESS) # The Type Of Depth Test To Do
+        GL.glDisable(GL.GL_DEPTH_TEST) # we do 2D, we need no depth test !
+        GL.glMatrixMode(GL.GL_PROJECTION)
+        #GL.glEnable(GL.GL_CULL_FACE)
         
         # Clear The Screen And The Depth Buffer
         GL.glClearColor(1, 1, 1, 0)
         GL.glClear(GL.GL_COLOR_BUFFER_BIT) # | GL.GL_DEPTH_BUFFER_BIT)
+
+        # Reset The View        
+        self.setupViewport(self.width(), self.height())
         
-        w = self.width()
-        h = self.height()
-        GL.glOrtho(0, w, 0, h, 0, 1)   
-        # Displacement trick for exact pixelization
-        GL.glTranslatef(0.375, 0.375, 0)
-        
-        self.drawBackground()
-        
-        self.drawGrid()
-        
-        self.drawDataQuads()
-        
-        self.drawRuler()        
-        
+        self.drawBackground()       
+        self.drawGrid()        
+        self.drawDataQuads()        
+        self.drawRuler()                
         self.drawBorder()
+
+        # revert our changes for cooperation with QPainter
+        GL.glShadeModel(GL.GL_FLAT)
+        GL.glEnable(GL.GL_DEPTH_TEST)
         
         GL.glMatrixMode(GL.GL_PROJECTION)
         GL.glPopMatrix()
@@ -490,10 +477,18 @@ class GLWidget(QtOpenGL.QGLWidget):
         
         # TODO: If the arrays could be drawn as SHORTs istead of FLOATs, it
         # could also be dramatically faster
+
+        GL.glVertexPointerd(self.vertices)
+        GL.glColorPointerd(self.colors)
+        GL.glEnableClientState(GL.GL_VERTEX_ARRAY)
+        GL.glEnableClientState(GL.GL_COLOR_ARRAY)
         
         #GL.glDisable(GL.GL_LIGHTING)
-        GL.glDrawArrays(GL.GL_QUADS, 0, 4*self.n)
-        #GL.glEnable(GL.GL_LIGHTING)    
+        GL.glDrawArrays(GL.GL_QUADS, 0, 4*self.vertices.shape[0])
+        #GL.glEnable(GL.GL_LIGHTING)
+        
+        GL.glDisableClientState(GL.GL_COLOR_ARRAY)
+        GL.glDisableClientState(GL.GL_VERTEX_ARRAY)
     
     def drawTrackerText(self, painter): 
         if self.ruler:
@@ -529,13 +524,15 @@ class GLWidget(QtOpenGL.QGLWidget):
             painter.drawText(rect, Qt.Qt.AlignLeft, text)
 
     def resizeGL(self, width, height):
-        side = min(width, height)
-        if side < 0:
-            return
-        
+        self.setupViewport(self.width(), self.height())
+
+    def setupViewport(self, width, height):
         GL.glViewport(0, 0, width, height)
         GL.glMatrixMode(GL.GL_PROJECTION)
         GL.glLoadIdentity()
+        GL.glOrtho(0, width, 0, height, 0, 1)
+        # Displacement trick for exact pixelization
+        GL.glTranslatef(0.375, 0.375, 0)
 
     def drawBackground(self):
         w = self.width()
