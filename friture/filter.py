@@ -103,7 +103,7 @@ def octave_filter_bank_decimation(blow, alow, forward, feedback, x, zis=None):
 				y[k] = filt
 				dec[k] = 2**j
 				k -= 1
-   			x_dec, = decimate(blow, alow, x_dec)
+   			x_dec, zf = decimate(blow, alow, x_dec)
 		
 		return y, dec, None
 	else:
