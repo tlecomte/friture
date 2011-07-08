@@ -21,7 +21,7 @@ from PyQt4 import QtGui
 from numpy import log10, array, arange
 from friture.histplot import HistPlot
 from friture.octavespectrum_settings import OctaveSpectrum_Settings_Dialog # settings dialog
-from friture.filter import octave_filter_bank_decimation, octave_frequencies, lfilter
+from friture.filter import octave_filter_bank_decimation, octave_frequencies, octave_filter_bank_decimation_filtic
 
 from friture.exp_smoothing_conv import pyx_exp_smoothed_value
 
@@ -251,14 +251,12 @@ class OctaveSpectrum_Widget(QtGui.QWidget):
 class octave_filters():
 	def __init__(self, bandsperoctave):
 		[self.bdec, self.adec] = generated_filters.params['dec']
-				
-		self.zfs = None
 		
 		self.setbandsperoctave(bandsperoctave)
 
 	def filter(self, floatdata):
-		y, dec, zfs = octave_filter_bank_decimation(self.bdec, self.adec, self.boct, self.aoct, floatdata)
-		#y, dec, zfs = octave_filter_bank_decimation(self.bdec, self.adec, self.boct, self.aoct, floatdata, zis=self.zfs)
+		#y, dec, zfs = octave_filter_bank_decimation(self.bdec, self.adec, self.boct, self.aoct, floatdata)
+		y, dec, zfs = octave_filter_bank_decimation(self.bdec, self.adec, self.boct, self.aoct, floatdata, zis=self.zfs)
 		#y, zfs = octave_filter_bank(self.b_nodec, self.a_nodec, floatdata); dec = [1.]*len(y)
 		#y, zfs = octave_filter_bank(self.b_nodec, self.a_nodec, floatdata, zis=self.zfs); dec = [1.]*len(y)
 		
@@ -295,4 +293,5 @@ class octave_filters():
 		self.C = 0.06 + 20.*log10(Rc)
 		self.B = 0.17 + 20.*log10(Rb)
 		self.A = 2.0  + 20.*log10(Ra)
-		self.zfs = None
+		#self.zfs = None
+		self.zfs = octave_filter_bank_decimation_filtic(self.bdec, self.adec, self.boct, self.aoct)

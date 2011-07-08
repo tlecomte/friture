@@ -137,6 +137,20 @@ def octave_filter_bank_decimation(blow, alow, forward, feedback, x, zis=None):
 		
 		return y, dec, zfs
 
+# build a proper array of zero initial conditions to start the filters
+def octave_filter_bank_decimation_filtic(blow, alow, forward, feedback):
+	BandsPerOctave = len(forward)		
+	zfs = []
+		
+	for j in range(0, NOCTAVE):
+		for i in range(0, BandsPerOctave)[::-1]:
+			l = max(len(forward[i]), len(feedback[i])) - 1
+			zfs += [zeros(l)]
+		l = max(len(blow), len(alow)) - 1
+		zfs += [zeros(l)]
+	
+	return zfs
+
 def lfilter(b, a, x, axis=-1, zi=None):
     """
     Filter data along one-dimension with an IIR or FIR filter.
