@@ -95,20 +95,15 @@ def octave_filter_bank_decimation(blow, alow, forward, feedback, x, zis=None):
 	zfs = []
 	
 	if zis == None:
-		m = 0
 		k = Nbank - 1
 	
 		for j in range(0, NOCTAVE):
 			for i in range(0, BandsPerOctave)[::-1]:
 				filt = lfilter(forward[i], feedback[i], x_dec)
-				m += 1
 				y[k] = filt
 				dec[k] = 2**j
 				k -= 1
-			# utiliser un décimateur polyphase ici !!!
-			x_dec = lfilter(blow, alow, x_dec)
-			m += 1
-			x_dec = x_dec[::2]
+   			x_dec, = decimate(blow, alow, x_dec)
 		
 		return y, dec, None
 	else:
@@ -126,16 +121,25 @@ def octave_filter_bank_decimation(blow, alow, forward, feedback, x, zis=None):
 				y[k] = filt
 				dec[k] = 2**j
 				k -= 1
-			# utiliser un décimateur polyphase ici !!!
-			x_dec, zf = lfilter(blow, alow, x_dec, zi=zis[m])
-			#x_dec = lfilter(blow, alow, x_dec)
+			x_dec, zf = decimate(blow, alow, x_dec, zi=zis[m])
 			m += 1
 			# zf can be reused to restart the filter
 			zfs += [zf]
 			#zfs += [0.]
-			x_dec = x_dec[::2]
-		
+
 		return y, dec, zfs
+
+def decimate(bdec, adec, x, zi=None):
+    	if zi == None:
+		# utiliser un décimateur polyphase ici !!!
+		x_dec = lfilter(bdec, adec, x)
+		zf = None
+	else:
+		# utiliser un décimateur polyphase ici !!!
+		x_dec, zf = lfilter(bdec, adec, x, zi=zi)
+
+	x_dec = x_dec[::2]
+	return x_dec, zf
 
 # build a proper array of zero initial conditions to start the filters
 def octave_filter_bank_decimation_filtic(blow, alow, forward, feedback):
