@@ -20,7 +20,7 @@ Alternatively, to build the 'exp_smoothing_conv' extension manually on Linux, yo
 
 Filters parameters
 ------------------
-The filters parameters are precomputed in a file called 'generated_filters.pkl'. To rebuild this file,
+The filters parameters are precomputed in a file called 'generated_filters.py'. To rebuild this file,
 run the script named 'filter_design.py'.
 
 Windows executable
