@@ -128,6 +128,11 @@ class OctaveSpectrum_Widget(QtGui.QWidget):
 		#get the fresh data
 		floatdata = self.audiobuffer.newdata()
 
+		#the behaviour of the filters functions is sometimes
+		#unexpected when they are called on empty arrays
+		if floatdata.shape[1] == 0:
+			return
+
 		# for now, take the first channel only
 		floatdata = floatdata[0,:]
 
@@ -256,7 +261,9 @@ class octave_filters():
 
 	def filter(self, floatdata):
 		#y, dec, zfs = octave_filter_bank_decimation(self.bdec, self.adec, self.boct, self.aoct, floatdata)
-		y, dec, zfs = octave_filter_bank_decimation(self.bdec, self.adec, self.boct, self.aoct, floatdata, zis=self.zfs)
+		y, dec, zfs = octave_filter_bank_decimation(self.bdec, self.adec,
+                                                                   self.boct, self.aoct,
+                                                                   floatdata, zis=self.zfs)
 		#y, zfs = octave_filter_bank(self.b_nodec, self.a_nodec, floatdata); dec = [1.]*len(y)
 		#y, zfs = octave_filter_bank(self.b_nodec, self.a_nodec, floatdata, zis=self.zfs); dec = [1.]*len(y)
 		
@@ -274,8 +281,8 @@ class octave_filters():
 		self.bandsperoctave = bandsperoctave
 		self.nbands = NOCTAVE*self.bandsperoctave
 		self.fi, self.flow, self.fhigh = octave_frequencies(self.nbands, self.bandsperoctave)
-		[self.boct, self.aoct, fi, flow, fhigh] = generated_filters.params['%d' %bandsperoctave] 
-		
+		[self.boct, self.aoct, fi, flow, fhigh] = generated_filters.params['%d' %bandsperoctave]
+
 		#z, p, k = tf2zpk(self.bdec, self.adec)
 		#print "poles", p, abs(p)**2
 		#print "zeros", z, abs(z)**2
