@@ -89,6 +89,8 @@ class HistogramItem(Qwt.QwtPlotItem):
 		self.transform_origin = 0.
 		
 		self.pixmaps = [QtGui.QPixmap()]
+  
+		self.yMap = None
 
 	def setData(self, fl, fh, y):
 		if len(self.y) <> len(y):
@@ -140,6 +142,11 @@ class HistogramItem(Qwt.QwtPlotItem):
 		w = rect.width()
 		if w < self.canvas_width - 1 or w > self.canvas_width + 1:
 			self.canvas_width = w
+			self.need_transform = True
+
+		# the transform parameters change when the scale changes
+		if self.yMap <> yMap:
+			self.yMap = yMap
 			self.need_transform = True
 		
 		# update the cached pixmaps and coordinates if necessary
@@ -247,6 +254,7 @@ class HistogramPeakBarItem(Qwt.QwtPlotItem):
 		self.need_transform = False
 		self.transform_slope = 1.
 		self.transform_origin = 0.
+		self.yMap = None
 		
 		self.palette = [Qt.QColor(255, gb, gb) for gb in range(0,256)]
 
@@ -265,6 +273,11 @@ class HistogramPeakBarItem(Qwt.QwtPlotItem):
 		w = rect.width()
 		if w <> self.canvas_width:
 			self.canvas_width = w
+			self.need_transform = True
+
+		# the transform parameters change when the scale changes
+		if self.yMap <> yMap:
+			self.yMap = yMap
 			self.need_transform = True
 		
 		if self.need_transform:
