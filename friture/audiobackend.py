@@ -36,10 +36,12 @@ class AudioBackend(QtCore.QObject):
 		self.logger.push("Initializing PyAudio")
 		self.pa = PyAudio()
 
-		# look for input devices
+		# look for devices
 		self.input_devices = self.get_input_devices()
+		self.output_devices = self.get_output_devices()
 		
-		# we will try to open all the devices until one works, starting by the default input device
+		# we will try to open all the input devices until one
+		# works, starting by the default input device
 		for device in self.input_devices:
 			self.logger.push("Opening the stream")
 			self.stream = self.open_stream(device)
@@ -83,8 +85,35 @@ class AudioBackend(QtCore.QObject):
 		return devices_list
 
 	# method
+	def get_readable_output_devices_list(self):
+		devices_list = []
+		
+		default_device_index = self.get_default_output_device()
+		
+		for device in self.output_devices:
+			dev_info = self.pa.get_device_info_by_index(device)
+			api = self.pa.get_host_api_info_by_index(dev_info['hostApi'])['name']
+
+			if device is default_device_index:
+				extra_info = ' (system default)'
+			else:
+				extra_info = ''
+			
+			nchannels = self.pa.get_device_info_by_index(device)['maxOutputChannels']
+   
+			desc = "%s (%d channels) (%s) %s" %(dev_info['name'], nchannels, api, extra_info)
+			
+			devices_list += [desc]			
+
+		return devices_list
+
+	# method
 	def get_default_input_device(self):
 		return self.pa.get_default_input_device_info()['index']
+
+	# method
+	def get_default_output_device(self):
+		return self.pa.get_default_output_device_info()['index']
 
 	# method
 	def get_device_count(self):
@@ -110,6 +139,26 @@ class AudioBackend(QtCore.QObject):
 				input_devices += [device]
 		
 		return input_devices
+
+	# method
+	# returns a list of output devices index, starting with the system default
+	def get_output_devices(self):
+		device_count = self.get_device_count()
+		default_output_device = self.get_default_output_device()
+		
+		device_range = range(0, device_count)
+		# start by the default input device
+		device_range.remove(default_output_device)
+		device_range = [default_output_device] + device_range
+
+		# select only the output devices by looking at the number of output channels
+		output_devices = []
+  		for device in device_range:
+			n_output_channels = self.pa.get_device_info_by_index(device)['maxOutputChannels']
+			if n_output_channels > 0:
+				output_devices += [device]
+		
+		return output_devices
 
 	# method
 	def select_input_device(self, device):
