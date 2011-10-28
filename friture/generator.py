@@ -35,7 +35,7 @@ DEFAULT_BURST_PERIOD_S = 1.
 DEFAULT_SWEEP_PERIOD_S = 1.
 
 def pinknoise(n, rvs=stats.norm.rvs):
-    k = min(int(np.floor(np.log(n)/np.log(2))), 12)
+    k = int(min(np.floor(np.log(n)/np.log(2)), 12.))
     pink = np.zeros((n,), np.float)
 
     for m in 2**np.arange(k):
