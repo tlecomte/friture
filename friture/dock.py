@@ -23,6 +23,7 @@ from friture.spectrum import Spectrum_Widget
 from friture.spectrogram import Spectrogram_Widget
 from friture.octavespectrum import OctaveSpectrum_Widget
 from friture.scope import Scope_Widget
+from friture.generator import Generator_Widget
 from friture.controlbar import ControlBar
 
 class Dock(QtGui.QDockWidget):
@@ -61,7 +62,7 @@ class Dock(QtGui.QDockWidget):
 		    self.audiowidget.close()
 		
 		self.type = item
-		
+
 		if item is 0:
 			self.audiowidget = Levels_Widget(self, self.logger)
 		elif item is 1:
@@ -71,8 +72,10 @@ class Dock(QtGui.QDockWidget):
 		elif item is 3:
 			self.audiowidget = Spectrogram_Widget(self, self.logger)
 			self.audiowidget.timer.start()
-		else:
+		elif item is 4:
 			self.audiowidget = OctaveSpectrum_Widget(self, self.logger)
+		elif item is 5:
+			self.audiowidget = Generator_Widget(self, self.logger)
 		
 		self.audiowidget.set_buffer(self.parent.audiobuffer)
 		

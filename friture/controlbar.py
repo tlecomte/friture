@@ -120,6 +120,7 @@ class ControlBar(QtGui.QWidget):
 		self.comboBox_select.addItem("FFT Spectrum")
 		self.comboBox_select.addItem("2D Spectrogram")
 		self.comboBox_select.addItem("Octave Spectrum")
+		self.comboBox_select.addItem("Generator")
 		self.comboBox_select.setCurrentIndex(0)
 		self.comboBox_select.setToolTip("Select the type of audio widget")
 		

@@ -145,7 +145,7 @@ class Friture(QMainWindow, ):
 		# log change
 		self.connect(self.logger, QtCore.SIGNAL('logChanged'), self.log_changed)
 		self.connect(self.about_dialog.log_scrollarea.verticalScrollBar(), QtCore.SIGNAL('rangeChanged(int,int)'), self.log_scroll_range_changed)
-		
+
 		# restore the settings and widgets geometries
 		self.restoreAppState()
 
