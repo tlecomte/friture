@@ -19,8 +19,9 @@
 
 from PyQt4 import QtGui, QtCore
 import numpy as np
-from scipy import stats
+from scipy.stats import norm as stats_norm
 import pyaudio
+from numpy.random import standard_normal
 
 SMOOTH_DISPLAY_TIMER_PERIOD_MS = 25
 SAMPLING_RATE = 44100
@@ -34,7 +35,7 @@ DEFAULT_SWEEP_STOPFREQUENCY = 22000.
 DEFAULT_BURST_PERIOD_S = 1.
 DEFAULT_SWEEP_PERIOD_S = 1.
 
-def pinknoise(n, rvs=stats.norm.rvs):
+def pinknoise(n, rvs=stats_norm.rvs):
     k = int(min(np.floor(np.log(n)/np.log(2)), 12.))
     pink = np.zeros((n,), np.float)
 
@@ -298,7 +299,7 @@ class Generator_Widget(QtGui.QWidget):
             floatdata = np.sin(2.*np.pi*t*f)
         elif kind == 1:
             # white noise
-            floatdata = np.random.standard_normal(n)
+            floatdata = standard_normal(n)
         elif kind == 2:
             #pink noise
             floatdata = pinknoise(n)
