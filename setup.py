@@ -33,7 +33,18 @@ if py2exe_build:
 	#exclude dlls that py2exe includes by error
 	dll_excludes += ["powrprof.dll", "msvcp90.dll"]
 	#manually include python libraries that py2exe fails to detect
-	includes += ["sip", "PyQt4.QtSvg", "PyQt4.QtXml"]
+	# for pyOpenGL : http://www.jstump.com/blog/archive/2009/06/30/py2exe-and-pyopengl-3x-with-no-manual-tinkering/
+	# + OpenGL_accelerate.formathandler that is imported by the Python/C
+	# API so that py2exe does not detect it
+	includes += ["sip", "PyQt4.QtSvg", "PyQt4.QtXml",
+              "OpenGL.platform.win32",
+              "OpenGL.arrays.ctypesarrays",
+              "OpenGL.arrays.numpymodule",
+              "OpenGL.arrays.lists",
+              "OpenGL.arrays.numbers",
+              "OpenGL.arrays.strings",
+              "OpenGL_accelerate.formathandler"
+              ]
 
 	if os.name == 'nt':
 		if os.environ.has_key('CPATH'):
