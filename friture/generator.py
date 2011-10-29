@@ -34,8 +34,10 @@ DEFAULT_SWEEP_STOPFREQUENCY = 22000.
 DEFAULT_BURST_PERIOD_S = 1.
 DEFAULT_SWEEP_PERIOD_S = 1.
 
+PINK_FIDELITY = 100.
+
 def pinknoise(n, rvs=standard_normal):
-    k = int(min(np.floor(np.log(n)/np.log(2)), 12.))
+    k = int(min(np.floor(np.log(n)/np.log(2)), PINK_FIDELITY))
     pink = np.zeros((n,), np.float)
 
     for m in 2**np.arange(k):
