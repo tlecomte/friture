@@ -98,6 +98,16 @@ class Spectrogram_Widget(QtGui.QWidget):
 		self.update = None
   
 		self.timer_time = QtCore.QTime()
+  
+ # FIXME
+ # for smoothness, the following shoudl be observed
+ # - the FFT should be done with Hamming, or Hanning or Kaiser windows
+ #   with 50% or more overlap.
+ # - the animation should be advanced according to the actual time elapsed
+ #   since the last update. Proper advancement is done through interpolation.
+ #   (Linear or quadratic (causal!) interpolation should be fine first)
+ # - ideally timer should be removed altogether and replaced by bloacking OpenGL
+ #   paintings synchronized to vsync
 
 	# method
 	def set_buffer(self, buffer):
