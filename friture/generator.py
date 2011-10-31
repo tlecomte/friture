@@ -47,7 +47,7 @@ def pinknoise(n, rvs=standard_normal):
     return pink/k
 
 class Generator_Widget(QtGui.QWidget):
-    def __init__(self, parent, logger = None):
+    def __init__(self, parent, audiobackend, logger = None):
         QtGui.QWidget.__init__(self, parent)
 
         # store the logger instance
@@ -141,7 +141,7 @@ class Generator_Widget(QtGui.QWidget):
 
         self.t = 0.
 
-        self.audiobackend = self.parent().parent.audiobackend
+        self.audiobackend = audiobackend
 
         self.p = pyaudio.PyAudio()
 
