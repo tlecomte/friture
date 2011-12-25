@@ -1,0 +1,107 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+	<title>Friture : Programming notes</title>
+	
+	<link rel="stylesheet" type="text/css" href="css/style.css"> 
+	
+	<link rel="shortcut icon" type="image/x-icon" href="images/favicon.ico" />
+
+	<script type="text/javascript">
+		var _gaq = _gaq || [];
+		_gaq.push(['_setAccount', 'UA-25716805-1']);
+		_gaq.push(['_trackPageview']);
+		(function() {
+		var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+		ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+		var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+		})();
+	</script>
+</head>
+
+<body>
+  <a href="http://github.com/tlecomte/friture"><img style="position: absolute; top: 0; right: 0; border: 0;" src="images/forkme_right_darkblue_121621.png" alt="Fork me on GitHub" /></a>
+
+  <div id="container">
+
+    <h1><img src="images/friture-logo.png" width="128" height="128" alt="Friture logo" style="vertical-align:middle"/>Programming notes</h1>
+    
+        <p>Friture is mostly written in the programming language called <a href="http://www.python.org">Python</a>.
+        <p>Additionally, Friture uses the following libraries:</p>
+        <ul>
+        <li><a href="http://www.portaudio.com/">PortAudio</a> for cross-platform audio capture
+        (Python bindings: <a href="http://people.csail.mit.edu/hubert/pyaudio/">Pyaudio</a>),</li>
+        <li><a href="http://numpy.scipy.org/">Numpy</a> and <a href="http://www.scipy.org/">Scipy</a>
+        for digital processing on the audio data,</li>
+        <li><a href="http://qt.nokia.com/">Qt</a> for the graphical user interface (Python bindings:
+        <a href="http://www.riverbankcomputing.co.uk/">PyQt4</a>),</li>
+        <li><a href="http://qwt.sourceforge.net/">Qwt</a> for the plot widgets (Python bindings:
+        <a href="http://pyqwt.sourceforge.net/">PyQwt</a>).</li>
+        </ul>
+        <p>Where performance is critical, some operations are specifically written in
+        <a href="http://cython.org">Cython</a>, a programming language that provides
+        C-extensions for Python. Meanwhile, some critical graphical operations are accelerated
+        with <a href="http://www.opengl.org">OpenGL</a> (Python bindings:
+        <a href="http://pyopengl.sourceforge.net">PyOpenGL</a>).</p>
+
+        <p>Here are some technical details about the design of Friture:</p>
+
+        <h2>Initial design</h2>
+
+        <p>Initially, the program was based on multiple processes: one gets the
+        data from the soundcard, sends to the second for processing, which in turn
+        sends to the third for display. Ultimately this scheme looked too complex and
+        introduced too many synchronization issues.
+
+        <h2>Second design</h2>
+
+        <p>A first rewrite was done to base the program on a single timer which periodically
+        checks for audio data from the soundcard. Now there is one critical parameter : the period
+        of that timer. It must obey to several time constraints:</p>
+
+        <ol>
+        <li>The display should be as smooth as possible. Quantitatively, the various audio widgets
+        should update every 20 ms or less (so a frequency of 50Hz and faster). At first, it was 
+        precisely set as the time needed to acquire 1024 samples at 44100 samples per second,
+        which is 23,22 ms.
+        Ideally, it should to be set to the vertical syncing period of the display.</li>
+        <li>The length of the FFT, which defines the number of points in the computed spectra,
+        defines another time constant, which is the length N of the FFT times the sampling rate
+        (typically 44100 samples per second). The longer the FFT is, the slower it gets refreshed.
+        Also note that for algorithmic performance reasons, the FFT is best done on power-of-two lengths.
+        So for the above setting (1024 samples per timer period), we can draw eight spectra at 128 points,
+        four at 256 points, two at 512 points, one at 1024 points, and for higher numbers of points several
+        ticks of the timer are needed.</li>
+        <li>The size of the rolling spectrogram window, in pixels, and the time dT associated with it, defines
+        a time per pixel constraint. It means we should roll the window by one pixel every dT, by using the
+        spectra which are available at that time.</li>
+        </ol>
+
+        <h2>Current design</h2>
+
+        <p>The current scheme is based on multiple timers, with distinct period constraints. A first timer
+        has a period of 20 ms (50 Hz) for smooth display update of the levels, scope and 1D spectrum widgets.
+        The other timers have a period that is fixed by the display constraints of their associated widget.
+        Currently, the rolling spectrogram widget uses such a custom timer. Its period is the time associated
+        to one column of the rolling spectrogram. All timers first fetch the available data from the audio input,
+        then pass the data to a circular audio buffer, and finally update their associated widget with the data
+        contained in this audio buffer.</p>
+
+        <h2>Profiling</h2>
+
+        <p>To optimize the source code of Friture and make it suitable for run-time audio analysis with a
+        computer of average power, profiling is essential. It has helped a lot writing efficient pieces
+        like the rolling spectrogram, whose logic almost never appears in the profiles now. <a href="https://github.com/tlecomte/friture/wiki/Profiles">Learn more</a>
+        about the profiles.</p>
+
+    <hr>
+    <p align=center><a href="index.html">Friture Homepage</a> <a href="download.html">Download Friture</a></p>
+
+  </div>
+  
+</body>
+</html>
