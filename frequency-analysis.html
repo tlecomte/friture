@@ -1,0 +1,75 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+	<title>Friture : Tools for frequency analysis</title>
+	
+	<link rel="stylesheet" type="text/css" href="css/style.css"> 
+	
+	<link rel="shortcut icon" type="image/x-icon" href="images/favicon.ico" />
+
+	<script type="text/javascript">
+		var _gaq = _gaq || [];
+		_gaq.push(['_setAccount', 'UA-25716805-1']);
+		_gaq.push(['_trackPageview']);
+		(function() {
+		var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+		ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+		var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+		})();
+	</script>
+</head>
+
+<body>
+  <a href="http://github.com/tlecomte/friture"><img style="position: absolute; top: 0; right: 0; border: 0;" src="images/forkme_right_darkblue_121621.png" alt="Fork me on GitHub" /></a>
+
+  <div id="container">
+
+    <h1><img src="images/friture-logo.png" width="128" height="128" alt="Friture logo" style="vertical-align:middle"/>Frequency analysis</h1>
+
+    <p>We describe here the various approaches to frequency analysis of audio signals.</p>
+
+    <h2>Short-time Fourier Transform</h2>
+
+        <p>The most "basic" tool for frequency analysis is the Fourier transform.
+        It describes a chunk of time-domain data as frequency-domain components.
+        Those components are complex numbers, which can be seen as two quadratures, or amplitude and phase.
+        Usually the spectral power is displayed, that is the square of the amplitude.
+        The frequency scale is linear in the Fourier transform.
+        Programming a Fourier transform is very efficient thanks to the Fast Fourier Transform (FFT) algorithm.</p>
+
+        <p>Unfortunately, even if the Fourier transform allows to analyze easily the data
+        in the full scale of audible frequency (roughly 20 to 20000 Hz), it does so with a
+        linear scale which does not correspond to our perception of frequencies. Display the
+        spectrum of a speech on a linear scale and you will see that most of the power is
+        concentrated on the lower end of the spectrum. Analyzing audio data on a linear frequency
+        scale gives an unsatisfyingly low resolution for small frequencies, and wasting high
+        resolution for large frequencies.</p>
+
+        <p>By trial and error, one can find that a FFT length between 1024 and 4096 is a good
+        compromise between precision in the low frequency components and refresh time.</p>
+
+    <h2>Constant-Q transform</h2>
+
+        <p>The alternative is to analyze the data on a nonlinear scale. This is done by a
+        "constant-Q transform". There are some academic papers about this transform and
+        its algorithmic complexity, but it seems that few implementations have been used in the audio world.</p>
+
+    <h2>Filter bank</h2>
+
+        <p>Instead of a formal constant-Q transform, we chose to achieve the same result by using
+        a set of filters with a constant Q factor. This set is also described as an "octave filter-bank",
+        or as a "fraction-of-octave filter bank". More precisely, the filter bank is a collection of
+        band-pass filters (digital IIR elliptic filters) working in one octave, plus a decimation filter
+        (low-pass IIR elliptic filter) to go one octave to its lower neighbor.</p>
+
+    <hr>
+    <p align=center><a href="index.html">Friture Homepage</a> <a href="download.html">Download Friture</a></p>
+
+  </div>
+  
+</body>
+</html>
