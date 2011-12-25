@@ -1,0 +1,65 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+	<title>Friture : Features</title>
+	
+	<link rel="stylesheet" type="text/css" href="css/style.css"> 
+	
+	<link rel="shortcut icon" type="image/x-icon" href="images/favicon.ico" />
+
+	<script type="text/javascript">
+		var _gaq = _gaq || [];
+		_gaq.push(['_setAccount', 'UA-25716805-1']);
+		_gaq.push(['_trackPageview']);
+		(function() {
+		var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+		ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+		var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+		})();
+	</script>
+</head>
+
+<body>
+  <a href="http://github.com/tlecomte/friture"><img style="position: absolute; top: 0; right: 0; border: 0;" src="images/forkme_right_darkblue_121621.png" alt="Fork me on GitHub" /></a>
+
+  <div id="container">
+
+    <h1><img src="images/friture-logo.png" width="128" height="128" alt="Friture logo" style="vertical-align:middle"/>Features of Friture</h1>
+    <p>The purpose of Friture is to help analyze an audio signal to make adjustments in the preprocessing. This is achieved by providing a set of widgets to visualize audio data:</p>
+
+        <h2>Level widget</h2>
+        <img src="images/friture_levels_20100318.png" width="179" height="167" alt="Friture levels widget"/>
+        <p>The level widget displays RMS power and peak power in dBFS (dB Full Scale). It is refreshed approximately every 20 ms.</p>
+
+        <h2>Scope widget</h2>
+        <img src="images/friture_scope_20100318.png" width="352" height="161" alt="Friture scope widget"/>
+        <p>The scope widget displays audio data versus time, for chunks of approximately 20 ms. It is refreshed approximately every 20 ms.</p>
+
+        <h2>Spectrum widget</h2>
+        <img src="images/friture_spectrum_20100318.png" width="301" height="166" alt="Friture spectrum widget"/>
+        <p>The spectrum widget displays audio data versus frequency. The refresh time is fixed by the window length of the Fourier transform. For 1024 points at a sampling rate of 44100 Hz, the refresh time is 1024/44100 = 23.2 ms. When the refresh time to too long, two successive transform windows can be made to overlap (this is not currently implemented). Additionally, the widget draws peaks for each frequency component, which are increased by the spectrum and slowly decrease as for the peaks in the level widget.</p>
+
+        <h2>Rolling spectrogram widget</h2>
+        <a href="images/friture_spectrogram_20100318.png" title="Click for the full size"><img src="images/friture_spectrogram_20100318_320.png" width="320" height="128" alt="Friture spectrogram widget"/></a>
+        <p>The rolling spectrogram widget displays audio data versus both frequency and time, in a rolling-against-time fashion. The refresh time is limited by the window length of the Fourier transform, as for the spectrum widget, and also by the time resolution of the widget, which is fixed by the width of the widget in pixels and the total time scale to be displayed. As for the spectrum widgets, when the refresh time to too long because of the window length of the Fourier transform, two successive transform windows can be made to overlap (this is not currently implemented).</p>
+
+        <h2>Upcoming features</h2>
+        <p>In addition to the above list of widgets that are already available in Friture, the following widgets are going to be implemented later:</p>
+
+        <h3>Rolling waveform widget</h3>
+        <p>The rolling waveform widget is similar to the usual waveform display in audio edition software like audacity. It displays RMS and peak levels in dBFS against time. It is synchronized with the rolling spectrogram widget.</p>
+
+        <h3>Long-time level widget</h3>
+        <p>The long-time level widget displays power versus time, for long time scales. The purpose of this widget is to determine if the average level has changed over time.</p>
+
+    <hr>
+    <p align=center><a href="index.html">Homepage</a></p>
+
+  </div>
+  
+</body>
+</html>
