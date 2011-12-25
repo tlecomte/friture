@@ -1,7 +1,7 @@
 body {
     margin-top: 1.0em;
     background-color: #434a57;
-    font-family: "Helvetica,Arial,FreeSans";
+    font-family: Helvetica, Arial, FreeSans;
     color: #000000;
     background-image:url('../images/denim.png');
 }
@@ -88,7 +88,6 @@ p.latest-version {
 	border:1px solid #268a16;
 	display:inline-block;
 	color:#306108;
-	font-family:Times New Roman;
 	font-size:20px;
 	font-weight:bold;
 	padding:6px 24px;
