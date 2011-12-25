@@ -38,6 +38,8 @@ h3 {
 
 a { color: #0d76f8; }
 
+.align-right { float:right; margin: 0 0 15px 15px; }
+
 .description {
     font-size: 1.2em;
     margin-bottom: 30px;
