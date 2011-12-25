@@ -1,8 +1,9 @@
 body {
     margin-top: 1.0em;
-    background-color: #606060;
+    background-color: #434a57;
     font-family: "Helvetica,Arial,FreeSans";
     color: #000000;
+    background-image:url('../images/denim.png');
 }
 
 #container {
