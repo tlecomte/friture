@@ -52,8 +52,7 @@ if py2exe_build:
 		else:
 			os.environ['CPATH'] = numpy.get_include()
 
-ext_modules = [Extension("friture.exp_smoothing_conv", ["friture/extension/exp_smoothing_conv.pyx"]),
-	include_dirs = [numpy.get_include()])]
+ext_modules = [Extension("friture.exp_smoothing_conv", ["friture/extension/exp_smoothing_conv.pyx"])]
 
 setup(name = "friture",
 	version = '0.1',
