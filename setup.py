@@ -14,6 +14,10 @@ except ImportError:
 	py2exe_build = False
 
 # see INSTALL file for details
+# to create a source package
+#       python setup.py sdist
+# to create a bundled windows executable
+#       python setup.py py2exe
 
 data_files = []
 excludes = []
@@ -62,7 +66,9 @@ setup(name = "friture",
 Friture
 -------
 
-Friture is an application to display real-time visualization of live audio data.
+Friture is an application to display real-time analysis and visualization of live audio data.
+
+Friture displays audio data in several widgets, such as a scope, a spectrum analyzer, or a rolling 2D spectrogram.
 
 This program can be useful for educational purposes, or to analyze the audio response of a hall, etc.
 
