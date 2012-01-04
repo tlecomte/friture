@@ -75,7 +75,6 @@ The name *friture* is a french word for *frying*, also used for *noise* in a sou
 	keywords = ["audio", "spectrum", "spectrogram"],
 	classifiers = [
 	"Programming Language :: Python",
-	"Programming Language :: Python :: 3",
 	"Programming Language :: Cython",
 	"Development Status :: 4 - Beta",
 	"Environment :: MacOS X",
