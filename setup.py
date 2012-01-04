@@ -15,7 +15,11 @@ except ImportError:
 
 # see INSTALL file for details
 # to create a source package
-#       python setup.py sdist
+#       python setup.py sdist --formats=gztar,zip
+# to register a new release on PyPI
+#       python setup.py register
+# to upload the source files to PyPI after registering
+#       python setup.py sdist --formats=gztar,zip upload
 # to create a bundled windows executable
 #       python setup.py py2exe
 
