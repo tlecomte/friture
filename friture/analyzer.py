@@ -290,7 +290,7 @@ class Friture(QMainWindow, ):
 		self.buffer_timer_time = (95.*self.buffer_timer_time + 5.*t)/100.
 
 	def get_cpu_percent(self):
-		self.cpu_percent = psutil.cpu_percent()
+		self.cpu_percent = psutil.cpu_percent(0)
 
 	# method
 	def statistics(self):
