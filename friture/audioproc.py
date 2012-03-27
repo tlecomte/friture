@@ -81,9 +81,12 @@ class audioproc():
 		
 		# FFT for a linear transformation in frequency scale
 		fft = rfft(samples*self.window)
-		spectrum = abs(fft) / float(fft_size/self.decimation)
+		spectrum = self.norm(fft, fft_size)
 		
 		return spectrum, self.freq, self.A, self.B, self.C
+
+	def norm(self, fft, fft_size):
+		return abs(fft) / float(fft_size/self.decimation)
 
 	# above is done a FFT of the signal. This is ok for linear frequency scale, but
 	# not satisfying for logarithmic scale, which is much more adapted to voice or music
