@@ -198,6 +198,11 @@ class Generator_Widget(QtGui.QWidget):
 
         self.connect(self.settings_dialog.comboBox_outputDevice, QtCore.SIGNAL('currentIndexChanged(int)'), self.device_changed)
 
+        self.sweepGenerator = SweepGenerator()
+        self.connect(self.spinBox_sweep_startfrequency, QtCore.SIGNAL('valueChanged(int)'), self.sweepGenerator.setf1)
+        self.connect(self.spinBox_sweep_stopfrequency, QtCore.SIGNAL('valueChanged(int)'), self.sweepGenerator.setf2)
+        self.connect(self.spinBox_sweep_period, QtCore.SIGNAL('valueChanged(double)'), self.sweepGenerator.setT)
+        
 #        channels = self.audiobackend.get_readable_current_output_channels()
 #        for channel in channels:
 #            self.settings_dialog.comboBox_firstChannel.addItem(channel)
@@ -304,18 +309,7 @@ class Generator_Widget(QtGui.QWidget):
             floatdata = pinknoise(n)
         elif kind == 3:
             #sweep
-            # https://ccrma.stanford.edu/realsimple/imp_meas/Sine_Sweep_Measurement_Theory.html
-            f1 = float(self.spinBox_sweep_startfrequency.value())
-            f2 = float(self.spinBox_sweep_stopfrequency.value())
-            T = self.spinBox_sweep_period.value() # period
-            #f = (fmax - fmin)*(1. + np.sin(2*np.pi*t/T))/2. + fmin
-            #print f.min(), f.max()
-            #floatdata = np.sin(2*np.pi*t*f)
-            w1 = 2*np.pi*f1
-            w2 = 2*np.pi*f2
-            K = w1*T/np.log(w2/w1)
-            L = T/np.log(w2/w1)
-            floatdata = np.sin(K*(np.exp(t%T/L) - 1.))
+            floatdata = self.sweepGenerator.sweepSignal(t)
         elif kind == 4:
             #burst
             floatdata = np.zeros(t.shape)
@@ -394,3 +388,36 @@ class Generator_Settings_Dialog(QtGui.QDialog):
         # change the device only if it exists in the device list
         if id >= 0:
             self.comboBox_outputDevice.setCurrentIndex(id)
+
+class SweepGenerator:
+    def __init__(self):
+        self.f1 = 20.
+        self.f2 = 22000.
+        self.T = 1.
+        self.L, self.K = self.computeKL(self.f1, self.f2, self.T)
+    
+    def computeKL(self, f1, f2, T):
+        w1 = 2*np.pi*f1
+        w2 = 2*np.pi*f2
+        K = w1*T/np.log(w2/w1)
+        L = T/np.log(w2/w1)
+        return L, K
+
+    def setf1(self, f1):
+        self.f1 = f1
+        self.L, self.K = self.computeKL(self.f1, self.f2, self.T)
+        
+    def setf2(self, f2):
+        self.f2 = f2
+        self.L, self.K = self.computeKL(self.f1, self.f2, self.T)        
+
+    def setT(self, T):
+        self.T = T
+        self.L, self.K = self.computeKL(self.f1, self.f2, self.T)
+    
+    def sweepSignal(self, t):
+        # https://ccrma.stanford.edu/realsimple/imp_meas/Sine_Sweep_Measurement_Theory.html
+
+        #f = (self.f2 - self.f1)*(1. + np.sin(2*np.pi*t/self.T))/2. + self.f1
+        #return np.sin(2*np.pi*t*f)
+        return np.sin(self.K*(np.exp(t%self.T/self.L) - 1.))
