@@ -40,7 +40,7 @@ class RingBuffer():
 		if l > self.buffer_length:
                                   # let the buffer grow according to our needs
                                   self.buffer_length = l
-                                  self.buffer = zeros((1, 2*self.buffer_length))
+                                  self.buffer = zeros((self.buffer.shape[0], 2*self.buffer_length))
                                   self.offset = 0                                  
 		
 		# first copy, always complete
@@ -57,7 +57,7 @@ class RingBuffer():
 		if length > self.buffer_length:
                                   # let the buffer grow according to our needs
                                   self.buffer_length = length
-                                  self.buffer = zeros((1, 2*self.buffer_length))
+                                  self.buffer = zeros((self.buffer.shape[0], 2*self.buffer_length))
                                   self.offset = 0                                  
 
 		start = self.offset + self.buffer_length - length
@@ -68,7 +68,7 @@ class RingBuffer():
 		if length + delay_samples > self.buffer_length:
                                   # let the buffer grow according to our needs
                                   self.buffer_length = length + delay_samples
-                                  self.buffer = zeros((1, 2*self.buffer_length))
+                                  self.buffer = zeros((self.buffer.shape[0], 2*self.buffer_length))
                                   self.offset = 0                                  
 		
 		start = self.offset + self.buffer_length - length - delay_samples
