@@ -75,7 +75,7 @@ class Dock(QtGui.QDockWidget):
 		elif item is 4:
 			self.audiowidget = OctaveSpectrum_Widget(self, self.logger)
 		elif item is 5:
-			self.audiowidget = Generator_Widget(self, self.logger)
+			self.audiowidget = Generator_Widget(self, self.parent.audiobackend, self.logger)
 		
 		self.audiowidget.set_buffer(self.parent.audiobuffer)
 		

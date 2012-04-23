@@ -71,7 +71,7 @@ class CentralWidget(QtGui.QWidget):
 		elif item is 4:
 			self.audiowidget = OctaveSpectrum_Widget(self, self.logger)
 		elif item is 5:
-			self.audiowidget = Generator_Widget(self, self.logger)
+			self.audiowidget = Generator_Widget(self, self.parent.parent().audiobackend, self.logger)
 		
 		self.audiowidget.set_buffer(self.parent.parent().audiobuffer)
 		

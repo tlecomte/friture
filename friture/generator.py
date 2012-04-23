@@ -19,8 +19,8 @@
 
 from PyQt4 import QtGui, QtCore
 import numpy as np
-from scipy import stats
 import pyaudio
+from numpy.random import standard_normal
 
 SMOOTH_DISPLAY_TIMER_PERIOD_MS = 25
 SAMPLING_RATE = 44100
@@ -34,8 +34,10 @@ DEFAULT_SWEEP_STOPFREQUENCY = 22000.
 DEFAULT_BURST_PERIOD_S = 1.
 DEFAULT_SWEEP_PERIOD_S = 1.
 
-def pinknoise(n, rvs=stats.norm.rvs):
-    k = int(min(np.floor(np.log(n)/np.log(2)), 12.))
+PINK_FIDELITY = 100.
+
+def pinknoise(n, rvs=standard_normal):
+    k = int(min(np.floor(np.log(n)/np.log(2)), PINK_FIDELITY))
     pink = np.zeros((n,), np.float)
 
     for m in 2**np.arange(k):
@@ -45,7 +47,7 @@ def pinknoise(n, rvs=stats.norm.rvs):
     return pink/k
 
 class Generator_Widget(QtGui.QWidget):
-    def __init__(self, parent, logger = None):
+    def __init__(self, parent, audiobackend, logger = None):
         QtGui.QWidget.__init__(self, parent)
 
         # store the logger instance
@@ -139,7 +141,7 @@ class Generator_Widget(QtGui.QWidget):
 
         self.t = 0.
 
-        self.audiobackend = self.parent().parent.audiobackend
+        self.audiobackend = audiobackend
 
         self.p = pyaudio.PyAudio()
 
@@ -303,7 +305,7 @@ class Generator_Widget(QtGui.QWidget):
             floatdata = np.sin(2.*np.pi*t*f)
         elif kind == 1:
             # white noise
-            floatdata = np.random.standard_normal(n)
+            floatdata = standard_normal(n)
         elif kind == 2:
             #pink noise
             floatdata = pinknoise(n)

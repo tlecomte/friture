@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from numpy import arange, sqrt, zeros, isscalar
+from numpy import arange, sqrt, zeros
 # the three following lines are a workaround for a bug with scipy and py2exe
 # together. See http://www.pyinstaller.org/ticket/83 for reference.
 #from scipy.misc import factorial
@@ -15,9 +15,6 @@ from scipy.signal.sigtools import _linear_filter
 #NOTE: by default scipy.signal.__init__.py imports all of its submodules
 #To decrease the py2exe distributions dramatically, these import lines can
 #be commented out !
-
-import pickle
-import os.path
 
 NOCTAVE = 8
 

@@ -14,6 +14,14 @@ except ImportError:
 	py2exe_build = False
 
 # see INSTALL file for details
+# to create a source package
+#       python setup.py sdist --formats=gztar,zip
+# to register a new release on PyPI
+#       python setup.py register
+# to upload the source files to PyPI after registering
+#       python setup.py sdist --formats=gztar,zip upload
+# to create a bundled windows executable
+#       python setup.py py2exe
 
 data_files = []
 excludes = []
@@ -33,7 +41,18 @@ if py2exe_build:
 	#exclude dlls that py2exe includes by error
 	dll_excludes += ["powrprof.dll", "msvcp90.dll"]
 	#manually include python libraries that py2exe fails to detect
-	includes += ["sip", "PyQt4.QtSvg", "PyQt4.QtXml"]
+	# for pyOpenGL : http://www.jstump.com/blog/archive/2009/06/30/py2exe-and-pyopengl-3x-with-no-manual-tinkering/
+	# + OpenGL_accelerate.formathandler that is imported by the Python/C
+	# API so that py2exe does not detect it
+	includes += ["sip", "PyQt4.QtSvg", "PyQt4.QtXml",
+              "OpenGL.platform.win32",
+              "OpenGL.arrays.ctypesarrays",
+              "OpenGL.arrays.numpymodule",
+              "OpenGL.arrays.lists",
+              "OpenGL.arrays.numbers",
+              "OpenGL.arrays.strings",
+              "OpenGL_accelerate.formathandler"
+              ]
 
 	if os.name == 'nt':
 		if os.environ.has_key('CPATH'):
@@ -41,16 +60,19 @@ if py2exe_build:
 		else:
 			os.environ['CPATH'] = numpy.get_include()
 
-ext_modules = [Extension("friture.exp_smoothing_conv", ["friture/extension/exp_smoothing_conv.pyx"])]
+ext_modules = [Extension("friture.exp_smoothing_conv", ["friture/extension/exp_smoothing_conv.pyx"],
+                         include_dirs = [numpy.get_include()])]
 
 setup(name = "friture",
-	version = '0.1',
+	version = '0.2',
 	description = 'Real-time visualization of live audio data',
 	long_description = """\
 Friture
 -------
 
-Friture is an application to display real-time visualization of live audio data.
+Friture is an application to display real-time analysis and visualization of live audio data.
+
+Friture displays audio data in several widgets, such as a scope, a spectrum analyzer, or a rolling 2D spectrogram.
 
 This program can be useful for educational purposes, or to analyze the audio response of a hall, etc.
 
@@ -63,7 +85,6 @@ The name *friture* is a french word for *frying*, also used for *noise* in a sou
 	keywords = ["audio", "spectrum", "spectrogram"],
 	classifiers = [
 	"Programming Language :: Python",
-	"Programming Language :: Python :: 3",
 	"Programming Language :: Cython",
 	"Development Status :: 4 - Beta",
 	"Environment :: MacOS X",

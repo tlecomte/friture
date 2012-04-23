@@ -96,6 +96,18 @@ class Spectrogram_Widget(QtGui.QWidget):
         # we do not use the display timer since we have a special one
         # tell the caller by setting this variable as None
         self.update = None
+  
+        self.timer_time = QtCore.QTime()
+  
+ # FIXME
+ # for smoothness, the following shoudl be observed
+ # - the FFT should be done with Hamming, or Hanning or Kaiser windows
+ #   with 50% or more overlap.
+ # - the animation should be advanced according to the actual time elapsed
+ #   since the last update. Proper advancement is done through interpolation.
+ #   (Linear or quadratic (causal!) interpolation should be fine first)
+ # - ideally timer should be removed altogether and replaced by bloacking OpenGL
+ #   paintings synchronized to vsync
 
     # method
     def set_buffer(self, buffer):
@@ -195,3 +207,8 @@ class Spectrogram_Widget(QtGui.QWidget):
         self.custom_update()
         
         self.spectrogram_timer_time = (95.*self.spectrogram_timer_time + 5.*t.elapsed())/100.
+
+        # Achieved timer period can be much higher than the one
+        # we asked for, and is very variable
+        # => We cannot rely on it
+        # print "asked for:", self.period_ms, "achieved:", self.timer_time.restart()
