@@ -18,7 +18,7 @@
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
 from PyQt4 import QtGui
-from numpy import log10, where, linspace, sign
+from numpy import log10, where, linspace, sign, arange
 from friture.timeplot import TimePlot
 from friture.scope_settings import Scope_Settings_Dialog # settings dialog
 
@@ -67,26 +67,47 @@ class Scope_Widget(QtGui.QWidget):
             return
 
         time = SMOOTH_DISPLAY_TIMER_PERIOD_MS/1000.
+        width = time*SAMPLING_RATE
         #basic trigger capability on leading edge
-        floatdata = self.audiobuffer.data(time*SAMPLING_RATE)
+        floatdata = self.audiobuffer.data(2*width)
+
+        #number of data points received at the last audio buffer update
+        #newpoints = self.audiobuffer.newpoints
+        #print newpoints
+
+        # because of the buffering, sometimes we have not got any data
+        #if newpoints==0:
+        #    return
+        
+        #floatdata = self.audiobuffer.data(newpoints + width)
 
         twoChannels = False
         if floatdata.shape[0] > 1:
             twoChannels = True
 
         # trigger on the first channel only
-        floatdata = floatdata[0,:]
+        triggerdata = floatdata[0,:]
+        # trigger on half of the waveform
+        trig_search_start = width/2
+        trig_search_stop = -width/2
+        triggerdata = triggerdata[trig_search_start : trig_search_stop]
 
         max = floatdata.max()
         trigger_level = max*2./3.
-        trigger_pos = where((floatdata[:-1] < trigger_level)*(floatdata[1:] >= trigger_level))[0]
+        #trigger_level = 0.6
+        trigger_pos = where((triggerdata[:-1] < trigger_level)*(triggerdata[1:] >= trigger_level))[0]
+
+        if len(trigger_pos)==0:
+            return
+        
         if len(trigger_pos) > 0:
-            shift = time*SAMPLING_RATE - trigger_pos[0]
+            shift = trigger_pos[0]
+            print shift
         else:
             shift = 0
-        floatdata = self.audiobuffer.data(time*SAMPLING_RATE + shift)
-        floatdata = floatdata[:, 0 : time*SAMPLING_RATE]
-  
+        shift += trig_search_start
+        floatdata = floatdata[:, shift - width/2: shift + width/2]
+ 
         y = floatdata[0,::-1] #- floatdata.mean()
         if twoChannels:
             y2 = floatdata[1,::-1] #- floatdata.mean()
@@ -98,7 +119,7 @@ class Scope_Widget(QtGui.QWidget):
             if twoChannels:
                 y2 = sign(y2)*(20*log10(abs(y2))).clip(dBmin, 0.)/(-dBmin) + sign(y2)*1.
     
-        time = linspace(0., len(y)/float(SAMPLING_RATE), len(y))
+        time = (arange(len(y)) - width/2)/float(SAMPLING_RATE)
         
         if twoChannels:
             self.PlotZoneUp.setdataTwoChannels(time, y, y2)
