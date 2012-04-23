@@ -63,14 +63,17 @@ class TimePlot(ClassPlot):
 		xtitle = Qwt.QwtText('Time (ms)')
 		xtitle.setFont(QtGui.QFont(8))
 		self.setAxisTitle(Qwt.QwtPlot.xBottom, xtitle)
+		self.setAxisScale(Qwt.QwtPlot.yLeft, -1., 1.)
 		# self.setAxisTitle(Qwt.QwtPlot.xBottom, 'Time (ms)')
+		self.xmin = 0.
+		self.xmax = 1.
+
 		ytitle = Qwt.QwtText('Signal')
 		ytitle.setFont(QtGui.QFont(8))
 		self.setAxisTitle(Qwt.QwtPlot.yLeft, ytitle)
 		# self.setAxisTitle(Qwt.QwtPlot.yLeft, 'Signal')
 		self.setAxisScale(Qwt.QwtPlot.yLeft, -1., 1.)
 		self.setAxisScaleEngine(Qwt.QwtPlot.xBottom, Qwt.QwtLinearScaleEngine())
-		self.xmax = 0
 		
 		self.paint_time = 0.
 		
@@ -118,9 +121,15 @@ class TimePlot(ClassPlot):
 		x_ms =  1e3*x
 		needfullreplot = False
 		if self.xmax <> x_ms[-1]:
-			self.logger.push("timeplot : changing x scale")
+			self.logger.push("timeplot : changing x max")
 			self.xmax = x_ms[-1]
-			self.setAxisScale(Qwt.QwtPlot.xBottom, 0., self.xmax)
+			self.setAxisScale(Qwt.QwtPlot.xBottom, self.xmin, self.xmax)
+			self.update_xscale()
+			needfullreplot = True
+		if self.xmin <> x_ms[0]:
+			self.logger.push("timeplot : changing x min")
+			self.xmin = x_ms[0]
+			self.setAxisScale(Qwt.QwtPlot.xBottom, self.xmin, self.xmax)
 			self.update_xscale()
 			needfullreplot = True
 
@@ -151,9 +160,15 @@ class TimePlot(ClassPlot):
 		x_ms =  1e3*x
 		needfullreplot = False
 		if self.xmax <> x_ms[-1]:
-			self.logger.push("timeplot : changing x scale")
+			self.logger.push("timeplot : changing x max")
 			self.xmax = x_ms[-1]
-			self.setAxisScale(Qwt.QwtPlot.xBottom, 0., self.xmax)
+			self.setAxisScale(Qwt.QwtPlot.xBottom, self.xmin, self.xmax)
+			self.update_xscale()
+			needfullreplot = True
+		if self.xmin <> x_ms[0]:
+			self.logger.push("timeplot : changing x min")
+			self.xmin = x_ms[0]
+			self.setAxisScale(Qwt.QwtPlot.xBottom, self.xmin, self.xmax)
 			self.update_xscale()
 			needfullreplot = True
 
@@ -171,7 +186,7 @@ class TimePlot(ClassPlot):
 			self.cached_canvas.update()
 
 	def update_xscale(self):
-		self.xscaled = linspace(0., self.xmax, self.canvas_width)
+		self.xscaled = linspace(self.xmin, self.xmax, self.canvas_width)
 
 	def drawCanvas(self, painter):
 		t = QtCore.QTime()
