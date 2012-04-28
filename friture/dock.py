@@ -24,6 +24,7 @@ from friture.spectrogram import Spectrogram_Widget
 from friture.octavespectrum import OctaveSpectrum_Widget
 from friture.scope import Scope_Widget
 from friture.generator import Generator_Widget
+from friture.delay_estimator import Delay_Estimator_Widget
 from friture.controlbar import ControlBar
 
 class Dock(QtGui.QDockWidget):
@@ -76,6 +77,8 @@ class Dock(QtGui.QDockWidget):
 			self.audiowidget = OctaveSpectrum_Widget(self, self.logger)
 		elif item is 5:
 			self.audiowidget = Generator_Widget(self, self.parent.audiobackend, self.logger)
+		elif item is 6:
+			self.audiowidget = Delay_Estimator_Widget(self, self.logger)
 		
 		self.audiowidget.set_buffer(self.parent.audiobuffer)
 		
