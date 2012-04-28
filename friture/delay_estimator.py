@@ -97,10 +97,10 @@ Select two-channels mode in the setup window."""
                 message = "Overflow"
 
             # detect when the max is not clear enough ?
-            m0 = (floatdata[0:width]**2).mean()
-            m1 = (floatdata[1:width]**2).mean()
+            m0 = (floatdata[0, :width]**2).mean()
+            m1 = (floatdata[1, :width]**2).mean()
             #print s0, m0, s0/m0, s1, m1, s1/m1
-            threshold = 200.
+            threshold = 100.
             if s0/m0 < threshold or s1/m1 < threshold:
                 message = "Peak not found"
 
