@@ -78,8 +78,10 @@ class Delay_Estimator_Widget(QtGui.QWidget):
         floatdata = self.audiobuffer.data(2*width)
 
         if floatdata.shape[0] == 1:
-            message = """Peak delay detector only works with two channels.
-Select two-channels mode in the setup window."""
+            message = """Delay estimator only works
+with two channels.
+Select two-channels mode
+in the setup window."""
             self.delay_label.setText(message)
         else:
             i0 = argmax(floatdata[0, :width]**2)
