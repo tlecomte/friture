@@ -66,7 +66,7 @@ class Scope_Widget(QtGui.QWidget):
         if not self.isVisible():
             return
 
-        time = SMOOTH_DISPLAY_TIMER_PERIOD_MS/1000.
+        time = 2*SMOOTH_DISPLAY_TIMER_PERIOD_MS/1000.
         width = time*SAMPLING_RATE
         #basic trigger capability on leading edge
         floatdata = self.audiobuffer.data(2*width)
@@ -102,8 +102,8 @@ class Scope_Widget(QtGui.QWidget):
         
         if len(trigger_pos) > 0:
             shift = trigger_pos[0]
-            print shift
         else:
+            #return
             shift = 0
         shift += trig_search_start
         floatdata = floatdata[:, shift - width/2: shift + width/2]
