@@ -45,6 +45,8 @@ class Delay_Estimator_Widget(QtGui.QWidget):
         else:
             self.logger = logger
         
+        self.previous_message = ""
+        
         self.setObjectName("Delay_Estimattor_Widget")
         self.gridLayout = QtGui.QGridLayout(self)
         self.gridLayout.setObjectName("gridLayout")
@@ -82,7 +84,6 @@ class Delay_Estimator_Widget(QtGui.QWidget):
 with two channels.
 Select two-channels mode
 in the setup window."""
-            self.delay_label.setText(message)
         else:
             i0 = argmax(floatdata[0, :width]**2)
             t0_ms = float(i0)/SAMPLING_RATE*1e3 
@@ -106,7 +107,9 @@ in the setup window."""
             if s0/m0 < threshold or s1/m1 < threshold:
                 message = "Peak not found"
 
+        if message <> self.previous_message:
             self.delay_label.setText(message)
+            self.previous_message = message
 
     # slot
     def settings_called(self, checked):
