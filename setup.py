@@ -64,7 +64,7 @@ ext_modules = [Extension("friture.exp_smoothing_conv", ["friture/extension/exp_s
                          include_dirs = [numpy.get_include()])]
 
 setup(name = "friture",
-	version = '0.2',
+	version = '0.3',
 	description = 'Real-time visualization of live audio data',
 	long_description = """\
 Friture
