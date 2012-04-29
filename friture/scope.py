@@ -108,9 +108,9 @@ class Scope_Widget(QtGui.QWidget):
         shift += trig_search_start
         floatdata = floatdata[:, shift - width/2: shift + width/2]
  
-        y = floatdata[0,::-1] #- floatdata.mean()
+        y = floatdata[0,:] #- floatdata.mean()
         if twoChannels:
-            y2 = floatdata[1,::-1] #- floatdata.mean()
+            y2 = floatdata[1,:] #- floatdata.mean()
         
         dBscope = False
         if dBscope:
