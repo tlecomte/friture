@@ -172,10 +172,12 @@ class TimePlot(ClassPlot):
 			self.update_xscale()
 			needfullreplot = True
 
-		y_interp = interp(self.xscaled, x_ms, y)
-  		y_interp2 = interp(self.xscaled, x_ms, y2)
-		ClassPlot.setdata(self, self.xscaled, y_interp)
-		self.curve2.setData(self.xscaled, y_interp2)
+		#y_interp = interp(self.xscaled, x_ms, y)
+  		#y_interp2 = interp(self.xscaled, x_ms, y2)
+		#ClassPlot.setdata(self, self.xscaled, y_interp)
+		#self.curve2.setData(self.xscaled, y_interp2)
+		ClassPlot.setdata(self, x_ms, y)
+		self.curve2.setData(x_ms, y2)
 
 		if needfullreplot:
 			self.replot()
