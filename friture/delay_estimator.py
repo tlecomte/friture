@@ -91,7 +91,8 @@ in the setup window."""
             t1_ms = float(i1)/SAMPLING_RATE*1e3
             delay_ms = t1_ms - t0_ms
             #print i0, t0_ms, i1, t1_ms, delay_ms
-            message = "%.1f ms" %(delay_ms)
+            c = 340. # speed of sound, in meters per second (approximate)
+            message = "%.1f ms\n (%.1f m)" %(delay_ms, delay_ms*1e-3*c)
             
             # detect overflow
             s0 = floatdata[0, i0]**2
