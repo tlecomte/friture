@@ -317,10 +317,11 @@ class Generator_Widget(QtGui.QWidget):
             floatdata = np.zeros(t.shape)
             T = self.spinBox_burst_period.value() # period
             i = (t*SAMPLING_RATE)%(T*SAMPLING_RATE)
-            ind_plus = np.where(i < 1.)
-            ind_minus = np.where((i >= 1.)*(i < 2.))
-            floatdata[ind_plus] = 1.
-            floatdata[ind_minus] = -1.
+            n = 1
+            ind_plus = np.where(i < n)
+            #ind_minus = np.where((i >= n)*(i < 2*n))
+            floatdata[ind_plus] = 0.99
+            #floatdata[ind_minus] = -0.99
         else:
             print "generator error : index of signal type not found"
             return
