@@ -35,7 +35,7 @@ if py2exe_build:
 	#exclude some python libraries that py2exe includes by error
 	excludes += ["matplotlib","_ssl","Tkconstants","Tkinter","tcl","email","pyreadline","nose",\
 			"doctest", "pdb", "pydoc", "_hashlib", "bz2","httplib","cookielib","cookielib","urllib","urllib2","Image",\
-			"pywin","optparse","zipfile","calendar","subprocess","compiler",\
+			"pywin","optparse","zipfile","calendar","compiler",\
 			"_imaging","_ssl"]
 	#Note: unittest, inspect are needed by numpy
 	#exclude dlls that py2exe includes by error
