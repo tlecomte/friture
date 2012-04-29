@@ -106,7 +106,8 @@ class Scope_Widget(QtGui.QWidget):
             #return
             shift = 0
         shift += trig_search_start
-        floatdata = floatdata[:, shift - width/2: shift + width/2]
+        datarange = width
+        floatdata = floatdata[:, shift -  datarange/2: shift +  datarange/2]
  
         y = floatdata[0,:] #- floatdata.mean()
         if twoChannels:
@@ -119,7 +120,7 @@ class Scope_Widget(QtGui.QWidget):
             if twoChannels:
                 y2 = sign(y2)*(20*log10(abs(y2))).clip(dBmin, 0.)/(-dBmin) + sign(y2)*1.
     
-        time = (arange(len(y)) - width/2)/float(SAMPLING_RATE)
+        time = (arange(len(y)) - datarange/2)/float(SAMPLING_RATE)
         
         if twoChannels:
             self.PlotZoneUp.setdataTwoChannels(time, y, y2)
