@@ -57,6 +57,7 @@ class CentralWidget(QtGui.QWidget):
 	def widget_select(self, item):
 		if self.audiowidget is not None:
 		    self.audiowidget.close()
+		    self.audiowidget.deleteLater()
 		
 		self.type = item
 		

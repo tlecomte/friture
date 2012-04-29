@@ -192,6 +192,7 @@ class Friture(QMainWindow, ):
 	#slot
 	def dock_closed(self, dock):
 		self.docks.remove(dock)
+		dock.deleteLater()
 	
 	# event handler
 	def closeEvent(self, event):
