@@ -39,7 +39,8 @@ if py2exe_build:
 			"_imaging","_ssl"]
 	#Note: unittest, inspect are needed by numpy
 	#exclude dlls that py2exe includes by error
-	dll_excludes += ["powrprof.dll", "msvcp90.dll"]
+	dll_excludes += ["powrprof.dll", "msvcp90.dll", "winnsi.dll", "nsi.dll", "iphlpapi.dll",
+			"API-MS-Win-Core*.dll"]
 	#manually include python libraries that py2exe fails to detect
 	# for pyOpenGL : http://www.jstump.com/blog/archive/2009/06/30/py2exe-and-pyopengl-3x-with-no-manual-tinkering/
 	# + OpenGL_accelerate.formathandler that is imported by the Python/C
