@@ -19,19 +19,8 @@
 
 from PyQt4 import QtGui
 from numpy import argmax
-from friture.timeplot import TimePlot
 
-SMOOTH_DISPLAY_TIMER_PERIOD_MS = 25
 SAMPLING_RATE = 44100
-
-STYLESHEET = """
-QwtPlotCanvas {
-    border: 1px solid gray;
-    border-radius: 2px;
-    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-    stop: 0 #E0E0E0, stop: 0.5 #FFFFFF);
-}
-"""
 
 class Delay_Estimator_Widget(QtGui.QWidget):
     def __init__(self, parent = None, logger = None):
@@ -50,9 +39,6 @@ class Delay_Estimator_Widget(QtGui.QWidget):
         self.setObjectName("Delay_Estimattor_Widget")
         self.gridLayout = QtGui.QGridLayout(self)
         self.gridLayout.setObjectName("gridLayout")
-        #self.PlotZoneUp = TimePlot(self, self.logger)
-        #self.PlotZoneUp.setObjectName("PlotZoneUp")
-        #self.gridLayout.addWidget(self.PlotZoneUp, 0, 0, 1, 1)
         self.delay_label = QtGui.QLabel(self)
         font = QtGui.QFont()
         font.setPointSize(14)
@@ -62,8 +48,6 @@ class Delay_Estimator_Widget(QtGui.QWidget):
         self.delay_label.setObjectName("delay_label")
         self.gridLayout.addWidget(self.delay_label, 0, 0, 1, 1)
         
-        self.setStyleSheet(STYLESHEET)
-
         self.settings_dialog = Delay_Estimator_Settings_Dialog(self, self.logger)
 
     # method
