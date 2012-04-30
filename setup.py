@@ -19,6 +19,7 @@ except ImportError:
 # to register a new release on PyPI
 #       python setup.py register
 # to upload the source files to PyPI after registering
+# Warning: the folder should be clean !
 #       python setup.py sdist --formats=gztar,zip upload
 # to create a bundled windows executable
 #       python setup.py py2exe
