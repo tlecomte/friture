@@ -72,7 +72,7 @@ setup(name = "friture",
 Friture
 -------
 
-Friture is an application to display real-time analysis and visualization of live audio data.
+Friture is an application to visualize and analyze live audio data in real-time.
 
 Friture displays audio data in several widgets, such as a scope, a spectrum analyzer, or a rolling 2D spectrogram.
 
