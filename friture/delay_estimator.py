@@ -85,9 +85,11 @@ with two channels.
 Select two-channels mode
 in the setup window."""
         else:
-            i0 = argmax(floatdata[0, :width]**2)
+            d0 = floatdata[0, :width]**2
+            i0 = argmax(d0)
             t0_ms = float(i0)/SAMPLING_RATE*1e3 
-            i1 = argmax(floatdata[1, i0:i0+width]**2) + i0 # only detect peaks that arrive later
+            d1 = floatdata[1, i0:i0+width]**2
+            i1 = argmax(d1) + i0 # only detect peaks that arrive later
             t1_ms = float(i1)/SAMPLING_RATE*1e3
             delay_ms = t1_ms - t0_ms
             #print i0, t0_ms, i1, t1_ms, delay_ms
@@ -95,14 +97,14 @@ in the setup window."""
             message = "%.1f ms\n (%.1f m)" %(delay_ms, delay_ms*1e-3*c)
             
             # detect overflow
-            s0 = floatdata[0, i0]**2
-            s1 = floatdata[1, i1]**2
+            s0 = d0[i0]
+            s1 = d1[i1 - i0]
             if s0==1. or s1==1.:
                 message = "Overflow"
 
             # detect when the max is not clear enough ?
-            m0 = (floatdata[0, :width]**2).mean()
-            m1 = (floatdata[1, :width]**2).mean()
+            m0 = d0.mean()
+            m1 = d1.mean()
             #print s0, m0, s0/m0, s1, m1, s1/m1
             threshold = 100.
             if s0/m0 < threshold or s1/m1 < threshold:
