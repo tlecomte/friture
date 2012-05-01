@@ -337,7 +337,7 @@ class Generator_Widget(QtGui.QWidget):
 
         # update the time counter
         if N > 0:
-            self.t = t[-1]
+            self.t += N/float(SAMPLING_RATE)
 
     def saveState(self, settings):
         settings.setValue("generator kind", self.comboBox_generator_kind.currentIndex())
