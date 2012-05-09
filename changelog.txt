@@ -1,0 +1,645 @@
+Friture Changelog
+(full changelog can be found in the git repository)
+
+HEAD
++    (generator) Test for zero mean before using it as a denominator
++    (Pink noise generator) Fix the parameter k   
+    k, the number of white channels to sum, was dynamic,
+    and this was causing changes of colors in the produced noise,
+    changes that could be heard.
++    (Generator) Fix exception in pink noise generator.   
+    Now returns empty array when asked for n=0 samples
++    (Generator) prevent overflows at -1.   
+    Premultiplying by 0.99.
++    (Generator) Bugfix: time array was not incremented properly.
++    Improve english wording of package description.
++    Add comment about folder state before PyPI upload
++    (delay_estimator) Remove unused import and commented out code
++    (delay_estimator) only compute the square once
+
+Version 0.3 - 2012/04/29
++    (delay estimator) also display the delay in meters
++    (py2exe) Exclude more dll from the package
++    Increment version
++    Add version and release date in the about page.
++    Properly delete widgets when closed or changed.
++    (py2exe) do not exclude subprocess    
+    subprocess is now required by psutils
++    (py2exe) do not ignore difflib   
+    difflib is now required for numpy
++    Do not redraw the delay label if the text has not changed.
++    Disable the linear screen interpolation in timeplot.   
+    This was bogus signal-wise, and practically prevented from
+    displaying some data correctly.
++    Introduce a variable for the time window in the scope.
++    Remove the minus peak in the burst generator.
++    Remove the bogus time inversion in the scope.
++    Fix message for delay estimator in single channel.
++    Fix detection of peaks in the delay estimator.
++    Add a new widget to measure delays.    
+    Detect peaks in two channels and measure the time
+    difference between the two.
++    Enlarge the trigger window
+    (and remove leftover debug statement)
++    Change scope to trigger on center of window, improve triggering.
++    Fix buffer growth in ringbuffer.py
++    Allow negative times in the scope horizontal axis
++    Fix indentation
++    Immprove the burst generator
+    Make the computation cleaner, and double its amplitude.
++    Move the norm computation (after fft) to own function so that it appears on the profile directly
++    Move the sweep generator in a separate class
++    Pass 0 to cpu_percent to make it non-blocking
++    Fix indentation
++    Add more comments about instructions for PyPI
++    Add some usage comments to setup.py, and add a little text to the description
+
+Version 0.2 (Windows 2011/10/31 - all platforms PyPI 2012/01/04)
++    Add Numpy include to Cython extension building
++    Fix audiobackend reference for the generator when launched in the central widget
++    Increase pink noise fidelity
++    Cleanup generator import (avoid scipy import)
++    Fix py2exe inclusion of OpenGL packages
++    Fix integer comparison in pink noise code
++    Plug the generator dock into the dock widgets
++    Generator dock
++    Add output devices listing in audiobackend class
++    Update properly the histogram spectrum coordinate transform when the scale changes
++    Avoid calling the filters with empty input arrays
++    Fix use of the decimate function in the no-initial-conditions case
++    Define a separate decimate function
++    Enable the filter initial conditions propagation for correct filtering
++    Ring buffer size can grow (fix issues with long delays)
++    Fix qwt/opengl/numpy widget for arrays proper initialization (actually fix multiple simultaneous FFT widgets)
++    Add a spectrum GUI setting for single/dual channels
++    Introduce a delay setting that acts one the spectrum (for now)
++    Save and restore the input device/channel/single//duo configuration
++    Simplify baseline computation (and remove substraction warning
++    Make the about dialog a child of the mainwindow so that it is closed automatically when the mainwindow is closed.
++    Some preliminary code for baseline setting
++    Some preliminary code for nicer shading
++    Fix qwt/opengl/numpy plot for linear scale
++    Add legend to the scope when two channels are used
++    Two channels mode for the level meter
++    Two channels for the scope
++    Make the spectrum draw the power difference when two channels are used
++    New feature : two-channel difference as input
++    Fix background gradient in spectrum
++    Enable the qwt/opengl/numpy spectrum plot instead of the original curved one
++    Add cumulative time profiling stats
++    Put the individual icon files in the repository
+
+Windows Version 2012/05/26
++    Qt plugin for svg icons (qsvg4.dll) now depends on QtXml, thatpy2exe failed to include automatically
+
+Windows version 2012/05/17
++    Fix histplot transforms initializations (removes errors on startup) and make transformation more performant
++    Use array operations for the canvas transformation
++    Fix add-dock toolbar icon, which was badly rendered on windows
++    Fix dock settings icon, which was badly rendered on windows
++    Convert to MUI2, fix encoding, improve uninstaller
++    Nice microphone photo for the splash screen - license is cc-by-2.0
++    Remove non-updated statistics
++    The current working directory no longer needs to be set at the end of install
++    generated_filters.pkl is no longer to be installed
++    Store the filter params in a true python file, simplifies the import
++    Fix vu-meters that decrease indefinitely
+
+Version 0.1 on PyPI - 2011/02/02
++    Fixes for non-py2exe setup
++    Improve setup.py for distribution, with classifiers, startup script and manifest
++    Allow friture.py to be executed as a child of another script, such as lsprofcalltree
++    Fix off-by-one pixel for the level meter
++    Remove bogus styling of the level meters
++    Let python manage the spectrogram painter object lifetime
++    Ordering for object creation fixed
++    Move friture.py to subdir
++    Move scripts to subdir, remove lsprofcalltree from friture.py
++    Move Cython extension to subsubdir
++    Move source files to subdir
+
+Windows version 2011/01/29
++    Fix uninstaller, improve installer info
++    Use packaging date for the installer version
++    Fix for the installer move
++    Move some source files to subdir
++    Move .ui files to subdir
++    Move ui*.py and resource py file to friture subdir
++    Move the installer and Microsoft redist pack to a subdirectory
++    Update install instructions
++    Move test files to sandbox subdir
++    Move image files and resource file to a subdirectory
++    Move installation details to a separate file
++    Move profiling info to separate file
++    New colors for FFT spectrum, less agressive
++    New style for octave spectrum's peaks
++    Add 'central dock' label to clarify what is the central widget
+
+Windows version 2011/01/09
+
++    Stop py2exe from complaining about msvcp90.dll
++    Add manual bounds ckecking in exponential smoother
++    Add code to include numpy headers when building the cython extension on Windows
++    Major cleanup and optimisation in the histogram plot
++    Better peak meter, remove integer conversions
++    Add exponential smoothing (0.125 s) to the RMS level widget
++    Cleanup and optimization in octavespectrum update
++    Fix bug : could not add any dock when all of them were removed
++    Major performance improvements in histplot by caching and avoiding QwtInterval
++    Specific import from PyQt4.QtGui to improve startup time
++    Add Cython machinery to setup.py
++    Make the exponential smoothing smarter, and implement it as a cython module (dramatic speed improvement)
+
+Windows version 2010/11/08
+
++    (NSIS installer) Fix Working Directory when starting Friture at the end of the installation
+
+Windows version 2010/11/04
+
++    Optionally remove settings when uninstalling (NSIS)
++    Improve dock deletion, and dock index selection
++    Use a real exponential moving average at the output of the octave filters
++    Fix settings initialization for the 2D spectrogram, fft and octave spectrum (Note: could be done slightly smarter)
+
+Windows version 2010/10/25
+
++    Clean and fix errors about bar widths in the octave spectrum
++    Fix minimumSizeHint computation for octave, time and spectrum plots from a missing replot() at init end
++    Add tooltips to the control bar
++    Update splash screen with logo
++    Tweak FFT spectrum default settings
++    Tweak defautl settings for the octave spectrum
++    Fix default settings for the 2D spectrogram (log frequency scale)
++    Remove levels and scope widgets from the default set of widgets shown on the first launch
++    Improve the profiler info
++    Add an option to set the reponse time in the octave spectrum.
+
+Windows version 2010/09/29
+
++    Check if the bar pixmap needs to be updated only once per timer update.
++    Use an opaque color for the FFT spectrum plot brushes, disables the stroke,
+    and draw the grid on top.
++    More generic NSIS script, more robust ot my own mistakes !
++    Even more precise import for lighter py2exe distribution
++    Tweak About message, add email address, remove name.
++    Fill the peak curve in the FFT spectrum
++    Import from scipy.signal.sigtools and scipy.signal.filter_design instead of scipy.signal
++    Import lfilter from scipy.signal.sigtools instead of scipy.signal
++    Hyperlink for the homepage address in the about widget
+
+Windows version 2010/07/14
+
++    Exclude unused modules from py2exe
++    Include the filters file in nsis distribution
++    Separate filter design and use in two different source files.
++    Import more selectively. Hopefully helps py2exe
++    Include the filters coeff file in py2exe packaging
++    Add X-grid to the octave spectrum
++    Tweak widget names
++    Display a colorbar next to the spectrogram plot
++    Fill under the spectrum curve, makes it a little more readable
++    Recreate ring buffers when necessary only
++    Do not call len() multiple times
++    Avoid checking for proper ringbuffer at each timer tick.
++    Use pre-generated filters coeff instead of recomputing them at each change.
++    Disable filter conditions propagation for now.
++    Introduce peaks in the octave spectrum.
++    Tweaks to the decimating filters analysis.
++    Go for order-3 decimating filter
++    Go for 50 dB stopbands
++    Better analysis of the filter bank frequency response
++    Go for a non-decimating filter bank since the frequency output of the decimating one in close to catastrophic...
++    Introduce zi/zf to the filtering without decimation
++    Code for visual analysis of the filters frequency response
++    Use log10 scale engine while the log2 engine still has references issues.
++    Switch to 80dB stopband filters to make the octave analyzer nicer with single frequency excitation.
++    Simplify histogram draw by removing the horizontal bar feature.
++    Fix canvas height caching
++    Implement ring buffer for filtering - seems like there's an issue with the filters stability
++    Move the ring buffer class to its own file for reuse
++    Move octave filtering to a class
++    Add audiobuffer method to get the new points only
++    Fixed and improvements to the histplot pixmap cache
++    Cache bar in a pixmap.
++    Spacebar is a shortcut for start/stop
++    Move from 7 octave to 8 octave
+
+
+Windows version 2010/06/29
++    Allow 1/3, 1/6, 1/12 and 1/24 octave filters, with proper weightings.
++    Implement IIR+decimation instead of IIR only. Will be especially useful for more-than-one
+    bands per octave.
++    Make bands number automatically computed from the bands per octave choice.
++    Add Hann window to the fft code for better frequency resolution.
++    Implement an octave-band filter widget.
++    Finish and cleanup implementation of an octave (or fraction of octave) filter bank
++    Move scope trigger to the left edge
++    Move the log to a dedicated tab in the about dialog
++    Make the statistics widget part of the about window instead of a dock widget.
++    Start/Stop for the spectrogram timer.
++    Spectrum scale defaults to log10.
++    Spectrogram default to log10 scale.
++    Move About code to source file instead of ui file, and prepare for
+    tabing.
++    Fix start/stop button text.
++    Fix the start/stop icon state.
++    Fix minimum size of the level widget.
++    Display the weighting state in the spectrum y-axis title.
+
+Windows version 2010/06/16
+
++    Add human middle-ear weightings A, B and C to the spectrum and spectrogram settings.
++    Put common code for the docks control bar in a separate file.
++    Allow to select the channel for any device stream with more than one channel.
++    Bugfix : actionStart belongs to self.ui
++    Reorder icons in the toolbar
++    Pass the logger to widget classes
++    Monitor the global CPU usage in the statistics widget. This may deserve its own widget, with something like QProgressBar.
+    The feature is based on psutil, which becomes a new dependency for friture !
++    Set size policies of scope, spectrum, spectrogram so they can be shrinked
++    Move ui code from Ui_xyz.py to xyz.py directly
+
+Windows version 2010/06/06
+
++    Fix to the vcredist section in the installer script.
++    Lighter gradients in the widgets.
++    Tell the user that the levels and scope widgets have no settings yet.
++    Put the VC++2008 redistribuable libs in the tree.
++    Install VC redistribuable libraries.
+
+Windows version 2010/06/04
+
++    Draw a white background on the plots mouse trackers.
++    New log icon with an exclamation mark
++    New icon to add a new dock
++    Use About Friture instead of just About for the About button
++    Use the friture icon for the About button
++    Comment out the toolbar styling for now, not that beautiful
++    At first launch, do not display the log and stat docks.
++    At first start the central widget is a spectrogram.
++    Default set of docks at first start.
++    Use smaller fonts for the plot axis titles.
++    Remove the docks separator styling, not very nice.
++    Update the installer file list.
++    Automatically distribute the Qt svg plugin.
++    Exclude powrprof.dll in py2exe distribution.
++    Put the settings icon on the left.
++    Do not fail when ctypes cannot find the dll
++    Comment out the stylesheets for now, and use stock dock widgets instead of using a custom titlebar
++    Set the separator style to black 1 pixel.
++    Apply some styling to the toolbars so that they look more custom.
++    Slightly change the plots background gradients to nicely merge
+    with the grid.
++    Set central layout margins to zero.
++    Pass the logger to the spectrum, scope, levels widgets.
+    Do the same for all widgets in the central widget too.
++    Add a dummy scope and levels settings dialog.
++    Fix spectrogram initial settings.
++    Implement the spectrum y range settings.
++    Fix spectrum initial settings.
++    Remove previous static scope, spectrum and spectrogram widgets
++    Save and restore central widget state
++    Remove the settings buttons from the spectrum and spectrogram widgets
++    Now the central widget is very close to the dock widget in feature/aspect
++    Move spectrum stylesheet from mainwindow ui file to spectrum code file.
++    Move scope stylesheet from the global ui file to the scope file
++    Add a settings icon to the dock.
++    Add an icon to the "dock" button.
++    Dock icon based on svg objects, no contour or path.
++    Custom icon for dock/undock.
++    Use an icon for the dock close button.
++    Add (modified) about svg.
++    Restore state before restoring geometry.
++    Save and restore the window geometry.
++    Save and restore dock states.
++    Add the possibility to choose the dock widget type on creation.
++    Save and restore docks existence and positions.
++    Assign a fixed height to the dock control widgets.
++    Add a dock button to the floating dock.
++    Stylesheet the dock control widgets.
++    Add another special control widget to a floating dock.
++    Add a custom toolbar as the dockwidget titlebar.
++    Enable the spectrogram timer in a dock
++    Enable the code to select a widget in a dock.
++    Put the Dock code in a separate file
++    Connect the new dock widget to the timer, pass it the audiobuffer.
++    Directly connect the widgets to the display timer.
++    Pass the audiobuffer in separate functions instead of passing it
+    when asking for the widget update.
++   Connect the statistics update function directly to the timer tick
++    Move the buffer update to a specific function, directly connnected to the timer tick
++    Actually add a dock and a widget (needs to be connected to the timer tick still)
++    Move settings for spectrogram and spectrum to separate classes and window
++    Move audio backend code to a separate file
++    Move audio initialization to a separate method
++    Use isVisible() functions instead of visibilityChanged signals.
++    Refactor the frequency range code
++    Move the spectrogram code and ui in separate files
++    Move spectrum to separate code and ui files
++    Use numpy fancy indexing to compute the peak falloff
++    Move scope widget to separate .py and .ui files
++    Fix for levels statistics
++    Move the level widget code in a separate source file, and in a
+    separate ui file.
++    Make the log text selectable
++    Scroll the log widget so that the last log line is visible
++    Set the log and statistics widget backgrounds as white
++    Add a line number to the log messages
++    Remove log base 2 frequency scale
++    Move audio ring code to a separate file.
++    Source file encoding fix
++    Factorize the stream opening function.
++    Comment functions as slots or methods. Will help me to separate
+    methods to their own appropriate module if applicable.
++    New Logger class, built to handle log messages from all the
+    program classes.
++    Put "Settings" dialog code in a separate file.
++    Put the "About" dialog code in a separate file.
++    New titlebar widget mockup. Plan: one dockwidget = one visualiation
+    placeholder.
+
+Windows version 2010/03/20
+
++    Remove dash from Windows installer filename.
++    Automatically use the date as the Windows installer name.
++    Add the icons to the source versioning, and fix setup.py
++    Add icon to the Windows exe.
++    Workaround to properly display the icon in Windows 7 taskbar.
+
+Windows version 2010/03/17
+
++    Special case for stderr on Windows, logging to a file.
++    Add custom icon for the About icon in the toolbar
++    Add an icon in the About dialog
++    Add an about dialog.
++    Update window icon
++    Move some messages to the new logging window.
++    Add logging window
++    Cleanup stylesheet
++    Display text labels in the toolbar, in a white font.
++    Use solid lines for plot grids
++    Disable latency logging by commenting out (forgot to disable
+    the file creation, caused permission problems on Windows).
++    Update NSIS script with proper license text, and installer name that
+    include the version number.
++    Update levels icons with gradient and white offset.
+
+Windows version 2010/03/16
+
++    Update statistics icon.
++    Add a grid to the spectrum
++    Add a grid the scope
++    Disable latency logging facility for now.
++    Add small radius to the border corners of levels, scope and spectrum.
++    Add stylesheets for scope, spectrum and levels to make them a little fancier, and
+    learn how to use CSS.
+
+Windows version 2010/03/15 (executable & installer not publicly released)
+
++    NSIS script to generate a install exe from a py2exe distribution.
++    Special case for IOError on stream read. To be more specialized
+    to the input overflow case.
++    Add frame corders to all qdockwidgets, so that they are more
+    easily moved.
++    Add a "cool modern" linear gradient as a toolbar background.
++    Put the statistics in a QScrollArea to gain some space.
++    Change settings dialog title and icon.
++    Update window icon.
++    Add icon to the settings menu
++    Update start/stop icons
+
+Windows version 2010/03/12 (no installer, executable not publicly released)
+
++    Add some excludes to setup.py:py2exe
++    Comment out cochlear code since it is unused for now, and causes
+    py2exe to include a lot of scipy, if not all.
+
+First ever Windows executable (not publicly released) 2010/03/11
+
++    Workaround a bug in scipy imports that appears when using py2exe.
++    Add code for cochlear processing. Not enabled yet, may not
+    be the best idea after all.
++    Add a file with an implementation of the gammatone
+    filter bank in numpy (currently only half-converted
+    from Matlab)
++    Add code for logarithmic scope, not enabled yet.
+    A better solution could be to dynamically adjust the scale, using
+    the same kind of algorithm as for the peak computations.
++    Finally fix off by one color computation.
++    Ask Qt not to update the canvas background on each paint event.
++    Use astype instead of digitize, which is mush slower because it can do
+    so much more. Nest step could be to use a function instead of a
+    precomputed palette.
+
+2009/11
+
++    Small simplificaton in UI layout code
++    Use numpy clip function
++    Add profiling instructions at the top of friture.py
++    Add a script to convert the pstats output to a graphviz dot file, which can
+    in turn be converted to a png
++    Replace a boolean mask with a simple substraction
++    Cache the decimation computation to avoid a log2.
++    Replace uses of .max() with [-1] where possible.
++    Do the dB conversion once instead of twice for level widgets
++    Remove a useless sqrt since we do a log10 just after.
++    Cache the canvas object for all plots, since it appears to be a
+    slow call in qwt.
++    Add a window icon, currently very basic
++    Simplify peak computation
++    Introduce one more cached array for peak computation
++    Decimate as much as possible before doing the fft
++    Remove log10 usage from peaks computation in the spectrum
++    Just import what is needed in audioproc.py
++    Cache the frequency scale in audioproc
++    Move the spectrum processing to its function.
++    Move scope processing ot its function.
++    Move level processing to its function
++    Remove the use of the status bar to gain screen spece.
+    Use the plot picker instead.
++    Move the frequency scale definition to the processing function.
+    This is in preparation to the use of decimation to decrease
+    computing time for fft of small upper range.
++    Compute the peaks directly on the interpolated spectrum.
+    Fewer peaks to compute when the fft size is larger than the number
+    of pixels in the plot, which is a common case.
++    Move the computing of peaks to a specific function.
+    That way it appears independently in the profile.
++    Use command-lien arguments to select the profiling tool.
+    Default to no profiling.
++    Bug fix : stream is in int16 format, not int32 ! This fixes the frequency
+    scale factor of 2 that was observed.
++    Use SAMPLING_RATE instead of hardcoded number.
++    Use rfft since the input is real.
++    Cleanup spectrum code.
++    Add basic trigger capability to the scope widget
++    Move the default position for the statistics widget to the left.
++    Replace the settings button with an action in the toolbar.
++    Move settings to a separate dialog. Greatly cleans up the interface !
+
+2009/10
+
++    Disable antialiasing fro scope and spectrum. Dramatically improves
+    the performance !
++    Intelligently (i.e. with interpolation) limit the number of points
+    to be drawn on the plot to the canvas width (in pixel units). Avoids
+    the spectrum painting time to skyrocket for high fft sizes
++    Add statistics field about spectrogram timer period
++    Change statistics description to be more meaningfull
++    Add timing statistics about computation and display
++    Add file for log2 scale engine
++    Disable plots decimation since it raises issues with the spectrum
+    plot and its peaks
++    Add time information for each timer events
++    Factorization of log10
++    SYnc to qsynthmeter.cpp rev 306, adds gradient look
++    Simplify fft size save/restore
++    Fix frequency scale saving
++    Fix the frequencies labels formatting
++    Fix the frequency label formatting
++    Save/restore color ranges
++    Save/restore time range.
++    Save/restore frequencies minimum and maximum
++    Save/restore the frequency scale
++    Save and restore the fft size when closing/starting Friture.
++    Move state save/restore to specific functions
++    Add base 2 logarithmic frequency scale for the spectrogram.
+    Warning: the frequency scales drawn on the side of the graph are wrong !
+    I am waiting for a bug fix in PyQwt before implementing them.
++    Change the frequency range for the spectrogram too.
++    Add two spinBoxes for frequency range selection. Only works for the spectrum
+    for now.
++    Uncheck actionStart when changing input device
++    Major timer redesign.
+    Now we have two timers: one for 1D and 2D widgets (levels, scope, spectrum,
+    statistics), and one for 3D widgets (spectrogram). Using an audio buffer
+    avoids latency issues. This audio buffer behaves like the spectrogram pixmap.
+    It is a circular buffer, with data written twice.
++    Add statistics about FFT period.
++    Log to a file the time delay between spectrogram updates. Add a script
+    to analyze it, called hist.py
++    Add new file "hellogl.py" to experiment with opengl drawing.
++    Save and restore dock and toolbar states on exit and restart, respectively.
++    Allow to modify the time range of the spectrogram.
++    Fix the logic of lost chunks in the timer slot.
++    Make the time range a parameter in the CanvasScaledSpectrogram class.
++    Add a flag to indicate that we are processing the last chunk of the
+    timer fire, so that if we are not we do not bother updating the screen.
++    Replace while loop with a for loop, allows to know where we are
+    in the process.
++    Store the number of available chunks in a variable instead of
+    calling the interface multiple times.
++    Add a statistics entry about mean number of chunks by timer fire,
+    in the last 1000 timer fires.
++    Add a latency measurement to the statistics.
++    Add icon for the statistics button in the toolbar. Now we have icons
+    for all buttons.
+
+2009/09
+
++    Add profiling option with console output instead of a file for
+    kcachegrind.
++    Add an icon for the spectrum action.
++    Do not update the spectrum when the widget is not visible.
++    Do not compute and update the levels when the widget is not visible.
++    Do not try to display the statistics when the widget is not visible.
++    Do not update the scope widget when it is not visible.
++    Add svg icons for levels and scope widget.
++    Add an icon for the Stop button.
++    New resource svg for the Start button. Also rename the resource
+    file to resource_rc.py since it's what Qt Designer asks for.
++    Use QDockWidget::toggleViewAction instead of our own actions with
+    signals and slots.
++    Fix FFT size in UI
++    Add a __del__ method for explicit deletion of the spectrogram painter
+    and its pixmap. Avoids a segfault.
++    Add a setup.py file with basic commands for py2exe. Allows building
+    an exe for Windows.
++    Add resource.py to the versioned-controled files.
++    More fine tuning to the level widget layout. Move it to the left.
++    Fix Level widget layout.
++    Fix minimum size for the qsynthmeter widget.
++    Small adjustment to level widget layout. Needs more work.
++    Remove frame around spectrogram. Fix statusbar.
++    Add tollbar buttons to toggle the display of individual widgets.
++    Move the Start/Stop button to a new toolbar. Move the scope, spectrum,
+    level and statistics widgets to dock widgets.
++    Dynamically choose the maximum number of chunks to read by timer
+    tick based on the latency reported by portaudio.
++    Handle up to three chunks in a row instead of discarding the additional
+    ones.
++    Be a little more verbose for statistics, to be clearer.
+
+2009/08
+
++    Add a link to the wiki in README
++    Rework the layout of the level meter a little bit.
++    Add peaks to the spectrum widget
++    Derive qsynthMeter from QFrame and give it a raised look
++    Int conversion cleanup
++    Use default for size hints of levels.
++    Change the way audio levels are displayed : put them closer to the
+    level widget.
++    Remove the display of the max of the current audio data.
++    Fix the time axis on the spectrogram widget. Now set to 10 seconds
+    for every choice of the FFT window length.
+
+2009/07
+
++    Add a spacer in the first horizontal layout to give a more natural
+    size to the buttons.
++    Use only integers in frequency scales.
++    Move buttons at the top of the layout for better alignment of the
+    widgets.
++    Use custom labels using 'k' for thousands in frequency scales
+    widgets.
++    Switch from seconds to milliseconds in the signal widget.
++    Add pointer info in the status bar when clicking in the signal or
+    spectrum widgets.
++    Add pointer info in the status bar when clicking on the rolling spectrogram widget.
+
+2009/06
+
++    Add statistics about useless timer events
++    Bugfix : forgot to reset the needfullreplot switch
++    Display info about lost chunks of data
++    Fix logarithmic scale in the spectrum plot
++    Fix use of timer and Start button when changing device
++    Factor device test code
++    Print an error message when selecting a non-working input device
++    Non-fatal error on device change
++    Iterate over available devices for a working one
+    On startup, first try the default system device, and then the other
++    Bugfix for delays
+    
+    If the program is too slow to process all the chunks, discard those
+    in excess. In fact, it is not that it is too slow, it is probably
+    that there is a small mismatch between the timer period and the audio
+    buffer period.
++    Major timer-based refactor
+    
+    All sub-processes have been removed and replaced with a timer in the
+    main process. This timer fires every 20 ms or so and retrieves audio
+    data. This removes a lot of complexity coming from synchronization
+    issues.
+    
+    Additionnally a level-meter widget is introduced, and the plot widgets
+    have been optimized so that only the needed part is redrawn (namely axes
+    are not redrawn).
+
+2009/01
+
++    Add a copy of the GPLv3.
++    Update License statements to GPL version 3.
++    Add proper encoding statements, and License statements.
++    Add details in TODO.
++    Add items and details in TODO.
++    Add a TODO file.
++    "Simplify" locking.
++    Move profiling code to be all conditional.
+
+commit 812b5b8050a921267c4844457d70d7a2a853c6e5
+Author: Timothée Lecomte <timothee.lecomte@lpa.ens.fr>
+Date:   Fri Jan 9 21:47:07 2009 +0100
+
+    first commit
