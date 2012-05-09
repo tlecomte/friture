@@ -91,7 +91,7 @@ in the setup window."""
             m1 = d1.mean()
             #print s0, m0, s0/m0, s1, m1, s1/m1
             threshold = 100.
-            if s0/m0 < threshold or s1/m1 < threshold:
+            if m0 == 0. or m1 == 0. or s0/m0 < threshold or s1/m1 < threshold:
                 message = "Peak not found"
 
         if message <> self.previous_message:
