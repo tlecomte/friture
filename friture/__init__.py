@@ -17,4 +17,6 @@
 # You should have received a copy of the GNU General Public License
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
-# this file is empty on purpose
+# version and date
+__version__ = "0.3.0"
+__releasedate__ = "2012-04-29"

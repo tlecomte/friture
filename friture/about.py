@@ -19,15 +19,7 @@
 
 from PyQt4 import QtGui, QtCore
 import friture.friture_rc
-import datetime
-
-major = 0
-minor = 3
-micro = 0
-qualifier = ""
-date = datetime.date(2012, 4, 29)
-
-version = "%d.%d.%d%s" %(major, minor, micro, qualifier) if (micro > 0)  else "%d.%d%s" %(major, minor, qualifier)
+import friture
 
 aboutText = """
 <p> <b>Friture %s</b> (dated %s)
@@ -37,7 +29,7 @@ aboutText = """
 <p> Homepage: <a href="http://tlecomte.github.com/friture">http://tlecomte.github.com/friture</a>
 <p> Send comments, ideas and bug reports to: <a href="mailto:lecomte.timothee@gmail.com">lecomte.timothee@gmail.com</a>
 <p> Splash screen photo credit: <a href="http://www.flickr.com/photos/visual_dichotomy/3623619145/">visual.dichotomy</a> (CC BY 2.0)
-""" %(version, date.isoformat())
+""" %(friture.__version__, friture.__releasedate__)
 
 class About_Dialog(QtGui.QDialog):
 	def __init__(self, parent):
