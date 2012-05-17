@@ -1,0 +1,9 @@
+Cython
+PyAudio
+PyOpenGL
+PyOpenGL-accelerate
+docutils
+numpy
+psutil
+scipy
+PyQt
