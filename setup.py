@@ -4,6 +4,7 @@ from distutils.extension import Extension
 from Cython.Distutils import build_ext
 from glob import glob
 import os
+from os.path import join, dirname # for README content reading
 import numpy
 import friture # for the version number
 
@@ -69,18 +70,7 @@ ext_modules = [Extension("friture.exp_smoothing_conv", ["friture/extension/exp_s
 setup(name = "friture",
 	version = friture.__version__,
 	description = 'Real-time visualization of live audio data',
-	long_description = """\
-Friture
--------
-
-Friture is an application to visualize and analyze live audio data in real-time.
-
-Friture displays audio data in several widgets, such as a scope, a spectrum analyzer, or a rolling 2D spectrogram.
-
-This program can be useful for educational purposes, or to analyze the audio response of a hall, etc.
-
-The name *friture* is a french word for *frying*, also used for *noise* in a sound.
-""",
+	long_description = open(join(dirname(__file__), 'README.rst')).read(),
 	license = "GNU GENERAL PUBLIC LICENSE",
 	author = 'Timothée Lecomte',
 	author_email = 'lecomte.timothee@gmail.com',
