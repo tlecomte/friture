@@ -1,3 +1,4 @@
+=======
 Friture
 =======
 
@@ -5,8 +6,8 @@ Friture
 
 This program can be useful for educational purposes, or to analyze the audio response of a hall, etc.
 
-The name *friture* is a french word for *frying*, also used for *noise* in a sound.
+The name *Friture* is a french word for *frying*, also used for *noise* in a sound.
 
-See the [project homepage] [1] for screenshots and more information.
+See the `project homepage`_ for screenshots and more information.
 
-[1]: http://tlecomte.github.com/friture/
+.. _`project homepage`: http://tlecomte.github.com/friture/
