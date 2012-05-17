@@ -5,6 +5,7 @@ from Cython.Distutils import build_ext
 from glob import glob
 import os
 import numpy
+import friture # for the version number
 
 py2exe_build = True
 try:
@@ -66,7 +67,7 @@ ext_modules = [Extension("friture.exp_smoothing_conv", ["friture/extension/exp_s
                          include_dirs = [numpy.get_include()])]
 
 setup(name = "friture",
-	version = '0.3',
+	version = friture.__version__,
 	description = 'Real-time visualization of live audio data',
 	long_description = """\
 Friture
