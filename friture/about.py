@@ -34,7 +34,7 @@ aboutText = """
 <p> Friture is an application for real-time audio analysis.
 <p> Written in Python, using PyQt, PyQwt, PyAudio and SciPy.
 <p> License is GPLv3.
-<p> Homepage: <a href="http://www.github.com/tlecomte/friture">http://www.github.com/tlecomte/friture</a>
+<p> Homepage: <a href="http://tlecomte.github.com/friture">http://tlecomte.github.com/friture</a>
 <p> Send comments, ideas and bug reports to: <a href="mailto:lecomte.timothee@gmail.com">lecomte.timothee@gmail.com</a>
 <p> Splash screen photo credit: <a href="http://www.flickr.com/photos/visual_dichotomy/3623619145/">visual.dichotomy</a> (CC BY 2.0)
 """ %(version, date.isoformat())
