@@ -1,6 +1,6 @@
 include COPYING.txt
 include INSTALL.txt
 include PROFILING.txt
-include README.md
+include README.rst
 include TODO.txt
 include friture.py

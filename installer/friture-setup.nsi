@@ -5,7 +5,7 @@
 ; HM NIS Edit Wizard helper defines
 !define PRODUCT_NAME "Friture"
 !define /date PRODUCT_VERSION "%Y/%m/%d"
-!define PRODUCT_PUBLISHER "Timothée Lecomte"
+!define PRODUCT_PUBLISHER "TimothÃ©e Lecomte"
 !define PRODUCT_DESCRIPTION "Real-time audio visualizations"
 !define PRODUCT_WEB_SITE "http://tlecomte.github.com/friture/"
 !define PRODUCT_DIR_REGKEY "Software\Microsoft\Windows\CurrentVersion\App Paths\friture.exe"
@@ -65,7 +65,7 @@ VIProductVersion "0.0.0.0"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductName" "${PRODUCT_NAME}"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "Comments" "${PRODUCT_DESCRIPTION}"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "CompanyName" "${PRODUCT_PUBLISHER}"
-VIAddVersionKey /LANG=${LANG_ENGLISH} "LegalCopyright" "© ${PRODUCT_PUBLISHER} under the GNU GPLv3."
+VIAddVersionKey /LANG=${LANG_ENGLISH} "LegalCopyright" "Â© ${PRODUCT_PUBLISHER} under the GNU GPLv3."
 VIAddVersionKey /LANG=${LANG_ENGLISH} "FileDescription" "Installation for ${PRODUCT_NAME}"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "FileVersion" "${PRODUCT_VERSION}"
 
@@ -89,7 +89,7 @@ Section "SectionPrincipale" SEC01
   File "${PROJECT_PATH}\dist\friture.exe"
   File "${PROJECT_PATH}\dist\w9xpopen.exe"
   File "${PROJECT_PATH}\COPYING.txt"
-  File "${PROJECT_PATH}\README.md"
+  File "${PROJECT_PATH}\README.rst"
   File "${PROJECT_PATH}\TODO.txt"
 SectionEnd
 
@@ -122,7 +122,7 @@ Function un.onInit
 FunctionEnd
 
 LangString STR_remove_settings ${LANG_ENGLISH} "Do you want to remove Friture saved settings ?"
-LangString STR_remove_settings ${LANG_FRENCH} "Voulez-vous supprimer les réglages de Friture précédemment sauvegardés ?"
+LangString STR_remove_settings ${LANG_FRENCH} "Voulez-vous supprimer les rÃ©glages de Friture prÃ©cÃ©demment sauvegardÃ©s ?"
 
 Section Uninstall
   RMDir /r "$INSTDIR"
