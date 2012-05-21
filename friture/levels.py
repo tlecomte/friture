@@ -34,7 +34,10 @@ padding: 1px;
 """
 
 SMOOTH_DISPLAY_TIMER_PERIOD_MS = 25
+LEVEL_TEXT_LABEL_PERIOD_MS = 250
 SAMPLING_RATE = 44100
+
+LEVEL_TEXT_LABEL_STEPS = LEVEL_TEXT_LABEL_PERIOD_MS/SMOOTH_DISPLAY_TIMER_PERIOD_MS
 
 class Levels_Widget(QtGui.QWidget):
 	def __init__(self, parent = None, logger = None):
@@ -118,6 +121,8 @@ class Levels_Widget(QtGui.QWidget):
   
 		self.two_channels = False
 
+		self.i = 0
+
 	# method
 	def set_buffer(self, buffer):
 		self.audiobuffer = buffer
@@ -126,7 +131,9 @@ class Levels_Widget(QtGui.QWidget):
 	def update(self):
 		if not self.isVisible():
 			return
-		
+
+		self.i += 1		
+
 		# get the fresh data
 		floatdata = self.audiobuffer.newdata()
 
@@ -155,22 +162,24 @@ class Levels_Widget(QtGui.QWidget):
 		
 		level_rms = 10.*log10(value_rms*2. + 0.*1e-80) #*2. to get 0dB for a sine wave
 		level_max = 20.*log10(self.old_max + 0.*1e-80)
-		if level_rms > -150.:
-			string_rms = "%.01f" % level_rms
-		else:
-			string_rms = "-Inf"
-		if level_max > -150.:
-			string_peak = "%.01f" % level_max
-		else:
-			string_peak = "-Inf"
+  
+		if self.i == LEVEL_TEXT_LABEL_STEPS:
+	    		if level_rms > -150.:
+	    			string_rms = "%.01f" % level_rms
+	    		else:
+	    			string_rms = "-Inf"
+	    		if level_max > -150.:
+	    			string_peak = "%.01f" % level_max
+	    		else:
+	    			string_peak = "-Inf"
 
 		if not self.two_channels:
 			self.meter.setValue(0, level_rms)
 			self.meter.setValue(1, level_max)
-			self.label_rms.setText(string_rms)
-			self.label_peak.setText(string_peak)
-
-		if self.two_channels:
+			if self.i == LEVEL_TEXT_LABEL_STEPS:
+				self.label_rms.setText(string_rms)
+				self.label_peak.setText(string_peak)
+		else:
 			# second channel
 			y2 = floatdata[1,:]
 		
@@ -189,23 +198,29 @@ class Levels_Widget(QtGui.QWidget):
 			
 			level_rms_2 = 10.*log10(value_rms*2. + 0.*1e-80) #*2. to get 0dB for a sine wave
 			level_max_2 = 20.*log10(self.old_max_2 + 0.*1e-80)
-			if level_rms_2 > -150.:
-				string_rms_2 = "%.01f" % level_rms_2
-			else:
-				string_rms_2 = "-Inf"
-			if level_max > -150.:
-				string_peak_2 = "%.01f" % level_max_2
-			else:
-				string_peak_2 = "-Inf"
 
 			#self.meter.m_iPortCount = 3
 			self.meter.setValue(0, level_rms)
 			self.meter.setValue(1, level_rms_2)
 			self.meter.setValue(2, level_max)
 			self.meter.setValue(3, level_max_2)
-			self.label_rms.setText("Ch1:\n%s\n\nCh2:\n%s" %(string_rms, string_rms_2))
-			self.label_peak.setText("Ch1:\n%s\n\nCh2:\n%s" %(string_peak, string_peak_2))
-		
+
+			if self.i == LEVEL_TEXT_LABEL_STEPS:
+				if level_rms_2 > -150.:
+					string_rms_2 = "%.01f" % level_rms_2
+				else:
+					string_rms_2 = "-Inf"
+				if level_max > -150.:
+					string_peak_2 = "%.01f" % level_max_2
+				else:
+					string_peak_2 = "-Inf"
+
+				self.label_rms.setText("Ch1:\n%s\n\nCh2:\n%s" %(string_rms, string_rms_2))
+				self.label_peak.setText("Ch1:\n%s\n\nCh2:\n%s" %(string_peak, string_peak_2))
+
+		if self.i == LEVEL_TEXT_LABEL_STEPS:
+			self.i = 0
+
 		if 0:
 			fft_size = time*SAMPLING_RATE #1024
 			maxfreq = SAMPLING_RATE/2
