@@ -19,8 +19,38 @@
 
 from PyQt4 import QtGui
 from numpy import argmax
+import numpy
+from numpy.fft import rfft, irfft
+from filter import decimate
+from friture import generated_filters
+from ringbuffer import RingBuffer
 
 SAMPLING_RATE = 44100
+
+def subsampler(Ndec, bdec, adec, x, zis):      
+    x_dec = x
+    
+    if zis == None:
+        for i in range(Ndec):
+            x_dec, zf = decimate(bdec, adec, x_dec)
+        return x_dec, None
+    else:
+        m = 0
+        zfs = []
+        for i in range(Ndec):
+            x_dec, zf = decimate(bdec, adec, x_dec, zi=zis[m])
+            m += 1
+            # zf can be reused to restart the filter
+            zfs += [zf]
+        return x_dec, zfs
+
+# build a proper array of zero initial conditions to start the subsampler
+def subsampler_filtic(Ndec, bdec, adec):
+    zfs = []
+    for i in range(Ndec):
+        l = max(len(bdec), len(adec)) - 1
+        zfs += [numpy.zeros(l)]
+    return zfs    
 
 class Delay_Estimator_Widget(QtGui.QWidget):
     def __init__(self, parent = None, logger = None):
@@ -49,6 +79,23 @@ class Delay_Estimator_Widget(QtGui.QWidget):
         self.gridLayout.addWidget(self.delay_label, 0, 0, 1, 1)
         
         self.settings_dialog = Delay_Estimator_Settings_Dialog(self, self.logger)
+        
+        self.i = 0
+
+        # We will decimate several times
+        # no decimation => 1/fs = 23 µs resolution
+        # 1 ms resolution => fs = 1000 Hz is enough => can divide the sampling rate by 44 !
+        # => can decimate 5 times (2**5 = 32 => 0.7 ms resolution)!
+        # if I decimate 2 times (2**2 = 4 => 0.092 ms resolution)!
+        # if I decimate 3 times (2**3 = 8 => 0.184 ms resolution)!
+        self.Ndec = 3
+        self.subsampled_sampling_rate = SAMPLING_RATE/2**(self.Ndec)
+        [self.bdec, self.adec] = generated_filters.params['dec']
+        self.zfs = subsampler_filtic(self.Ndec, self.bdec, self.adec)
+
+        # ringbuffers for the subsampled data        
+        self.ringbuffer0 = RingBuffer()
+        self.ringbuffer1 = RingBuffer()
 
     # method
     def set_buffer(self, buffer):
@@ -68,36 +115,77 @@ class Delay_Estimator_Widget(QtGui.QWidget):
 with two channels.
 Select two-channels mode
 in the setup window."""
+            if message <> self.previous_message:
+                self.delay_label.setText(message)
+                self.previous_message = message
         else:
-            d0 = floatdata[0, :width]**2
-            i0 = argmax(d0)
-            t0_ms = float(i0)/SAMPLING_RATE*1e3 
-            d1 = floatdata[1, i0:i0+width]**2
-            i1 = argmax(d1) + i0 # only detect peaks that arrive later
-            t1_ms = float(i1)/SAMPLING_RATE*1e3
-            delay_ms = t1_ms - t0_ms
-            #print i0, t0_ms, i1, t1_ms, delay_ms
-            c = 340. # speed of sound, in meters per second (approximate)
-            message = "%.1f ms\n (%.1f m)" %(delay_ms, delay_ms*1e-3*c)
-            
-            # detect overflow
-            s0 = d0[i0]
-            s1 = d1[i1 - i0]
-            if s0==1. or s1==1.:
-                message = "Overflow"
+            #get the fresh data
+            floatdata = self.audiobuffer.newdata()
+            # separate the channels
+            x0 = floatdata[0,:]
+            x1 = floatdata[1,:]
+            #subsample them
+            x0_dec, self.zfs = subsampler(self.Ndec, self.bdec, self.adec, x0, self.zfs)
+            x1_dec, self.zfs = subsampler(self.Ndec, self.bdec, self.adec, x1, self.zfs)
+            # push to a 1-second ring buffer
+            x0_dec.shape = (1, x0_dec.size)
+            x1_dec.shape = (1, x1_dec.size)
+            self.ringbuffer0.push(x0_dec)
+            self.ringbuffer1.push(x1_dec)
 
-            # detect when the max is not clear enough ?
-            m0 = d0.mean()
-            m1 = d1.mean()
-            #print s0, m0, s0/m0, s1, m1, s1/m1
-            threshold = 100.
-            if m0 == 0. or m1 == 0. or s0/m0 < threshold or s1/m1 < threshold:
-                message = "Peak not found"
+            if (self.i==10):
+                self.i = 0
+                # retrieve last one-second of data
+                time = 2.
+                length = time*self.subsampled_sampling_rate
+                d0 = self.ringbuffer0.data(length)
+                d1 = self.ringbuffer1.data(length)
+                if d0.size>0 and numpy.std(d0)>0. and numpy.std(d1)>0.:
+                    # substract the means
+                    # (in order to get a normalized cross-correlation at the end)
+                    d0 -= d0.mean()
+                    d1 -= d1.mean()
+                    # compute the cross-correlation
+                    D0 = rfft(d0)
+                    D1 = rfft(d1)
+                    D0r = D0.conjugate() # FIXME D0r was supposed to be -D0.conjugate(), not +D0.conjugate()
+                    Xcorr = irfft(D0r*D1)
+                    #numpy.save("Xcorr.npy", Xcorr)
+                    absXcorr = numpy.abs(Xcorr)
+                    i = argmax(absXcorr)
+                    # normalize
+                    Xcorr_max_norm = Xcorr[0,i]/(d0.size*numpy.std(d0)*numpy.std(d1))
+                    #print Xcorr_max_norm
+                    delay_ms = 1e3*float(i)/self.subsampled_sampling_rate
+                else:
+                    delay_ms = 0.
+                    Xcorr_max_norm = 0.
 
-        if message <> self.previous_message:
-            self.delay_label.setText(message)
-            self.previous_message = message
+                c = 340. # speed of sound, in meters per second (approximate)
+                distance_m = delay_ms*1e-3*c
 
+                certainty = int(abs(Xcorr_max_norm)*100)                
+                
+                if Xcorr_max_norm >= 0:
+                    phase_message = "In-phase"
+                else:
+                    phase_message = "Reversed phase"
+                
+                message = "%.1f ms\n(%.1f m)\n\nCertainty %d%%\n\n%s" %(delay_ms, distance_m, certainty, phase_message)
+
+                if message <> self.previous_message:
+                    self.delay_label.setText(message)
+                    self.previous_message = message
+
+                #max = absXcorr[0,i]
+                #mean = absXcorr[0,:].mean()
+                # Three standard deviations account for 99.7% of the sample population
+                #std = numpy.std(Xcorr[0,:])
+                #ratio = max/(3.*std)
+                #print "argmax = %d = %f ms, value = %g, std = %g, ratio = %g" %(i, delay_ms, max, std, ratio)
+
+            self.i += 1
+    
     # slot
     def settings_called(self, checked):
         self.settings_dialog.show()
