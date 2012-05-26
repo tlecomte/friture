@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt4 import QtGui
+from PyQt4 import QtGui, QtCore
 from numpy import argmax
 import numpy
 from numpy.fft import rfft, irfft
@@ -26,6 +26,8 @@ from friture import generated_filters
 from ringbuffer import RingBuffer
 
 SAMPLING_RATE = 44100
+
+DEFAULT_DELAYRANGE = 1 # default delay range is 1 second
 
 def subsampler(Ndec, bdec, adec, x, zis):      
     x_dec = x
@@ -98,6 +100,8 @@ class Delay_Estimator_Widget(QtGui.QWidget):
         # ringbuffers for the subsampled data        
         self.ringbuffer0 = RingBuffer()
         self.ringbuffer1 = RingBuffer()
+        
+        self.delayrange_s = DEFAULT_DELAYRANGE # confidence range
 
     # method
     def set_buffer(self, buffer):
@@ -108,9 +112,8 @@ class Delay_Estimator_Widget(QtGui.QWidget):
         if not self.isVisible():
             return
 
-        time = 1.
-        width = time*SAMPLING_RATE
-        floatdata = self.audiobuffer.data(2*width)
+        # temporary buffer just to check the data shape
+        floatdata = self.audiobuffer.data(2)
 
         if floatdata.shape[0] == 1:
             message = """Delay estimator only works
@@ -138,7 +141,7 @@ in the setup window."""
             if (self.i==10):
                 self.i = 0
                 # retrieve last one-second of data
-                time = 2.
+                time = 2*self.delayrange_s
                 length = time*self.subsampled_sampling_rate
                 d0 = self.ringbuffer0.data(length)
                 d1 = self.ringbuffer1.data(length)
@@ -152,7 +155,7 @@ in the setup window."""
                     # compute the cross-correlation
                     D0 = rfft(d0)
                     D1 = rfft(d1)
-                    D0r = D0.conjugate() # FIXME D0r was supposed to be -D0.conjugate(), not +D0.conjugate()
+                    D0r = D0.conjugate()
                     Xcorr = irfft(D0r*D1)
                     #numpy.save("Xcorr.npy", Xcorr)
                     absXcorr = numpy.abs(Xcorr)
@@ -182,6 +185,9 @@ in the setup window."""
 
             self.i += 1
     
+    def set_delayrange(self, delay_s):
+        self.delayrange_s = delay_s
+    
     # slot
     def settings_called(self, checked):
         self.settings_dialog.show()
@@ -205,28 +211,25 @@ class Delay_Estimator_Settings_Dialog(QtGui.QDialog):
         
         self.formLayout = QtGui.QFormLayout(self)
         
-        #self.doubleSpinBox_timerange = QtGui.QDoubleSpinBox(self)
-        #self.doubleSpinBox_timerange.setDecimals(1)
-        #self.doubleSpinBox_timerange.setMinimum(0.1)
-        #self.doubleSpinBox_timerange.setMaximum(1000.0)
-        #self.doubleSpinBox_timerange.setProperty("value", DEFAULT_TIMERANGE)
-        #self.doubleSpinBox_timerange.setObjectName("doubleSpinBox_timerange")
-        #self.doubleSpinBox_timerange.setSuffix(" s")
+        self.doubleSpinBox_delayrange = QtGui.QDoubleSpinBox(self)
+        self.doubleSpinBox_delayrange.setDecimals(1)
+        self.doubleSpinBox_delayrange.setMinimum(0.1)
+        self.doubleSpinBox_delayrange.setMaximum(1000.0)
+        self.doubleSpinBox_delayrange.setProperty("value", DEFAULT_DELAYRANGE)
+        self.doubleSpinBox_delayrange.setObjectName("doubleSpinBox_delayrange")
+        self.doubleSpinBox_delayrange.setSuffix(" s")
 
-        #self.formLayout.addRow("Time range:", self.doubleSpinBox_timerange)
-        self.formLayout.addRow("No settings for the delay estimator.", None)
+        self.formLayout.addRow("Delay range (maximum delay that is reliably estimated):", self.doubleSpinBox_delayrange)
         
         self.setLayout(self.formLayout)
-
-        #self.connect(self.doubleSpinBox_timerange, QtCore.SIGNAL('valueChanged(double)'), self.parent.timerangechanged)
+        
+        self.connect(self.doubleSpinBox_delayrange, QtCore.SIGNAL('valueChanged(double)'), self.parent.set_delayrange)
 
     # method
     def saveState(self, settings):
-        #settings.setValue("timeRange", self.doubleSpinBox_timerange.value())
-        return
+        settings.setValue("delayRange", self.doubleSpinBox_delayrange.value())
 
     # method
     def restoreState(self, settings):
-        #(timeRange, ok) = settings.value("timeRange", DEFAULT_TIMERANGE).toDouble()
-        #self.doubleSpinBox_timerange.setValue(timeRange)
-        return
+        (delayRange, ok) = settings.value("delayRange", DEFAULT_DELAYRANGE).toDouble()
+        self.doubleSpinBox_delayrange.setValue(delayRange)
