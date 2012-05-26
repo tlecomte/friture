@@ -66,19 +66,51 @@ class Delay_Estimator_Widget(QtGui.QWidget):
         else:
             self.logger = logger
         
-        self.previous_message = ""
+        self.previous_delay_message = ""
+        self.previous_certainty_message = ""
+        self.previous_polarity_message = ""
+        self.previous_channelInfo_message = ""
         
-        self.setObjectName("Delay_Estimattor_Widget")
-        self.gridLayout = QtGui.QGridLayout(self)
-        self.gridLayout.setObjectName("gridLayout")
-        self.delay_label = QtGui.QLabel(self)
+        self.setObjectName("Delay_Estimator_Widget")
+        self.layout = QtGui.QFormLayout(self)
+        self.layout.setObjectName("layout")
+        
         font = QtGui.QFont()
         font.setPointSize(14)
         font.setWeight(75)
         font.setBold(True)
+        
+        self.delay_label = QtGui.QLabel(self)
         self.delay_label.setFont(font)
         self.delay_label.setObjectName("delay_label")
-        self.gridLayout.addWidget(self.delay_label, 0, 0, 1, 1)
+        
+        self.delayText_label = QtGui.QLabel(self)
+        self.delayText_label.setObjectName("delayText_label")
+        self.delayText_label.setText("Delay:")
+
+        self.certainty_label = QtGui.QLabel(self)
+        #self.certainty_label.setFont(font)
+        self.certainty_label.setObjectName("Certainty_label")
+        
+        self.certaintyText_label = QtGui.QLabel(self)
+        self.certaintyText_label.setObjectName("certaintyText_label")
+        self.certaintyText_label.setText("Certainty:")
+
+        self.polarity_label = QtGui.QLabel(self)
+        self.polarity_label.setFont(font)
+        self.polarity_label.setObjectName("polarity_label")
+        
+        self.polarityText_label = QtGui.QLabel(self)
+        self.polarityText_label.setObjectName("polarityText_label")
+        self.polarityText_label.setText("Polarity:")
+        
+        self.channelInfo_label = QtGui.QLabel(self)
+        self.channelInfo_label.setObjectName("channelInfo_label")
+        
+        self.layout.addRow(self.delayText_label, self.delay_label)
+        self.layout.addRow(self.certaintyText_label, self.certainty_label)
+        self.layout.addRow(self.polarityText_label, self.polarity_label)
+        self.layout.addRow(None, self.channelInfo_label)
         
         self.settings_dialog = Delay_Estimator_Settings_Dialog(self, self.logger)
         
@@ -120,9 +152,15 @@ class Delay_Estimator_Widget(QtGui.QWidget):
 with two channels.
 Select two-channels mode
 in the setup window."""
-            if message <> self.previous_message:
-                self.delay_label.setText(message)
-                self.previous_message = message
+            if message <> self.previous_channelInfo_message:
+                self.previous_delay_message = "N/A ms\n(N/A m)"
+                self.delay_label.setText(self.previous_delay_message)
+                self.previous_certainty_message = "N/A %"
+                self.certainty_label.setText(self.previous_certainty_message)
+                self.previous_polarity_message = "N/A"
+                self.polarity_label.setText(self.previous_polarity_message)
+                self.channelInfo_label.setText(message)
+                self.previous_channelInfo_message = message
         else:
             #get the fresh data
             floatdata = self.audiobuffer.newdata()
@@ -172,16 +210,26 @@ in the setup window."""
 
                 certainty = int(abs(Xcorr_max_norm)*100)                
                 
+                delay_message = "%.1f ms\n(%.2f m)" %(delay_ms, distance_m)
+                certainty_message = "%d%%" %(certainty)
                 if Xcorr_max_norm >= 0:
-                    phase_message = "In-phase"
+                    polarity_message = "In-phase"
                 else:
-                    phase_message = "Reversed phase"
-                
-                message = "%.1f ms\n(%.2f m)\n\nCertainty %d%%\n\n%s" %(delay_ms, distance_m, certainty, phase_message)
+                    polarity_message = "Reversed phase"                
+                channelInfo_message = ""
 
-                if message <> self.previous_message:
-                    self.delay_label.setText(message)
-                    self.previous_message = message
+                if delay_message <> self.previous_delay_message:
+                    self.delay_label.setText(delay_message)
+                    self.previous_delay_message = delay_message
+                if certainty_message <> self.previous_certainty_message:
+                    self.certainty_label.setText(certainty_message)
+                    self.previous_certainty_message = certainty_message
+                if polarity_message <> self.previous_polarity_message:
+                    self.polarity_label.setText(polarity_message)
+                    self.previous_polarity_message = polarity_message
+                if channelInfo_message <> self.previous_channelInfo_message:
+                    self.channelInfo_label.setText(channelInfo_message)
+                    self.previous_channelInfo_message = channelInfo_message
 
             self.i += 1
     
