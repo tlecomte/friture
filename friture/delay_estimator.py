@@ -67,7 +67,7 @@ class Delay_Estimator_Widget(QtGui.QWidget):
             self.logger = logger
         
         self.previous_delay_message = ""
-        self.previous_certainty_message = ""
+        self.previous_correlation_message = ""
         self.previous_polarity_message = ""
         self.previous_channelInfo_message = ""
         
@@ -88,13 +88,12 @@ class Delay_Estimator_Widget(QtGui.QWidget):
         self.delayText_label.setObjectName("delayText_label")
         self.delayText_label.setText("Delay:")
 
-        self.certainty_label = QtGui.QLabel(self)
-        #self.certainty_label.setFont(font)
-        self.certainty_label.setObjectName("Certainty_label")
+        self.correlation_label = QtGui.QLabel(self)
+        self.correlation_label.setObjectName("Correlation_label")
         
-        self.certaintyText_label = QtGui.QLabel(self)
-        self.certaintyText_label.setObjectName("certaintyText_label")
-        self.certaintyText_label.setText("Certainty:")
+        self.correlationText_label = QtGui.QLabel(self)
+        self.correlationText_label.setObjectName("correlationText_label")
+        self.correlationText_label.setText("Correlation:")
 
         self.polarity_label = QtGui.QLabel(self)
         self.polarity_label.setFont(font)
@@ -108,7 +107,7 @@ class Delay_Estimator_Widget(QtGui.QWidget):
         self.channelInfo_label.setObjectName("channelInfo_label")
         
         self.layout.addRow(self.delayText_label, self.delay_label)
-        self.layout.addRow(self.certaintyText_label, self.certainty_label)
+        self.layout.addRow(self.correlationText_label, self.correlation_label)
         self.layout.addRow(self.polarityText_label, self.polarity_label)
         self.layout.addRow(None, self.channelInfo_label)
         
@@ -155,8 +154,8 @@ in the setup window."""
             if message <> self.previous_channelInfo_message:
                 self.previous_delay_message = "N/A ms\n(N/A m)"
                 self.delay_label.setText(self.previous_delay_message)
-                self.previous_certainty_message = "N/A %"
-                self.certainty_label.setText(self.previous_certainty_message)
+                self.previous_correlation_message = "N/A %"
+                self.correlation_label.setText(self.previous_correlation_message)
                 self.previous_polarity_message = "N/A"
                 self.polarity_label.setText(self.previous_polarity_message)
                 self.channelInfo_label.setText(message)
@@ -208,10 +207,10 @@ in the setup window."""
                 c = 340. # speed of sound, in meters per second (approximate)
                 distance_m = delay_ms*1e-3*c
 
-                certainty = int(abs(Xcorr_max_norm)*100)                
+                correlation = int(abs(Xcorr_max_norm)*100)                
                 
                 delay_message = "%.1f ms\n(%.2f m)" %(delay_ms, distance_m)
-                certainty_message = "%d%%" %(certainty)
+                correlation_message = "%d%%" %(correlation)
                 if Xcorr_max_norm >= 0:
                     polarity_message = "In-phase"
                 else:
@@ -221,15 +220,16 @@ in the setup window."""
                 if delay_message <> self.previous_delay_message:
                     self.delay_label.setText(delay_message)
                     self.previous_delay_message = delay_message
-                if certainty_message <> self.previous_certainty_message:
-                    self.certainty_label.setText(certainty_message)
-                    self.previous_certainty_message = certainty_message
+                if correlation_message <> self.previous_correlation_message:
+                    self.correlation_label.setText(correlation_message)
+                    self.previous_correlation_message = correlation_message
                 if polarity_message <> self.previous_polarity_message:
                     self.polarity_label.setText(polarity_message)
                     self.previous_polarity_message = polarity_message
                 if channelInfo_message <> self.previous_channelInfo_message:
                     self.channelInfo_label.setText(channelInfo_message)
                     self.previous_channelInfo_message = channelInfo_message
+
 
             self.i += 1
     
