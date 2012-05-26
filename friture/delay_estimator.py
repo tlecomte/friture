@@ -85,9 +85,11 @@ class Delay_Estimator_Widget(QtGui.QWidget):
         # We will decimate several times
         # no decimation => 1/fs = 23 µs resolution
         # 1 ms resolution => fs = 1000 Hz is enough => can divide the sampling rate by 44 !
-        # => can decimate 5 times (2**5 = 32 => 0.7 ms resolution)!
-        # if I decimate 2 times (2**2 = 4 => 0.092 ms resolution)!
-        # if I decimate 3 times (2**3 = 8 => 0.184 ms resolution)!
+        # if I decimate 2 times (2**2 = 4 => 0.092 ms (3 cm) resolution)!
+        # if I decimate 3 times (2**3 = 8 => 0.184 ms (6 cm) resolution)!
+        # if I decimate 5 times (2**5 = 32 => 0.7 ms (24 cm) resolution)!
+        # (actually, I could fit a gaussian on the cross-correlation peak to get
+        # higher resolution even at low sample rates)
         self.Ndec = 3
         self.subsampled_sampling_rate = SAMPLING_RATE/2**(self.Ndec)
         [self.bdec, self.adec] = generated_filters.params['dec']
@@ -171,7 +173,7 @@ in the setup window."""
                 else:
                     phase_message = "Reversed phase"
                 
-                message = "%.1f ms\n(%.1f m)\n\nCertainty %d%%\n\n%s" %(delay_ms, distance_m, certainty, phase_message)
+                message = "%.1f ms\n(%.2f m)\n\nCertainty %d%%\n\n%s" %(delay_ms, distance_m, certainty, phase_message)
 
                 if message <> self.previous_message:
                     self.delay_label.setText(message)
