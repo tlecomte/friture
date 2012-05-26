@@ -142,7 +142,9 @@ in the setup window."""
                 length = time*self.subsampled_sampling_rate
                 d0 = self.ringbuffer0.data(length)
                 d1 = self.ringbuffer1.data(length)
-                if d0.size>0 and numpy.std(d0)>0. and numpy.std(d1)>0.:
+                std0 = numpy.std(d0)
+                std1 = numpy.std(d1)
+                if d0.size>0 and std0>0. and std1>0.:
                     # substract the means
                     # (in order to get a normalized cross-correlation at the end)
                     d0 -= d0.mean()
@@ -156,8 +158,7 @@ in the setup window."""
                     absXcorr = numpy.abs(Xcorr)
                     i = argmax(absXcorr)
                     # normalize
-                    Xcorr_max_norm = Xcorr[0,i]/(d0.size*numpy.std(d0)*numpy.std(d1))
-                    #print Xcorr_max_norm
+                    Xcorr_max_norm = Xcorr[0,i]/(d0.size*std0*std1)
                     delay_ms = 1e3*float(i)/self.subsampled_sampling_rate
                 else:
                     delay_ms = 0.
@@ -178,13 +179,6 @@ in the setup window."""
                 if message <> self.previous_message:
                     self.delay_label.setText(message)
                     self.previous_message = message
-
-                #max = absXcorr[0,i]
-                #mean = absXcorr[0,:].mean()
-                # Three standard deviations account for 99.7% of the sample population
-                #std = numpy.std(Xcorr[0,:])
-                #ratio = max/(3.*std)
-                #print "argmax = %d = %f ms, value = %g, std = %g, ratio = %g" %(i, delay_ms, max, std, ratio)
 
             self.i += 1
     
