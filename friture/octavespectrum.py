@@ -21,7 +21,8 @@ from PyQt4 import QtGui
 from numpy import log10, array, arange
 from friture.histplot import HistPlot
 from friture.octavespectrum_settings import OctaveSpectrum_Settings_Dialog # settings dialog
-from friture.filter import octave_filter_bank_decimation, octave_frequencies, octave_filter_bank_decimation_filtic
+from friture.filter import (octave_filter_bank_decimation, octave_frequencies,
+                            octave_filter_bank_decimation_filtic, NOCTAVE)
 
 from friture.exp_smoothing_conv import pyx_exp_smoothed_value
 
@@ -29,7 +30,6 @@ from friture import generated_filters
 
 SMOOTH_DISPLAY_TIMER_PERIOD_MS = 25
 SAMPLING_RATE = 44100
-NOCTAVE = 8
 
 STYLESHEET = """
 QwtPlotCanvas {
