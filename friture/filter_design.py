@@ -9,12 +9,14 @@ scipy.factorial = factorial
 #importing from scipy.signal.signaltools and scipy.signal.filter_design instead of scipy.signal
 #decreases dramatically the number of modules imported
 from scipy.signal.signaltools import lfilter
-from scipy.signal.filter_design import ellip, butter, firwin, cheby1, iirdesign, freqz
+from scipy.signal.filter_design import ellip, butter, cheby1, iirdesign, freqz
+from scipy.signal.fir_filter_design import firwin
 
 # allow this script to properly import other friture modules
 import sys
 sys.path.insert(0, '.')
-from friture.filter import octave_frequencies, octave_filter_bank, octave_filter_bank_decimation
+from friture.filter import (octave_frequencies, octave_filter_bank,
+                            octave_filter_bank_decimation, NOCTAVE)
 
 # bank of filters for any other kind of frequency scale
 # http://cobweb.ecn.purdue.edu/~malcolm/apple/tr35/PattersonsEar.pdf
@@ -25,8 +27,6 @@ from friture.filter import octave_frequencies, octave_filter_bank, octave_filter
 EarQ = 9.26449 # Glasberg and Moore Parameters
 minBW = 24.7
 order = 1.
-
-NOCTAVE = 8
 
 def frequencies(fs, numChannels, lowFreq):
 	channels = arange(0, numChannels)
@@ -102,6 +102,7 @@ def octave_filters(Nbands, BandsPerOctave):
 	wi = fi/(fs/2.) # normalized frequencies
 	w_low = f_low/(fs/2.)
 	w_high = f_high/(fs/2.)
+	w_high = (w_high<1.)*w_high + (w_high>=1.)*1.
 
 	B = []
 	A = []
@@ -119,11 +120,6 @@ def octave_filters(Nbands, BandsPerOctave):
 		
 	return [B, A, fi, f_low, f_high]
 
-# Note : A way to make the filtering more efficient is to do it with IIR + decimation
-# instead of IIR only
-# More precisely, we design as much filters as bands per octave (instead of total number
-# of bands), and apply it several times on repeatedly decimated signal to go from one octave
-# to its lower neighbor
 def octave_filters_oneoctave(Nbands, BandsPerOctave):
 	# Bandpass Filter Generation
 	pbrip = .5	# Pass band ripple
@@ -141,6 +137,7 @@ def octave_filters_oneoctave(Nbands, BandsPerOctave):
 	wi = fi/(fs/2.) # normalized frequencies
 	w_low = f_low/(fs/2.)
 	w_high = f_high/(fs/2.)
+	w_high = (w_high<1.)*w_high + (w_high>=1.)*1.
 
 	B = []
 	A = []
