@@ -55,9 +55,6 @@ def octave_frequencies(Nbands, BandsPerOctave):
 	else:
 		i = arange(-imax, imax + 1)
 
-	# shift the frequency array to avoid the cutoff bands
-	i -= 1
-
 	if BandsPerOctave%2 == 1:
 	 	fi = f0 * 2**(i*b)
 	else:

@@ -22,7 +22,7 @@ from pyaudio import PyAudio, paInt16
 from numpy import floor, int16, fromstring, vstack
 
 # the sample rate below should be dynamic, taken from PyAudio/PortAudio
-SAMPLING_RATE = 44100
+SAMPLING_RATE = 48000
 FRAMES_PER_BUFFER = 1024
 
 class AudioBackend(QtCore.QObject):
