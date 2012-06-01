@@ -18,9 +18,9 @@
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
 from PyQt4 import QtGui, QtCore
+from friture.audiobackend import SAMPLING_RATE
 
 # shared with spectrum_settings.py
-SAMPLING_RATE = 44100
 DEFAULT_FFT_SIZE = 7 #4096 points
 DEFAULT_FREQ_SCALE = 1 #log10
 DEFAULT_MAXFREQ = 20000

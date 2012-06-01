@@ -28,8 +28,9 @@ from friture.exp_smoothing_conv import pyx_exp_smoothed_value
 
 from friture import generated_filters
 
+from friture.audiobackend import SAMPLING_RATE
+
 SMOOTH_DISPLAY_TIMER_PERIOD_MS = 25
-SAMPLING_RATE = 44100
 
 STYLESHEET = """
 QwtPlotCanvas {

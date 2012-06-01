@@ -25,6 +25,8 @@ from friture.audioproc import audioproc
 
 from friture.exp_smoothing_conv import pyx_exp_smoothed_value
 
+from friture.audiobackend import SAMPLING_RATE
+
 STYLESHEET = """
 qsynthMeter {
 border: 1px solid gray;
@@ -35,7 +37,6 @@ padding: 1px;
 
 SMOOTH_DISPLAY_TIMER_PERIOD_MS = 25
 LEVEL_TEXT_LABEL_PERIOD_MS = 250
-SAMPLING_RATE = 44100
 
 LEVEL_TEXT_LABEL_STEPS = LEVEL_TEXT_LABEL_PERIOD_MS/SMOOTH_DISPLAY_TIMER_PERIOD_MS
 

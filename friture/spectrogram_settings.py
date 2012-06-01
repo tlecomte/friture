@@ -18,8 +18,7 @@
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
 from PyQt4 import QtGui, QtCore
-
-SAMPLING_RATE = 44100
+from friture.audiobackend import SAMPLING_RATE
 
 # shared with spectrogram.py
 DEFAULT_FFT_SIZE = 7 #4096 points

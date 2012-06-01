@@ -25,7 +25,7 @@ from filter import decimate
 from friture import generated_filters
 from ringbuffer import RingBuffer
 
-SAMPLING_RATE = 44100
+from friture.audiobackend import SAMPLING_RATE
 
 DEFAULT_DELAYRANGE = 1 # default delay range is 1 second
 

@@ -22,9 +22,9 @@ from numpy import log10, where, linspace
 from friture.imageplot import ImagePlot
 from friture.audioproc import audioproc # audio processing class
 from friture.spectrogram_settings import Spectrogram_Settings_Dialog# settings dialog
+from friture.audiobackend import SAMPLING_RATE
 
 SMOOTH_DISPLAY_TIMER_PERIOD_MS = 25
-SAMPLING_RATE = 44100
 
 # shared with spectrogram_settings.py
 DEFAULT_FFT_SIZE = 7 #4096 points

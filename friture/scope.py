@@ -21,9 +21,9 @@ from PyQt4 import QtGui
 from numpy import log10, where, linspace, sign, arange
 from friture.timeplot import TimePlot
 from friture.scope_settings import Scope_Settings_Dialog # settings dialog
+from friture.audiobackend import SAMPLING_RATE
 
 SMOOTH_DISPLAY_TIMER_PERIOD_MS = 25
-SAMPLING_RATE = 44100
 
 STYLESHEET = """
 QwtPlotCanvas {

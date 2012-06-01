@@ -19,8 +19,7 @@
 
 from numpy import linspace, abs, log2, floor, log10, cos, arange, pi
 from numpy.fft import rfft
-# the sample rate below should be dynamic, taken from PyAudio/PortAudio
-SAMPLING_RATE = 44100
+from friture.audiobackend import SAMPLING_RATE
 
 #from cochlear import MakeERBFilters, ERBFilterBank, frequencies
 

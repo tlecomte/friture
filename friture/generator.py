@@ -21,9 +21,9 @@ from PyQt4 import QtGui, QtCore
 import numpy as np
 import pyaudio
 from numpy.random import standard_normal
+from friture.audiobackend import SAMPLING_RATE
 
 SMOOTH_DISPLAY_TIMER_PERIOD_MS = 25
-SAMPLING_RATE = 44100
 
 FRAMES_PER_BUFFER = 2*1024
 
