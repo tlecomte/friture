@@ -7,6 +7,7 @@ import sys
 
 from PyQt4 import QtCore, QtGui, QtOpenGL, Qt
 import PyQt4.Qwt5 as Qwt
+from friture.audiobackend import SAMPLING_RATE
 
 try:
     from OpenGL import GL
@@ -178,7 +179,7 @@ class GLPlotWidget(QtGui.QWidget):
         x1[0] = 1e-10
         x1[1:] = (x[1:] + x[:-1])/2.
         x2[:-1] = x1[1:]
-        x2[-1] = 22050.
+        x2[-1] = float(SAMPLING_RATE/2)
         
         if len(x1) <> len(self.x1):
             self.needtransform = True
