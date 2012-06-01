@@ -20,6 +20,7 @@
 import numpy
 from PyQt4 import Qt, QtCore, QtGui
 import PyQt4.Qwt5 as Qwt
+from friture.audiobackend import SAMPLING_RATE
 
 class CanvasScaledSpectrogram(QtCore.QObject):
 	def __init__(self, logger, spectrum_length = 129, T = 10., canvas_height = 2,  canvas_width = 2):
@@ -62,7 +63,7 @@ class CanvasScaledSpectrogram(QtCore.QObject):
 		self.offset = 0
 
 	def time_bin_number(self):
-		sampling_rate = 44100.
+		sampling_rate = SAMPLING_RATE
 		Dt = 2*2.*(self.spectrum_length-1)/sampling_rate
 		return self.T/Dt
 		

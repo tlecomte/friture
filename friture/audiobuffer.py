@@ -18,6 +18,7 @@
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
 from friture.ringbuffer import RingBuffer
+from friture.audiobackend import SAMPLING_RATE
 
 FRAMES_PER_BUFFER = 1024
 
@@ -47,4 +48,4 @@ class AudioBuffer():
 		return data
 
 	def set_delay_ms(self, delay_ms):
-		self.delay_samples = delay_ms*1e-3*44100
+		self.delay_samples = delay_ms*1e-3*SAMPLING_RATE
