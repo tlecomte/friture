@@ -18,6 +18,8 @@ sys.path.insert(0, '.')
 from friture.filter import (octave_frequencies, octave_filter_bank,
                             octave_filter_bank_decimation, NOCTAVE)
 
+from friture.audiobackend import SAMPLING_RATE
+
 # bank of filters for any other kind of frequency scale
 # http://cobweb.ecn.purdue.edu/~malcolm/apple/tr35/PattersonsEar.pdf
 # bandwidth of a cochlear channel as a function of center frequency
@@ -98,7 +100,7 @@ def octave_filters(Nbands, BandsPerOctave):
 
 	fi, f_low, f_high = octave_frequencies(Nbands, BandsPerOctave)
 
-	fs = 44100 # sampling rate
+	fs = SAMPLING_RATE
 	wi = fi/(fs/2.) # normalized frequencies
 	w_low = f_low/(fs/2.)
 	w_high = f_high/(fs/2.)
@@ -133,7 +135,7 @@ def octave_filters_oneoctave(Nbands, BandsPerOctave):
 	f_low  = f_low[-BandsPerOctave:]
 	f_high = f_high[-BandsPerOctave:]
 
-	fs = 44100 # sampling rate
+	fs = SAMPLING_RATE
 	wi = fi/(fs/2.) # normalized frequencies
 	w_low = f_low/(fs/2.)
 	w_high = f_high/(fs/2.)
@@ -201,7 +203,7 @@ def main():
 	from numpy import log10, linspace, interp, angle, array, concatenate
 
 	N = 2048*2*2
-	fs = 44100.
+	fs = float(SAMPLING_RATE)
 	Nchannels = 20
 	low_freq = 20.
 
