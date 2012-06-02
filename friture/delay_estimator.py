@@ -193,12 +193,20 @@ in the setup window."""
                     D0 = rfft(d0)
                     D1 = rfft(d1)
                     D0r = D0.conjugate()
-                    Xcorr = irfft(D0r*D1)
+                    G = D0r*D1
+                    G = (G==0.)*1e-30 + (G<>0.)*G
+                    #W = 1. # frequency unweighted
+                    W = 1./numpy.abs(G) # "PHAT"
+                    #D1r = D1.conjugate(); G0 = D0r*D0; G1 = D1r*D1; W = numpy.abs(G)/(G0*G1) # HB weighted
+                    Xcorr = irfft(W*G)
+                    Xcorr_unweighted = irfft(G) # FIXME I only use one 
+                    #numpy.save("d0.npy", d0)
+                    #numpy.save("d1.npy", d1)
                     #numpy.save("Xcorr.npy", Xcorr)
                     absXcorr = numpy.abs(Xcorr)
                     i = argmax(absXcorr)
                     # normalize
-                    Xcorr_max_norm = Xcorr[0,i]/(d0.size*std0*std1)
+                    Xcorr_max_norm = Xcorr_unweighted[0,i]/(d0.size*std0*std1)
                     delay_ms = 1e3*float(i)/self.subsampled_sampling_rate
                 else:
                     delay_ms = 0.
