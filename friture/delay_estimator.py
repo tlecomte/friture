@@ -127,7 +127,8 @@ class Delay_Estimator_Widget(QtGui.QWidget):
         self.Ndec = 3
         self.subsampled_sampling_rate = SAMPLING_RATE/2**(self.Ndec)
         [self.bdec, self.adec] = generated_filters.params['dec']
-        self.zfs = subsampler_filtic(self.Ndec, self.bdec, self.adec)
+        self.zfs0 = subsampler_filtic(self.Ndec, self.bdec, self.adec)
+        self.zfs1 = subsampler_filtic(self.Ndec, self.bdec, self.adec)
 
         # ringbuffers for the subsampled data        
         self.ringbuffer0 = RingBuffer()
@@ -168,8 +169,8 @@ in the setup window."""
             x0 = floatdata[0,:]
             x1 = floatdata[1,:]
             #subsample them
-            x0_dec, self.zfs = subsampler(self.Ndec, self.bdec, self.adec, x0, self.zfs)
-            x1_dec, self.zfs = subsampler(self.Ndec, self.bdec, self.adec, x1, self.zfs)
+            x0_dec, self.zfs0 = subsampler(self.Ndec, self.bdec, self.adec, x0, self.zfs0)
+            x1_dec, self.zfs1 = subsampler(self.Ndec, self.bdec, self.adec, x1, self.zfs1)
             # push to a 1-second ring buffer
             x0_dec.shape = (1, x0_dec.size)
             x1_dec.shape = (1, x1_dec.size)
