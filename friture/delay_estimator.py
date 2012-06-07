@@ -244,7 +244,7 @@ in the setup window."""
                 x = (slope*x)**p
                 correlation = int((x/(1. + x))*100)
                 
-                delay_message = "%.1f ms\n(%.2f m)" %(delay_ms, distance_m)
+                delay_message = "%.1f ms\n= %.2f m" %(delay_ms, distance_m)
                 correlation_message = "%d%%" %(correlation)
                 if Xcorr_extremum >= 0:
                     polarity_message = "In-phase"
