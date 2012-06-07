@@ -61,6 +61,9 @@ class AudioBackend(QtCore.QObject):
 		else:
    			self.second_channel = 1
 
+		# counter for the number of input buffer overflows
+		self.xruns = 0
+
 	# method
 	def get_readable_devices_list(self):
 		devices_list = []
@@ -290,8 +293,8 @@ class AudioBackend(QtCore.QObject):
 			except IOError as inst:
 				# FIXME specialize this exception handling code
 				# to treat overflow errors particularly
-				print inst
-				print "Caught an IOError on stream read."
+				self.xruns += 1
+				print "Caught an IOError on stream read.", inst
 				break
 			floatdata = fromstring(rawdata, int16)[channel::nchannels]/(2.**(16-1))
 			if self.duo_input:                            			

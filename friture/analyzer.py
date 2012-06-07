@@ -297,8 +297,9 @@ class Friture(QMainWindow, ):
 		    
 		label = "Chunk #%d\n"\
 		"Audio buffer retrieval: %.02f ms\n"\
-		"Global CPU usage: %d %%"\
-		% (self.chunk_number, self.buffer_timer_time, self.cpu_percent)
+		"Global CPU usage: %d %%\n"\
+		"Number of overflowed inputs (XRUNs): %d"\
+		% (self.chunk_number, self.buffer_timer_time, self.cpu_percent, self.audiobackend.xruns)
 		
 		self.about_dialog.LabelStats.setText(label)
 
