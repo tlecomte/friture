@@ -93,7 +93,7 @@ class Delay_Estimator_Widget(QtGui.QWidget):
         
         self.correlationText_label = QtGui.QLabel(self)
         self.correlationText_label.setObjectName("correlationText_label")
-        self.correlationText_label.setText("Correlation:")
+        self.correlationText_label.setText("Confidence:")
 
         self.polarity_label = QtGui.QLabel(self)
         self.polarity_label.setFont(font)
