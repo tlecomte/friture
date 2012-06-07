@@ -124,7 +124,7 @@ class Delay_Estimator_Widget(QtGui.QWidget):
         # if I decimate 5 times (2**5 = 32 => 0.7 ms (24 cm) resolution)!
         # (actually, I could fit a gaussian on the cross-correlation peak to get
         # higher resolution even at low sample rates)
-        self.Ndec = 3
+        self.Ndec = 2
         self.subsampled_sampling_rate = SAMPLING_RATE/2**(self.Ndec)
         [self.bdec, self.adec] = generated_filters.params['dec']
         self.zfs0 = subsampler_filtic(self.Ndec, self.bdec, self.adec)
@@ -135,6 +135,8 @@ class Delay_Estimator_Widget(QtGui.QWidget):
         self.ringbuffer1 = RingBuffer()
         
         self.delayrange_s = DEFAULT_DELAYRANGE # confidence range
+        
+        self.old_Xcorr = None
 
     # method
     def set_buffer(self, buffer):
@@ -177,13 +179,15 @@ in the setup window."""
             self.ringbuffer0.push(x0_dec)
             self.ringbuffer1.push(x1_dec)
 
-            if (self.i==10):
+            if (self.i==5):
                 self.i = 0
                 # retrieve last one-second of data
                 time = 2*self.delayrange_s
                 length = time*self.subsampled_sampling_rate
                 d0 = self.ringbuffer0.data(length)
                 d1 = self.ringbuffer1.data(length)
+                d0.shape = (d0.size)
+                d1.shape = (d1.size)
                 std0 = numpy.std(d0)
                 std1 = numpy.std(d1)
                 if d0.size>0 and std0>0. and std1>0.:
@@ -201,27 +205,48 @@ in the setup window."""
                     W = 1./numpy.abs(G) # "PHAT"
                     #D1r = D1.conjugate(); G0 = D0r*D0; G1 = D1r*D1; W = numpy.abs(G)/(G0*G1) # HB weighted
                     Xcorr = irfft(W*G)
-                    Xcorr_unweighted = irfft(G) # FIXME I only use one 
+                    #Xcorr_unweighted = irfft(G)
                     #numpy.save("d0.npy", d0)
                     #numpy.save("d1.npy", d1)
                     #numpy.save("Xcorr.npy", Xcorr)
+
+                    if self.old_Xcorr != None and self.old_Xcorr.shape == Xcorr.shape:
+                        # smoothing
+                        alpha = 0.2
+                        Xcorr = alpha*Xcorr + (1. - alpha)*self.old_Xcorr
+                    
                     absXcorr = numpy.abs(Xcorr)
                     i = argmax(absXcorr)
                     # normalize
-                    Xcorr_max_norm = Xcorr_unweighted[0,i]/(d0.size*std0*std1)
+                    #Xcorr_max_norm = Xcorr_unweighted[i]/(d0.size*std0*std1)
+                    Xcorr_extremum = Xcorr[i]
+                    Xcorr_max_norm = abs(Xcorr[i])/(3*numpy.std(Xcorr))
                     delay_ms = 1e3*float(i)/self.subsampled_sampling_rate
+                
+                    # store for smoothing
+                    self.old_Xcorr = Xcorr
                 else:
                     delay_ms = 0.
                     Xcorr_max_norm = 0.
+                    Xcorr_extremum = 0.
+
+                # debug wrong phase detection
+                #if Xcorr[i] < 0.:
+                #    numpy.save("Xcorr.npy", Xcorr)
 
                 c = 340. # speed of sound, in meters per second (approximate)
                 distance_m = delay_ms*1e-3*c
 
-                correlation = int(abs(Xcorr_max_norm)*100)                
+                # home-made measure of the significance
+                slope = 0.12
+                p = 3
+                x = (Xcorr_max_norm>1.)*(Xcorr_max_norm-1.)
+                x = (slope*x)**p
+                correlation = int((x/(1. + x))*100)
                 
                 delay_message = "%.1f ms\n(%.2f m)" %(delay_ms, distance_m)
                 correlation_message = "%d%%" %(correlation)
-                if Xcorr_max_norm >= 0:
+                if Xcorr_extremum >= 0:
                     polarity_message = "In-phase"
                 else:
                     polarity_message = "Reversed phase"                
