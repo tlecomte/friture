@@ -2,6 +2,41 @@ Friture Changelog
 (full changelog can be found in the git repository)
 
 HEAD
++   (levels) remove the bogus factor of 2 on the rms. Now the rms of a sine is
+    3dB below its peak, as expected.
++   (delay estimator) Increase the delay smoothing for more reliabilty
+
+Version 0.6 - 2012/06/07
++   (general) Track the number of Xruns. Display it in the about dialog,
+    in the statistics tab.
++   (delay estimator) Cross-correlation is time averaged for robustness, better
+    significance estimation, and phase info taken from the weighted
+    cross-correlation too.
++   (delay estimator) Use generalized cross-correlation computation, with PHAT
+    weighting. Now the estimation is much more robust in a reverberating
+    environment.
++   (general) Increase sample rate to 48000 Hz. This simplifies and improves the
+    quality of the filters in the octave spectrum.
++   (octave spectrum) Fix midband frequencies, so that they match the ISO
+    bands of an equalizer
+
+Version 0.5 - 2012/05/26
++   (delay estimator) The maximum reliably-estimated delay is now configurable.    
+    Just in case somebody needs more than one second
++    (delay estimator) Replace the peak detection by cross-correlation  
+    The cross-correlation is computed on (largely) subsampled data. It
+    not only provides the delay, but also the in-phase information,
+    and a measure of the correlation quality (value of the normalized
+    correlation coefficient).
++    Display the level labels with a 250 ms period.
+    This reduces the work that needs to be done (drawing text is
+    costly), and makes the values much more readable.
+
+Version 0.4 - 2012/05/18
++    First embryo of documentation
++    Add PyPI requirements.txt file, so that friture dependencies
+    be installed by 'pip'
++    New text file for user-readable changelog
 +    (generator) Test for zero mean before using it as a denominator
 +    (Pink noise generator) Fix the parameter k   
     k, the number of white channels to sum, was dynamic,
