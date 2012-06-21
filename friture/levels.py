@@ -161,7 +161,7 @@ class Levels_Widget(QtGui.QWidget):
 		value_rms = pyx_exp_smoothed_value(self.kernel, self.alpha, y1**2, self.old_rms)
 		self.old_rms = value_rms
 		
-		level_rms = 10.*log10(value_rms*2. + 0.*1e-80) #*2. to get 0dB for a sine wave
+		level_rms = 10.*log10(value_rms + 0.*1e-80)
 		level_max = 20.*log10(self.old_max + 0.*1e-80)
   
 		if self.i == LEVEL_TEXT_LABEL_STEPS:
@@ -197,7 +197,7 @@ class Levels_Widget(QtGui.QWidget):
 			value_rms = pyx_exp_smoothed_value(self.kernel, self.alpha, y2**2, self.old_rms_2)
 			self.old_rms_2 = value_rms
 			
-			level_rms_2 = 10.*log10(value_rms*2. + 0.*1e-80) #*2. to get 0dB for a sine wave
+			level_rms_2 = 10.*log10(value_rms + 0.*1e-80)
 			level_max_2 = 20.*log10(self.old_max_2 + 0.*1e-80)
 
 			#self.meter.m_iPortCount = 3
