@@ -2,6 +2,7 @@ Friture Changelog
 (full changelog can be found in the git repository)
 
 HEAD
++   (generator) Add ramps at start/stop to avoid undesirable bursts.
 +   (levels) remove the bogus factor of 2 on the rms. Now the rms of a sine is
     3dB below its peak, as expected.
 +   (delay estimator) Increase the delay smoothing for more reliabilty

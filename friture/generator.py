@@ -144,6 +144,7 @@ class Generator_Widget(QtGui.QWidget):
         self.burstLayout.addRow("Period:", self.spinBox_burst_period)
 
         self.t = 0.
+        self.playing = False
 
         self.audiobackend = audiobackend
 
@@ -290,7 +291,16 @@ class Generator_Widget(QtGui.QWidget):
     # method
     def update(self):
         if not self.startStopButton.isChecked():
-            return
+            if self.playing:
+                stopping = True
+                self.playing = False
+            else:
+                return
+        else:
+            if not self.playing:
+                self.playing = True
+                self.t = 0. # restart the counter
+            stopping = False
 
         # play
 
@@ -306,7 +316,7 @@ class Generator_Widget(QtGui.QWidget):
         if kind == 0:
             # sinusoid
             f = float(self.spinBox_sine_frequency.value())
-            floatdata = 0.99*np.sin(2.*np.pi*t*f)
+            floatdata = 0.99*np.sin(2.*np.pi*t*f)                
         elif kind == 1:
             # white noise
             floatdata = 0.99*standard_normal(n)
@@ -329,6 +339,16 @@ class Generator_Widget(QtGui.QWidget):
         else:
             print "generator error : index of signal type not found"
             return
+
+        # add smooth ramps at start/stop to avoid undesirable bursts
+        # FIXME this may not work if N is too small
+        ramp_length = 10e-3 # 10 ms
+        if self.t == 0.:
+            # add a ramp at the start of the sine
+            floatdata *= np.clip(t/ramp_length, 0., 1.)
+        if stopping:
+            # add a ramp at the end of the sine
+            floatdata *= np.clip((t.max() - t)/ramp_length, 0., 1.)
 
         # output channels are interleaved
         # we output to all channels simultaneously with the same data
