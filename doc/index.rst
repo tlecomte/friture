@@ -7,7 +7,7 @@
 
 .. Build the doc using 'sphinx-build -b html doc doc/_build'
 
-Welcome to Friture's documentation!
+Welcome to Friture documentation!
 ===================================
 
 This document contains some notes to help you use Friture to perform various
@@ -49,9 +49,9 @@ octave (one third octave resolution) is the best tool that you can use.
 Instructions:
     1. Plug a measurement microphone to the Left input channel.
     2. In Friture, add a new dock, and choose the Octave Spectrum in the widget list.
-    3. In the dock settings, ask for 3 bands per octave
+    3. In the dock settings, ask for 3 bands per octave.
     4. Play pink noise to your sound system (using Friture pink noise generator
-       if you will)
+       if you will).
     5. The ideal spectrum should be flat. Use an equalizer to raise the dips and
        lower the peaks in the spectrum.
 
@@ -59,23 +59,26 @@ Measure a delay, align audio sources
 ------------------------------------
 
 The Delay Estimator can identify and measure a delay between two audio streams.
-It works by locating energy peaks in the audio signals of each of the two
-channels. The Left channel should be the reference, i.e. the channel where the
-peak is heard first.
+It works by computing how much the audio signals look like each other depending
+on the relative delay, and looking for the maximum of similarity
+(mathematically, the "similarity" function is a generalized cross-correlation
+with a PHAT-transform weighting, time-smoothed by an exponential filter).
 
 Instructions:
-    1. Plug the reference channel (output of the burst generator, or output of
-       the mixing console) to the Left channel
-    2. Plug the delayed channel (measurement microphone) to the Right channel
+    1. Plug the reference signal (the output of the mixing console) to the Left
+       channel.
+    2. Plug the delayed channel (the measurement microphone) to the Right channel.
     3. Enable the two-channel mode in Friture settings, and make sure that the
-       First channel is the Left channel, and the Second channel is the Right channel
-    4. Add a new dock, and choose the Delay Estimator in the widget list
+       First channel is the Left channel, and the Second channel is the Right channel.
+    4. Add a new dock, and choose the Delay Estimator in the widget list.
     5. Play a Burst signal in your system (using Friture burst generator if you
        will), with a period of one second.
     6. The delay will be displayed in milliseconds and, equivalently, in meters.
-       If you see the message "Peaks fot found", it means that the signal is either too
-       weak, or saturated in one or both of the input channels, or the bursts are
-       masked by the ambiant noise in the measurement microphone channel.
+       If a meaningless delay is displayed, a low confidence is probably
+       displayed too, and it means that the signal is either too weak, or
+       saturated in one or both of the input channels, or the signal is
+       masked by the ambiant noise in the measurement microphone channel, or the
+       room is too reverberant.
 
 .. Indices and tables
    ==================
