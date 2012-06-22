@@ -36,6 +36,10 @@ DEFAULT_SWEEP_PERIOD_S = 1.
 
 PINK_FIDELITY = 100.
 
+RAMP_LENGTH = 10e-3 # 10 ms
+
+(stopped, starting, playing, stopping) = range(0, 4)
+
 def pinknoise(n, rvs=standard_normal):
     if n==0:
         return np.zeros((0,))
@@ -144,7 +148,9 @@ class Generator_Widget(QtGui.QWidget):
         self.burstLayout.addRow("Period:", self.spinBox_burst_period)
 
         self.t = 0.
-        self.playing = False
+        self.t_start = 0.
+        self.t_stop = RAMP_LENGTH
+        self.state = stopped
 
         self.audiobackend = audiobackend
 
@@ -285,27 +291,28 @@ class Generator_Widget(QtGui.QWidget):
     def startStopButton_toggle(self, checked):
         if checked:
             self.startStopButton.setText("Stop")
+            if self.state == stopped or self.state == stopping:
+                self.state = starting
+                self.t_start = 0.
         else:
             self.startStopButton.setText("Start")
+            if self.state == playing or self.state == starting:
+                self.state = stopping
+                self.t_stop = RAMP_LENGTH
 
     # method
     def update(self):
-        if not self.startStopButton.isChecked():
-            if self.playing:
-                stopping = True
-                self.playing = False
-            else:
-                return
-        else:
-            if not self.playing:
-                self.playing = True
-                self.t = 0. # restart the counter
-            stopping = False
+        if self.state == stopped:
+            return
 
         # play
 
         # maximum number of frames that can be written without waiting
         N = self.stream.get_write_available()
+        
+        # if we cannot write any sample, return now
+        if N==0:
+            return
 
         #t = self.t + np.arange(0, 5*SMOOTH_DISPLAY_TIMER_PERIOD_MS*1e-3, 1./float(SAMPLING_RATE))
         t = self.t + np.arange(0, N/float(SAMPLING_RATE), 1./float(SAMPLING_RATE))
@@ -341,14 +348,23 @@ class Generator_Widget(QtGui.QWidget):
             return
 
         # add smooth ramps at start/stop to avoid undesirable bursts
-        # FIXME this may not work if N is too small
-        ramp_length = 10e-3 # 10 ms
-        if self.t == 0.:
-            # add a ramp at the start of the sine
-            floatdata *= np.clip(t/ramp_length, 0., 1.)
-        if stopping:
-            # add a ramp at the end of the sine
-            floatdata *= np.clip((t.max() - t)/ramp_length, 0., 1.)
+        if self.state == starting:
+            # add a ramp at the start
+            t_ramp = self.t_start + np.arange(0, N/float(SAMPLING_RATE), 1./float(SAMPLING_RATE))
+            t_ramp = np.clip(t_ramp, 0., RAMP_LENGTH)
+            floatdata *= t_ramp/RAMP_LENGTH
+            self.t_start += N/float(SAMPLING_RATE)
+            if self.t_start > RAMP_LENGTH:
+                self.state = playing
+        
+        if self.state == stopping:
+            # add a ramp at the end
+            t_ramp = self.t_stop - np.arange(0, N/float(SAMPLING_RATE), 1./float(SAMPLING_RATE))
+            t_ramp = np.clip(t_ramp, 0., RAMP_LENGTH)
+            floatdata *= t_ramp/RAMP_LENGTH
+            self.t_stop -= N/float(SAMPLING_RATE)
+            if self.t_stop < 0.:
+                self.state = stopped
 
         # output channels are interleaved
         # we output to all channels simultaneously with the same data
@@ -360,8 +376,7 @@ class Generator_Widget(QtGui.QWidget):
         self.stream.write(chardata)
 
         # update the time counter
-        if N > 0:
-            self.t += N/float(SAMPLING_RATE)
+        self.t += N/float(SAMPLING_RATE)
 
     def saveState(self, settings):
         settings.setValue("generator kind", self.comboBox_generator_kind.currentIndex())
