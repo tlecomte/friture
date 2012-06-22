@@ -607,9 +607,13 @@ class GLWidget(QtOpenGL.QGLWidget):
         self.mousex = event.x()
         self.mousey = event.y()
         self.ruler = True
+        # ask for update so the the ruler is actually painted
+        self.update()
 
     def mouseReleaseEvent(self, event):
         self.ruler = False
+        # ask for update so the the ruler is actually erased
+        self.update()
 
     def mouseMoveEvent(self, event):
         if event.buttons() & QtCore.Qt.LeftButton:
