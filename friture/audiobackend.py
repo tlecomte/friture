@@ -23,7 +23,8 @@ from numpy import floor, int16, fromstring, vstack
 
 # the sample rate below should be dynamic, taken from PyAudio/PortAudio
 SAMPLING_RATE = 48000
-FRAMES_PER_BUFFER = 1024
+FRAMES_PER_BUFFER = 1024 # FIXME this parameter seems to have no effect on the
+# actual frames_per_buffer used by PortAudio. Is it a bug in PyAudio ?
 
 class AudioBackend(QtCore.QObject):
 	def __init__(self, logger):
@@ -285,6 +286,10 @@ class AudioBackend(QtCore.QObject):
 
 		# read what is available
 		# we read by multiples of FRAMES_PER_BUFFER, otherwise segfaults !
+
+		#print available, int(floor(available/FRAMES_PER_BUFFER))
+		#FIXME no less than 2048 samples at each stream read ??
+
 		available = int(floor(available/FRAMES_PER_BUFFER))
 		for j in range(0, available):
 			chunks += 1
