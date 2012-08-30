@@ -68,8 +68,7 @@ class CentralWidget(QtGui.QWidget):
 		elif item is 2:
 			self.audiowidget = Spectrum_Widget(self, self.logger)
 		elif item is 3:
-			self.audiowidget = Spectrogram_Widget(self, self.logger)
-			self.audiowidget.timer.start()
+			self.audiowidget = Spectrogram_Widget(self, self.parent.parent().audiobackend, self.logger)
 		elif item is 4:
 			self.audiowidget = OctaveSpectrum_Widget(self, self.logger)
 		elif item is 5:

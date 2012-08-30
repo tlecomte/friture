@@ -69,8 +69,10 @@ class Spectrum_Widget(QtGui.QWidget):
 		self.proc = audioproc(self.logger)
 		
 		self.maxfreq = DEFAULT_MAXFREQ
+		self.proc.set_maxfreq(self.maxfreq)
 		self.minfreq = DEFAULT_MINFREQ
 		self.fft_size = 2**DEFAULT_FFT_SIZE*32
+		self.proc.set_fftsize(self.fft_size)
 		self.spec_min = DEFAULT_SPEC_MIN
 		self.spec_max = DEFAULT_SPEC_MAX
 		self.weighting = DEFAULT_WEIGHTING
@@ -98,20 +100,23 @@ class Spectrum_Widget(QtGui.QWidget):
 		floatdata = self.audiobuffer.data(self.fft_size)
 
 		# first channel
-		sp1, freq, A, B, C = self.proc.analyzelive(floatdata[0,:], self.fft_size, self.maxfreq)
+		sp1 = self.proc.analyzelive(floatdata[0,:])
 
 		if self.dual_channels and floatdata.shape[0] > 1:
 			# second channel for comparison
-			sp2, freq, A, B, C  = self.proc.analyzelive(floatdata[1,:], self.fft_size, self.maxfreq)   
+			sp2, freq, A, B, C  = self.proc.analyzelive(floatdata[1,:])
 
 			floatdata_delayed = self.audiobuffer.data_delayed(self.fft_size)
-			sp1, freq, A, B, C  = self.proc.analyzelive(floatdata_delayed[0,:], self.fft_size, self.maxfreq)   
+			sp1  = self.proc.analyzelive(floatdata_delayed[0,:])
 
 		#sp, freq = self.proc.analyzelive_cochlear(floatdata, 50, minfreq, maxfreq)
 		# scale the db spectrum from [- spec_range db ... 0 db] > [0..1]
 		#print freq[len(freq)/6], A[len(freq)/6]
 		epsilon = 1e-30
 		
+		freq = self.proc.get_freq_scale()
+		A, B, C = self.proc.get_freq_weighting()
+
 		if self.weighting is 0:
 			w = 0.
 		elif self.weighting is 1:
@@ -124,9 +129,9 @@ class Spectrum_Widget(QtGui.QWidget):
 	           # the log operation and the weighting could be deffered
 	           # to the post-weedening !		
 		if self.dual_channels and floatdata.shape[0] > 1:
-			db_spectrogram = 20*log10(sp2 + epsilon) - 20*log10(sp1 + epsilon)
+			db_spectrogram = 10*log10(sp2 + epsilon) - 10*log10(sp1 + epsilon)
 		else:
-			db_spectrogram = 20*log10(sp1 + epsilon) + w
+			db_spectrogram = 10*log10(sp1 + epsilon) + w
 
 		self.PlotZoneSpect.setdata(freq, db_spectrogram)
 
@@ -136,10 +141,12 @@ class Spectrum_Widget(QtGui.QWidget):
 
 	def setmaxfreq(self, freq):
 		self.maxfreq = freq
+  		self.proc.set_maxfreq(self.maxfreq)
 		self.PlotZoneSpect.setfreqrange(self.minfreq, self.maxfreq)
 
 	def setfftsize(self, fft_size):
 		self.fft_size = fft_size
+		self.proc.set_fftsize(self.fft_size)
 
 	def setmin(self, value):
 		self.spec_min = value

@@ -20,6 +20,10 @@
 import PyQt4.Qwt5 as Qwt
 from PyQt4 import QtCore, QtGui, Qt
 from friture.spectrogram_image import CanvasScaledSpectrogram
+from online_linear_2D_resampler import Online_Linear_2D_resampler
+from fractions import Fraction
+from frequency_resampler import Frequency_Resampler
+import numpy as np
 
 class FreqScaleDraw(Qwt.QwtScaleDraw):
 	def __init__(self, *args):
@@ -39,7 +43,7 @@ class picker(Qwt.QwtPlotPicker):
 	def trackerText(self, pos):
 		pos2 = self.invTransform(pos)
 		return Qwt.QwtText("%.2f s, %d Hz" %(pos2.x(), pos2.y()))
-	
+			
 	def drawTracker(self, painter):
 		textRect = self.trackerRect(painter.font())
 		if not textRect.isEmpty():
@@ -55,18 +59,51 @@ class picker(Qwt.QwtPlotPicker):
 		  	   	   painter.restore()
 
 class PlotImage(Qwt.QwtPlotItem):
-	def __init__(self, logger):
+	def __init__(self, logger, parent, audiobackend):
 		Qwt.QwtPlotItem.__init__(self)
 		self.canvasscaledspectrogram = CanvasScaledSpectrogram(logger)
+		self.T = 0.
+		self.dT = 1.
+		self.parent = parent
+		self.audiobackend = audiobackend
+		#self.previous_time = self.audiobackend.get_stream_time()
+		self.offset = 0 #self.audiobackend.get_stream_time()/self.dT
+		
+		self.sfft_rate_frac = Fraction(1, 1)
+		self.frequency_resampler = Frequency_Resampler()
+		self.resampler = Online_Linear_2D_resampler()
 
 	def addData(self, freq, xyzs, logfreqscale):
-		self.canvasscaledspectrogram.setlogfreqscale(logfreqscale)
-		self.canvasscaledspectrogram.addData(freq, xyzs)
+		self.frequency_resampler.setlogfreqscale(logfreqscale)
+
+		# Note: both the frequency and the time resampler work
+		# only on 1D arrays, so we loop on the columns of data.
+		# However, we reassemble the 2D output before drawing
+		# on the widget's pixmap, because the drawing operation
+		# seems to have a costly warmup phase, so it is better
+		# to invoke it the fewer number of times possible.
+
+		n = self.resampler.processable(xyzs.shape[1])
+		resampled_data = np.zeros((self.frequency_resampler.nsamples, n))
+
+		i = 0
+		for j in range(xyzs.shape[1]):
+			freq_resampled_data = self.frequency_resampler.process(freq, xyzs[:, j])
+			data = self.resampler.process(freq_resampled_data)
+			resampled_data[:,i:i+data.shape[1]] = data
+			i += data.shape[1]
+
+		self.canvasscaledspectrogram.addData(resampled_data)
 
 	def draw(self, painter, xMap, yMap, rect):
 		# update the spectrogram according to possibly new canvas dimensions
+		self.frequency_resampler.setnsamples(rect.height())
+		self.resampler.set_height(rect.height())
 		self.canvasscaledspectrogram.setcanvas_height(rect.height())
 		self.canvasscaledspectrogram.setcanvas_width(rect.width())
+
+		screen_rate_frac = Fraction(rect.width(), int(self.T*1000))
+		self.resampler.set_ratio(self.sfft_rate_frac, screen_rate_frac)
 
 		pixmap = self.canvasscaledspectrogram.getpixmap()
 		offset = self.canvasscaledspectrogram.getpixmapoffset()
@@ -74,29 +111,58 @@ class PlotImage(Qwt.QwtPlotItem):
 		rolling = True
 		if rolling:
 			# draw the whole canvas with a selected portion of the pixmap
-			painter.drawPixmap(rect.left(), rect.top(), pixmap,  offset,  0,  0,  0)
-		else:
-			# draw one single line of the pixmap at a moving position
-			painter.drawPixmap(rect.left() + offset, rect.top(), pixmap,  offset-1,  0,  1,  0)
-		
-		#print painter
-		#print xMap.p1(), xMap.p2(), xMap.s1(), xMap.s2()
-		#print yMap.p1(), yMap.p2(), yMap.s1(), yMap.s2()
-		#print rect
 
-	def settimerange(self, timerange_seconds):
-		self.canvasscaledspectrogram.setT(timerange_seconds)
+			hints = painter.renderHints()
+			# enable bilinear pixmap transformation
+			painter.setRenderHints(hints|QtGui.QPainter.SmoothPixmapTransform)
+			#FIXME instead of a generic bilinear transformation, I need a specialized one
+			# since no transformation is needed in y, and the sampling rate is already known to be ok in x
+			sw = rect.width()
+			sh = rect.height()
+
+			# this function should be called by repaint, for better time sync
+
+			# FIXME the following is wrong when the display is paused !
+			# and even when not paused, it does not improve the smoothness
+			# and has a problem of offset
+			#current_time = self.audiobackend.get_stream_time()
+			#delay = sw*(current_time - self.previous_time)/self.T
+			#self.previous_time = current_time
+			#self.offset += delay
+			#self.offset = (self.offset % sw)
+			#offset = self.offset
+
+			source_rect = QtCore.QRectF(offset, 0, sw, sh)
+			# QRectF since the offset and width may be non-integer
+			painter.drawPixmap(QtCore.QRectF(rect), pixmap, source_rect)
+		else:
+			sw = rect.width()
+			sh = rect.height()
+			source_rect = QtCore.QRectF(0, 0, sw, sh)
+			painter.drawPixmap(QtCore.QRectF(rect), pixmap, source_rect)
+
+	def settimerange(self, timerange_seconds, dT):
+		self.T = timerange_seconds
+		self.dT = dT
 
 	def setfreqrange(self, minfreq, maxfreq):
-		self.canvasscaledspectrogram.setfreqrange(minfreq, maxfreq)
+		self.frequency_resampler.setfreqrange(minfreq, maxfreq)
+
+	def set_sfft_rate(self, rate_frac):
+		self.sfft_rate_frac = rate_frac
+
+	def setlogfreqscale(self, logfreqscale):
+		self.frequency_resampler.setlogfreqscale(logfreqscale)
 
 	def erase(self):
 		self.canvasscaledspectrogram.erase()
 
 class ImagePlot(Qwt.QwtPlot):
 
-	def __init__(self, parent, logger):
+	def __init__(self, parent, logger, audiobackend):
 		Qwt.QwtPlot.__init__(self)
+
+		self.parent = parent
 
 		# we do not need caching
 		self.canvas().setPaintAttribute(Qwt.QwtPlotCanvas.PaintCached, False)
@@ -121,7 +187,7 @@ class ImagePlot(Qwt.QwtPlot):
 		# self.setAxisTitle(Qwt.QwtPlot.yLeft, 'Frequency (Hz)')
 		
 		# attach a plot image
-		self.plotImage = PlotImage(logger)
+		self.plotImage = PlotImage(logger, self, audiobackend)
 		self.plotImage.attach(self)
 		self.setlinfreqscale()
 		self.setfreqrange(20., 20000.)
@@ -156,6 +222,8 @@ class ImagePlot(Qwt.QwtPlot):
 
 	def addData(self, freq, xyzs):
 		self.plotImage.addData(freq, xyzs, self.logfreqscale)
+
+	def updatePlot(self):
 		# self.replot() would call updateAxes() which is dead slow (probably because it
 		# computes label sizes); instead, let's ask Qt to repaint the canvas only next time
 		# This works because we disable the cache
@@ -170,12 +238,14 @@ class ImagePlot(Qwt.QwtPlot):
 	def setlinfreqscale(self):
 		self.plotImage.erase()
 		self.logfreqscale = 0
+		self.plotImage.setlogfreqscale(False)
 		self.setAxisScaleEngine(Qwt.QwtPlot.yLeft, Qwt.QwtLinearScaleEngine())
 		self.replot()
 
 	def setlog10freqscale(self):
 		self.plotImage.erase()
 		self.logfreqscale = 1
+		self.plotImage.setlogfreqscale(True)
 		self.setAxisScaleEngine(Qwt.QwtPlot.yLeft, Qwt.QwtLog10ScaleEngine())
 		self.replot()
 		
@@ -186,10 +256,13 @@ class ImagePlot(Qwt.QwtPlot):
 	#	self.setAxisScaleEngine(Qwt.QwtPlot.yLeft, Qwt.QwtLog10ScaleEngine())
 	#	self.replot()
 
-	def settimerange(self, timerange_seconds):
-		self.plotImage.settimerange(timerange_seconds)
+	def settimerange(self, timerange_seconds, dT_seconds):   
+		self.plotImage.settimerange(timerange_seconds, dT_seconds)
 		self.setAxisScale(Qwt.QwtPlot.xBottom, 0., timerange_seconds)
 		self.replot()
+
+	def set_sfft_rate(self, rate_frac):
+		self.plotImage.set_sfft_rate(rate_frac)
 
 	def setfreqrange(self, minfreq, maxfreq):
 		self.plotImage.setfreqrange(minfreq, maxfreq)

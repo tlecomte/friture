@@ -17,14 +17,14 @@
 # You should have received a copy of the GNU General Public License
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt4 import QtGui, QtCore
-from numpy import log10, where, linspace
+from PyQt4 import QtGui
+from numpy import log10, floor, zeros, float64, tile
 from friture.imageplot import ImagePlot
 from friture.audioproc import audioproc # audio processing class
 from friture.spectrogram_settings import Spectrogram_Settings_Dialog# settings dialog
 from friture.audiobackend import SAMPLING_RATE
-
-SMOOTH_DISPLAY_TIMER_PERIOD_MS = 25
+#from glrollingcanvaswidget import GLRollingCanvasWidget
+from fractions import Fraction
 
 # shared with spectrogram_settings.py
 DEFAULT_FFT_SIZE = 7 #4096 points
@@ -37,7 +37,7 @@ DEFAULT_TIMERANGE = 10.
 DEFAULT_WEIGHTING = 1 #A
 
 class Spectrogram_Widget(QtGui.QWidget):
-    def __init__(self, parent, logger = None):
+    def __init__(self, parent, audiobackend, logger = None):
         QtGui.QWidget.__init__(self, parent)
 
         # store the logger instance
@@ -45,103 +45,106 @@ class Spectrogram_Widget(QtGui.QWidget):
             self.logger = parent.parent().logger
         else:
             self.logger = logger
-        
+        			
         self.parent = parent
 
         self.setObjectName("Spectrogram_Widget")
         self.gridLayout = QtGui.QGridLayout(self)
         self.gridLayout.setObjectName("gridLayout")
-        self.PlotZoneImage = ImagePlot(self, self.logger)
+        self.PlotZoneImage = ImagePlot(self, self.logger, audiobackend)
+        #self.PlotZoneImage = GLRollingCanvasWidget(self, self.logger)
         self.PlotZoneImage.setObjectName("PlotZoneImage")
         self.gridLayout.addWidget(self.PlotZoneImage, 0, 1, 1, 1)
 
         self.audiobuffer = None
+        self.audiobackend = audiobackend
         
         # initialize the class instance that will do the fft
         self.proc = audioproc(self.logger)
 
         self.maxfreq = DEFAULT_MAXFREQ
+        self.proc.set_maxfreq(self.maxfreq)
         self.minfreq = DEFAULT_MINFREQ
         self.fft_size = 2**DEFAULT_FFT_SIZE*32
+        self.proc.set_fftsize(self.fft_size)
         self.spec_min = DEFAULT_SPEC_MIN
         self.spec_max = DEFAULT_SPEC_MAX
         self.weighting = DEFAULT_WEIGHTING
         
-        self.spectrogram_timer_time = 0.
-        
+        self.update_weighting()
+        self.freq = self.proc.get_freq_scale()
+              
         self.timerange_s = DEFAULT_TIMERANGE
         self.canvas_width = 100.
+        
+        self.old_index = 0        
+        self.overlap = 3./4.
+        self.overlap_frac = Fraction(3, 4)
+        self.dT_s = self.fft_size*(1. - self.overlap)/float(SAMPLING_RATE)
         
         self.PlotZoneImage.setlog10freqscale() #DEFAULT_FREQ_SCALE = 1 #log10
         self.PlotZoneImage.setfreqrange(self.minfreq, self.maxfreq)
         self.PlotZoneImage.setspecrange(self.spec_min, self.spec_max)
         self.PlotZoneImage.setweighting(self.weighting)
-        self.PlotZoneImage.settimerange(self.timerange_s)
-        
-        # this timer is used to update the spectrogram widget, whose update period
-        # is fixed by the time scale and the width of the widget canvas
-        self.timer = QtCore.QTimer()
-        self.period_ms = SMOOTH_DISPLAY_TIMER_PERIOD_MS
-        self.timer.setInterval(self.period_ms) # variable timing
+        self.PlotZoneImage.settimerange(self.timerange_s, self.dT_s)
+
+        sfft_rate_frac = Fraction(SAMPLING_RATE, self.fft_size)/(Fraction(1) - self.overlap_frac)/1000
+        self.PlotZoneImage.set_sfft_rate(sfft_rate_frac)
         
         # initialize the settings dialog
         self.settings_dialog = Spectrogram_Settings_Dialog(self, self.logger)
-        
-        # timer ticks
-        self.connect(self.timer, QtCore.SIGNAL('timeout()'), self.timer_slot)
-        
-        # window resize
-        self.connect(self.PlotZoneImage.plotImage.canvasscaledspectrogram, QtCore.SIGNAL("canvasWidthChanged"), self.canvasWidthChanged)
-
-        # we do not use the display timer since we have a special one
-        # tell the caller by setting this variable as None
-        self.update = None
-  
-        self.timer_time = QtCore.QTime()
-  
- # FIXME
- # for smoothness, the following shoudl be observed
- # - the FFT should be done with Hamming, or Hanning or Kaiser windows
- #   with 50% or more overlap.
- # - the animation should be advanced according to the actual time elapsed
- #   since the last update. Proper advancement is done through interpolation.
- #   (Linear or quadratic (causal!) interpolation should be fine first)
- # - ideally timer should be removed altogether and replaced by bloacking OpenGL
- #   paintings synchronized to vsync
 
     # method
     def set_buffer(self, buffer):
         self.audiobuffer = buffer
 
-    # method
-    def custom_update(self):
-        if not self.isVisible():
-            return
-        
-        # FIXME We should allow here for more intelligent transforms, especially when the log freq scale is selected
-        floatdata = self.audiobuffer.data(self.fft_size)
-
-        # for now, take the first channel only
-        floatdata = floatdata[0,:]
-
-        sp, freq, A, B, C = self.proc.analyzelive(floatdata, self.fft_size, self.maxfreq)
-        # scale the db spectrum from [- spec_range db ... 0 db] > [0..1]
+    def log_spectrogram(self, sp):
         epsilon = 1e-30
-        
-        if self.weighting is 0:
-            w = 0.
-        elif self.weighting is 1:
-            w = A
-        elif self.weighting is 2:
-            w = B
-        else:
-            w = C
-        
-        db_spectrogram = 20*log10(sp + epsilon) + w
-        norm_spectrogram = (db_spectrogram.clip(min = self.spec_min, max = self.spec_max) - self.spec_min)/(self.spec_max - self.spec_min)
-        
-        self.PlotZoneImage.addData(freq, norm_spectrogram)
+        return 10.*log10(sp + epsilon)
 
+    # scale the db spectrum from [- spec_range db ... 0 db] > [0..1]    
+    def scale_spectrogram(self, sp):
+        return (sp.clip(min = self.spec_min, max = self.spec_max) - self.spec_min)/(self.spec_max - self.spec_min)
+
+    # method
+    def update(self):
+        if not self.isVisible():
+            return        
+        
+        # we need to maintain an index of where we are in the buffer
+        index = self.audiobuffer.ringbuffer.offset
+        
+        # if we have enough data to add a frequency column in the time-frequency plane, compute it
+        needed = self.fft_size*(1. - self.overlap)        
+        realizable = int(floor((index - self.old_index)/needed))
+
+        if realizable > 0:
+            spn = zeros((len(self.freq), realizable), dtype=float64)
+        
+            for i in range(realizable):
+                floatdata = self.audiobuffer.data_indexed(self.old_index, self.fft_size)
+    
+                # for now, take the first channel only
+                floatdata = floatdata[0,:]
+    
+                # FIXME We should allow here for more intelligent transforms, especially when the log freq scale is selected
+                spn[:, i] = self.proc.analyzelive(floatdata)
+    
+                self.old_index += int(needed)
+                    
+            w = tile(self.w, (1, realizable))
+            norm_spectrogram = self.scale_spectrogram(self.log_spectrogram(spn) + w)            
+            self.PlotZoneImage.addData(self.freq, norm_spectrogram)
+        self.PlotZoneImage.updatePlot()
+            
+        # thickness of a frequency column depends on FFT size and window overlap
+        # hamming window with 75% overlap provides good quality (Perfect reconstruction,
+        # aliasing from side lobes only, 42 dB channel isolation)
+        
+        # number of frequency columns that we keep depends on the time history that the user has chosen
+        
+        # actual displayed spectrogram is a scaled version of the time-frequency plane
+        
     def setminfreq(self, freq):
         self.minfreq = freq
         self.PlotZoneImage.setfreqrange(self.minfreq, self.maxfreq)
@@ -149,9 +152,22 @@ class Spectrogram_Widget(QtGui.QWidget):
     def setmaxfreq(self, freq):
         self.maxfreq = freq
         self.PlotZoneImage.setfreqrange(self.minfreq, self.maxfreq)
+        self.proc.set_maxfreq(freq)
+        self.update_weighting()
+        self.freq = self.proc.get_freq_scale()
     
     def setfftsize(self, fft_size):
         self.fft_size = fft_size
+        
+        self.proc.set_fftsize(fft_size)
+        self.update_weighting()
+        self.freq = self.proc.get_freq_scale()
+                    
+        self.dT_s = self.fft_size*(1. - self.overlap)/float(SAMPLING_RATE)
+        self.PlotZoneImage.settimerange(self.timerange_s, self.dT_s)
+
+        sfft_rate_frac = Fraction(SAMPLING_RATE, self.fft_size)/(Fraction(1) - self.overlap_frac)/1000
+        self.PlotZoneImage.set_sfft_rate(sfft_rate_frac)
 
     def setmin(self, value):
         self.spec_min = value
@@ -164,7 +180,20 @@ class Spectrogram_Widget(QtGui.QWidget):
     def setweighting(self, weighting):
         self.weighting = weighting
         self.PlotZoneImage.setweighting(weighting)
+        self.update_weighting()
     
+    def update_weighting(self):    
+        A, B, C = self.proc.get_freq_weighting()
+        if self.weighting is 0:
+            self.w = 0.
+        elif self.weighting is 1:
+            self.w = A
+        elif self.weighting is 2:
+            self.w = B
+        else:
+            self.w = C
+        self.w.shape = (len(self.w), 1)
+
     def settings_called(self, checked):
         self.settings_dialog.show()
     
@@ -177,38 +206,8 @@ class Spectrogram_Widget(QtGui.QWidget):
     # slot
     def timerangechanged(self, value):
         self.timerange_s = value
-        self.PlotZoneImage.settimerange(value)
-        self.reset_timer()
+        self.PlotZoneImage.settimerange(self.timerange_s, self.dT_s)
 
     # slot
     def canvasWidthChanged(self, width):
         self.canvas_width = width
-        self.reset_timer()
-
-    # method
-    def reset_timer(self):
-        # FIXME millisecond resolution is limiting !
-        # need to find a way to integrate this cleverly in the GUI
-        # When the period is smaller than 25 ms, we can reasonably
-        # try to draw as many columns at once as possible
-        self.period_ms = 1000.*self.timerange_s/self.canvas_width
-        self.logger.push("Resetting the timer, will fire every %d ms" %(self.period_ms))
-        self.timer.setInterval(self.period_ms)
-        
-    # slot
-    def timer_slot(self):
-        #(chunks, t) = self.audiobuffer.update(self.audiobackend.stream)
-        #self.chunk_number += chunks
-        #self.buffer_timer_time = (95.*self.buffer_timer_time + 5.*t)/100.
-
-        t = QtCore.QTime()
-        t.start()
-
-        self.custom_update()
-        
-        self.spectrogram_timer_time = (95.*self.spectrogram_timer_time + 5.*t.elapsed())/100.
-
-        # Achieved timer period can be much higher than the one
-        # we asked for, and is very variable
-        # => We cannot rely on it
-        # print "asked for:", self.period_ms, "achieved:", self.timer_time.restart()

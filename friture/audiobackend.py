@@ -318,3 +318,7 @@ class AudioBackend(QtCore.QObject):
 
 	def set_duo_input(self):
 		self.duo_input = True
+
+	# returns the stream time in seconds
+	def get_stream_time(self):
+		return self.stream.get_time()

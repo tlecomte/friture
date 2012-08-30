@@ -49,3 +49,6 @@ class AudioBuffer():
 
 	def set_delay_ms(self, delay_ms):
 		self.delay_samples = delay_ms*1e-3*SAMPLING_RATE
+
+	def data_indexed(self, start, length):
+		return self.ringbuffer.data_indexed(start, length)
