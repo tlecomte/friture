@@ -20,6 +20,7 @@
 from numpy import linspace, log2, floor, log10, cos, arange, pi
 from numpy.fft import rfft
 from friture.audiobackend import SAMPLING_RATE
+from friture.norm_square import pyx_norm_square
 
 #from cochlear import MakeERBFilters, ERBFilterBank, frequencies
 
@@ -55,7 +56,8 @@ class audioproc():
 		# FIXME I don't need abs, since I do a log anyway after that
 		# real**2 + imag**2 is enough, the sqrt is superfluous
 		# This should be done in Cython, too costly in numpy
-		return (fft.real**2 + fft.imag**2) / self.size_sq
+		return pyx_norm_square(fft, 1./self.size_sq)
+		#return (fft.real**2 + fft.imag**2) / self.size_sq
 
 	def decimate(self, samples):
 		# first we remove as much points as possible
