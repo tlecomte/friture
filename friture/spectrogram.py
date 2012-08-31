@@ -99,6 +99,10 @@ class Spectrogram_Widget(QtGui.QWidget):
         self.audiobuffer = buffer
 
     def log_spectrogram(self, sp):
+        # Note: implementing the log10 of the array in Cython did not bring
+        # any speedup.
+        # Idea: Instead of computing the log of the data, I could pre-compute
+        # a list of values associated with the colormap, and then do a search...
         epsilon = 1e-30
         return 10.*log10(sp + epsilon)
 
