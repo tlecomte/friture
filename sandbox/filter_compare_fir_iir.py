@@ -1,10 +1,11 @@
 from matplotlib import pylab as plt
 import numpy as np
-from scipy.signal import remez, iirdesign
+from scipy.signal.filter_design import iirdesign
+from scipy.signal.fir_filter_design import remez
 from scipy.signal.signaltools import lfilter
 from numpy.fft import fft, fftshift, fftfreq
 
-N = 2**16
+N = 2**13
 fs = 44100.
 x = np.arange(0,N)/fs
 f = 1800.
@@ -25,8 +26,15 @@ b_fir = remez(numtaps=Ntaps, bands=[0., 0.49/2., 0.51/2., 1./2.], desired=[1.,0.
 a_fir = [1.]
 print "FIR coeff created", len(b_fir), len(a_fir)
 
+import time
+t0 = time.time()
 yf_fir, zf = lfilter(b_fir, a_fir, y, zi=np.zeros(max(len(a_fir),len(b_fir))-1))
+t1 = time.time()
 yf_iir, zf = lfilter(b_iir, a_iir, y, zi=np.zeros(max(len(a_iir),len(b_iir))-1))
+t2 = time.time()
+tfir = t1 - t0
+tiir = t2 - t1
+print "fir", tfir, "iir", tiir, "fir/iir", tfir/tiir
 
 impulse = np.zeros(N); impulse[N/2] = 1.
 yf_imp_fir, zf = lfilter(b_fir, a_fir, impulse, zi=np.zeros(max(len(a_fir),len(b_fir))-1))
