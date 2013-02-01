@@ -96,8 +96,8 @@ class RingBuffer():
 	def grow_if_needed(self, length):
 		if length > self.buffer_length:
 			# let the buffer grow according to our needs
-			print "growing buffer for length %d" %(length)
-			self.buffer_length = length
+			print "growing buffer for length %d" %(int(1.5*length))
+			self.buffer_length = int(1.5*length)
 			self.buffer = zeros((self.buffer.shape[0], 2*self.buffer_length))
 			self.offset = 0
   
