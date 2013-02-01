@@ -31,6 +31,12 @@ DEFAULT_DELAYRANGE = 1 # default delay range is 1 second
 
 def subsampler(Ndec, bdec, adec, x, zis):      
     x_dec = x
+
+    # FIXME problems when x is smaller than filter coeff
+
+    # do not run on empty arrays, otherwise bad artefacts on the output !!
+    if x.size == 0:
+        return x, zis
     
     if zis == None:
         for i in range(Ndec):
