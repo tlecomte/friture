@@ -292,7 +292,6 @@ class AudioBackend(QtCore.QObject):
 
 		available = int(floor(available/FRAMES_PER_BUFFER))
 		for j in range(0, available):
-			chunks += 1
 			try:
 				rawdata = self.stream.read(FRAMES_PER_BUFFER)
 			except IOError as inst:
@@ -316,6 +315,7 @@ class AudioBackend(QtCore.QObject):
 			
 			# update the circular buffer
 			ringbuffer.push(floatdata)
+			chunks += 1
 
 		return (chunks, t.elapsed(), chunks*FRAMES_PER_BUFFER)
   
