@@ -117,8 +117,6 @@ class Delay_Estimator_Widget(QtGui.QWidget):
         
         self.settings_dialog = Delay_Estimator_Settings_Dialog(self, self.logger)
         
-        self.i = 0
-
         # We will decimate several times
         # no decimation => 1/fs = 23 µs resolution
         # 1 ms resolution => fs = 1000 Hz is enough => can divide the sampling rate by 44 !
@@ -141,6 +139,8 @@ class Delay_Estimator_Widget(QtGui.QWidget):
         self.delayrange_s = DEFAULT_DELAYRANGE # confidence range
         
         self.old_Xcorr = None
+
+        self.old_index = 0
 
     # method
     def set_buffer(self, buffer):
@@ -183,18 +183,34 @@ in the setup window."""
             self.ringbuffer0.push(x0_dec)
             self.ringbuffer1.push(x1_dec)
 
-            if (self.i==5):
-                self.i = 0
-                # retrieve last one-second of data
-                time = 2*self.delayrange_s
-                length = time*self.subsampled_sampling_rate
+            # we need to maintain an index of where we are in the buffer
+            index = self.ringbuffer0.offset
+            available = index - self.old_index
+
+            if available < 0:
+                #ringbuffer must have grown or something...
+                available = 0
+                self.old_index = index
+
+            time = 2*self.delayrange_s
+            length = time*self.subsampled_sampling_rate
+            overlap = 0.5
+            needed = int(overlap*length)
+
+            realizable = int(available/needed)
+
+            #print available, needed, realizable
+
+            for i in range(realizable):
+                self.old_index += int(needed)
 
                 n = numpy.arange(length)
                 # Hann window : better frequency resolution than the rectangular window
                 window = 0.5*(1. - numpy.cos(2*numpy.pi*n/(length-1)))
 
-                d0 = self.ringbuffer0.data(length)
-                d1 = self.ringbuffer1.data(length)
+                # retrieve data
+                d0 = self.ringbuffer0.data_indexed(self.old_index, length)
+                d1 = self.ringbuffer1.data_indexed(self.old_index, length)
                 d0.shape = (d0.size)
                 d1.shape = (d1.size)
                 std0 = numpy.std(d0)
@@ -277,9 +293,6 @@ in the setup window."""
                 if channelInfo_message <> self.previous_channelInfo_message:
                     self.channelInfo_label.setText(channelInfo_message)
                     self.previous_channelInfo_message = channelInfo_message
-
-
-            self.i += 1
     
     def set_delayrange(self, delay_s):
         self.delayrange_s = delay_s
