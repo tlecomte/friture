@@ -117,10 +117,17 @@ class Spectrogram_Widget(QtGui.QWidget):
         
         # we need to maintain an index of where we are in the buffer
         index = self.audiobuffer.ringbuffer.offset
-        
+
+        available = index - self.old_index
+
+        if available < 0:
+            #ringbuffer must have grown or something...
+            available = 0
+            self.old_index = index
+    
         # if we have enough data to add a frequency column in the time-frequency plane, compute it
         needed = self.fft_size*(1. - self.overlap)        
-        realizable = int(floor((index - self.old_index)/needed))
+        realizable = int(floor(available/needed))
 
         if realizable > 0:
             spn = zeros((len(self.freq), realizable), dtype=float64)
