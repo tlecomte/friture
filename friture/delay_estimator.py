@@ -37,11 +37,9 @@ def subsampler(Ndec, bdec, adec, x, zis):
             x_dec, zf = decimate(bdec, adec, x_dec)
         return x_dec, None
     else:
-        m = 0
         zfs = []
-        for i in range(Ndec):
-            x_dec, zf = decimate(bdec, adec, x_dec, zi=zis[m])
-            m += 1
+        for i, zi in zip(range(Ndec), zis):
+            x_dec, zf = decimate(bdec, adec, x_dec, zi=zi)
             # zf can be reused to restart the filter
             zfs += [zf]
         return x_dec, zfs
@@ -184,6 +182,11 @@ in the setup window."""
                 # retrieve last one-second of data
                 time = 2*self.delayrange_s
                 length = time*self.subsampled_sampling_rate
+
+                n = numpy.arange(length)
+                # Hann window : better frequency resolution than the rectangular window
+                window = 0.5*(1. - numpy.cos(2*numpy.pi*n/(length-1)))
+
                 d0 = self.ringbuffer0.data(length)
                 d1 = self.ringbuffer1.data(length)
                 d0.shape = (d0.size)
@@ -196,13 +199,16 @@ in the setup window."""
                     d0 -= d0.mean()
                     d1 -= d1.mean()
                     # compute the cross-correlation
-                    D0 = rfft(d0)
-                    D1 = rfft(d1)
+                    D0 = rfft(d0*window)
+                    D1 = rfft(d1*window)
                     D0r = D0.conjugate()
                     G = D0r*D1
-                    G = (G==0.)*1e-30 + (G<>0.)*G
+                    #G = (G==0.)*1e-30 + (G<>0.)*G
                     #W = 1. # frequency unweighted
-                    W = 1./numpy.abs(G) # "PHAT"
+                    #W = 1./numpy.abs(G) # "PHAT"
+                    absG = numpy.abs(G)
+                    m = max(absG)
+                    W = 1./(1e-4*m + absG)
                     #D1r = D1.conjugate(); G0 = D0r*D0; G1 = D1r*D1; W = numpy.abs(G)/(G0*G1) # HB weighted
                     Xcorr = irfft(W*G)
                     #Xcorr_unweighted = irfft(G)
@@ -217,6 +223,7 @@ in the setup window."""
                     
                     absXcorr = numpy.abs(Xcorr)
                     i = argmax(absXcorr)
+
                     # normalize
                     #Xcorr_max_norm = Xcorr_unweighted[i]/(d0.size*std0*std1)
                     Xcorr_extremum = Xcorr[i]
