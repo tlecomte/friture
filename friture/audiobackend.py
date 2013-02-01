@@ -301,11 +301,17 @@ class AudioBackend(QtCore.QObject):
 				self.xruns += 1
 				print "Caught an IOError on stream read.", inst
 				break
-			floatdata = fromstring(rawdata, int16)[channel::nchannels]/(2.**(16-1))
+			
+			intdata_all_channels = fromstring(rawdata, int16)
+			floatdata_all_channels = intdata_all_channels/(2.**(16-1))
+
+			floatdata1 = floatdata_all_channels[channel::nchannels]
+
 			if self.duo_input:                            			
-                                       floatdata2 = fromstring(rawdata, int16)[channel_2::nchannels]/(2.**(16-1))
-                                       floatdata = vstack((floatdata, floatdata2))
-			else:   
+                                       floatdata2 = floatdata_all_channels[channel_2::nchannels]
+                                       floatdata = vstack((floatdata1, floatdata2))
+			else:  
+                                       floatdata = floatdata1
                                        floatdata.shape = (1, FRAMES_PER_BUFFER)
 			
 			# update the circular buffer
