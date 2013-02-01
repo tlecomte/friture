@@ -39,12 +39,8 @@ class RingBuffer():
 		if dim <> self.buffer.shape[0]:
 			# switched from single to dual channels or vice versa  
 			self.buffer = zeros((dim, 2*self.buffer_length))
-	
-		if l > self.buffer_length:
-                                  # let the buffer grow according to our needs
-                                  self.buffer_length = l
-                                  self.buffer = zeros((self.buffer.shape[0], 2*self.buffer_length))
-                                  self.offset = 0                                  
+
+		self.grow_if_needed(l)
 		
 		# first copy, always complete
 		offset = self.offset % self.buffer_length
@@ -58,23 +54,15 @@ class RingBuffer():
 		self.offset += l
 
 	def data(self, length):
-		if length > self.buffer_length:
-                                  # let the buffer grow according to our needs
-                                  print "growing buffer for length %d" %(length)
-                                  self.buffer_length = length
-                                  self.buffer = zeros((self.buffer.shape[0], 2*self.buffer_length))
-                                  self.offset = 0
+		self.grow_if_needed(length)
 
 		stop = self.offset%self.buffer_length + self.buffer_length
 		start = stop - length
   
 		while stop > 2*self.buffer_length:
-                                  # let the buffer grow according to our needs
-                                  print "growing buffer for stop %d" %(stop)
-                                  self.buffer_length = stop
-                                  self.buffer = zeros((self.buffer.shape[0], 2*self.buffer_length))
-                                  stop = self.offset%self.buffer_length + self.buffer_length
-                                  start = stop - length
+			self.grow_if_needed(stop)
+			stop = self.offset%self.buffer_length + self.buffer_length
+			start = stop - length
   
 		if start > 2*self.buffer_length or start < 0:
 			raise ArithmeticError("Start index is wrong %d %d" %(start, self.buffer_length))
@@ -83,11 +71,7 @@ class RingBuffer():
 		return self.buffer[:, start : stop]
 
 	def data_older(self, length, delay_samples):     
-		if length + delay_samples > self.buffer_length:
-                                  # let the buffer grow according to our needs
-                                  self.buffer_length = length + delay_samples
-                                  self.buffer = zeros((self.buffer.shape[0], 2*self.buffer_length))
-                                  self.offset = 0
+		self.grow_if_needed(length + delay_samples)
 		
 		start = (self.offset - length - delay_samples) % self.buffer_length + self.buffer_length 
 		stop = start + length
@@ -95,11 +79,7 @@ class RingBuffer():
 
 	def data_indexed(self, start, length):
 		delay = self.offset - start
-		if length + delay > self.buffer_length:
-                                  # let the buffer grow according to our needs
-                                  print "growing buffer for length + delay %d" %(length + delay)
-                                  self.buffer_length = length + delay
-                                  self.buffer = zeros((self.buffer.shape[0], 2*self.buffer_length))
+		self.grow_if_needed(length + delay)
 		
 		#start0 = start % self.buffer_length + self.buffer_length
 		#stop0 = start0 + length
@@ -112,4 +92,12 @@ class RingBuffer():
 			raise ArithmeticError("Stop index is larger than buffer size: %d > %d" %(stop0, 2*self.buffer_length))
 
 		return self.buffer[:, start0 : stop0]
+
+	def grow_if_needed(self, length):
+		if length > self.buffer_length:
+			# let the buffer grow according to our needs
+			print "growing buffer for length %d" %(length)
+			self.buffer_length = length
+			self.buffer = zeros((self.buffer.shape[0], 2*self.buffer_length))
+			self.offset = 0
   
