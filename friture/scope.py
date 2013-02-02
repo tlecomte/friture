@@ -17,13 +17,13 @@
 # You should have received a copy of the GNU General Public License
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt4 import QtGui
+from PyQt4 import QtGui, QtCore
 from numpy import log10, where, linspace, sign, arange
 from friture.timeplot import TimePlot
-from friture.scope_settings import Scope_Settings_Dialog # settings dialog
 from friture.audiobackend import SAMPLING_RATE
 
 SMOOTH_DISPLAY_TIMER_PERIOD_MS = 25
+DEFAULT_TIMERANGE = 2*SMOOTH_DISPLAY_TIMER_PERIOD_MS
 
 STYLESHEET = """
 QwtPlotCanvas {
@@ -57,6 +57,8 @@ class Scope_Widget(QtGui.QWidget):
 
         self.settings_dialog = Scope_Settings_Dialog(self, self.logger)
 
+        self.timerange = DEFAULT_TIMERANGE
+
     # method
     def set_buffer(self, buffer):
         self.audiobuffer = buffer
@@ -66,8 +68,8 @@ class Scope_Widget(QtGui.QWidget):
         if not self.isVisible():
             return
 
-        time = 2*SMOOTH_DISPLAY_TIMER_PERIOD_MS/1000.
-        width = time*SAMPLING_RATE
+        time = self.timerange*1e-3
+        width = int(time*SAMPLING_RATE)
         #basic trigger capability on leading edge
         floatdata = self.audiobuffer.data(2*width)
 
@@ -128,6 +130,10 @@ class Scope_Widget(QtGui.QWidget):
             self.PlotZoneUp.setdata(time, y)
 
     # slot
+    def set_timerange(self, timerange):
+        self.timerange = timerange
+
+    # slot
     def settings_called(self, checked):
         self.settings_dialog.show()
 
@@ -138,3 +144,38 @@ class Scope_Widget(QtGui.QWidget):
     # method
     def restoreState(self, settings):
         self.settings_dialog.restoreState(settings)
+
+
+class Scope_Settings_Dialog(QtGui.QDialog):
+    def __init__(self, parent, logger):
+        QtGui.QDialog.__init__(self, parent)
+        
+        self.parent = parent
+        self.logger = logger
+        
+        self.setWindowTitle("Scope settings")
+        
+        self.formLayout = QtGui.QFormLayout(self)
+        
+        self.doubleSpinBox_timerange = QtGui.QDoubleSpinBox(self)
+        self.doubleSpinBox_timerange.setDecimals(1)
+        self.doubleSpinBox_timerange.setMinimum(0.1)
+        self.doubleSpinBox_timerange.setMaximum(1000.0)
+        self.doubleSpinBox_timerange.setProperty("value", DEFAULT_TIMERANGE)
+        self.doubleSpinBox_timerange.setObjectName("doubleSpinBox_timerange")
+        self.doubleSpinBox_timerange.setSuffix(" ms")
+
+        self.formLayout.addRow("Time range:", self.doubleSpinBox_timerange)
+        
+        self.setLayout(self.formLayout)
+
+        self.connect(self.doubleSpinBox_timerange, QtCore.SIGNAL('valueChanged(double)'), self.parent.set_timerange)
+
+    # method
+    def saveState(self, settings):
+        settings.setValue("timeRange", self.doubleSpinBox_timerange.value())
+
+    # method
+    def restoreState(self, settings):
+        (timeRange, ok) = settings.value("timeRange", DEFAULT_TIMERANGE).toDouble()
+        self.doubleSpinBox_timerange.setValue(timeRange)
