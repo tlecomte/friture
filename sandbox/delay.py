@@ -128,13 +128,15 @@ def main():
 
             if old_Xcorr != None and old_Xcorr.shape == Xcorr.shape:
                 # smoothing
-                alpha = 0.15
-                Xcorr = alpha*Xcorr + (1. - alpha)*old_Xcorr
+                alpha = 0.3
+                smoothed_Xcorr = alpha*Xcorr + (1. - alpha)*old_Xcorr
+            else:
+                smoothed_Xcorr = Xcorr
             
             #plt2.plot(Xcorr)
             #plt.draw()
 
-            absXcorr = numpy.abs(Xcorr)
+            absXcorr = numpy.abs(smoothed_Xcorr)
             ind = argmax(absXcorr)
 
             #h2_ = fft(absXcorr**2)
@@ -150,20 +152,21 @@ def main():
 
             # normalize
             #Xcorr_max_norm = Xcorr_unweighted[ind]/(d0.size*std0*std1)
-            Xcorr_extremum = Xcorr[ind]
-            Xcorr_max_norm = abs(Xcorr[ind])/(3*numpy.std(Xcorr))
+            Xcorr_extremum = smoothed_Xcorr[ind]
+            Xcorr_max_norm = abs(smoothed_Xcorr[ind])/(3*numpy.std(smoothed_Xcorr))
             delay_ms = 1e3*float(ind)/subsampled_sampling_rate
         
             # store for smoothing
-            old_Xcorr = Xcorr
+            old_Xcorr = smoothed_Xcorr
         else:
             delay_ms = 0.
             Xcorr_max_norm = 0.
             Xcorr_extremum = 0.
 
         # debug wrong phase detection
-        #if Xcorr[i] < 0.:
+        #if Xcorr_extremum < 0.:
         #    numpy.save("Xcorr.npy", Xcorr)
+        #    numpy.save("smoothed_Xcorr.npy", smoothed_Xcorr)
 
         c = 340. # speed of sound, in meters per second (approximate)
         distance_m = delay_ms*1e-3*c
