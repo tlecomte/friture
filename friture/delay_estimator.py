@@ -246,19 +246,25 @@ in the setup window."""
                     if self.old_Xcorr != None and self.old_Xcorr.shape == Xcorr.shape:
                         # smoothing
                         alpha = 0.15
-                        Xcorr = alpha*Xcorr + (1. - alpha)*self.old_Xcorr
+                        smoothed_Xcorr = alpha*Xcorr + (1. - alpha)*self.old_Xcorr
+                    else:
+                        print "not smoothing"
+                        smoothed_Xcorr = Xcorr
                     
-                    absXcorr = numpy.abs(Xcorr)
+                    absXcorr = numpy.abs(smoothed_Xcorr)
                     i = argmax(absXcorr)
 
                     # normalize
                     #Xcorr_max_norm = Xcorr_unweighted[i]/(d0.size*std0*std1)
-                    Xcorr_extremum = Xcorr[i]
-                    Xcorr_max_norm = abs(Xcorr[i])/(3*numpy.std(Xcorr))
+                    Xcorr_extremum = smoothed_Xcorr[i]
+                    Xcorr_max_norm = abs(smoothed_Xcorr[i])/(3*numpy.std(smoothed_Xcorr))
                     delay_ms = 1e3*float(i)/self.subsampled_sampling_rate
                 
+                    #numpy.save("Xcorr_%d_%.1f.npy" %(i,delay_ms), Xcorr)
+                    #numpy.save("smoothed_Xcorr%d_%.1f.npy" %(i,delay_ms), smoothed_Xcorr)
+
                     # store for smoothing
-                    self.old_Xcorr = Xcorr
+                    self.old_Xcorr = smoothed_Xcorr
                 else:
                     delay_ms = 0.
                     Xcorr_max_norm = 0.
