@@ -204,9 +204,8 @@ in the setup window."""
             for i in range(realizable):
                 self.old_index += int(needed)
 
-                n = numpy.arange(length)
-                # Hann window : better frequency resolution than the rectangular window
-                window = 0.5*(1. - numpy.cos(2*numpy.pi*n/(length-1)))
+                # Hann window to mitigate non-periodicity effects
+                window = numpy.hanning(length)
 
                 # retrieve data
                 d0 = self.ringbuffer0.data_indexed(self.old_index, length)
