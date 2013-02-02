@@ -156,6 +156,10 @@ def main():
             Xcorr_max_norm = abs(smoothed_Xcorr[ind])/(3*numpy.std(smoothed_Xcorr))
             delay_ms = 1e3*float(ind)/subsampled_sampling_rate
         
+            # delays larger than the half of the window most likely are actually negative
+            if delay_ms > 1e3*time/2.:
+                delay_ms -= 1e3*time
+        
             # store for smoothing
             old_Xcorr = smoothed_Xcorr
         else:

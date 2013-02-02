@@ -259,6 +259,10 @@ in the setup window."""
                     Xcorr_extremum = smoothed_Xcorr[i]
                     Xcorr_max_norm = abs(smoothed_Xcorr[i])/(3*numpy.std(smoothed_Xcorr))
                     delay_ms = 1e3*float(i)/self.subsampled_sampling_rate
+
+                    # delays larger than the half of the window most likely are actually negative
+                    if delay_ms > 1e3*time/2.:
+                        delay_ms -= 1e3*time
                 
                     #numpy.save("Xcorr_%d_%.1f.npy" %(i,delay_ms), Xcorr)
                     #numpy.save("smoothed_Xcorr%d_%.1f.npy" %(i,delay_ms), smoothed_Xcorr)
