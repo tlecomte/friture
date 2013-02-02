@@ -323,16 +323,16 @@ class Generator_Widget(QtGui.QWidget):
         if kind == 0:
             # sinusoid
             f = float(self.spinBox_sine_frequency.value())
-            floatdata = 0.99*np.sin(2.*np.pi*t*f)                
+            floatdata = np.sin(2.*np.pi*t*f)                
         elif kind == 1:
             # white noise
-            floatdata = 0.99*standard_normal(n)
+            floatdata = standard_normal(n)
         elif kind == 2:
             #pink noise
-            floatdata = 0.99*pinknoise(n)
+            floatdata = pinknoise(n)
         elif kind == 3:
             #sweep
-            floatdata = 0.99*self.sweepGenerator.sweepSignal(t)
+            floatdata = self.sweepGenerator.sweepSignal(t)
         elif kind == 4:
             #burst
             floatdata = np.zeros(t.shape)
@@ -341,8 +341,8 @@ class Generator_Widget(QtGui.QWidget):
             n = 1
             ind_plus = np.where(i < n)
             #ind_minus = np.where((i >= n)*(i < 2*n))
-            floatdata[ind_plus] = 0.99
-            #floatdata[ind_minus] = -0.99
+            floatdata[ind_plus] = 1.
+            #floatdata[ind_minus] = -1.
         else:
             print "generator error : index of signal type not found"
             return
