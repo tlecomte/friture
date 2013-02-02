@@ -19,7 +19,7 @@
 
 from PyQt4 import QtCore
 from pyaudio import PyAudio, paInt16
-from numpy import floor, int16, fromstring, vstack, iinfo
+from numpy import floor, int16, fromstring, vstack, iinfo, float64
 
 # the sample rate below should be dynamic, taken from PyAudio/PortAudio
 SAMPLING_RATE = 48000
@@ -305,7 +305,8 @@ class AudioBackend(QtCore.QObject):
 
 			int16info = iinfo(int16)
 			norm_coeff = max(abs(int16info.min), int16info.max)
-			floatdata_all_channels = intdata_all_channels/float(norm_coeff)
+			floatdata_all_channels = intdata_all_channels.astype(float64)/float(norm_coeff)
+
 
 			floatdata1 = floatdata_all_channels[channel::nchannels]
 
