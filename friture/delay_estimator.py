@@ -58,6 +58,35 @@ def subsampler_filtic(Ndec, bdec, adec):
         zfs += [numpy.zeros(l)]
     return zfs    
 
+def generalized_cross_correlation(d0, d1):
+    # substract the means
+    # (in order to get a normalized cross-correlation at the end)
+    d0 -= d0.mean()
+    d1 -= d1.mean()
+
+    # Hann window to mitigate non-periodicity effects
+    window = numpy.hanning(len(d0))
+
+    # compute the cross-correlation
+    D0 = rfft(d0*window)
+    D1 = rfft(d1*window)
+    D0r = D0.conjugate()
+    G = D0r*D1
+    #G = (G==0.)*1e-30 + (G<>0.)*G
+    #W = 1. # frequency unweighted
+    #W = 1./numpy.abs(G) # "PHAT"
+    absG = numpy.abs(G)
+    m = max(absG)
+    W = 1./(1e-4*m + absG)
+    #D1r = D1.conjugate(); G0 = D0r*D0; G1 = D1r*D1; W = numpy.abs(G)/(G0*G1) # HB weighted
+    Xcorr = irfft(W*G)
+    #Xcorr_unweighted = irfft(G)
+    #numpy.save("d0.npy", d0)
+    #numpy.save("d1.npy", d1)
+    #numpy.save("Xcorr.npy", Xcorr)
+
+    return Xcorr
+
 class Delay_Estimator_Widget(QtGui.QWidget):
     def __init__(self, parent = None, logger = None):
         QtGui.QWidget.__init__(self, parent)
@@ -204,9 +233,6 @@ in the setup window."""
             for i in range(realizable):
                 self.old_index += int(needed)
 
-                # Hann window to mitigate non-periodicity effects
-                window = numpy.hanning(length)
-
                 # retrieve data
                 d0 = self.ringbuffer0.data_indexed(self.old_index, length)
                 d1 = self.ringbuffer1.data_indexed(self.old_index, length)
@@ -215,27 +241,7 @@ in the setup window."""
                 std0 = numpy.std(d0)
                 std1 = numpy.std(d1)
                 if std0>0. and std1>0.:
-                    # substract the means
-                    # (in order to get a normalized cross-correlation at the end)
-                    d0 -= d0.mean()
-                    d1 -= d1.mean()
-                    # compute the cross-correlation
-                    D0 = rfft(d0*window)
-                    D1 = rfft(d1*window)
-                    D0r = D0.conjugate()
-                    G = D0r*D1
-                    #G = (G==0.)*1e-30 + (G<>0.)*G
-                    #W = 1. # frequency unweighted
-                    #W = 1./numpy.abs(G) # "PHAT"
-                    absG = numpy.abs(G)
-                    m = max(absG)
-                    W = 1./(1e-4*m + absG)
-                    #D1r = D1.conjugate(); G0 = D0r*D0; G1 = D1r*D1; W = numpy.abs(G)/(G0*G1) # HB weighted
-                    Xcorr = irfft(W*G)
-                    #Xcorr_unweighted = irfft(G)
-                    #numpy.save("d0.npy", d0)
-                    #numpy.save("d1.npy", d1)
-                    #numpy.save("Xcorr.npy", Xcorr)
+                    Xcorr = generalized_cross_correlation(d0, d1)
 
                     if self.old_Xcorr != None and self.old_Xcorr.shape == Xcorr.shape:
                         # smoothing

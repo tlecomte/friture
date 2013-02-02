@@ -25,7 +25,7 @@ from friture.filter import decimate
 from friture import generated_filters
 from friture.ringbuffer import RingBuffer
 from friture.audiobackend import SAMPLING_RATE
-from friture.delay_estimator import subsampler, subsampler_filtic, DEFAULT_DELAYRANGE
+from friture.delay_estimator import subsampler, subsampler_filtic, DEFAULT_DELAYRANGE, generalized_cross_correlation
 from scipy.io import wavfile
 import matplotlib.pyplot as plt
 
@@ -121,33 +121,7 @@ def main():
         std0 = numpy.std(d0)
         std1 = numpy.std(d1)
         if d0.size>0 and std0>0. and std1>0.:
-            # substract the means
-            # (in order to get a normalized cross-correlation at the end)
-            d0 -= d0.mean()
-            d1 -= d1.mean()
-            # compute the cross-correlation
-            if False:
-                D0 = rfft(d0)
-                D1 = rfft(d1)
-            else:
-                D0 = rfft(d0*window)
-                D1 = rfft(d1*window)
-            D0r = D0.conjugate()
-            G = D0r*D1
-            if False:
-                G = (G==0.)*1e-30 + (G<>0.)*G
-                #W = 1. # frequency unweighted
-                W = 1./numpy.abs(G) # "PHAT"
-            else:
-                absG = numpy.abs(G)
-                m = max(absG)
-                W = 1./(m*1e-4 + absG) # "PHAT"
-            #D1r = D1.conjugate(); G0 = D0r*D0; G1 = D1r*D1; W = numpy.abs(G)/(G0*G1) # HB weighted
-            Xcorr = irfft(W*G)
-            #Xcorr_unweighted = irfft(G)
-            #numpy.save("d0.npy", d0)
-            #numpy.save("d1.npy", d1)
-            #numpy.save("Xcorr.npy", Xcorr)
+            Xcorr = generalized_cross_correlation(d0, d1)
 
             #plt1.plot(Xcorr)
             #plt.figure()
