@@ -214,7 +214,7 @@ in the setup window."""
                 d1.shape = (d1.size)
                 std0 = numpy.std(d0)
                 std1 = numpy.std(d1)
-                if d0.size>0 and std0>0. and std1>0.:
+                if std0>0. and std1>0.:
                     # substract the means
                     # (in order to get a normalized cross-correlation at the end)
                     d0 -= d0.mean()
