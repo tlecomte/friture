@@ -245,7 +245,7 @@ in the setup window."""
 
                     if self.old_Xcorr != None and self.old_Xcorr.shape == Xcorr.shape:
                         # smoothing
-                        alpha = 0.15
+                        alpha = 0.3
                         smoothed_Xcorr = alpha*Xcorr + (1. - alpha)*self.old_Xcorr
                     else:
                         print "not smoothing"
