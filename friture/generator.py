@@ -373,7 +373,7 @@ class Generator_Widget(QtGui.QWidget):
 
         int16info = np.iinfo(np.int16)
         norm_coeff = min(abs(int16info.min), int16info.max)
-        intdata = (floatdata*norm_coeff).astype(np.int16)
+        intdata = (np.clip(floatdata, int16info.min, int16info.max)*norm_coeff).astype(np.int16)
         chardata = intdata.tostring()
         self.stream.write(chardata)
 
