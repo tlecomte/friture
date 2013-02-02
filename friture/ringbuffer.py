@@ -26,7 +26,7 @@ from numpy import zeros
 class RingBuffer():
 	def __init__(self):
 		# buffer length is dynamic based on the needs
-		self.buffer_length = 10000.
+		self.buffer_length = 10000
 		self.buffer = zeros((1, 2*self.buffer_length))
 		self.offset = 0
 
@@ -96,8 +96,23 @@ class RingBuffer():
 	def grow_if_needed(self, length):
 		if length > self.buffer_length:
 			# let the buffer grow according to our needs
-			print "growing buffer for length %d" %(int(1.5*length))
-			self.buffer_length = int(1.5*length)
-			self.buffer = zeros((self.buffer.shape[0], 2*self.buffer_length))
-			self.offset = 0
+			old_length = self.buffer_length
+			new_length = int(1.5*length)
+			print "growing buffer for length %d" %(new_length)
+			#create new buffer
+			newbuffer = zeros((self.buffer.shape[0], 2*new_length))
+			#copy existing data so that self.offset does not have to be changed
+			old_offset_mod = self.offset%old_length
+			new_offset_mod = self.offset%new_length
+			shift = new_offset_mod - old_offset_mod
+			# first copy, always complete
+			newbuffer[:, shift:shift + old_length] = self.buffer[:, :old_length]
+			# second copy, can be folded
+			direct = min(old_length, new_length - shift)
+			folded = old_length - direct
+			newbuffer[:, new_length + shift:new_length + shift + direct] = self.buffer[:, :direct]
+			newbuffer[:, :folded] = self.buffer[:, direct:direct+folded]
+			#assign self.butter to the new larger buffer
+			self.buffer = newbuffer
+			self.buffer_length = new_length
   
