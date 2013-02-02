@@ -371,7 +371,9 @@ class Generator_Widget(QtGui.QWidget):
         maxOutputChannels = self.p.get_device_info_by_index(self.device)['maxOutputChannels']
         floatdata = floatdata.repeat(maxOutputChannels)
 
-        intdata = (floatdata*(2.**(16-1))).astype(np.int16)
+        int16info = np.iinfo(np.int16)
+        norm_coeff = min(abs(int16info.min), int16info.max)
+        intdata = (floatdata*norm_coeff).astype(np.int16)
         chardata = intdata.tostring()
         self.stream.write(chardata)
 
