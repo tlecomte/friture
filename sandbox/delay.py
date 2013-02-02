@@ -24,7 +24,6 @@ from numpy.fft import rfft, irfft, fft, ifft
 from friture.filter import decimate
 from friture import generated_filters
 from friture.ringbuffer import RingBuffer
-from friture.audiobackend import SAMPLING_RATE
 from friture.delay_estimator import subsampler, subsampler_filtic, DEFAULT_DELAYRANGE, generalized_cross_correlation
 from scipy.io import wavfile
 import matplotlib.pyplot as plt
@@ -34,29 +33,28 @@ def main():
 
     print "Loading data"
 
-    if True:
-        # load data
-        #fname = 'sandbox/test_cpea_20120602_part3.wav' # delay = 45.2 ms = 1993 samples (from Friture cross-correlation measurements)
-        #fname = 'sandbox/gary_moore_separate_chambre.wav'
-        #fname = 'sandbox/gary_moore_loner_chambre.wav'
-        fname = 'sandbox/test_cpea_20120602.wav'
-        #data, fs, enc = wavread(fname)
-        fs, data = wavfile.read(fname)
+    # load data
+    #fname = 'sandbox/test_cpea_20120602_part3.wav' # delay = 45.2 ms = 1993 samples (from Friture cross-correlation measurements)
+    #fname = 'sandbox/gary_moore_separate_chambre.wav'
+    #fname = 'sandbox/gary_moore_loner_chambre.wav'
+    fname = 'sandbox/test_cpea_20120602.wav'
+    #data, fs, enc = wavread(fname)
+    SAMPLING_RATE, data = wavfile.read(fname)
 
-        print data.shape, data.dtype
-        data = data.astype(np.float64) # convert from integer to floats for computations
+    print data.shape, data.dtype
+    data = data.astype(np.float64) # convert from integer to floats for computations
 
-        ht = None
+    ht = None
 
-        #data = data[:Ns,:]
-        data /= 2**16
-        #data = data[::-1,:]
+    #data = data[:Ns,:]
+    data /= 2**16
+    #data = data[::-1,:]
 
-        # original signal
-        x = data[:Ns,0]
-        
-        # measured signal
-        m = data[:Ns,1]
+    # original signal
+    x = data[:Ns,0]
+    
+    # measured signal
+    m = data[:Ns,1]
 
     print "Data loaded"
 
