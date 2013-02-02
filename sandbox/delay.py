@@ -120,7 +120,7 @@ def main():
 
         std0 = numpy.std(d0)
         std1 = numpy.std(d1)
-        if d0.size>0 and std0>0. and std1>0.:
+        if std0>0. and std1>0.:
             Xcorr = generalized_cross_correlation(d0, d1)
 
             #plt1.plot(Xcorr)
