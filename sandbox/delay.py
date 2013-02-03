@@ -24,20 +24,56 @@ from numpy.fft import rfft, irfft, fft, ifft
 from friture.filter import decimate
 from friture import generated_filters
 from friture.ringbuffer import RingBuffer
-from friture.delay_estimator import subsampler, subsampler_filtic, DEFAULT_DELAYRANGE, generalized_cross_correlation
+from friture.delay_estimator import subsampler, subsampler_filtic, DEFAULT_DELAYRANGE
 from scipy.io import wavfile
 import matplotlib.pyplot as plt
 
+def generalized_cross_correlation(d0, d1):
+    # substract the means
+    # (in order to get a normalized cross-correlation at the end)
+    d0 -= d0.mean()
+    d1 -= d1.mean()
+
+    # Hann window to mitigate non-periodicity effects
+    window = numpy.hanning(len(d0))
+
+    #d0_padded = np.zeros((len(d0)*2), dtype=d0.dtype)
+    #d0_padded[:len(d0)] = d0
+    #d1_padded = np.zeros((len(d1)*2), dtype=d1.dtype)
+    #d1_padded[len(d1):] = d1
+
+    # compute the cross-correlation
+    D0 = rfft(d0*window)
+    D1 = rfft(d1*window)
+    #D0 = rfft(d0_padded)
+    #D1 = rfft(d1_padded)
+    D0r = D0.conjugate()
+    G = D0r*D1
+    #G = (G==0.)*1e-30 + (G<>0.)*G
+    #W = 1. # frequency unweighted
+    #W = 1./numpy.abs(G) # "PHAT"
+    absG = numpy.abs(G)
+    m = max(absG)
+    W = 1./(1e-6*m + absG)
+    #D1r = D1.conjugate(); G0 = D0r*D0; G1 = D1r*D1; W = numpy.abs(G)/(G0*G1) # HB weighted
+    Xcorr = irfft(W*G)
+    #Xcorr_unweighted = irfft(G)
+    #numpy.save("d0.npy", d0)
+    #numpy.save("d1.npy", d1)
+    #numpy.save("Xcorr.npy", Xcorr)
+
+    return Xcorr
+
 def main():
-    Ns = 44100*20 #44100*60*3 #3000000
+    Ns = 44100*40 #44100*60*3 #3000000
 
     print "Loading data"
 
     # load data
     #fname = 'sandbox/test_cpea_20120602_part3.wav' # delay = 45.2 ms = 1993 samples (from Friture cross-correlation measurements)
-    #fname = 'sandbox/gary_moore_separate_chambre.wav'
+    fname = 'sandbox/gary_moore_separate_chambre.wav'
     #fname = 'sandbox/gary_moore_loner_chambre.wav'
-    fname = 'sandbox/test_cpea_20120602.wav'
+    #fname = 'sandbox/test_cpea_20120602.wav'
     #data, fs, enc = wavread(fname)
     SAMPLING_RATE, data = wavfile.read(fname)
 
@@ -159,7 +195,7 @@ def main():
             # delays larger than the half of the window most likely are actually negative
             if delay_ms > 1e3*time/2.:
                 delay_ms -= 1e3*time
-        
+
             # store for smoothing
             old_Xcorr = smoothed_Xcorr
         else:
