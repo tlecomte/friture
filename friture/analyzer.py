@@ -83,7 +83,7 @@ class Friture(QMainWindow, ):
 		self.cpu_percent = 0.
 
 		# Initialize the audio data ring buffer
-		self.audiobuffer = AudioBuffer()
+		self.audiobuffer = AudioBuffer(self.logger)
 
 		# Initialize the audio backend
 		self.audiobackend = AudioBackend(self.logger)

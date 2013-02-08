@@ -23,8 +23,8 @@ from friture.audiobackend import SAMPLING_RATE
 FRAMES_PER_BUFFER = 1024
 
 class AudioBuffer():
-	def __init__(self):
-		self.ringbuffer = RingBuffer()
+	def __init__(self, logger):
+		self.ringbuffer = RingBuffer(logger)
 		self.newpoints = 0
 		self.delay_samples = 0
 

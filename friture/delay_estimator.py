@@ -162,8 +162,8 @@ class Delay_Estimator_Widget(QtGui.QWidget):
         self.zfs1 = subsampler_filtic(self.Ndec, self.bdec, self.adec)
 
         # ringbuffers for the subsampled data        
-        self.ringbuffer0 = RingBuffer()
-        self.ringbuffer1 = RingBuffer()
+        self.ringbuffer0 = RingBuffer(self.logger)
+        self.ringbuffer1 = RingBuffer(self.logger)
         
         self.delayrange_s = DEFAULT_DELAYRANGE # confidence range
         

@@ -24,11 +24,12 @@
 from numpy import zeros
 
 class RingBuffer():
-	def __init__(self):
+	def __init__(self, logger):
 		# buffer length is dynamic based on the needs
 		self.buffer_length = 10000
 		self.buffer = zeros((1, 2*self.buffer_length))
 		self.offset = 0
+		self.logger = logger
 
 	def push(self, floatdata):
 		# update the circular buffer
@@ -98,7 +99,13 @@ class RingBuffer():
 			# let the buffer grow according to our needs
 			old_length = self.buffer_length
 			new_length = int(1.5*length)
-			print "growing buffer for length %d" %(new_length)
+
+			message = "Ringbuffer: growing buffer for length %d" %(new_length)
+			if self.logger <> None:
+				self.logger.push(message)
+			else:
+				print message
+			
 			#create new buffer
 			newbuffer = zeros((self.buffer.shape[0], 2*new_length))
 			#copy existing data so that self.offset does not have to be changed
