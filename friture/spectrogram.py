@@ -97,6 +97,7 @@ class Spectrogram_Widget(QtGui.QWidget):
     # method
     def set_buffer(self, buffer):
         self.audiobuffer = buffer
+        self.old_index = self.audiobuffer.ringbuffer.offset
 
     def log_spectrogram(self, sp):
         # Note: implementing the log10 of the array in Cython did not bring
