@@ -77,7 +77,7 @@ def generalized_cross_correlation(d0, d1):
     #W = 1./numpy.abs(G) # "PHAT"
     absG = numpy.abs(G)
     m = max(absG)
-    W = 1./(1e-4*m + absG)
+    W = 1./(1e-10*m + absG)
     #D1r = D1.conjugate(); G0 = D0r*D0; G1 = D1r*D1; W = numpy.abs(G)/(G0*G1) # HB weighted
     Xcorr = irfft(W*G)
     #Xcorr_unweighted = irfft(G)

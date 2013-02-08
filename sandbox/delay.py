@@ -65,7 +65,7 @@ def generalized_cross_correlation(d0, d1):
     return Xcorr
 
 def main():
-    Ns = 44100*40 #44100*60*3 #3000000
+    Ns = 44100*400 #44100*60*3 #3000000
 
     print "Loading data"
 
