@@ -248,7 +248,6 @@ in the setup window."""
                         alpha = 0.3
                         smoothed_Xcorr = alpha*Xcorr + (1. - alpha)*self.old_Xcorr
                     else:
-                        print "not smoothing"
                         smoothed_Xcorr = Xcorr
                     
                     absXcorr = numpy.abs(smoothed_Xcorr)
