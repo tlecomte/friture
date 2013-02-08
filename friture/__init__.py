@@ -18,5 +18,5 @@
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
 # version and date
-__version__ = "0.6"
-__releasedate__ = "2012-06-07"
+__version__ = "0.7beta"
+__releasedate__ = "2013-02-08"
