@@ -18,7 +18,7 @@
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
 from PyQt4 import QtGui
-from numpy import log10
+from numpy import log10, argmax, max
 from friture.spectplot import SpectPlot
 from friture.audioproc import audioproc # audio processing class
 from friture.spectrum_settings import Spectrum_Settings_Dialog # settings dialog
@@ -133,7 +133,9 @@ class Spectrum_Widget(QtGui.QWidget):
 		else:
 			db_spectrogram = 10*log10(sp1 + epsilon) + w
 
-		self.PlotZoneSpect.setdata(freq, db_spectrogram)
+		i = argmax(db_spectrogram)
+		fmax = freq[i]
+		self.PlotZoneSpect.setdata(freq, db_spectrogram, fmax)
 
 	def setminfreq(self, freq):
 		self.minfreq = freq
