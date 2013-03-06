@@ -383,7 +383,7 @@ class HistPlot(Qwt.QwtPlot):
 		self.histogram.setBaseline(-200.)
 		
 		pos = [0.1, 1., 10.]
-		self.histogram.setData(pos[:-1], pos[1:], pos[:-1], pos[:-1])
+		self.histogram.setData(pos[:-1], pos[1:], [str(p) for p in pos[:-1]], pos[:-1])
 		self.histogram.attach(self)
 		
 		self.cached_canvas = self.canvas()
