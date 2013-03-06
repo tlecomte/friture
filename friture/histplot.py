@@ -82,6 +82,7 @@ class HistogramItem(Qwt.QwtPlotItem):
 		self.need_transform = False
 		self.fl = [0.]
 		self.fh = [0.]
+		self.fc = ["0"] # center frequencies
 		self.y = array([0.])
 		self.y0 = 0.
 		self.i = [0]
@@ -92,10 +93,11 @@ class HistogramItem(Qwt.QwtPlotItem):
   
 		self.yMap = None
 
-	def setData(self, fl, fh, y):
+	def setData(self, fl, fh, fc, y):
 		if len(self.y) <> len(y):
 			self.fl = fl
 			self.fh = fh
+			self.fc = fc
 			self.need_transform = True
 		
 		self.y = array(y)
@@ -170,6 +172,20 @@ class HistogramItem(Qwt.QwtPlotItem):
   
 		for x1, x2, y2, i in zip(self.x1, self.x2, y, self.i):
 			self.drawBar(painter, x1, y2, i)
+
+		# FIXME cache text pixmaps as we do for the bars
+		Dy = 6
+		fHeight = painter.fontMetrics().height()
+		for x1, x2, y2, f in zip(self.x1, self.x2, y, self.fc):
+			fRect = QtCore.QRectF(x1, y2 + Dy, x2-x1, fHeight)
+			if fRect.top() <= 0:
+				fRect.moveTop(3)
+			elif fRect.bottom() >= h-1:
+				fRect.moveBottom(h-3)
+				painter.setPen(QtCore.Qt.black)
+			else:
+				painter.setPen(QtCore.Qt.white)
+			painter.drawText(fRect, Qt.Qt.AlignHCenter, f)
 
 	def drawBar(self, painter, left, top, i):
 		painter.drawPixmap(left, top, self.pixmaps[i])
@@ -367,7 +383,7 @@ class HistPlot(Qwt.QwtPlot):
 		self.histogram.setBaseline(-200.)
 		
 		pos = [0.1, 1., 10.]
-		self.histogram.setData(pos[:-1], pos[1:], pos[:-1])
+		self.histogram.setData(pos[:-1], pos[1:], pos[:-1], pos[:-1])
 		self.histogram.attach(self)
 		
 		self.cached_canvas = self.canvas()
@@ -378,8 +394,8 @@ class HistPlot(Qwt.QwtPlot):
 		#need to replot here for the size Hints to be computed correctly (depending on axis scales...)
 		self.replot()
 
-	def setdata(self, fl, fh, y):
-		self.histogram.setData(fl, fh, y)
+	def setdata(self, fl, fh, fc, y):
+		self.histogram.setData(fl, fh, fc, y)
 		
 		self.compute_peaks(y)
 		self.bar_peak.setData(fl, fh, self.peak, self.peak_int)
