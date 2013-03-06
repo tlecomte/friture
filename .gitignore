@@ -1,6 +1,11 @@
 *~
 *.pyc
 *.so
+*.npy
+*.pyd
+*.wav
+*.exe
+*.zip
 build/*
 dist/*
 doc/_build/*
