@@ -17,7 +17,7 @@ except ImportError:
             "PyOpenGL must be installed to run this example.")
     sys.exit(1)
 
-from numpy import zeros, ones, log10, hstack, array, floor, mean, where
+from numpy import zeros, ones, log10, hstack, array, floor, mean, where, rint
 
 # The peak decay rates (magic goes here :).
 PEAK_DECAY_RATE = 1.0 - 3E-6
@@ -510,7 +510,10 @@ class GLWidget(QtOpenGL.QGLWidget):
 
     def drawFreqMaxText(self, painter):
         painter.setRenderHint(QtGui.QPainter.Antialiasing)
-        text = "%d Hz" %(self.fmax)
+        if self.fmax < 2e2:
+            text = "%.1f Hz" %(self.fmax)
+        else:
+            text = "%d Hz" %(rint(self.fmax))
         
         # compute tracker bounding rect
         painter.setPen(Qt.Qt.black)
