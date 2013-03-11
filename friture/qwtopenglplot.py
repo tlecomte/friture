@@ -519,14 +519,14 @@ class GLWidget(QtOpenGL.QGLWidget):
         # center the text around the max frequency
         rect.translate(-rect.width()/2, 0)
         
-        # avoid crossing the top and right borders
-        dx = - max(rect.x() + rect.width() - self.width(), 0)
-        dy = - min(rect.y(), 0)
+        # avoid crossing the left and top borders
+        dx = - min(rect.x()-2, 0)
+        dy = - min(rect.y()-1, 0)
         rect.translate(dx, dy)
-        
-        # avoid crossing the left and bottom borders
-        dx = - min(rect.x(), 0)
-        dy = - max(rect.y() + rect.height() - self.height(), 0)
+
+        # avoid crossing the right and bottom borders
+        dx = - max(rect.right() - self.width() + 2, 0)
+        dy = - max(rect.bottom() - self.height() + 1, 0)
         rect.translate(dx, dy)
         
         # draw a white background
