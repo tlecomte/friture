@@ -42,6 +42,7 @@ DEFAULT_MINFREQ = 20
 DEFAULT_SPEC_MIN = -100
 DEFAULT_SPEC_MAX = -20
 DEFAULT_WEIGHTING = 1 #A
+DEFAULT_SHOW_FREQ_LABELS = True
 
 class Spectrum_Widget(QtGui.QWidget):
 	def __init__(self, parent, logger = None):
@@ -84,6 +85,7 @@ class Spectrum_Widget(QtGui.QWidget):
 		self.PlotZoneSpect.setweighting(self.weighting)
 		self.PlotZoneSpect.set_peaks_enabled(True)
 		self.PlotZoneSpect.set_baseline_displayUnits(0.)
+		self.PlotZoneSpect.setShowFreqLabel(DEFAULT_SHOW_FREQ_LABELS)
 		
 		# initialize the settings dialog
 		self.settings_dialog = Spectrum_Settings_Dialog(self, self.logger)
@@ -170,6 +172,9 @@ class Spectrum_Widget(QtGui.QWidget):
 		else:
 			self.PlotZoneSpect.set_peaks_enabled(True)
 			self.PlotZoneSpect.set_baseline_displayUnits(0.)
+
+	def setShowFreqLabel(self, showFreqLabel):
+		self.PlotZoneSpect.setShowFreqLabel(showFreqLabel)
 
 	def settings_called(self, checked):
 		self.settings_dialog.show()

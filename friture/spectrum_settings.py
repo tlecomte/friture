@@ -28,6 +28,7 @@ DEFAULT_MINFREQ = 20
 DEFAULT_SPEC_MIN = -100
 DEFAULT_SPEC_MAX = -20
 DEFAULT_WEIGHTING = 1 #A
+DEFAULT_SHOW_FREQ_LABELS = True
 
 class Spectrum_Settings_Dialog(QtGui.QDialog):
 	def __init__(self, parent, logger):
@@ -106,6 +107,10 @@ class Spectrum_Settings_Dialog(QtGui.QDialog):
 		self.comboBox_weighting.addItem("C")
 		self.comboBox_weighting.setCurrentIndex(DEFAULT_WEIGHTING)
 
+		self.checkBox_showFreqLabels = QtGui.QCheckBox(self)
+		self.checkBox_showFreqLabels.setObjectName("showFreqLabels")
+		self.checkBox_showFreqLabels.setChecked(DEFAULT_SHOW_FREQ_LABELS)
+
 		self.formLayout.addRow("Measurement type:", self.comboBox_dual_channel)
 		self.formLayout.addRow("FFT Size:", self.comboBox_fftsize)
 		self.formLayout.addRow("Frequency scale:", self.comboBox_freqscale)
@@ -114,6 +119,7 @@ class Spectrum_Settings_Dialog(QtGui.QDialog):
 		self.formLayout.addRow("Min:", self.spinBox_specmin)
 		self.formLayout.addRow("Max:", self.spinBox_specmax)
 		self.formLayout.addRow("Middle-ear weighting:", self.comboBox_weighting)
+		self.formLayout.addRow("Display max-frequency label:", self.checkBox_showFreqLabels)
 		
 		self.setLayout(self.formLayout)
 
@@ -125,6 +131,7 @@ class Spectrum_Settings_Dialog(QtGui.QDialog):
 		self.connect(self.spinBox_specmin, QtCore.SIGNAL('valueChanged(int)'), self.parent.setmin)
 		self.connect(self.spinBox_specmax, QtCore.SIGNAL('valueChanged(int)'), self.parent.setmax)
 		self.connect(self.comboBox_weighting, QtCore.SIGNAL('currentIndexChanged(int)'), self.parent.setweighting)
+		self.connect(self.checkBox_showFreqLabels, QtCore.SIGNAL('toggled(bool)'), self.parent.setShowFreqLabel)
 
 	# slot
 	def dualchannelchanged(self, index):
@@ -160,6 +167,7 @@ class Spectrum_Settings_Dialog(QtGui.QDialog):
 		settings.setValue("Min", self.spinBox_specmin.value())
 		settings.setValue("Max", self.spinBox_specmax.value())
 		settings.setValue("weighting", self.comboBox_weighting.currentIndex())
+		settings.setValue("showFreqLabels", self.checkBox_showFreqLabels.isChecked())
 
 	# method
 	def restoreState(self, settings):
@@ -177,3 +185,5 @@ class Spectrum_Settings_Dialog(QtGui.QDialog):
 		self.spinBox_specmax.setValue(colorMax)
 		(weighting, ok) = settings.value("weighting", DEFAULT_WEIGHTING).toInt()
 		self.comboBox_weighting.setCurrentIndex(weighting)
+		showFreqLabels = settings.value("showFreqLabels", DEFAULT_SHOW_FREQ_LABELS).toBool()
+		self.checkBox_showFreqLabels.setChecked(showFreqLabels)

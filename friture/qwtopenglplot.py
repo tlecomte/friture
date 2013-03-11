@@ -139,6 +139,9 @@ class GLPlotWidget(QtGui.QWidget):
         self.needtransform = True
         self.draw()
     
+    def setShowFreqLabel(self, showFreqLabel):
+        self.glWidget.setShowFreqLabel(showFreqLabel)
+
     def set_peaks_enabled(self, enabled):
         self.peaks_enabled = enabled
     
@@ -414,6 +417,7 @@ class GLWidget(QtOpenGL.QGLWidget):
         self.mousex = 0
         self.mousey = 0
 
+        self.showFreqLabel = True
         self.xmax = 0
         self.fmax = 0.
         
@@ -439,6 +443,11 @@ class GLWidget(QtOpenGL.QGLWidget):
         else:
             self.xmax = int(xmax)
         self.fmax = fmax
+
+    def setShowFreqLabel(self, showFreqLabel):
+        self.showFreqLabel = showFreqLabel
+        # ask for update so the the label is actually erased or painted
+        self.update()
 
     def setQuadData(self, vertices, colors):
         self.vertices = vertices
@@ -512,6 +521,9 @@ class GLWidget(QtOpenGL.QGLWidget):
         GL.glDisableClientState(GL.GL_VERTEX_ARRAY)
 
     def drawFreqMaxText(self, painter):
+        if not self.showFreqLabel:
+            return
+
         painter.setRenderHint(QtGui.QPainter.Antialiasing)
         if self.fmax < 2e2:
             text = "%.1f Hz" %(self.fmax)
