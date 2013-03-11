@@ -18,7 +18,7 @@
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
 from PyQt4 import QtGui
-from numpy import log10, array, arange
+from numpy import log10, array, arange, where
 from friture.histplot import HistPlot
 from friture.octavespectrum_settings import OctaveSpectrum_Settings_Dialog # settings dialog
 from friture.filter import (octave_filter_bank_decimation, octave_frequencies,
@@ -29,6 +29,8 @@ from friture.exp_smoothing_conv import pyx_exp_smoothed_value
 from friture import generated_filters
 
 from friture.audiobackend import SAMPLING_RATE
+
+import friture.renard as renard
 
 SMOOTH_DISPLAY_TIMER_PERIOD_MS = 25
 
@@ -196,7 +198,7 @@ class OctaveSpectrum_Widget(QtGui.QWidget):
 		
 		epsilon = 1e-30
 		db_spectrogram = 10*log10(sp + epsilon) + w
-		self.PlotZoneSpect.setdata(self.filters.flow, self.filters.fhigh, db_spectrogram)
+		self.PlotZoneSpect.setdata(self.filters.flow, self.filters.fhigh, self.filters.f_nominal, db_spectrogram)
 
 	def setmin(self, value):
 		self.spec_min = value
@@ -303,3 +305,36 @@ class octave_filters():
 		self.A = 2.0  + 20.*log10(Ra)
 		#self.zfs = None
 		self.zfs = octave_filter_bank_decimation_filtic(self.bdec, self.adec, self.boct, self.aoct)
+
+		if bandsperoctave == 1:
+			basis = renard.R5
+		elif bandsperoctave == 3:
+			basis = renard.R10
+		elif bandsperoctave == 6:
+			basis = renard.R20
+		elif bandsperoctave == 12:
+			basis = renard.R40
+		elif bandsperoctave == 24:
+			basis = renard.R80
+		else:
+			raise Exception("Unknown bandsperoctave: %d" %(bandsperoctave))
+
+		# search the index of 1 kHz, the reference
+		i = where(self.fi == 1000.)[0][0]
+
+		# build the frequency scale
+		self.f_nominal = []
+
+		k = 0
+		while len(self.f_nominal) < len(self.fi) - i:
+			self.f_nominal += ["{0:.{width}f}k".format(10**k*f, width=2-k) for f in basis]
+			k += 1
+		self.f_nominal = self.f_nominal[:len(self.fi) - i]
+
+		k = 0
+		while len(self.f_nominal) < len(self.fi):
+			self.f_nominal = ["%d" %(10**(2-k)*f) for f in basis] + self.f_nominal
+			k += 1
+		self.f_nominal = self.f_nominal[-len(self.fi):]
+
+		

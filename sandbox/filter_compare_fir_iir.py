@@ -42,23 +42,31 @@ yf_imp_iir, zf = lfilter(b_iir, a_iir, impulse, zi=np.zeros(max(len(a_iir),len(b
 
 plt.figure()
 
-plt.subplot(311)
+plt.subplot(411)
 plt.title("original and filtered signals")
 plt.plot(x, y)
 plt.plot(x, yf_fir)
 plt.plot(x, yf_iir)
 
-plt.subplot(312)
+plt.subplot(412)
 plt.title("original and filtered frequency distributions")
 freqScale = fftshift(fftfreq(N,1./fs))[N/2:]
 plt.semilogx(freqScale, fftshift(20. * np.log10(abs(fft(y*window))))[N/2:])
 plt.semilogx(freqScale, fftshift(20. * np.log10(abs(fft(yf_fir*window))))[N/2:])
 plt.semilogx(freqScale, fftshift(20. * np.log10(abs(fft(yf_iir*window))))[N/2:])
 
-plt.subplot(313)
-plt.title("filter impulse response")
+plt.subplot(413)
+plt.title("filter impulse magnitude response")
 plt.semilogx(freqScale, fftshift(20. * np.log10(abs(fft(impulse*window))))[N/2:], label="signal")
 plt.semilogx(freqScale, fftshift(20. * np.log10(abs(fft(yf_imp_fir*window))))[N/2:], label="FIR filt.")
 plt.semilogx(freqScale, fftshift(20. * np.log10(abs(fft(yf_imp_iir*window))))[N/2:], label="IIR filt.")
 plt.legend(loc='lower left')
+
+plt.subplot(414)
+plt.title("filter impulse phase response")
+plt.semilogx(freqScale, fftshift(np.angle(fft(impulse*window)))[N/2:], label="signal")
+plt.semilogx(freqScale, fftshift(np.angle(fft(yf_imp_fir*window)))[N/2:], label="FIR filt.")
+plt.semilogx(freqScale, fftshift(np.angle(fft(yf_imp_iir*window)))[N/2:], label="IIR filt.")
+plt.legend(loc='lower left')
+
 plt.show()

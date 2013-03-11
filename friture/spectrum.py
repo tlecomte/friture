@@ -18,7 +18,7 @@
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
 from PyQt4 import QtGui
-from numpy import log10
+from numpy import log10, argmax, max
 from friture.spectplot import SpectPlot
 from friture.audioproc import audioproc # audio processing class
 from friture.spectrum_settings import Spectrum_Settings_Dialog # settings dialog
@@ -42,6 +42,7 @@ DEFAULT_MINFREQ = 20
 DEFAULT_SPEC_MIN = -100
 DEFAULT_SPEC_MAX = -20
 DEFAULT_WEIGHTING = 1 #A
+DEFAULT_SHOW_FREQ_LABELS = True
 
 class Spectrum_Widget(QtGui.QWidget):
 	def __init__(self, parent, logger = None):
@@ -84,6 +85,7 @@ class Spectrum_Widget(QtGui.QWidget):
 		self.PlotZoneSpect.setweighting(self.weighting)
 		self.PlotZoneSpect.set_peaks_enabled(True)
 		self.PlotZoneSpect.set_baseline_displayUnits(0.)
+		self.PlotZoneSpect.setShowFreqLabel(DEFAULT_SHOW_FREQ_LABELS)
 		
 		# initialize the settings dialog
 		self.settings_dialog = Spectrum_Settings_Dialog(self, self.logger)
@@ -133,7 +135,9 @@ class Spectrum_Widget(QtGui.QWidget):
 		else:
 			db_spectrogram = 10*log10(sp1 + epsilon) + w
 
-		self.PlotZoneSpect.setdata(freq, db_spectrogram)
+		i = argmax(db_spectrogram)
+		fmax = freq[i]
+		self.PlotZoneSpect.setdata(freq, db_spectrogram, fmax)
 
 	def setminfreq(self, freq):
 		self.minfreq = freq
@@ -168,6 +172,9 @@ class Spectrum_Widget(QtGui.QWidget):
 		else:
 			self.PlotZoneSpect.set_peaks_enabled(True)
 			self.PlotZoneSpect.set_baseline_displayUnits(0.)
+
+	def setShowFreqLabel(self, showFreqLabel):
+		self.PlotZoneSpect.setShowFreqLabel(showFreqLabel)
 
 	def settings_called(self, checked):
 		self.settings_dialog.show()

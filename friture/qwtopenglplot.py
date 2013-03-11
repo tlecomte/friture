@@ -17,7 +17,7 @@ except ImportError:
             "PyOpenGL must be installed to run this example.")
     sys.exit(1)
 
-from numpy import zeros, ones, log10, hstack, array, floor, mean, where
+from numpy import zeros, ones, log10, hstack, array, floor, mean, where, rint, inf
 
 # The peak decay rates (magic goes here :).
 PEAK_DECAY_RATE = 1.0 - 3E-6
@@ -43,6 +43,8 @@ class GLPlotWidget(QtGui.QWidget):
         self.x1 = array([0.1, 0.5, 1.])
         self.x2 = array([0.5, 1., 2.])
         self.y = array([0., 0., 0.])
+
+        self.fmax = 1e3
         
         self.transformed_x1 = self.x1
         self.transformed_x2 = self.x2
@@ -137,6 +139,9 @@ class GLPlotWidget(QtGui.QWidget):
         self.needtransform = True
         self.draw()
     
+    def setShowFreqLabel(self, showFreqLabel):
+        self.glWidget.setShowFreqLabel(showFreqLabel)
+
     def set_peaks_enabled(self, enabled):
         self.peaks_enabled = enabled
     
@@ -173,7 +178,7 @@ class GLPlotWidget(QtGui.QWidget):
     def inverseYTransform(self, y):
         return (y + 1. - self.bottomDist)*(self.ymax - self.ymin)/(self.glWidget.height() - self.topDist - self.bottomDist) + self.ymin
     
-    def setdata(self, x, y):        
+    def setdata(self, x, y, fmax):        
         x1 = zeros(x.shape)
         x2 = zeros(x.shape)
         x1[0] = 1e-10
@@ -189,6 +194,7 @@ class GLPlotWidget(QtGui.QWidget):
         
         # save data for resizing
         self.y = y
+        self.fmax = fmax
         
         self.draw()
         
@@ -325,7 +331,12 @@ class GLPlotWidget(QtGui.QWidget):
         else:
             # used for single channel analysis
             baseline = self.baseline
+
+        xmax = self.xtransform(self.fmax)
+        self.glWidget.setfmax(xmax, self.fmax)
+
         self.setQuadData(x1_with_peaks, y_with_peaks, x2_with_peaks - x1_with_peaks, baseline, r_with_peaks, g_with_peaks, b_with_peaks)
+
 
     # redraw when the widget is resized to update coordinates transformations
     def resizeEvent(self, event):
@@ -405,6 +416,10 @@ class GLWidget(QtOpenGL.QGLWidget):
         self.ruler = False
         self.mousex = 0
         self.mousey = 0
+
+        self.showFreqLabel = True
+        self.xmax = 0
+        self.fmax = 0.
         
         # use a cross cursor to easily select a point on the graph
         self.setCursor(Qt.Qt.CrossCursor)
@@ -421,6 +436,18 @@ class GLWidget(QtOpenGL.QGLWidget):
 
     def initializeGL(self):
         return
+
+    def setfmax(self, xmax, fmax):
+        if xmax==inf or xmax==-inf:
+            self.xmax = 0
+        else:
+            self.xmax = int(xmax)
+        self.fmax = fmax
+
+    def setShowFreqLabel(self, showFreqLabel):
+        self.showFreqLabel = showFreqLabel
+        # ask for update so the the label is actually erased or painted
+        self.update()
 
     def setQuadData(self, vertices, colors):
         self.vertices = vertices
@@ -469,6 +496,8 @@ class GLWidget(QtOpenGL.QGLWidget):
 
         painter = QtGui.QPainter(self)
         self.drawTrackerText(painter)
+        self.drawFreqMaxText(painter)
+
         painter.end()
 
     def drawDataQuads(self):
@@ -490,7 +519,42 @@ class GLWidget(QtOpenGL.QGLWidget):
         
         GL.glDisableClientState(GL.GL_COLOR_ARRAY)
         GL.glDisableClientState(GL.GL_VERTEX_ARRAY)
-    
+
+    def drawFreqMaxText(self, painter):
+        if not self.showFreqLabel:
+            return
+
+        painter.setRenderHint(QtGui.QPainter.Antialiasing)
+        if self.fmax < 2e2:
+            text = "%.1f Hz" %(self.fmax)
+        else:
+            text = "%d Hz" %(rint(self.fmax))
+        
+        # compute tracker bounding rect
+        painter.setPen(Qt.Qt.black)
+        rect = painter.boundingRect(QtCore.QRect(self.xmax, 0, 0, 0), Qt.Qt.AlignLeft, text)
+        
+        # center the text around the max frequency
+        rect.translate(-rect.width()/2, 0)
+        
+        # avoid crossing the left and top borders
+        dx = - min(rect.x()-2, 0)
+        dy = - min(rect.y()-1, 0)
+        rect.translate(dx, dy)
+
+        # avoid crossing the right and bottom borders
+        dx = - max(rect.right() - self.width() + 2, 0)
+        dy = - max(rect.bottom() - self.height() + 1, 0)
+        rect.translate(dx, dy)
+        
+        # draw a white background
+        painter.setPen(Qt.Qt.NoPen)
+        painter.setBrush(Qt.Qt.white)
+        painter.drawRect(rect)
+        
+        painter.setPen(Qt.Qt.black)
+        painter.drawText(rect, Qt.Qt.AlignLeft, text)
+
     def drawTrackerText(self, painter): 
         if self.ruler:
             painter.setRenderHint(QtGui.QPainter.Antialiasing)
