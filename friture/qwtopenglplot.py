@@ -17,7 +17,7 @@ except ImportError:
             "PyOpenGL must be installed to run this example.")
     sys.exit(1)
 
-from numpy import zeros, ones, log10, hstack, array, floor, mean, where, rint
+from numpy import zeros, ones, log10, hstack, array, floor, mean, where, rint, inf
 
 # The peak decay rates (magic goes here :).
 PEAK_DECAY_RATE = 1.0 - 3E-6
@@ -434,7 +434,10 @@ class GLWidget(QtOpenGL.QGLWidget):
         return
 
     def setfmax(self, xmax, fmax):
-        self.xmax = int(xmax)
+        if xmax==inf or xmax==-inf:
+            self.xmax = 0
+        else:
+            self.xmax = int(xmax)
         self.fmax = fmax
 
     def setQuadData(self, vertices, colors):
