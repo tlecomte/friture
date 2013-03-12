@@ -101,7 +101,7 @@ class Levels_Widget(QtGui.QWidget):
 		#time = 0.025 #IMPULSE setting for a sound level meter
 		#time = 0.125 #FAST setting for a sound level meter
 		#time = 1. #SLOW setting for a sound level meter
-		self.response_time = 0.125
+		self.response_time = 0.300 #300ms is a common value for VU meters
 		# an exponential smoothing filter is a simple IIR filter
 		# s_i = alpha*x_i + (1-alpha)*s_{i-1}
 		#we compute alpha so that the n most recent samples represent 100*w percent of the output
@@ -117,7 +117,8 @@ class Levels_Widget(QtGui.QWidget):
 		self.old_rms_2 = 1e-30
 		self.old_max_2 = 1e-30
 		
-		n2 = self.response_time/(SMOOTH_DISPLAY_TIMER_PERIOD_MS/1000.)
+		response_time_peaks = 0.025 # 25ms for instantaneous peaks
+		n2 = response_time_peaks/(SMOOTH_DISPLAY_TIMER_PERIOD_MS/1000.)
 		self.alpha2 = 1. - (1.-w)**(1./(n2+1))
   
 		self.two_channels = False
