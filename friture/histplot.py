@@ -99,7 +99,7 @@ class HistogramItem(Qwt.QwtPlotItem):
 		self.Hpixmaps = [[QtGui.QPixmap(), QtGui.QPixmap()]]
 		self.Vpixmaps = [[QtGui.QPixmap(), QtGui.QPixmap()]]
   
-		self.yMap = None
+		self.yMap = Qwt.QwtScaleMap()
 
 	def setData(self, fl, fh, fc, y):
 		if len(self.y) <> len(y):
@@ -156,10 +156,13 @@ class HistogramItem(Qwt.QwtPlotItem):
 			self.need_transform = True
 
 		# the transform parameters change when the scale changes
-		if self.yMap <> yMap:
+		if (   self.yMap.p1() <> yMap.p1()
+			or self.yMap.p2() <> yMap.p2()
+			or self.yMap.s1() <> yMap.s1()
+			or self.yMap.s2() <> yMap.s2()):
 			self.yMap = yMap
 			self.need_transform = True
-		
+
 		# update the cached pixmaps and coordinates if necessary
 		if self.need_transform:
 			self.x1 = array([xMap.transform(flow) for flow in self.fl])
