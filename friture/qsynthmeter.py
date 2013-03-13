@@ -98,6 +98,51 @@ class MeterScale(QtGui.QWidget):
 
 
 #----------------------------------------------------------------------------
+# BallisticPeak -- Peak with a value and a color, that holds then decays
+
+class BallisticPeak:
+	def __init__(self, meter):
+		self.meter = meter # used to reach IEC colors and levels
+		self.peakValue = 0 # in pixels
+		self.peakHoldCounter = 0
+		self.peakDecayFactor = PEAK_DECAY_RATE
+		self.peakColor       = self.meter.Color6dB
+
+	def value(self):
+		return self.peakValue
+
+	def color(self):
+		return self.peakColor
+
+	def reset(self):
+		self.peakValue = 0		
+
+	def refresh(self, value):
+		# peak-hold-then-decay mechanism
+		peakValue = self.peakValue
+		if peakValue < value:
+			# the value is higher than the peak, the peak must follow the value
+			peakValue = value
+			self.peakHoldCounter = 0 # reset the hold 
+			self.peakDecayFactor = PEAK_DECAY_RATE
+			self.peakColor = self.meter.Color10dB #iLevel
+			while self.peakColor > self.meter.ColorOver and peakValue >= self.meter.iec_level(self.peakColor):
+				self.peakColor -= 1
+		elif self.peakHoldCounter + 1 > self.meter.peakFalloff():
+			peakValue = self.peakDecayFactor * float(peakValue)
+			if self.peakValue < value:
+				peakValue = value
+			else:
+				#if peakValue < self.meter.iec_level(self.meter.Color10dB):
+					#self.peakColor = self.meter.Color6dB
+				self.peakDecayFactor *= self.peakDecayFactor
+		self.peakHoldCounter += 1
+
+		self.peakValue  = peakValue
+
+		return peakValue
+
+#----------------------------------------------------------------------------
 # MeterValue -- Meter bridge value widget.
 class MeterValue(QtGui.QFrame):
 	
@@ -107,10 +152,7 @@ class MeterValue(QtGui.QFrame):
 		self.meter      = meter
 		self.dBValue    = 0.0
 		self.pixelValue = 0
-		self.peakValue       = 0 # in pixels
-		self.peakHoldCounter = 0
-		self.peakDecayFactor = PEAK_DECAY_RATE
-		self.peakColor       = self.meter.Color6dB
+		self.peak = BallisticPeak(self.meter)
 
 		self.paint_time = 0.
 
@@ -119,7 +161,7 @@ class MeterValue(QtGui.QFrame):
 
 	# Reset peak holder.
 	def peakReset(self):
-		self.peakValue = 0
+		self.peak.reset()
 
 	def setValue(self, value):
 		self.dBValue = value
@@ -129,37 +171,8 @@ class MeterValue(QtGui.QFrame):
 		self.refresh()
 
 	def refresh(self):
-		dBValue = self.dBValue
-
-		pixelValue = self.meter.iec_scale(dBValue)
-
-		# peak-hold-then-decay mechanism
-		peakValue = self.peakValue
-		if peakValue < pixelValue:
-			# the value is higher than the peak, the peak must follow the value
-			peakValue = pixelValue
-			self.peakHoldCounter = 0 # reset the hold 
-			self.peakDecayFactor = PEAK_DECAY_RATE
-			self.peakColor = self.meter.Color10dB #iLevel
-			while self.peakColor > self.meter.ColorOver and peakValue >= self.meter.iec_level(self.peakColor):
-				self.peakColor -= 1
-		elif self.peakHoldCounter + 1 > self.meter.peakFalloff():
-			peakValue = self.peakDecayFactor * float(peakValue)
-			if self.peakValue < pixelValue:
-				peakValue = pixelValue
-			else:
-				#if peakValue < self.meter.iec_level(self.meter.Color10dB):
-					#self.peakColor = self.meter.Color6dB
-				self.peakDecayFactor *= self.peakDecayFactor
-		self.peakHoldCounter += 1
-
-		# avoid running the (possibly costly) repaint if there is no change
-		if pixelValue == self.pixelValue and peakValue == self.peakValue:
-			return
-
-		self.pixelValue = pixelValue
-		self.peakValue  = peakValue
-
+		self.pixelValue = self.meter.iec_scale(self.dBValue)
+		self.peak.refresh(self.pixelValue)
 		self.update()
 
 	def paintEvent(self, event):
@@ -184,13 +197,13 @@ class MeterValue(QtGui.QFrame):
 			self.meter.pixmap(), 0, h - self.pixelValue, w, self.pixelValue + 1)
 
 		# draw the peak line
-		painter.setPen(self.meter.color(self.peakColor))
-		painter.drawLine(0, h - self.peakValue, w, h - self.peakValue)
+		painter.setPen(self.meter.color(self.peak.color()))
+		painter.drawLine(0, h - self.peak.value(), w, h - self.peak.value())
 		
 		self.paint_time = (95.*self.paint_time + 5.*t.elapsed())/100.
 
 	def resizeEvent(self, resizeEvent):
-		self.peakValue = 0
+		self.peak.reset()
 
 		QtGui.QWidget.resizeEvent(self, resizeEvent)
 		#QtGui.QWidget.repaint(True)
