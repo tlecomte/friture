@@ -67,7 +67,7 @@ class qsynthMeterScale(QtGui.QWidget):
 				painter.drawLine(0, currentY, 2, currentY)
 				# if there are several meters, the scale is in-between
 				# so the segments need to be drawn on both sides
-				if self.meter.portCount() > 1:
+				if self.meter.getPortCount() > 1:
 					painter.drawLine(scaleWidth - 3, currentY, scaleWidth - 1, currentY)
 
 			# draw the text label (## dB)
@@ -222,20 +222,20 @@ class qsynthMeterValue(QtGui.QFrame):
 
 class qsynthMeter(QtGui.QFrame):
 	# Constructor.
-	def __init__(self, pParent):
-		QtGui.QFrame.__init__(self, pParent)
+	def __init__(self, parent):
+		QtGui.QFrame.__init__(self, parent)
 		
 		# Local instance variables.
-		self.m_iPortCount   = 2	# FIXME: Default port count.
-		self.m_iScaleCount  = self.m_iPortCount
+		self.portCount  = 2	# FIXME: Default port count.
+		self.scaleCount = self.portCount
 
-		self.m_fScale = 0.
+		self.heightToZerodB = 0.
 
 		if 1: #CONFIG_GRADIENT
-			self.m_pPixmap = QtGui.QPixmap()
+			self.levelPixmap = QtGui.QPixmap()
 
 		# Peak falloff mode setting (0=no peak falloff).
-		self.m_iPeakFalloff = QSYNTH_METER_PEAK_FALLOFF
+		self.peakFalloffCycleCount = QSYNTH_METER_PEAK_FALLOFF
 			
 		self.ColorOver	= 0
 		self.Color0dB	= 1
@@ -247,23 +247,23 @@ class qsynthMeter(QtGui.QFrame):
 		self.ColorFore	= 6
 		self.ColorCount	= 7
 		
-		self.m_levels = [0]*self.LevelCount
+		self.iecLevels = [0]*self.LevelCount
 
-		self.m_colors = [QtGui.QColor(0,  0, 0)]*self.ColorCount
-		self.m_colors[self.ColorOver] = QtGui.QColor(240,  0, 20)
-		self.m_colors[self.Color0dB]  = QtGui.QColor(240,160, 20)
-		self.m_colors[self.Color3dB]  = QtGui.QColor(220,220, 20)
-		self.m_colors[self.Color6dB]  = QtGui.QColor(160,220, 20)
-		self.m_colors[self.Color10dB] = QtGui.QColor( 40,160, 40)
-		self.m_colors[self.ColorBack] = QtGui.QColor( 20, 40, 20)
-		self.m_colors[self.ColorFore] = QtGui.QColor( 80, 80, 80)
+		self.colors = [QtGui.QColor(0, 0, 0)]*self.ColorCount
+		self.colors[self.ColorOver] = QtGui.QColor(240,  0, 20)
+		self.colors[self.Color0dB]  = QtGui.QColor(240,160, 20)
+		self.colors[self.Color3dB]  = QtGui.QColor(220,220, 20)
+		self.colors[self.Color6dB]  = QtGui.QColor(160,220, 20)
+		self.colors[self.Color10dB] = QtGui.QColor( 40,160, 40)
+		self.colors[self.ColorBack] = QtGui.QColor( 20, 40, 20)
+		self.colors[self.ColorFore] = QtGui.QColor( 80, 80, 80)
 
 		self.setBackgroundRole(QtGui.QPalette.NoRole)
 
-		self.m_pHBoxLayout = QtGui.QHBoxLayout()
-		self.m_pHBoxLayout.setMargin(0)
-		self.m_pHBoxLayout.setSpacing(0)
-		self.setLayout(self.m_pHBoxLayout)
+		self.HBoxLayout = QtGui.QHBoxLayout()
+		self.HBoxLayout.setMargin(0)
+		self.HBoxLayout.setSpacing(0)
+		self.setLayout(self.HBoxLayout)
 
 		self.build()
 
@@ -272,8 +272,8 @@ class qsynthMeter(QtGui.QFrame):
 
 	# build the widget layout depending on the port count.
 	def build(self):
-		while self.m_pHBoxLayout.count() > 0:
-			item = self.m_pHBoxLayout.takeAt(0)
+		while self.HBoxLayout.count() > 0:
+			item = self.HBoxLayout.takeAt(0)
 			if not item:
 				continue
 
@@ -281,32 +281,32 @@ class qsynthMeter(QtGui.QFrame):
 			if w:
 				w.deleteLater()
 
-		if self.m_iPortCount > 0 and self.m_iPortCount < 4:
-			self.m_iScaleCount = 1
-			self.m_ppValues = []
-			self.m_ppScales = []
-			for iPort in range(0, self.m_iPortCount):
-				self.m_ppValues += [qsynthMeterValue(self)]
-				self.m_pHBoxLayout.addWidget(self.m_ppValues[iPort])
-				if iPort < self.m_iScaleCount:
-					self.m_ppScales += [qsynthMeterScale(self)]
-					self.m_pHBoxLayout.addWidget(self.m_ppScales[iPort])
-			self.setMinimumSize(16 * self.m_iPortCount + 16 * self.m_iScaleCount, 120)
-			self.setMaximumWidth(16 * self.m_iPortCount + 16 * self.m_iScaleCount)
-		elif self.m_iPortCount >= 4:
-			self.m_iScaleCount = 1
-			self.m_ppValues = []
-			self.m_ppScales = []
-			for iPort in range(0, self.m_iPortCount):
-				self.m_ppValues += [qsynthMeterValue(self)]
-				self.m_pHBoxLayout.addWidget(self.m_ppValues[iPort])
+		if self.portCount > 0 and self.portCount < 4:
+			self.scaleCount = 1
+			self.singleMeters = []
+			self.singleScales = []
+			for iPort in range(0, self.portCount):
+				self.singleMeters += [qsynthMeterValue(self)]
+				self.HBoxLayout.addWidget(self.singleMeters[iPort])
+				if iPort < self.scaleCount:
+					self.singleScales += [qsynthMeterScale(self)]
+					self.HBoxLayout.addWidget(self.singleScales[iPort])
+			self.setMinimumSize(16 * self.portCount + 16 * self.scaleCount, 120)
+			self.setMaximumWidth(16 * self.portCount + 16 * self.scaleCount)
+		elif self.portCount >= 4:
+			self.scaleCount = 1
+			self.singleMeters = []
+			self.singleScales = []
+			for iPort in range(0, self.portCount):
+				self.singleMeters += [qsynthMeterValue(self)]
+				self.HBoxLayout.addWidget(self.singleMeters[iPort])
 				if iPort == 1:
-					self.m_ppScales += [qsynthMeterScale(self)]
-					self.m_pHBoxLayout.addWidget(self.m_ppScales[-1])
+					self.singleScales += [qsynthMeterScale(self)]
+					self.HBoxLayout.addWidget(self.singleScales[-1])
 				if iPort % 2 == 0:
-					self.m_pHBoxLayout.addSpacing(1)
-			self.setMinimumSize(16 * self.m_iPortCount + 16 * self.m_iScaleCount, 120)
-			self.setMaximumWidth(16 * self.m_iPortCount + 16 * self.m_iScaleCount)
+					self.HBoxLayout.addSpacing(1)
+			self.setMinimumSize(16 * self.portCount + 16 * self.scaleCount, 120)
+			self.setMaximumWidth(16 * self.portCount + 16 * self.scaleCount)
 		else:
 			self.setMinimumSize(2, 120)
 			self.setMaximumWidth(4)
@@ -330,36 +330,36 @@ class qsynthMeter(QtGui.QFrame):
 		else: # if (dB < 0.0)
 			fDef = (dB + 20.0) * 0.025 + 0.5
 
-		return fDef * self.m_fScale
+		return fDef * self.heightToZerodB
 
 
-	def iec_level (self, iIndex):
-		return self.m_levels[iIndex]
+	def iec_level (self, index):
+		return self.iecLevels[index]
 
 
-	def portCount (self):
-		return self.m_iPortCount
+	def getPortCount (self):
+		return self.portCount
 
 	def setPortCount (self, count):
-		self.m_iPortCount = count
+		self.portCount = count
     		self.build()
 
 	# Peak falloff mode setting.
-	def setPeakFalloff ( self, iPeakFalloff ):
-		self.m_iPeakFalloff = iPeakFalloff
+	def setPeakFalloff ( self, peakFalloffCount ):
+		self.peakFalloffCycleCount = peakFalloffCount
 
 
 	def peakFalloff ( self ):
-		return self.m_iPeakFalloff
+		return self.peakFalloffCycleCount
 
 
 	# Reset peak holder.
 	def peakReset (self):
-		for iPort in range (0, self.m_iPortCount):
-			self.m_ppValues[iPort].peakReset()
+		for iPort in range (0, self.portCount):
+			self.singleMeters[iPort].peakReset()
 
 	def pixmap (self):
-	  	return self.m_pPixmap
+	  	return self.levelPixmap
 
 	def updatePixmap (self):
 		w = self.width()
@@ -372,33 +372,33 @@ class qsynthMeter(QtGui.QFrame):
 		grad.setColorAt(0.6, self.color(self.Color6dB))
 		grad.setColorAt(0.8, self.color(self.Color10dB))
 
-		self.m_pPixmap = QtGui.QPixmap(w, h)
+		self.levelPixmap = QtGui.QPixmap(w, h)
 
-		QtGui.QPainter(self.m_pPixmap).fillRect(0, 0, w, h, grad);
+		QtGui.QPainter(self.levelPixmap).fillRect(0, 0, w, h, grad);
 
 	# Slot refreshment.
 	def refresh (self):
-		for iPort in range (0, self.m_iPortCount):
-			self.m_ppValues[iPort].refresh()
+		for iPort in range (0, self.portCount):
+			self.singleMeters[iPort].refresh()
 
 
 	# Resize event handler.
 	def resizeEvent ( self, event ):
-		self.m_fScale = 0.85 * float(self.height())
+		self.heightToZerodB = 0.85 * float(self.height())
 
-		self.m_levels[self.Color0dB]  = self.iec_scale(  0.0)
-		self.m_levels[self.Color3dB]  = self.iec_scale( -3.0)
-		self.m_levels[self.Color6dB]  = self.iec_scale( -6.0)
-		self.m_levels[self.Color10dB] = self.iec_scale(-10.0)
+		self.iecLevels[self.Color0dB]  = self.iec_scale(  0.0)
+		self.iecLevels[self.Color3dB]  = self.iec_scale( -3.0)
+		self.iecLevels[self.Color6dB]  = self.iec_scale( -6.0)
+		self.iecLevels[self.Color10dB] = self.iec_scale(-10.0)
 
 		if 1: #CONFIG_GRADIENT
 			self.updatePixmap()
 
 	# Meter value proxy.
 	def setValue ( self, iPort, fValue ):
-		self.m_ppValues[iPort].setValue(fValue)
+		self.singleMeters[iPort].setValue(fValue)
 		
 
 	# Common resource accessor.
-	def color ( self, iIndex ):
-		return self.m_colors[iIndex]
+	def color ( self, index ):
+		return self.colors[index]
