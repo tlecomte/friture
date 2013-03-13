@@ -355,7 +355,7 @@ class qsynthMeter(QtGui.QFrame):
 			self.singleMeters[iPort].refresh()
 
 	def resizeEvent ( self, event ):
-		self.IECScale.setHeight(0.85 * float(self.height()))
+		self.IECScale.setHeight(0.95 * float(self.height()))
 
 		self.iecLevels[self.Color0dB]  = self.iec_scale(  0.0)
 		self.iecLevels[self.Color3dB]  = self.iec_scale( -3.0)
