@@ -92,18 +92,17 @@ class qsynthMeterScale(QtGui.QWidget):
 # qsynthMeterValue -- Meter bridge value widget.
 class qsynthMeterValue(QtGui.QFrame):
 	# Constructor.
-	def __init__(self, pMeter):
-		QtGui.QFrame.__init__(self, pMeter)
+	def __init__(self, meter):
+		QtGui.QFrame.__init__(self, meter)
 		
 		# Local instance variables.
-		self.m_pMeter      = pMeter
-		self.m_fValue      = 0.0
-		self.m_iValue  = 0
-		#self.m_fValueDecay = QSYNTH_METER_DECAY_RATE1
-		self.m_iPeak       = 0
-		self.m_iPeakHold   = 0
-		self.m_fPeakDecay  = QSYNTH_METER_DECAY_RATE2
-		self.m_iPeakColor  = self.m_pMeter.Color6dB
+		self.meter      = meter
+		self.dBValue    = 0.0
+		self.pixelValue = 0
+		self.peakValue       = 0 # in pixels
+		self.peakHoldCounter = 0
+		self.peakDecayFactor = QSYNTH_METER_DECAY_RATE2
+		self.peakColor       = self.meter.Color6dB
 
 		self.paint_time = 0.
 
@@ -112,52 +111,50 @@ class qsynthMeterValue(QtGui.QFrame):
 
 	# Reset peak holder.
 	def peakReset(self):
-		self.m_iPeak = 0
+		self.peakValue = 0
 
 	# Frame value one-way accessors.
 	def setValue(self, fValue):
-		self.m_fValue = fValue
+		self.dBValue = fValue
 		self.refresh()
 
 	# Value refreshment.
 	def refresh(self):
-		dB = self.m_fValue
+		dBValue = self.dBValue
 		
-		if dB < QSYNTH_METER_MINDB:
-			dB = QSYNTH_METER_MINDB
-		elif dB > QSYNTH_METER_MAXDB:
-			dB = QSYNTH_METER_MAXDB
+		if dBValue < QSYNTH_METER_MINDB:
+			dBValue = QSYNTH_METER_MINDB
+		elif dBValue > QSYNTH_METER_MAXDB:
+			dBValue = QSYNTH_METER_MAXDB
 
-		iValue = self.m_pMeter.iec_scale(dB)
-		#if iValue < self.m_iValue:
-			#iValue = int(self.m_fValueDecay * float(self.m_iValue))
-			#self.m_fValueDecay *= self.m_fValueDecay
-		#else:
-			#self.m_fValueDecay = QSYNTH_METER_DECAY_RATE1
+		pixelValue = self.meter.iec_scale(dBValue)
 
-		iPeak = self.m_iPeak
-		if iPeak < iValue:
-			iPeak = iValue
-			self.m_iPeakHold = 0
-			self.m_fPeakDecay = QSYNTH_METER_DECAY_RATE2
-			self.m_iPeakColor = self.m_pMeter.Color10dB #iLevel
-			while self.m_iPeakColor > self.m_pMeter.ColorOver and iPeak >= self.m_pMeter.iec_level(self.m_iPeakColor):
-				self.m_iPeakColor -= 1
-		elif self.m_iPeakHold + 1 > self.m_pMeter.peakFalloff():
-			iPeak = self.m_fPeakDecay * float(iPeak)
-			if self.m_iPeak < iValue:
-				iPeak = iValue
+		# peak-hold-then-decay mechanism
+		peakValue = self.peakValue
+		if peakValue < pixelValue:
+			# the value is higher than the peak, the peak must follow the value
+			peakValue = pixelValue
+			self.peakHoldCounter = 0 # reset the hold 
+			self.peakDecayFactor = QSYNTH_METER_DECAY_RATE2
+			self.peakColor = self.meter.Color10dB #iLevel
+			while self.peakColor > self.meter.ColorOver and peakValue >= self.meter.iec_level(self.peakColor):
+				self.peakColor -= 1
+		elif self.peakHoldCounter + 1 > self.meter.peakFalloff():
+			peakValue = self.peakDecayFactor * float(peakValue)
+			if self.peakValue < pixelValue:
+				peakValue = pixelValue
 			else:
-				#if iPeak < self.m_pMeter.iec_level(self.m_pMeter.Color10dB):
-					#self.m_iPeakColor = self.m_pMeter.Color6dB
-				self.m_fPeakDecay *= self.m_fPeakDecay
-		self.m_iPeakHold += 1
+				#if peakValue < self.meter.iec_level(self.meter.Color10dB):
+					#self.peakColor = self.meter.Color6dB
+				self.peakDecayFactor *= self.peakDecayFactor
+		self.peakHoldCounter += 1
 
-		if iValue == self.m_iValue and iPeak == self.m_iPeak:
+		# avoid running the (possibly costly) repaint if there is no change
+		if pixelValue == self.pixelValue and peakValue == self.peakValue:
 			return
 
-		self.m_iValue = iValue
-		self.m_iPeak  = iPeak
+		self.pixelValue = pixelValue
+		self.peakValue  = peakValue
 
 		self.update()
 
@@ -173,50 +170,51 @@ class qsynthMeterValue(QtGui.QFrame):
 
 		if self.isEnabled():
 			painter.fillRect(0, 0, w, h,
-				self.m_pMeter.color(self.m_pMeter.ColorBack))
-			y = self.m_pMeter.iec_level(self.m_pMeter.Color0dB)
-			painter.setPen(self.m_pMeter.color(self.m_pMeter.ColorFore))
+				self.meter.color(self.meter.ColorBack))
+			y = self.meter.iec_level(self.meter.Color0dB)
+			painter.setPen(self.meter.color(self.meter.ColorFore))
 			painter.drawLine(0, h - y, w, h - y)
 		else:
 			painter.fillRect(0, 0, w, h, self.palette().dark().color())
 
 		if 1: #CONFIG_GRADIENT
-			painter.drawPixmap(0, h - self.m_iValue,
-				self.m_pMeter.pixmap(), 0, h - self.m_iValue, w, self.m_iValue + 1)
+			painter.drawPixmap(0, h - self.pixelValue,
+				self.meter.pixmap(), 0, h - self.pixelValue, w, self.pixelValue + 1)
 	  	else:
-			y = self.m_iValue
+			y = self.pixelValue
 
 			y_over = 0
-			y_curr = 0
+			y_current = 0
 
-			i = self.m_pMeter.Color10dB
-			while i > self.m_pMeter.ColorOver and y >= y_over:
-				y_curr = self.m_pMeter.iec_level(i)
+			i = self.meter.Color10dB
+			while i > self.meter.ColorOver and y >= y_over:
+				y_current = self.meter.iec_level(i)
 
-				if y < y_curr:
+				if y < y_current:
 					painter.fillRect(0, h - y, w, y - y_over,
-						self.m_pMeter.color(i))
+						self.meter.color(i))
 				else:
-					painter.fillRect(0, h - y_curr, w, y_curr - y_over,
-						self.m_pMeter.color(i))
-				y_over = y_curr
+					painter.fillRect(0, h - y_current, w, y_current - y_over,
+						self.meter.color(i))
+				y_over = y_current
 				i -= 1
 
 			if y > y_over:
 				painter.fillRect(0, h - y, w, y - y_over,
-					self.m_pMeter.color(self.m_pMeter.ColorOver))
+					self.meter.color(self.meter.ColorOver))
 
-		painter.setPen(self.m_pMeter.color(self.m_iPeakColor))
-		painter.drawLine(0, h - self.m_iPeak, w, h - self.m_iPeak)
+		# draw the peak line
+		painter.setPen(self.meter.color(self.peakColor))
+		painter.drawLine(0, h - self.peakValue, w, h - self.peakValue)
 		
 		self.paint_time = (95.*self.paint_time + 5.*t.elapsed())/100.
 
 	# Resize event handler.
-	def resizeEvent(self, pResizeEvent):
-		self.m_iPeak = 0
+	def resizeEvent(self, resizeEvent):
+		self.peakValue = 0
 
-		QtGui.QWidget.resizeEvent(self, pResizeEvent)
-		#QtGui.QWidget.repaint(true)
+		QtGui.QWidget.resizeEvent(self, resizeEvent)
+		#QtGui.QWidget.repaint(True)
 
 
 #----------------------------------------------------------------------------
