@@ -227,13 +227,13 @@ class qsynthMeter(QtGui.QFrame):
 		self.iecLevels = [0]*self.LevelCount
 
 		self.colors = [QtGui.QColor(0, 0, 0)]*self.ColorCount
-		self.colors[self.ColorOver] = QtGui.QColor(240,  0, 20)
-		self.colors[self.Color0dB]  = QtGui.QColor(240,160, 20)
-		self.colors[self.Color3dB]  = QtGui.QColor(220,220, 20)
-		self.colors[self.Color6dB]  = QtGui.QColor(160,220, 20)
-		self.colors[self.Color10dB] = QtGui.QColor( 40,160, 40)
-		self.colors[self.ColorBack] = QtGui.QColor( 20, 40, 20)
-		self.colors[self.ColorFore] = QtGui.QColor( 80, 80, 80)
+		self.colors[self.ColorOver] = QtGui.QColor(240,   0, 20)
+		self.colors[self.Color0dB]  = QtGui.QColor(240, 160, 20)
+		self.colors[self.Color3dB]  = QtGui.QColor(220, 220, 20)
+		self.colors[self.Color6dB]  = QtGui.QColor(160, 220, 20)
+		self.colors[self.Color10dB] = QtGui.QColor( 40, 160, 40)
+		self.colors[self.ColorBack] = QtGui.QColor( 20,  40, 20)
+		self.colors[self.ColorFore] = QtGui.QColor( 80,  80, 80)
 
 		self.setBackgroundRole(QtGui.QPalette.NoRole)
 
