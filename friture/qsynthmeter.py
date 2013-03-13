@@ -25,11 +25,8 @@ from numpy import log10
 QSYNTH_METER_MAXDB = +3.
 QSYNTH_METER_MINDB = -70.
 
-# The decay rates (magic goes here :).
-# - value decay rate (faster)
-#QSYNTH_METER_DECAY_RATE1 = 1.0 - 3E-2
-# - peak decay rate (slower)
-QSYNTH_METER_DECAY_RATE2 = 1.0 - 3E-6
+# - peak decay rate
+QSYNTH_METER_DECAY_RATE = 1.0 - 3E-6
 
 # Number of cycles the peak stays on hold before fall-off.
 QSYNTH_METER_PEAK_FALLOFF = 32 # default : 16
@@ -101,7 +98,7 @@ class qsynthMeterValue(QtGui.QFrame):
 		self.pixelValue = 0
 		self.peakValue       = 0 # in pixels
 		self.peakHoldCounter = 0
-		self.peakDecayFactor = QSYNTH_METER_DECAY_RATE2
+		self.peakDecayFactor = QSYNTH_METER_DECAY_RATE
 		self.peakColor       = self.meter.Color6dB
 
 		self.paint_time = 0.
@@ -135,7 +132,7 @@ class qsynthMeterValue(QtGui.QFrame):
 			# the value is higher than the peak, the peak must follow the value
 			peakValue = pixelValue
 			self.peakHoldCounter = 0 # reset the hold 
-			self.peakDecayFactor = QSYNTH_METER_DECAY_RATE2
+			self.peakDecayFactor = QSYNTH_METER_DECAY_RATE
 			self.peakColor = self.meter.Color10dB #iLevel
 			while self.peakColor > self.meter.ColorOver and peakValue >= self.meter.iec_level(self.peakColor):
 				self.peakColor -= 1
