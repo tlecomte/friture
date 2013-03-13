@@ -36,11 +36,16 @@ QSYNTH_METER_PEAK_FALLOFF = 32 # default : 16
 # qsynthMeterScale -- Meter bridge scale widget.
 
 class qsynthMeterScale(QtGui.QWidget):
+	SEGMENTS_LEFT = 0
+	SEGMENTS_BOTH  = 1
+
 	# Constructor.
-	def __init__(self, meter):
+	def __init__(self, meter, segmentsConf = SEGMENTS_LEFT):
 		QtGui.QWidget.__init__(self, meter)
 		self.meter = meter
 		self.lastY = 0
+	
+		self.segmentsConf = segmentsConf
 
 		self.setMinimumWidth(16)
 		#self.setBackgroundRole(QPalette.Mid)
@@ -61,17 +66,27 @@ class qsynthMeterScale(QtGui.QWidget):
 		if currentY < labelMidHeight or currentY > self.lastY + labelMidHeight:
 			# if the text label is small enough, draw horizontal segments on the side
 			if fontmetrics.width(label) < scaleWidth - 5:
-				painter.drawLine(0, currentY, 2, currentY)
-				# if there are several meters, the scale is in-between
-				# so the segments need to be drawn on both sides
-				if self.meter.getPortCount() > 1:
-					painter.drawLine(scaleWidth - 3, currentY, scaleWidth - 1, currentY)
+				self.drawSegments(painter, currentY, scaleWidth)
 
 			# draw the text label (## dB)
 			painter.drawText(0, currentY - labelMidHeight, scaleWidth-1, fontmetrics.height(),
 				QtCore.Qt.AlignHCenter | QtCore.Qt.AlignVCenter, label)
 
 			self.lastY = currentY + 1
+
+	# draw the horizontal segments next to the label
+	def drawSegments(self, painter, y, scaleWidth):
+		if self.segmentsConf in [self.SEGMENTS_LEFT, self.SEGMENTS_BOTH]:
+			painter.drawLine(0, y, 2, y)
+
+		if self.segmentsConf == self.SEGMENTS_BOTH:
+			# if there are several meters, the scale is in-between
+			# so the segments need to be drawn on both sides
+			if self.meter.getPortCount() > 1:
+				painter.drawLine(scaleWidth - 3, y, scaleWidth - 1, y)
+
+	def setSegments(self, conf):
+		self.segmentsConf = conf 
 
 	# Paint event handler.
 	def paintEvent (self, event):
@@ -115,7 +130,7 @@ class qsynthMeterValue(QtGui.QFrame):
 		self.dBValue = value
 		self.dBValue = max(self.dBValue, QSYNTH_METER_MINDB)
 		self.dBValue = min(self.dBValue, QSYNTH_METER_MAXDB)
-		
+
 		self.refresh()
 
 	# Value refreshment.
@@ -222,7 +237,6 @@ class qsynthMeter(QtGui.QFrame):
 		
 		# Local instance variables.
 		self.portCount  = 2	# FIXME: Default port count.
-		self.scaleCount = self.portCount
 
 		self.IECScale = IECScale()
 
@@ -278,26 +292,36 @@ class qsynthMeter(QtGui.QFrame):
 				w.deleteLater()
 
 		if self.portCount > 0:
-			self.scaleCount = 1
 			self.singleMeters = []
 			self.singleScales = []
-			for portIndex in range(0, self.portCount):
+
+			if self.portCount == 1:
 				self.singleMeters += [qsynthMeterValue(self)]
 				self.HBoxLayout.addWidget(self.singleMeters[portIndex])
-				if self.portCount < 4:
-					if portIndex < self.scaleCount:
-						self.singleScales += [qsynthMeterScale(self)]
+				self.singleScales += [qsynthMeterScale(self, segmentsConf=qsynthMeterScale.SEGMENTS_LEFT)]
+				self.HBoxLayout.addWidget(self.singleScales[portIndex])
+			elif self.portCount < 4:
+				for portIndex in range(0, self.portCount):
+					self.singleMeters += [qsynthMeterValue(self)]
+					self.HBoxLayout.addWidget(self.singleMeters[portIndex])
+					if portIndex < self.portCount - 1:
+						self.singleScales += [qsynthMeterScale(self, segmentsConf=qsynthMeterScale.SEGMENTS_BOTH)]
 						self.HBoxLayout.addWidget(self.singleScales[portIndex])
-				else:
+			else:
+				for portIndex in range(0, self.portCount):
+					self.singleMeters += [qsynthMeterValue(self)]
+					self.HBoxLayout.addWidget(self.singleMeters[portIndex])
+
 					# insert one scale only
 					if portIndex == 1:
-						self.singleScales += [qsynthMeterScale(self)]
+						self.singleScales += [qsynthMeterScale(self, segmentsConf=qsynthMeterScale.SEGMENTS_BOTH)]
 						self.HBoxLayout.addWidget(self.singleScales[-1])
-					# insert a spacer
-					if portIndex % 2 == 0:
+					else:
+						# insert a spacer
 						self.HBoxLayout.addSpacing(1)
-			self.setMinimumSize(16 * self.portCount + 16 * self.scaleCount, 120)
-			self.setMaximumWidth(16 * self.portCount + 16 * self.scaleCount)
+
+			self.setMinimumSize(16 * self.portCount + 16 * len(self.singleScales), 120)
+			self.setMaximumWidth(16 * self.portCount + 16 * len(self.singleScales))
 		else: # zero meters
 			self.setMinimumSize(2, 120)
 			self.setMaximumWidth(4)
