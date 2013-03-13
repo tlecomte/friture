@@ -40,43 +40,52 @@ QSYNTH_METER_PEAK_FALLOFF = 32 # default : 16
 
 class qsynthMeterScale(QtGui.QWidget):
 	# Constructor.
-	def __init__(self, pMeter):
-		QtGui.QWidget.__init__(self, pMeter)
-		self.m_pMeter = pMeter
-		self.m_iLastY = 0
+	def __init__(self, meter):
+		QtGui.QWidget.__init__(self, meter)
+		self.meter = meter
+		self.lastY = 0
 
 		self.setMinimumWidth(16)
 		#self.setBackgroundRole(QPalette.Mid)
 
 		self.setFont(QtGui.QFont(self.font().family(), 5))
 
-	# Draw IEC scale line and label assumes labels drawed from top to bottom.
-	def drawLineLabel(self, p, y, sLabel):
-		iCurrY = self.height() - y
-		iWidth = self.width()  #- 2
+	# Draw IEC scale line and label
+	# assumes labels drawed from top to bottom
+	def drawLineLabel(self, painter, y, label):
+		currentY = self.height() - y
+		scaleWidth = self.width()
 
-		fm = p.fontMetrics()
-		iMidHeight = fm.height()/2 # >> 1)
+		fontmetrics = painter.fontMetrics()
+		labelMidHeight = fontmetrics.height()/2
 
-		if iCurrY < iMidHeight or iCurrY > self.m_iLastY + iMidHeight:
-			if fm.width(sLabel) < iWidth - 5:
-				p.drawLine(0, iCurrY, 2, iCurrY)
-				if self.m_pMeter.portCount() > 1:
-					p.drawLine(iWidth - 3, iCurrY, iWidth - 1, iCurrY)
-			p.drawText(0, iCurrY - iMidHeight, iWidth-1, fm.height(),
-				QtCore.Qt.AlignHCenter | QtCore.Qt.AlignVCenter, sLabel)
-			self.m_iLastY = iCurrY + 1
+		# only draw the dB label if we are not too close to the top,
+		# or too close to the previous label
+		if currentY < labelMidHeight or currentY > self.lastY + labelMidHeight:
+			# if the text label is small enough, draw horizontal segments on the side
+			if fontmetrics.width(label) < scaleWidth - 5:
+				painter.drawLine(0, currentY, 2, currentY)
+				# if there are several meters, the scale is in-between
+				# so the segments need to be drawn on both sides
+				if self.meter.portCount() > 1:
+					painter.drawLine(scaleWidth - 3, currentY, scaleWidth - 1, currentY)
+
+			# draw the text label (## dB)
+			painter.drawText(0, currentY - labelMidHeight, scaleWidth-1, fontmetrics.height(),
+				QtCore.Qt.AlignHCenter | QtCore.Qt.AlignVCenter, label)
+
+			self.lastY = currentY + 1
 
 	# Paint event handler.
 	def paintEvent (self, event):
-		p = QtGui.QPainter(self)
+		painter = QtGui.QPainter(self)
 
-		self.m_iLastY = 0
+		self.lastY = 0
 
-		p.setPen(self.palette().mid().color().dark(140))
+		painter.setPen(self.palette().mid().color().dark(140))
 
 		for dB in [0, -3, -6, -10, -20, -30, -40, -50, -60]:
-			self.drawLineLabel(p, self.m_pMeter.iec_scale(dB), str(abs(dB)))
+			self.drawLineLabel(painter, self.meter.iec_scale(dB), str(abs(dB)))
 
 
 #----------------------------------------------------------------------------
