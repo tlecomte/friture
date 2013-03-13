@@ -111,18 +111,16 @@ class qsynthMeterValue(QtGui.QFrame):
 		self.peakValue = 0
 
 	# Frame value one-way accessors.
-	def setValue(self, fValue):
-		self.dBValue = fValue
+	def setValue(self, value):
+		self.dBValue = value
+		self.dBValue = max(self.dBValue, QSYNTH_METER_MINDB)
+		self.dBValue = min(self.dBValue, QSYNTH_METER_MAXDB)
+		
 		self.refresh()
 
 	# Value refreshment.
 	def refresh(self):
 		dBValue = self.dBValue
-		
-		if dBValue < QSYNTH_METER_MINDB:
-			dBValue = QSYNTH_METER_MINDB
-		elif dBValue > QSYNTH_METER_MAXDB:
-			dBValue = QSYNTH_METER_MAXDB
 
 		pixelValue = self.meter.iec_scale(dBValue)
 
