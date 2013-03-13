@@ -272,6 +272,7 @@ class qsynthMeter(QtGui.QFrame):
 
 	# build the widget layout depending on the port count.
 	def build(self):
+		# delete all elements of the current layout
 		while self.HBoxLayout.count() > 0:
 			item = self.HBoxLayout.takeAt(0)
 			if not item:
@@ -281,33 +282,28 @@ class qsynthMeter(QtGui.QFrame):
 			if w:
 				w.deleteLater()
 
-		if self.portCount > 0 and self.portCount < 4:
+		if self.portCount > 0:
 			self.scaleCount = 1
 			self.singleMeters = []
 			self.singleScales = []
-			for iPort in range(0, self.portCount):
+			for portIndex in range(0, self.portCount):
 				self.singleMeters += [qsynthMeterValue(self)]
-				self.HBoxLayout.addWidget(self.singleMeters[iPort])
-				if iPort < self.scaleCount:
-					self.singleScales += [qsynthMeterScale(self)]
-					self.HBoxLayout.addWidget(self.singleScales[iPort])
+				self.HBoxLayout.addWidget(self.singleMeters[portIndex])
+				if self.portCount < 4:
+					if portIndex < self.scaleCount:
+						self.singleScales += [qsynthMeterScale(self)]
+						self.HBoxLayout.addWidget(self.singleScales[portIndex])
+				else:
+					# insert one scale only
+					if portIndex == 1:
+						self.singleScales += [qsynthMeterScale(self)]
+						self.HBoxLayout.addWidget(self.singleScales[-1])
+					# insert a spacer
+					if portIndex % 2 == 0:
+						self.HBoxLayout.addSpacing(1)
 			self.setMinimumSize(16 * self.portCount + 16 * self.scaleCount, 120)
 			self.setMaximumWidth(16 * self.portCount + 16 * self.scaleCount)
-		elif self.portCount >= 4:
-			self.scaleCount = 1
-			self.singleMeters = []
-			self.singleScales = []
-			for iPort in range(0, self.portCount):
-				self.singleMeters += [qsynthMeterValue(self)]
-				self.HBoxLayout.addWidget(self.singleMeters[iPort])
-				if iPort == 1:
-					self.singleScales += [qsynthMeterScale(self)]
-					self.HBoxLayout.addWidget(self.singleScales[-1])
-				if iPort % 2 == 0:
-					self.HBoxLayout.addSpacing(1)
-			self.setMinimumSize(16 * self.portCount + 16 * self.scaleCount, 120)
-			self.setMaximumWidth(16 * self.portCount + 16 * self.scaleCount)
-		else:
+		else: # zero meters
 			self.setMinimumSize(2, 120)
 			self.setMaximumWidth(4)
 
@@ -334,8 +330,8 @@ class qsynthMeter(QtGui.QFrame):
 
 	# Reset peak holder.
 	def peakReset (self):
-		for iPort in range (0, self.portCount):
-			self.singleMeters[iPort].peakReset()
+		for port in range (0, self.portCount):
+			self.singleMeters[port].peakReset()
 
 	def pixmap (self):
 	  	return self.levelPixmap
