@@ -180,31 +180,8 @@ class MeterValue(QtGui.QFrame):
 		else:
 			painter.fillRect(0, 0, w, h, self.palette().dark().color())
 
-		if 1: #CONFIG_GRADIENT
-			painter.drawPixmap(0, h - self.pixelValue,
-				self.meter.pixmap(), 0, h - self.pixelValue, w, self.pixelValue + 1)
-	  	else:
-			y = self.pixelValue
-
-			y_over = 0
-			y_current = 0
-
-			i = self.meter.Color10dB
-			while i > self.meter.ColorOver and y >= y_over:
-				y_current = self.meter.iec_level(i)
-
-				if y < y_current:
-					painter.fillRect(0, h - y, w, y - y_over,
-						self.meter.color(i))
-				else:
-					painter.fillRect(0, h - y_current, w, y_current - y_over,
-						self.meter.color(i))
-				y_over = y_current
-				i -= 1
-
-			if y > y_over:
-				painter.fillRect(0, h - y, w, y - y_over,
-					self.meter.color(self.meter.ColorOver))
+		painter.drawPixmap(0, h - self.pixelValue,
+			self.meter.pixmap(), 0, h - self.pixelValue, w, self.pixelValue + 1)
 
 		# draw the peak line
 		painter.setPen(self.meter.color(self.peakColor))
@@ -372,8 +349,7 @@ class qsynthMeter(QtGui.QFrame):
 		self.iecLevels[self.Color6dB]  = self.iec_scale( -6.0)
 		self.iecLevels[self.Color10dB] = self.iec_scale(-10.0)
 
-		if 1: #CONFIG_GRADIENT
-			self.updatePixmap()
+		self.updatePixmap()
 
 	def setValue ( self, iPort, fValue ):
 		self.singleMeters[iPort].setValue(fValue)
