@@ -22,20 +22,20 @@ from PyQt4 import QtCore, QtGui
 from numpy import log10
 
 # Meter level limits (in dB).
-QSYNTH_METER_MAXDB = +3.
-QSYNTH_METER_MINDB = -70.
+MAXDB = +3.
+MINDB = -70.
 
 # - peak decay rate
-QSYNTH_METER_DECAY_RATE = 1.0 - 3E-6
+PEAK_DECAY_RATE = 1.0 - 3E-6
 
 # Number of cycles the peak stays on hold before fall-off.
-QSYNTH_METER_PEAK_FALLOFF = 32 # default : 16
+PEAK_FALLOFF = 32 # default : 16
 
 
 #----------------------------------------------------------------------------
-# qsynthMeterScale -- Meter bridge scale widget.
+# MeterScale -- Meter bridge scale widget.
 
-class qsynthMeterScale(QtGui.QWidget):
+class MeterScale(QtGui.QWidget):
 	SEGMENTS_LEFT = 0
 	SEGMENTS_BOTH  = 1
 
@@ -101,8 +101,8 @@ class qsynthMeterScale(QtGui.QWidget):
 
 
 #----------------------------------------------------------------------------
-# qsynthMeterValue -- Meter bridge value widget.
-class qsynthMeterValue(QtGui.QFrame):
+# MeterValue -- Meter bridge value widget.
+class MeterValue(QtGui.QFrame):
 	# Constructor.
 	def __init__(self, meter):
 		QtGui.QFrame.__init__(self, meter)
@@ -113,7 +113,7 @@ class qsynthMeterValue(QtGui.QFrame):
 		self.pixelValue = 0
 		self.peakValue       = 0 # in pixels
 		self.peakHoldCounter = 0
-		self.peakDecayFactor = QSYNTH_METER_DECAY_RATE
+		self.peakDecayFactor = PEAK_DECAY_RATE
 		self.peakColor       = self.meter.Color6dB
 
 		self.paint_time = 0.
@@ -128,8 +128,8 @@ class qsynthMeterValue(QtGui.QFrame):
 	# Frame value one-way accessors.
 	def setValue(self, value):
 		self.dBValue = value
-		self.dBValue = max(self.dBValue, QSYNTH_METER_MINDB)
-		self.dBValue = min(self.dBValue, QSYNTH_METER_MAXDB)
+		self.dBValue = max(self.dBValue, MINDB)
+		self.dBValue = min(self.dBValue, MAXDB)
 
 		self.refresh()
 
@@ -145,7 +145,7 @@ class qsynthMeterValue(QtGui.QFrame):
 			# the value is higher than the peak, the peak must follow the value
 			peakValue = pixelValue
 			self.peakHoldCounter = 0 # reset the hold 
-			self.peakDecayFactor = QSYNTH_METER_DECAY_RATE
+			self.peakDecayFactor = PEAK_DECAY_RATE
 			self.peakColor = self.meter.Color10dB #iLevel
 			while self.peakColor > self.meter.ColorOver and peakValue >= self.meter.iec_level(self.peakColor):
 				self.peakColor -= 1
@@ -244,7 +244,7 @@ class qsynthMeter(QtGui.QFrame):
 			self.levelPixmap = QtGui.QPixmap()
 
 		# Peak falloff mode setting (0=no peak falloff).
-		self.peakFalloffCycleCount = QSYNTH_METER_PEAK_FALLOFF
+		self.peakFalloffCycleCount = PEAK_FALLOFF
 			
 		self.ColorOver	= 0
 		self.Color0dB	= 1
@@ -296,25 +296,25 @@ class qsynthMeter(QtGui.QFrame):
 			self.singleScales = []
 
 			if self.portCount == 1:
-				self.singleMeters += [qsynthMeterValue(self)]
+				self.singleMeters += [MeterValue(self)]
 				self.HBoxLayout.addWidget(self.singleMeters[portIndex])
-				self.singleScales += [qsynthMeterScale(self, segmentsConf=qsynthMeterScale.SEGMENTS_LEFT)]
+				self.singleScales += [MeterScale(self, MeterScale.SEGMENTS_LEFT)]
 				self.HBoxLayout.addWidget(self.singleScales[portIndex])
 			elif self.portCount < 4:
 				for portIndex in range(0, self.portCount):
-					self.singleMeters += [qsynthMeterValue(self)]
+					self.singleMeters += [MeterValue(self)]
 					self.HBoxLayout.addWidget(self.singleMeters[portIndex])
 					if portIndex < self.portCount - 1:
-						self.singleScales += [qsynthMeterScale(self, segmentsConf=qsynthMeterScale.SEGMENTS_BOTH)]
+						self.singleScales += [MeterScale(self, MeterScale.SEGMENTS_BOTH)]
 						self.HBoxLayout.addWidget(self.singleScales[portIndex])
 			else:
 				for portIndex in range(0, self.portCount):
-					self.singleMeters += [qsynthMeterValue(self)]
+					self.singleMeters += [MeterValue(self)]
 					self.HBoxLayout.addWidget(self.singleMeters[portIndex])
 
 					# insert one scale only
 					if portIndex == 1:
-						self.singleScales += [qsynthMeterScale(self, segmentsConf=qsynthMeterScale.SEGMENTS_BOTH)]
+						self.singleScales += [MeterScale(self, MeterScale.SEGMENTS_BOTH)]
 						self.HBoxLayout.addWidget(self.singleScales[-1])
 					else:
 						# insert a spacer
