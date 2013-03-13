@@ -372,7 +372,7 @@ class qsynthMeter(QtGui.QFrame):
 
 
 # class to translate from dB to pixels with an IEC scaling
-class IECScale():
+class IECScale:
 	def __init__(self):
 		self.height = 1.
 
