@@ -25,7 +25,6 @@ from numpy import log10
 MAXDB = +3.
 MINDB = -70.
 
-# - peak decay rate
 PEAK_DECAY_RATE = 1.0 - 3E-6
 
 # Number of cycles the peak stays on hold before fall-off.
@@ -39,7 +38,6 @@ class MeterScale(QtGui.QWidget):
 	SEGMENTS_LEFT = 0
 	SEGMENTS_BOTH  = 1
 
-	# Constructor.
 	def __init__(self, meter, segmentsConf = SEGMENTS_LEFT):
 		QtGui.QWidget.__init__(self, meter)
 		self.meter = meter
@@ -88,7 +86,6 @@ class MeterScale(QtGui.QWidget):
 	def setSegments(self, conf):
 		self.segmentsConf = conf 
 
-	# Paint event handler.
 	def paintEvent (self, event):
 		painter = QtGui.QPainter(self)
 
@@ -103,11 +100,10 @@ class MeterScale(QtGui.QWidget):
 #----------------------------------------------------------------------------
 # MeterValue -- Meter bridge value widget.
 class MeterValue(QtGui.QFrame):
-	# Constructor.
+	
 	def __init__(self, meter):
 		QtGui.QFrame.__init__(self, meter)
 		
-		# Local instance variables.
 		self.meter      = meter
 		self.dBValue    = 0.0
 		self.pixelValue = 0
@@ -125,7 +121,6 @@ class MeterValue(QtGui.QFrame):
 	def peakReset(self):
 		self.peakValue = 0
 
-	# Frame value one-way accessors.
 	def setValue(self, value):
 		self.dBValue = value
 		self.dBValue = max(self.dBValue, MINDB)
@@ -133,7 +128,6 @@ class MeterValue(QtGui.QFrame):
 
 		self.refresh()
 
-	# Value refreshment.
 	def refresh(self):
 		dBValue = self.dBValue
 
@@ -168,7 +162,6 @@ class MeterValue(QtGui.QFrame):
 
 		self.update()
 
-	# Paint event handler.
 	def paintEvent(self, event):
 		t = QtCore.QTime()
 		t.start()
@@ -219,7 +212,6 @@ class MeterValue(QtGui.QFrame):
 		
 		self.paint_time = (95.*self.paint_time + 5.*t.elapsed())/100.
 
-	# Resize event handler.
 	def resizeEvent(self, resizeEvent):
 		self.peakValue = 0
 
@@ -231,11 +223,10 @@ class MeterValue(QtGui.QFrame):
 # qsynthMeter -- Meter bridge slot widget.
 
 class qsynthMeter(QtGui.QFrame):
-	# Constructor.
+	
 	def __init__(self, parent):
 		QtGui.QFrame.__init__(self, parent)
 		
-		# Local instance variables.
 		self.portCount  = 2	# FIXME: Default port count.
 
 		self.IECScale = IECScale()
@@ -326,7 +317,7 @@ class qsynthMeter(QtGui.QFrame):
 			self.setMinimumSize(2, 120)
 			self.setMaximumWidth(4)
 
-	# Child widget accessors.
+	# used by child widgets
 	def iec_scale (self, dB ):
 		return self.IECScale.iec_scale(dB)
 
@@ -340,7 +331,6 @@ class qsynthMeter(QtGui.QFrame):
 		self.portCount = count
     		self.build()
 
-	# Peak falloff mode setting.
 	def setPeakFalloff ( self, peakFalloffCount ):
 		self.peakFalloffCycleCount = peakFalloffCount
 
@@ -370,13 +360,10 @@ class qsynthMeter(QtGui.QFrame):
 
 		QtGui.QPainter(self.levelPixmap).fillRect(0, 0, w, h, grad);
 
-	# Slot refreshment.
 	def refresh (self):
 		for iPort in range (0, self.portCount):
 			self.singleMeters[iPort].refresh()
 
-
-	# Resize event handler.
 	def resizeEvent ( self, event ):
 		self.IECScale.setHeight(0.85 * float(self.height()))
 
@@ -388,12 +375,9 @@ class qsynthMeter(QtGui.QFrame):
 		if 1: #CONFIG_GRADIENT
 			self.updatePixmap()
 
-	# Meter value proxy.
 	def setValue ( self, iPort, fValue ):
 		self.singleMeters[iPort].setValue(fValue)
-		
-
-	# Common resource accessor.
+	
 	def color ( self, index ):
 		return self.colors[index]
 
@@ -406,7 +390,6 @@ class IECScale():
 	def setHeight(self, height):
 		self.height = height
 
-	# Child widget accessors.
 	def iec_scale (self, dB ):
 		fDef = 1.
 
