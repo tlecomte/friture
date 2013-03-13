@@ -229,7 +229,7 @@ class qsynthMeter(QtGui.QFrame):
 		self.portCount  = 2	# FIXME: Default port count.
 		self.scaleCount = self.portCount
 
-		self.heightToZerodB = 0.
+		self.IECScale = IECScale()
 
 		if 1: #CONFIG_GRADIENT
 			self.levelPixmap = QtGui.QPixmap()
@@ -313,29 +313,10 @@ class qsynthMeter(QtGui.QFrame):
 
 	# Child widget accessors.
 	def iec_scale (self, dB ):
-		fDef = 1.
-
-		if (dB < -70.0):
-			fDef = 0.0
-		elif (dB < -60.0):
-			fDef = (dB + 70.0) * 0.0025
-		elif (dB < -50.0):
-			fDef = (dB + 60.0) * 0.005 + 0.025
-		elif (dB < -40.0):
-			fDef = (dB + 50.0) * 0.0075 + 0.075
-		elif (dB < -30.0):
-			fDef = (dB + 40.0) * 0.015 + 0.15
-		elif (dB < -20.0):
-			fDef = (dB + 30.0) * 0.02 + 0.3
-		else: # if (dB < 0.0)
-			fDef = (dB + 20.0) * 0.025 + 0.5
-
-		return fDef * self.heightToZerodB
-
+		return self.IECScale.iec_scale(dB)
 
 	def iec_level (self, index):
 		return self.iecLevels[index]
-
 
 	def getPortCount (self):
 		return self.portCount
@@ -348,10 +329,8 @@ class qsynthMeter(QtGui.QFrame):
 	def setPeakFalloff ( self, peakFalloffCount ):
 		self.peakFalloffCycleCount = peakFalloffCount
 
-
 	def peakFalloff ( self ):
 		return self.peakFalloffCycleCount
-
 
 	# Reset peak holder.
 	def peakReset (self):
@@ -384,7 +363,7 @@ class qsynthMeter(QtGui.QFrame):
 
 	# Resize event handler.
 	def resizeEvent ( self, event ):
-		self.heightToZerodB = 0.85 * float(self.height())
+		self.IECScale.setHeight(0.85 * float(self.height()))
 
 		self.iecLevels[self.Color0dB]  = self.iec_scale(  0.0)
 		self.iecLevels[self.Color3dB]  = self.iec_scale( -3.0)
@@ -402,3 +381,33 @@ class qsynthMeter(QtGui.QFrame):
 	# Common resource accessor.
 	def color ( self, index ):
 		return self.colors[index]
+
+
+# class to translate from dB to pixels with an IEC scaling
+class IECScale():
+	def __init__(self):
+		self.height = 0.
+
+	def setHeight(self, height):
+		self.height = height
+
+	# Child widget accessors.
+	def iec_scale (self, dB ):
+		fDef = 1.
+
+		if (dB < -70.0):
+			fDef = 0.0
+		elif (dB < -60.0):
+			fDef = (dB + 70.0) * 0.0025
+		elif (dB < -50.0):
+			fDef = (dB + 60.0) * 0.005 + 0.025
+		elif (dB < -40.0):
+			fDef = (dB + 50.0) * 0.0075 + 0.075
+		elif (dB < -30.0):
+			fDef = (dB + 40.0) * 0.015 + 0.15
+		elif (dB < -20.0):
+			fDef = (dB + 30.0) * 0.02 + 0.3
+		else: # if (dB < 0.0)
+			fDef = (dB + 20.0) * 0.025 + 0.5
+
+		return fDef * self.height
