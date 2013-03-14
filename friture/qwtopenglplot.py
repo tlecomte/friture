@@ -532,10 +532,7 @@ class GLWidget(QtOpenGL.QGLWidget):
         
         # compute tracker bounding rect
         painter.setPen(Qt.Qt.black)
-        rect = painter.boundingRect(QtCore.QRect(self.xmax, 0, 0, 0), Qt.Qt.AlignLeft, text)
-        
-        # center the text around the max frequency
-        rect.translate(-rect.width()/2, 0)
+        rect = painter.boundingRect(QtCore.QRect(self.xmax, 0, 0, 0), Qt.Qt.AlignHCenter, text)
         
         # avoid crossing the left and top borders
         dx = - min(rect.x()-2, 0)
@@ -547,11 +544,30 @@ class GLWidget(QtOpenGL.QGLWidget):
         dy = - max(rect.bottom() - self.height() + 1, 0)
         rect.translate(dx, dy)
         
+        Hmiddle = (rect.left()+rect.right())/2
+        triangleSize = 4
+
         # draw a white background
         painter.setPen(Qt.Qt.NoPen)
         painter.setBrush(Qt.Qt.white)
         painter.drawRect(rect)
+
+        # draw a little downward-pointing triangle to indicate the frequency
+        # triangle fill
+        polygon = QtGui.QPolygon()
+        polygon << QtCore.QPoint(Hmiddle-triangleSize, rect.bottom()+1)
+        polygon << QtCore.QPoint(Hmiddle, rect.bottom()+1+triangleSize)
+        polygon << QtCore.QPoint(Hmiddle+triangleSize, rect.bottom()+1)
+        painter.drawPolygon(polygon)
+
+        # triangle outline
+        painter.setPen(Qt.Qt.black)
+        painter.drawLine(rect.left(), rect.bottom()+1, Hmiddle-triangleSize, rect.bottom()+1)
+        painter.drawLine(Hmiddle-triangleSize, rect.bottom()+1, Hmiddle, rect.bottom()+1+triangleSize)
+        painter.drawLine(Hmiddle, rect.bottom()+1+triangleSize, Hmiddle+triangleSize, rect.bottom()+1)
+        painter.drawLine(Hmiddle+triangleSize, rect.bottom()+1, rect.right(), rect.bottom()+1)
         
+        # frequency label
         painter.setPen(Qt.Qt.black)
         painter.drawText(rect, Qt.Qt.AlignLeft, text)
 
