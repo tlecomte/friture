@@ -221,8 +221,7 @@ class qsynthMeter(QtGui.QFrame):
 
 		self.IECScale = IECScale()
 
-		if 1: #CONFIG_GRADIENT
-			self.levelPixmap = QtGui.QPixmap()
+		self.levelPixmap = QtGui.QPixmap()
 
 		# Peak falloff mode setting (0=no peak falloff).
 		self.peakFalloffCycleCount = PEAK_FALLOFF
@@ -364,8 +363,8 @@ class qsynthMeter(QtGui.QFrame):
 
 		self.updatePixmap()
 
-	def setValue ( self, iPort, fValue ):
-		self.singleMeters[iPort].setValue(fValue)
+	def setValue ( self, port, value ):
+		self.singleMeters[port].setValue(value)
 	
 	def color ( self, index ):
 		return self.colors[index]
