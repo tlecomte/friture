@@ -48,7 +48,7 @@ class MeterScale(QtGui.QWidget):
 		self.setMinimumWidth(16)
 		#self.setBackgroundRole(QPalette.Mid)
 
-		self.setFont(QtGui.QFont(self.font().family(), 5))
+		self.setFont(QtGui.QFont(self.font().family(), 6))
 
 	# Draw IEC scale line and label
 	# assumes labels drawed from top to bottom
@@ -91,7 +91,7 @@ class MeterScale(QtGui.QWidget):
 
 		self.lastY = 0
 
-		painter.setPen(self.palette().mid().color().dark(140))
+		painter.setPen(self.palette().mid().color().dark(200))
 
 		for dB in [0, -3, -6, -10, -20, -30, -40, -50, -60]:
 			self.drawLineLabel(painter, self.meter.iec_scale(dB), str(abs(dB)))
@@ -154,6 +154,11 @@ class MeterValue(QtGui.QFrame):
 		self.pixelValue = 0
 		self.peak = BallisticPeak(self.meter)
 
+		# a second indicator used when displaying both RMS and peak info
+		# on the same meter
+		self.dBValue2 = None
+		self.pixelValue2 = 0
+
 		self.paint_time = 0.
 
 		self.setMinimumWidth(12)
@@ -163,16 +168,25 @@ class MeterValue(QtGui.QFrame):
 	def peakReset(self):
 		self.peak.reset()
 
-	def setValue(self, value):
+	def setValue(self, value, secondaryValue = None):
 		self.dBValue = value
 		self.dBValue = max(self.dBValue, MINDB)
 		self.dBValue = min(self.dBValue, MAXDB)
+
+		self.dBValue2 = secondaryValue
+		if self.dBValue2 <> None:
+			self.dBValue2 = max(self.dBValue2, MINDB)
+			self.dBValue2 = min(self.dBValue2, MAXDB)
 
 		self.refresh()
 
 	def refresh(self):
 		self.pixelValue = self.meter.iec_scale(self.dBValue)
-		self.peak.refresh(self.pixelValue)
+		if self.dBValue2 <> None:
+			self.pixelValue2 = self.meter.iec_scale(self.dBValue2)
+			self.peak.refresh(max(self.pixelValue, self.pixelValue2))
+		else:
+			self.peak.refresh(self.pixelValue)
 		self.update()
 
 	def paintEvent(self, event):
@@ -192,6 +206,10 @@ class MeterValue(QtGui.QFrame):
 			painter.drawLine(0, h - y, w, h - y)
 		else:
 			painter.fillRect(0, 0, w, h, self.palette().dark().color())
+
+		if self.pixelValue2 <> None:
+			painter.drawPixmap(0, h - self.pixelValue2,
+				self.meter.darkPixmap(), 0, h - self.pixelValue2, w, self.pixelValue2 + 1)
 
 		painter.drawPixmap(0, h - self.pixelValue,
 			self.meter.pixmap(), 0, h - self.pixelValue, w, self.pixelValue + 1)
@@ -217,11 +235,12 @@ class qsynthMeter(QtGui.QFrame):
 	def __init__(self, parent):
 		QtGui.QFrame.__init__(self, parent)
 		
-		self.portCount  = 2	# FIXME: Default port count.
+		self.portCount  = 1
 
 		self.IECScale = IECScale()
 
 		self.levelPixmap = QtGui.QPixmap()
+		self.darkLevelPixmap = QtGui.QPixmap()
 
 		# Peak falloff mode setting (0=no peak falloff).
 		self.peakFalloffCycleCount = PEAK_FALLOFF
@@ -277,9 +296,9 @@ class qsynthMeter(QtGui.QFrame):
 
 			if self.portCount == 1:
 				self.singleMeters += [MeterValue(self)]
-				self.HBoxLayout.addWidget(self.singleMeters[portIndex])
+				self.HBoxLayout.addWidget(self.singleMeters[0])
 				self.singleScales += [MeterScale(self, MeterScale.SEGMENTS_LEFT)]
-				self.HBoxLayout.addWidget(self.singleScales[portIndex])
+				self.HBoxLayout.addWidget(self.singleScales[0])
 			elif self.portCount < 4:
 				for portIndex in range(0, self.portCount):
 					self.singleMeters += [MeterValue(self)]
@@ -318,7 +337,7 @@ class qsynthMeter(QtGui.QFrame):
 
 	def setPortCount (self, count):
 		self.portCount = count
-    		self.build()
+		self.build()
 
 	def setPeakFalloff ( self, peakFalloffCount ):
 		self.peakFalloffCycleCount = peakFalloffCount
@@ -334,6 +353,9 @@ class qsynthMeter(QtGui.QFrame):
 	def pixmap (self):
 	  	return self.levelPixmap
 
+	def darkPixmap (self):
+		return self.darkLevelPixmap
+
 	def updatePixmap (self):
 		w = self.width()
 		h = self.height()
@@ -346,8 +368,19 @@ class qsynthMeter(QtGui.QFrame):
 		grad.setColorAt(0.8, self.color(self.Color10dB))
 
 		self.levelPixmap = QtGui.QPixmap(w, h)
-
 		QtGui.QPainter(self.levelPixmap).fillRect(0, 0, w, h, grad);
+
+		factor = 150
+		darkGrad = QtGui.QLinearGradient(0, 0, 0, h)
+		darkGrad.setColorAt(0.2, self.color(self.ColorOver).darker(factor))
+		darkGrad.setColorAt(0.3, self.color(self.Color0dB).darker(factor))
+		darkGrad.setColorAt(0.4, self.color(self.Color3dB).darker(factor))
+		darkGrad.setColorAt(0.6, self.color(self.Color6dB).darker(factor))
+		darkGrad.setColorAt(0.8, self.color(self.Color10dB).darker(factor))
+
+		self.darkLevelPixmap = QtGui.QPixmap(w, h)
+		QtGui.QPainter(self.darkLevelPixmap).fillRect(0, 0, w, h, darkGrad);
+
 
 	def refresh (self):
 		for iPort in range (0, self.portCount):
@@ -363,8 +396,8 @@ class qsynthMeter(QtGui.QFrame):
 
 		self.updatePixmap()
 
-	def setValue ( self, port, value ):
-		self.singleMeters[port].setValue(value)
+	def setValue ( self, port, value, secondaryValue = None):
+		self.singleMeters[port].setValue(value, secondaryValue)
 	
 	def color ( self, index ):
 		return self.colors[index]
