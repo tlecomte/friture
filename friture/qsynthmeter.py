@@ -366,11 +366,15 @@ class qsynthMeter(QtGui.QFrame):
 		grad.setColorAt(0.4, self.color(self.Color3dB))
 		grad.setColorAt(0.6, self.color(self.Color6dB))
 		grad.setColorAt(0.8, self.color(self.Color10dB))
+		grad = QtGui.QLinearGradient(0, 0, 0, h)
+		grad.setColorAt(0.0, QtGui.QColor(230,230,255))
+		grad.setColorAt(0.7, QtGui.QColor(0,0,255))
+		grad.setColorAt(1.0, QtGui.QColor(0,0,150))
 
 		self.levelPixmap = QtGui.QPixmap(w, h)
 		QtGui.QPainter(self.levelPixmap).fillRect(0, 0, w, h, grad);
 
-		factor = 150
+		factor = 0#150
 		darkGrad = QtGui.QLinearGradient(0, 0, 0, h)
 		darkGrad.setColorAt(0.2, self.color(self.ColorOver).darker(factor))
 		darkGrad.setColorAt(0.3, self.color(self.Color0dB).darker(factor))
