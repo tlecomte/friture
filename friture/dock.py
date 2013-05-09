@@ -61,6 +61,8 @@ class Dock(QtGui.QDockWidget):
 	def widget_select(self, item):
 		if self.audiowidget is not None:
 		    self.audiowidget.close()
+		    # this is a little strange, but for pyqt >=4.9.5 I have to disconnect explicitely
+		    self.disconnect(self.parent.display_timer, QtCore.SIGNAL('timeout()'), self.audiowidget.update)
 		    self.audiowidget.deleteLater()
 		
 		self.type = item
