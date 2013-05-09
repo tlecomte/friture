@@ -40,7 +40,11 @@ class AudioBackend(QtCore.QObject):
 		# look for devices
 		self.input_devices = self.get_input_devices()
 		self.output_devices = self.get_output_devices()
-		
+
+		self.device = None
+		self.first_channel = None
+		self.second_channel = None
+
 		# we will try to open all the input devices until one
 		# works, starting by the default input device
 		for device in self.input_devices:
@@ -55,12 +59,13 @@ class AudioBackend(QtCore.QObject):
 			else:
 				self.logger.push("Fail")
 
-		self.first_channel = 0
-		nchannels = self.get_current_device_nchannels()
-  		if nchannels == 1:
-			self.second_channel = 0
-		else:
-   			self.second_channel = 1
+		if self.device <> None:
+			self.first_channel = 0
+			nchannels = self.get_current_device_nchannels()
+	  		if nchannels == 1:
+				self.second_channel = 0
+			else:
+	   			self.second_channel = 1
 
 		# counter for the number of input buffer overflows
 		self.xruns = 0
@@ -113,11 +118,20 @@ class AudioBackend(QtCore.QObject):
 
 	# method
 	def get_default_input_device(self):
-		return self.pa.get_default_input_device_info()['index']
+		try:
+			index = self.pa.get_default_input_device_info()['index']
+		except IOError:
+			index = None
+
+		return index
 
 	# method
 	def get_default_output_device(self):
-		return self.pa.get_default_output_device_info()['index']
+		try:
+			index = self.pa.get_default_output_device_info()['index']
+		except IOError:
+			index = None
+		return 
 
 	# method
 	def get_device_count(self):
@@ -128,12 +142,14 @@ class AudioBackend(QtCore.QObject):
 	# returns a list of input devices index, starting with the system default
 	def get_input_devices(self):
 		device_count = self.get_device_count()
-		default_input_device = self.get_default_input_device()
-		
 		device_range = range(0, device_count)
-		# start by the default input device
-		device_range.remove(default_input_device)
-		device_range = [default_input_device] + device_range
+
+		default_input_device = self.get_default_input_device()
+
+		if default_input_device	<> None:
+			# start by the default input device
+			device_range.remove(default_input_device)
+			device_range = [default_input_device] + device_range
 
 		# select only the input devices by looking at the number of input channels
 		input_devices = []
@@ -148,12 +164,14 @@ class AudioBackend(QtCore.QObject):
 	# returns a list of output devices index, starting with the system default
 	def get_output_devices(self):
 		device_count = self.get_device_count()
-		default_output_device = self.get_default_output_device()
-		
 		device_range = range(0, device_count)
-		# start by the default input device
-		device_range.remove(default_output_device)
-		device_range = [default_output_device] + device_range
+
+		default_output_device = self.get_default_output_device()
+
+		if default_output_device <> None:
+			# start by the default input device
+			device_range.remove(default_output_device)
+			device_range = [default_output_device] + device_range
 
 		# select only the output devices by looking at the number of output channels
 		output_devices = []

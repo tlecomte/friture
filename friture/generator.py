@@ -156,6 +156,9 @@ class Generator_Widget(QtGui.QWidget):
 
         self.p = pyaudio.PyAudio()
 
+        self.device = None
+        self.stream = None
+
         # we will try to open all the input devices until one
         # works, starting by the default input device
         for device in self.audiobackend.output_devices:
@@ -207,7 +210,8 @@ class Generator_Widget(QtGui.QWidget):
         for device in devices:
             self.settings_dialog.comboBox_outputDevice.addItem(device)
 
-        self.settings_dialog.comboBox_outputDevice.setCurrentIndex(self.audiobackend.output_devices.index(self.device))
+        if self.device <> None:
+            self.settings_dialog.comboBox_outputDevice.setCurrentIndex(self.audiobackend.output_devices.index(self.device))
 
         self.connect(self.settings_dialog.comboBox_outputDevice, QtCore.SIGNAL('currentIndexChanged(int)'), self.device_changed)
 
@@ -303,6 +307,9 @@ class Generator_Widget(QtGui.QWidget):
     # method
     def update(self):
         if self.state == stopped:
+            return
+
+        if self.stream == None:
             return
 
         # play

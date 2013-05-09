@@ -20,7 +20,7 @@
 import sys, os, platform
 from PyQt4 import QtCore
 # specifically import from PyQt4.QtGui for startup time improvement :
-from PyQt4.QtGui import QMainWindow, QVBoxLayout, QErrorMessage, QApplication, QPixmap, QSplashScreen
+from PyQt4.QtGui import QMainWindow, QVBoxLayout, QErrorMessage, QApplication, QPixmap, QSplashScreen, QMessageBox
 from friture.ui_friture import Ui_MainWindow
 from friture.dock import Dock
 from friture.about import About_Dialog # About dialog
@@ -62,6 +62,15 @@ STYLESHEET = """
 #}
 #"""
 
+no_input_device_title = "No audio input device found"
+
+no_input_device_message = """No audio input device has been found.
+
+Please check your audio configuration.
+
+Friture will now exit.
+"""
+
 class Friture(QMainWindow, ):
 	def __init__(self, logger):
 		QMainWindow.__init__(self)
@@ -87,8 +96,15 @@ class Friture(QMainWindow, ):
 
 		# Initialize the audio backend
 		self.audiobackend = AudioBackend(self.logger)
-   
+
 		devices = self.audiobackend.get_readable_devices_list()
+
+		if devices == []:
+			# no audio input device: display a message and exit
+			QMessageBox.critical(self, no_input_device_title, no_input_device_message)
+			QtCore.QTimer.singleShot(0, self.exitOnInit)
+			return
+
 		for device in devices:
 			self.settings_dialog.comboBox_inputDevice.addItem(device)
 
@@ -151,6 +167,11 @@ class Friture(QMainWindow, ):
 		
 		self.logger.push("Init finished, entering the main loop")
 	
+	# slot
+	# used when no audio input device has been found, to exit immediately
+	def exitOnInit(self):
+		QApplication.instance().quit()
+
 	# slot
 	# update the log widget with the new log content
 	def log_changed(self):
