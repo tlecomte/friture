@@ -36,6 +36,11 @@ import psutil # for CPU usage monitoring
 # power allows it, firing down to every 10 ms
 SMOOTH_DISPLAY_TIMER_PERIOD_MS = 25
 
+# the slow timer is used for text refresh
+# Text has to be refreshed slowly in order to be readable.
+# (and text painting is costly)
+SLOW_TIMER_PERIOD_MS = 1000
+
 STYLESHEET = """
 """
 #QMainWindow::separator {
@@ -128,7 +133,7 @@ class Friture(QMainWindow, ):
 
 		# slow timer
 		self.slow_timer = QtCore.QTimer()
-		self.slow_timer.setInterval(1000) # constant timing
+		self.slow_timer.setInterval(SLOW_TIMER_PERIOD_MS) # constant timing
 
 		self.centralwidget = CentralWidget(self.ui.centralwidget, self.logger, "central_widget", 0)
 		self.centralLayout = QVBoxLayout(self.ui.centralwidget)
