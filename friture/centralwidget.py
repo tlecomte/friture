@@ -34,7 +34,6 @@ class CentralWidget(QtGui.QWidget):
 		
 		self.setObjectName(name)
 		
-		self.parent = parent
 		self.logger = logger
 		
 		self.controlBar = ControlBar(self)
@@ -69,15 +68,15 @@ class CentralWidget(QtGui.QWidget):
 		elif item is 2:
 			self.audiowidget = Spectrum_Widget(self, self.logger)
 		elif item is 3:
-			self.audiowidget = Spectrogram_Widget(self, self.parent.parent().audiobackend, self.logger)
+			self.audiowidget = Spectrogram_Widget(self, self.parent().parent().audiobackend, self.logger)
 		elif item is 4:
 			self.audiowidget = OctaveSpectrum_Widget(self, self.logger)
 		elif item is 5:
-			self.audiowidget = Generator_Widget(self, self.parent.parent().audiobackend, self.logger)
+			self.audiowidget = Generator_Widget(self, self.parent().parent().audiobackend, self.logger)
 		elif item is 6:
 			self.audiowidget = Delay_Estimator_Widget(self, self.logger)
 
-		self.audiowidget.set_buffer(self.parent.parent().audiobuffer)
+		self.audiowidget.set_buffer(self.parent().parent().audiobuffer)
 
 		self.layout.addWidget(self.audiowidget)
 		
