@@ -42,6 +42,8 @@ class CentralWidget(QtGui.QWidget):
 		self.connect(self.controlBar.comboBox_select, QtCore.SIGNAL('activated(int)'), self.widget_select)
 		self.connect(self.controlBar.settingsButton, QtCore.SIGNAL('clicked(bool)'), self.settings_slot)
 		
+		self.connect(self.parent.parent().display_timer, QtCore.SIGNAL('timeout()'), self.update)
+
 		self.label = QtGui.QLabel(self)
 		self.label.setText(" Central dock ") # spaces before and after for nicer alignment
 		self.controlBar.layout.insertWidget(0, self.label)
@@ -58,8 +60,6 @@ class CentralWidget(QtGui.QWidget):
 	def widget_select(self, item):
 		if self.audiowidget is not None:
 		    self.audiowidget.close()
-		    # this is a little strange, but for pyqt >=4.9.5 I have to disconnect explicitely
-		    self.disconnect(self.parent.parent().display_timer, QtCore.SIGNAL('timeout()'), self.audiowidget.update)
 		    self.audiowidget.deleteLater()
 		
 		self.type = item
@@ -80,13 +80,14 @@ class CentralWidget(QtGui.QWidget):
 			self.audiowidget = Delay_Estimator_Widget(self, self.logger)
 
 		self.audiowidget.set_buffer(self.parent.parent().audiobuffer)
-		
-		if self.audiowidget.update is not None:
-			self.connect(self.parent.parent().display_timer, QtCore.SIGNAL('timeout()'), self.audiowidget.update)
 
 		self.layout.addWidget(self.audiowidget)
 		
 		self.controlBar.comboBox_select.setCurrentIndex(item)
+
+	def update(self):
+		if self.audiowidget <> None:
+			self.audiowidget.update()
 
 	def custom_timer_start(self):
 		try:

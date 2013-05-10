@@ -43,6 +43,8 @@ class Dock(QtGui.QDockWidget):
 		
 		self.connect(self, QtCore.SIGNAL('closed'), self.parent.dock_closed)
 		
+		self.connect(self.parent.display_timer, QtCore.SIGNAL('timeout()'), self.update)
+
 		self.dockwidget = QtGui.QWidget(self)
 		self.layout = QtGui.QVBoxLayout(self.dockwidget)
 		self.layout.addWidget(self.controlBar)
@@ -61,8 +63,6 @@ class Dock(QtGui.QDockWidget):
 	def widget_select(self, item):
 		if self.audiowidget is not None:
 		    self.audiowidget.close()
-		    # this is a little strange, but for pyqt >=4.9.5 I have to disconnect explicitely
-		    self.disconnect(self.parent.display_timer, QtCore.SIGNAL('timeout()'), self.audiowidget.update)
 		    self.audiowidget.deleteLater()
 		
 		self.type = item
@@ -83,13 +83,14 @@ class Dock(QtGui.QDockWidget):
 			self.audiowidget = Delay_Estimator_Widget(self, self.logger)
 		
 		self.audiowidget.set_buffer(self.parent.audiobuffer)
-		
-		if self.audiowidget.update is not None:
-			self.connect(self.parent.display_timer, QtCore.SIGNAL('timeout()'), self.audiowidget.update)
 
 		self.layout.addWidget(self.audiowidget)
 		
 		self.controlBar.comboBox_select.setCurrentIndex(item)
+
+	def update(self):
+		if self.audiowidget <> None:
+			self.audiowidget.update()
 
 	def custom_timer_start(self):
 		try:
