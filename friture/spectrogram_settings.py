@@ -34,7 +34,6 @@ class Spectrogram_Settings_Dialog(QtGui.QDialog):
 	def __init__(self, parent, logger):
 		QtGui.QDialog.__init__(self, parent)
 		
-		self.parent = parent
 		self.logger = logger
 		
 		self.setWindowTitle("Spectrogram settings")
@@ -122,26 +121,26 @@ class Spectrogram_Settings_Dialog(QtGui.QDialog):
 
 		self.connect(self.comboBox_fftsize, QtCore.SIGNAL('currentIndexChanged(int)'), self.fftsizechanged)
 		self.connect(self.comboBox_freqscale, QtCore.SIGNAL('currentIndexChanged(int)'), self.freqscalechanged)
-		self.connect(self.spinBox_minfreq, QtCore.SIGNAL('valueChanged(int)'), self.parent.setminfreq)
-		self.connect(self.spinBox_maxfreq, QtCore.SIGNAL('valueChanged(int)'), self.parent.setmaxfreq)
-		self.connect(self.spinBox_specmin, QtCore.SIGNAL('valueChanged(int)'), self.parent.setmin)
-		self.connect(self.spinBox_specmax, QtCore.SIGNAL('valueChanged(int)'), self.parent.setmax)
-		self.connect(self.doubleSpinBox_timerange, QtCore.SIGNAL('valueChanged(double)'), self.parent.timerangechanged)
-		self.connect(self.comboBox_weighting, QtCore.SIGNAL('currentIndexChanged(int)'), self.parent.setweighting)
+		self.connect(self.spinBox_minfreq, QtCore.SIGNAL('valueChanged(int)'), self.parent().setminfreq)
+		self.connect(self.spinBox_maxfreq, QtCore.SIGNAL('valueChanged(int)'), self.parent().setmaxfreq)
+		self.connect(self.spinBox_specmin, QtCore.SIGNAL('valueChanged(int)'), self.parent().setmin)
+		self.connect(self.spinBox_specmax, QtCore.SIGNAL('valueChanged(int)'), self.parent().setmax)
+		self.connect(self.doubleSpinBox_timerange, QtCore.SIGNAL('valueChanged(double)'), self.parent().timerangechanged)
+		self.connect(self.comboBox_weighting, QtCore.SIGNAL('currentIndexChanged(int)'), self.parent().setweighting)
 
 	# slot
 	def fftsizechanged(self, index):
 		self.logger.push("fft_size_changed slot %d %d %f" %(index, 2**index*32, 150000/2**index*32))
 		fft_size = 2**index*32
-		self.parent.setfftsize(fft_size)
+		self.parent().setfftsize(fft_size)
 	
 	# slot
 	def freqscalechanged(self, index):
 		self.logger.push("freq_scale slot %d" %index)
 		if index == 1:
-			self.parent.PlotZoneImage.setlog10freqscale()
+			self.parent().PlotZoneImage.setlog10freqscale()
 		else:
-			self.parent.PlotZoneImage.setlinfreqscale()
+			self.parent().PlotZoneImage.setlinfreqscale()
 
 	# method
 	def saveState(self, settings):
