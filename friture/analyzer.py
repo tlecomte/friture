@@ -71,6 +71,9 @@ Please check your audio configuration.
 Friture will now exit.
 """
 
+DEFAULT_DOCKS = [3, # spectrogram
+                 4] # octave spectrum
+
 class Friture(QMainWindow, ):
 	def __init__(self, logger):
 		QMainWindow.__init__(self)
@@ -260,11 +263,7 @@ class Friture(QMainWindow, ):
 				settings.endGroup()
 		else:
 			self.logger.push("First launch, display a default set of docks")
-			self.docks = []
-			self.docks += [Dock(self, self.logger, "Dock 0", type = 3)] #spectrogram
-			self.docks += [Dock(self, self.logger, "Dock 1", type = 4)] #octave spectrum
-			#self.docks += [Dock(self, self.logger, "Dock 2", type = 1)] #scope
-			#self.docks += [Dock(self, self.logger, "Dock 3", type = 0)] #level
+			self.docks = [Dock(self, self.logger, "Dock %d" %(i), type = type) for i, type in enumerate(DEFAULT_DOCKS)]
 			for dock in self.docks:
 				self.addDockWidget(QtCore.Qt.TopDockWidgetArea, dock)
 
