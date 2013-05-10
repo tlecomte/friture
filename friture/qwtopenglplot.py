@@ -400,8 +400,6 @@ class GLPlotWidget(QtGui.QWidget):
 class GLWidget(QtOpenGL.QGLWidget):
     def __init__(self, parent):
         super(GLWidget, self).__init__(parent)
-        
-        self.parent = parent
 
         self.lastPos = QtCore.QPoint()
         
@@ -575,8 +573,8 @@ class GLWidget(QtOpenGL.QGLWidget):
         if self.ruler:
             painter.setRenderHint(QtGui.QPainter.Antialiasing)
             
-            x = self.parent.inverseXTransform(self.mousex)
-            y = self.parent.inverseYTransform(self.height() - self.mousey)
+            x = self.parent().inverseXTransform(self.mousex)
+            y = self.parent().inverseYTransform(self.height() - self.mousey)
             text = "%d Hz, %.1f dB" %(x, y)
             
             # compute tracker bounding rect
