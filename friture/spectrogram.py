@@ -41,8 +41,7 @@ class Spectrogram_Widget(QtGui.QWidget):
     def __init__(self, parent, audiobackend, logger = PrintLogger()):
         QtGui.QWidget.__init__(self, parent)
 
-        self.logger = logger        			
-        self.parent = parent
+        self.logger = logger
 
         self.setObjectName("Spectrogram_Widget")
         self.gridLayout = QtGui.QGridLayout(self)
