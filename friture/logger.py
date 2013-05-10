@@ -38,3 +38,14 @@ class Logger(QtCore.QObject):
 	# return the current log
 	def text(self):
 		return self.log
+
+
+# simple logger that prints to the console
+class PrintLogger:
+	# push some text to the log
+	def push(self, text):
+		print text
+
+	# return the current log
+	def text(self):
+		return ""

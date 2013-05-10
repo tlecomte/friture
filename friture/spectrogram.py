@@ -23,6 +23,7 @@ from friture.imageplot import ImagePlot
 from friture.audioproc import audioproc # audio processing class
 from friture.spectrogram_settings import Spectrogram_Settings_Dialog# settings dialog
 from friture.audiobackend import SAMPLING_RATE
+from friture.logger import PrintLogger
 #from glrollingcanvaswidget import GLRollingCanvasWidget
 from fractions import Fraction
 
@@ -37,15 +38,10 @@ DEFAULT_TIMERANGE = 10.
 DEFAULT_WEIGHTING = 1 #A
 
 class Spectrogram_Widget(QtGui.QWidget):
-    def __init__(self, parent, audiobackend, logger = None):
+    def __init__(self, parent, audiobackend, logger = PrintLogger()):
         QtGui.QWidget.__init__(self, parent)
 
-        # store the logger instance
-        if logger is None:
-            self.logger = parent.parent().logger
-        else:
-            self.logger = logger
-        			
+        self.logger = logger        			
         self.parent = parent
 
         self.setObjectName("Spectrogram_Widget")

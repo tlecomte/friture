@@ -22,6 +22,7 @@ import numpy as np
 import pyaudio
 from numpy.random import standard_normal
 from friture.audiobackend import SAMPLING_RATE
+from friture.logger import PrintLogger
 
 SMOOTH_DISPLAY_TIMER_PERIOD_MS = 25
 
@@ -55,15 +56,10 @@ def pinknoise(n, rvs=standard_normal):
     return pink/k
 
 class Generator_Widget(QtGui.QWidget):
-    def __init__(self, parent, audiobackend, logger = None):
+    def __init__(self, parent, audiobackend, logger = PrintLogger()):
         QtGui.QWidget.__init__(self, parent)
 
-        # store the logger instance
-        if logger is None:
-            self.logger = parent.parent.logger
-        else:
-            self.logger = logger
-
+        self.logger = logger
         self.audiobuffer = None
 
         self.setObjectName("Generator_Widget")

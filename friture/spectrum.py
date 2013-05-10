@@ -22,6 +22,7 @@ from numpy import log10, argmax, max
 from friture.spectplot import SpectPlot
 from friture.audioproc import audioproc # audio processing class
 from friture.spectrum_settings import Spectrum_Settings_Dialog # settings dialog
+from friture.logger import PrintLogger
 
 from friture.qwtopenglplot import GLPlotWidget
 
@@ -45,15 +46,10 @@ DEFAULT_WEIGHTING = 1 #A
 DEFAULT_SHOW_FREQ_LABELS = True
 
 class Spectrum_Widget(QtGui.QWidget):
-	def __init__(self, parent, logger = None):
+	def __init__(self, parent, logger = PrintLogger()):
 		QtGui.QWidget.__init__(self, parent)
 
-		# store the logger instance
-		if logger is None:
-		    self.logger = parent.parent.logger
-		else:
-		    self.logger = logger
-
+		self.logger = logger
 		self.audiobuffer = None
 
 		self.setObjectName("Spectrum_Widget")

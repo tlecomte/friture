@@ -22,6 +22,7 @@ from numpy import log10, abs, arange
 from friture.levels_settings import Levels_Settings_Dialog # settings dialog
 from friture.qsynthmeter import qsynthMeter
 from friture.audioproc import audioproc
+from friture.logger import PrintLogger
 
 from friture.exp_smoothing_conv import pyx_exp_smoothed_value
 
@@ -41,7 +42,7 @@ LEVEL_TEXT_LABEL_PERIOD_MS = 250
 LEVEL_TEXT_LABEL_STEPS = LEVEL_TEXT_LABEL_PERIOD_MS/SMOOTH_DISPLAY_TIMER_PERIOD_MS
 
 class Levels_Widget(QtGui.QWidget):
-	def __init__(self, parent = None, logger = None):
+	def __init__(self, parent = None, logger = PrintLogger()):
 		QtGui.QWidget.__init__(self, parent)
 		self.setObjectName("Levels_Widget")
 		
@@ -92,12 +93,7 @@ class Levels_Widget(QtGui.QWidget):
 		#self.label_peak.setSizePolicy(QtGui.QSizePolicy(QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding))
 		#self.label_peak_legend.setSizePolicy(QtGui.QSizePolicy(QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding))
 		
-		# store the logger instance
-		if logger is None:
-		    self.logger = parent.parent.logger
-		else:
-		    self.logger = logger
-
+		self.logger = logger
 		self.audiobuffer = None
 		
 		# initialize the settings dialog

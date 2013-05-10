@@ -21,6 +21,7 @@ from PyQt4 import QtGui, QtCore
 from numpy import log10, where, linspace, sign, arange
 from friture.timeplot import TimePlot
 from friture.audiobackend import SAMPLING_RATE
+from friture.logger import PrintLogger
 
 SMOOTH_DISPLAY_TIMER_PERIOD_MS = 25
 DEFAULT_TIMERANGE = 2*SMOOTH_DISPLAY_TIMER_PERIOD_MS
@@ -35,16 +36,11 @@ QwtPlotCanvas {
 """
 
 class Scope_Widget(QtGui.QWidget):
-    def __init__(self, parent = None, logger = None):
+    def __init__(self, parent = None, logger = PrintLogger()):
         QtGui.QWidget.__init__(self, parent)
 
         self.audiobuffer = None
-        
-        # store the logger instance
-        if logger is None:
-            self.logger = parent.parent.logger
-        else:
-            self.logger = logger
+        self.logger = logger
         
         self.setObjectName("Scope_Widget")
         self.gridLayout = QtGui.QGridLayout(self)

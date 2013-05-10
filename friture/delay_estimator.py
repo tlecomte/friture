@@ -24,6 +24,7 @@ from numpy.fft import rfft, irfft
 from filter import decimate
 from friture import generated_filters
 from ringbuffer import RingBuffer
+from friture.logger import PrintLogger
 
 from friture.audiobackend import SAMPLING_RATE
 
@@ -88,16 +89,11 @@ def generalized_cross_correlation(d0, d1):
     return Xcorr
 
 class Delay_Estimator_Widget(QtGui.QWidget):
-    def __init__(self, parent = None, logger = None):
+    def __init__(self, parent = None, logger = PrintLogger()):
         QtGui.QWidget.__init__(self, parent)
 
         self.audiobuffer = None
-        
-        # store the logger instance
-        if logger is None:
-            self.logger = parent.parent.logger
-        else:
-            self.logger = logger
+        self.logger = logger
         
         self.previous_delay_message = ""
         self.previous_correlation_message = ""

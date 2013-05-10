@@ -19,6 +19,7 @@
 
 from PyQt4 import QtGui
 from numpy import log10, array, arange, where
+from friture.logger import PrintLogger
 from friture.histplot import HistPlot
 from friture.octavespectrum_settings import OctaveSpectrum_Settings_Dialog # settings dialog
 from friture.filter import (octave_filter_bank_decimation, octave_frequencies,
@@ -53,15 +54,10 @@ DEFAULT_RESPONSE_TIME = 0.125 # FAST
 DEFAULT_RESPONSE_TIME_INDEX = 1 # FAST
 
 class OctaveSpectrum_Widget(QtGui.QWidget):
-	def __init__(self, parent, logger = None):
+	def __init__(self, parent, logger = PrintLogger()):
 		QtGui.QWidget.__init__(self, parent)
 
-		# store the logger instance
-		if logger is None:
-		    self.logger = parent.parent.logger
-		else:
-		    self.logger = logger
-
+		self.logger = logger
 		self.audiobuffer = None
 
 		self.setObjectName("Spectrum_Widget")
