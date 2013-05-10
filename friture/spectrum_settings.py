@@ -34,7 +34,6 @@ class Spectrum_Settings_Dialog(QtGui.QDialog):
 	def __init__(self, parent, logger):
 		QtGui.QDialog.__init__(self, parent)
 		
-		self.parent = parent
 		self.logger = logger
 		
 		self.setWindowTitle("Spectrum settings")
@@ -126,19 +125,19 @@ class Spectrum_Settings_Dialog(QtGui.QDialog):
 		self.connect(self.comboBox_dual_channel, QtCore.SIGNAL('currentIndexChanged(int)'), self.dualchannelchanged)
 		self.connect(self.comboBox_fftsize, QtCore.SIGNAL('currentIndexChanged(int)'), self.fftsizechanged)
 		self.connect(self.comboBox_freqscale, QtCore.SIGNAL('currentIndexChanged(int)'), self.freqscalechanged)
-		self.connect(self.spinBox_minfreq, QtCore.SIGNAL('valueChanged(int)'), self.parent.setminfreq)
-		self.connect(self.spinBox_maxfreq, QtCore.SIGNAL('valueChanged(int)'), self.parent.setmaxfreq)
-		self.connect(self.spinBox_specmin, QtCore.SIGNAL('valueChanged(int)'), self.parent.setmin)
-		self.connect(self.spinBox_specmax, QtCore.SIGNAL('valueChanged(int)'), self.parent.setmax)
-		self.connect(self.comboBox_weighting, QtCore.SIGNAL('currentIndexChanged(int)'), self.parent.setweighting)
-		self.connect(self.checkBox_showFreqLabels, QtCore.SIGNAL('toggled(bool)'), self.parent.setShowFreqLabel)
+		self.connect(self.spinBox_minfreq, QtCore.SIGNAL('valueChanged(int)'), self.parent().setminfreq)
+		self.connect(self.spinBox_maxfreq, QtCore.SIGNAL('valueChanged(int)'), self.parent().setmaxfreq)
+		self.connect(self.spinBox_specmin, QtCore.SIGNAL('valueChanged(int)'), self.parent().setmin)
+		self.connect(self.spinBox_specmax, QtCore.SIGNAL('valueChanged(int)'), self.parent().setmax)
+		self.connect(self.comboBox_weighting, QtCore.SIGNAL('currentIndexChanged(int)'), self.parent().setweighting)
+		self.connect(self.checkBox_showFreqLabels, QtCore.SIGNAL('toggled(bool)'), self.parent().setShowFreqLabel)
 
 	# slot
 	def dualchannelchanged(self, index):
 		if index == 0:
-			self.parent.setdualchannels(False)
+			self.parent().setdualchannels(False)
 		else:
-			self.parent.setdualchannels(True)
+			self.parent().setdualchannels(True)
 
 	# slot
 	def fftsizechanged(self, index):
@@ -146,7 +145,7 @@ class Spectrum_Settings_Dialog(QtGui.QDialog):
 		if self.logger is not None:
 			self.logger.push("fft_size_changed slot %d %d %f" %(index, 2**index*32, 150000/2**index*32))
 		fft_size = 2**index*32
-		self.parent.setfftsize(fft_size)
+		self.parent().setfftsize(fft_size)
 	
 	# slot
 	def freqscalechanged(self, index):
@@ -154,9 +153,9 @@ class Spectrum_Settings_Dialog(QtGui.QDialog):
 		if self.logger is not None:
 			self.logger.push("freq_scale slot %d" %index)
 		if index == 1:
-			self.parent.PlotZoneSpect.setlogfreqscale()
+			self.parent().PlotZoneSpect.setlogfreqscale()
 		else:
-			self.parent.PlotZoneSpect.setlinfreqscale()
+			self.parent().PlotZoneSpect.setlinfreqscale()
 
 	# method
 	def saveState(self, settings):
