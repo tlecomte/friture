@@ -414,7 +414,6 @@ class Generator_Settings_Dialog(QtGui.QDialog):
     def __init__(self, parent, logger):
         QtGui.QDialog.__init__(self, parent)
 
-        self.parent = parent
         self.logger = logger
 
         self.setWindowTitle("Spectrum settings")
