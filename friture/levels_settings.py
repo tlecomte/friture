@@ -23,7 +23,6 @@ class Levels_Settings_Dialog(QtGui.QDialog):
 	def __init__(self, parent, logger):
 		QtGui.QDialog.__init__(self, parent)
 		
-		self.parent = parent
 		self.logger = logger
 		
 		self.setWindowTitle("Levels settings")
@@ -43,7 +42,7 @@ class Levels_Settings_Dialog(QtGui.QDialog):
 		
 		self.setLayout(self.formLayout)
 
-		#self.connect(self.doubleSpinBox_timerange, QtCore.SIGNAL('valueChanged(double)'), self.parent.timerangechanged)
+		#self.connect(self.doubleSpinBox_timerange, QtCore.SIGNAL('valueChanged(double)'), self.parent().timerangechanged)
 
 	# method
 	def saveState(self, settings):
