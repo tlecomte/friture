@@ -29,6 +29,7 @@ from friture.logger import Logger # Logging class
 from friture.audiobuffer import AudioBuffer # audio ring buffer class
 from friture.audiobackend import AudioBackend# audio backend class
 from friture.centralwidget import CentralWidget
+from friture.defaults import DEFAULT_DOCKS
 import psutil # for CPU usage monitoring
 
 # the display timer could be made faster when the processing
@@ -70,9 +71,6 @@ Please check your audio configuration.
 
 Friture will now exit.
 """
-
-DEFAULT_DOCKS = [3, # spectrogram
-                 4] # octave spectrum
 
 class Friture(QMainWindow, ):
 	def __init__(self, logger):

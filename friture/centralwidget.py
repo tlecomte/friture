@@ -26,6 +26,7 @@ from friture.scope import Scope_Widget
 from friture.generator import Generator_Widget
 from friture.delay_estimator import Delay_Estimator_Widget
 from friture.controlbar import ControlBar
+from friture.defaults import DEFAULT_CENTRAL_WIDGET
 
 class CentralWidget(QtGui.QWidget):
 	def __init__(self, parent, logger, name, type = 0):
@@ -110,6 +111,6 @@ class CentralWidget(QtGui.QWidget):
 	
 	# method
 	def restoreState(self, settings):
-		(type, ok) = settings.value("type", 2).toInt()
+		(type, ok) = settings.value("type", DEFAULT_CENTRAL_WIDGET).toInt()
 		self.widget_select(type)
 		self.audiowidget.restoreState(settings)
