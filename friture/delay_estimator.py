@@ -323,7 +323,6 @@ class Delay_Estimator_Settings_Dialog(QtGui.QDialog):
     def __init__(self, parent, logger):
         QtGui.QDialog.__init__(self, parent)
         
-        self.parent = parent
         self.logger = logger
         
         self.setWindowTitle("Delay estimator settings")
@@ -342,7 +341,7 @@ class Delay_Estimator_Settings_Dialog(QtGui.QDialog):
         
         self.setLayout(self.formLayout)
         
-        self.connect(self.doubleSpinBox_delayrange, QtCore.SIGNAL('valueChanged(double)'), self.parent.set_delayrange)
+        self.connect(self.doubleSpinBox_delayrange, QtCore.SIGNAL('valueChanged(double)'), self.parent().set_delayrange)
 
     # method
     def saveState(self, settings):
