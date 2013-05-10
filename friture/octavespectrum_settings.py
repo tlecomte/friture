@@ -32,7 +32,6 @@ class OctaveSpectrum_Settings_Dialog(QtGui.QDialog):
 	def __init__(self, parent, logger):
 		QtGui.QDialog.__init__(self, parent)
 		
-		self.parent = parent
 		self.logger = logger
 		
 		self.setWindowTitle("Spectrum settings")
@@ -89,16 +88,16 @@ class OctaveSpectrum_Settings_Dialog(QtGui.QDialog):
 		self.setLayout(self.formLayout)
 
 		self.connect(self.comboBox_bandsperoctave, QtCore.SIGNAL('currentIndexChanged(int)'), self.bandsperoctavechanged)
-		self.connect(self.spinBox_specmin, QtCore.SIGNAL('valueChanged(int)'), self.parent.setmin)
-		self.connect(self.spinBox_specmax, QtCore.SIGNAL('valueChanged(int)'), self.parent.setmax)
-		self.connect(self.comboBox_weighting, QtCore.SIGNAL('currentIndexChanged(int)'), self.parent.setweighting)
+		self.connect(self.spinBox_specmin, QtCore.SIGNAL('valueChanged(int)'), self.parent().setmin)
+		self.connect(self.spinBox_specmax, QtCore.SIGNAL('valueChanged(int)'), self.parent().setmax)
+		self.connect(self.comboBox_weighting, QtCore.SIGNAL('currentIndexChanged(int)'), self.parent().setweighting)
 		self.connect(self.comboBox_response_time, QtCore.SIGNAL('currentIndexChanged(int)'), self.responsetimechanged)
 
 	# slot
 	def bandsperoctavechanged(self, index):
 		bandsperoctave = 3*2**(index-1) if index >= 1 else 1
 		self.logger.push("bandsperoctavechanged slot %d %d" %(index, bandsperoctave))
-		self.parent.setbandsperoctave(bandsperoctave)
+		self.parent().setbandsperoctave(bandsperoctave)
 
 	# slot
 	def responsetimechanged(self, index):
@@ -111,7 +110,7 @@ class OctaveSpectrum_Settings_Dialog(QtGui.QDialog):
 		elif index == 3:
 			response_time = 1.
 		self.logger.push("responsetimechanged slot %d %d" %(index, response_time))
-		self.parent.setresponsetime(response_time)
+		self.parent().setresponsetime(response_time)
 
 	# method
 	def saveState(self, settings):
