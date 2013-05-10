@@ -142,6 +142,7 @@ class Friture(QMainWindow, ):
 
 		# timer ticks
 		self.connect(self.display_timer, QtCore.SIGNAL('timeout()'), self.update_buffer)
+		self.connect(self.display_timer, QtCore.SIGNAL('timeout()'), self.centralwidget.update)
 
 		# timer ticks
 		self.connect(self.slow_timer, QtCore.SIGNAL('timeout()'), self.get_cpu_percent)
@@ -208,6 +209,7 @@ class Friture(QMainWindow, ):
 			index = max(dockindexes)+1
 		name = "Dock %d" %index
 		new_dock = Dock(self, self.logger, name)
+		self.connect(self.display_timer, QtCore.SIGNAL('timeout()'), new_dock.update)
 		self.addDockWidget(QtCore.Qt.TopDockWidgetArea, new_dock)
 		
 		self.docks += [new_dock]
@@ -269,6 +271,9 @@ class Friture(QMainWindow, ):
 			self.docks = [Dock(self, self.logger, "Dock %d" %(i), type = type) for i, type in enumerate(DEFAULT_DOCKS)]
 			for dock in self.docks:
 				self.addDockWidget(QtCore.Qt.TopDockWidgetArea, dock)
+
+		for dock in self.docks:
+			self.connect(self.display_timer, QtCore.SIGNAL('timeout()'), dock.update)
 
 		settings.endGroup()
 

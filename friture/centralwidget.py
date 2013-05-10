@@ -41,8 +41,6 @@ class CentralWidget(QtGui.QWidget):
 				
 		self.connect(self.controlBar.comboBox_select, QtCore.SIGNAL('activated(int)'), self.widget_select)
 		self.connect(self.controlBar.settingsButton, QtCore.SIGNAL('clicked(bool)'), self.settings_slot)
-		
-		self.connect(self.parent.parent().display_timer, QtCore.SIGNAL('timeout()'), self.update)
 
 		self.label = QtGui.QLabel(self)
 		self.label.setText(" Central dock ") # spaces before and after for nicer alignment

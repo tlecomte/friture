@@ -42,8 +42,6 @@ class Dock(QtGui.QDockWidget):
 		self.connect(self.controlBar.settingsButton, QtCore.SIGNAL('clicked(bool)'), self.settings_slot)
 		
 		self.connect(self, QtCore.SIGNAL('closed'), self.parent.dock_closed)
-		
-		self.connect(self.parent.display_timer, QtCore.SIGNAL('timeout()'), self.update)
 
 		self.dockwidget = QtGui.QWidget(self)
 		self.layout = QtGui.QVBoxLayout(self.dockwidget)
