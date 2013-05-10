@@ -33,7 +33,6 @@ class Dock(QtGui.QDockWidget):
 		
 		self.setObjectName(name)
 		
-		self.parent = parent
 		self.logger = logger
 		
 		self.controlBar = ControlBar(self)
@@ -41,7 +40,7 @@ class Dock(QtGui.QDockWidget):
 		self.connect(self.controlBar.comboBox_select, QtCore.SIGNAL('activated(int)'), self.widget_select)
 		self.connect(self.controlBar.settingsButton, QtCore.SIGNAL('clicked(bool)'), self.settings_slot)
 		
-		self.connect(self, QtCore.SIGNAL('closed'), self.parent.dock_closed)
+		self.connect(self, QtCore.SIGNAL('closed'), self.parent().dock_closed)
 
 		self.dockwidget = QtGui.QWidget(self)
 		self.layout = QtGui.QVBoxLayout(self.dockwidget)
@@ -72,15 +71,15 @@ class Dock(QtGui.QDockWidget):
 		elif item is 2:
 			self.audiowidget = Spectrum_Widget(self, self.logger)
 		elif item is 3:
-			self.audiowidget = Spectrogram_Widget(self, self.parent.audiobackend, self.logger)
+			self.audiowidget = Spectrogram_Widget(self, self.parent().audiobackend, self.logger)
 		elif item is 4:
 			self.audiowidget = OctaveSpectrum_Widget(self, self.logger)
 		elif item is 5:
-			self.audiowidget = Generator_Widget(self, self.parent.audiobackend, self.logger)
+			self.audiowidget = Generator_Widget(self, self.parent().audiobackend, self.logger)
 		elif item is 6:
 			self.audiowidget = Delay_Estimator_Widget(self, self.logger)
 		
-		self.audiowidget.set_buffer(self.parent.audiobuffer)
+		self.audiowidget.set_buffer(self.parent().audiobuffer)
 
 		self.layout.addWidget(self.audiowidget)
 		
