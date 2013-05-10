@@ -136,11 +136,11 @@ class Friture(QMainWindow, ):
 
 		# timer ticks
 		self.connect(self.display_timer, QtCore.SIGNAL('timeout()'), self.update_buffer)
-		self.connect(self.display_timer, QtCore.SIGNAL('timeout()'), self.statistics)
 
 		# timer ticks
 		self.connect(self.slow_timer, QtCore.SIGNAL('timeout()'), self.get_cpu_percent)
-		
+		self.connect(self.slow_timer, QtCore.SIGNAL('timeout()'), self.statistics)
+
 		# toolbar clicks
 		self.connect(self.ui.actionStart, QtCore.SIGNAL('triggered()'), self.timer_toggle)
 		self.connect(self.ui.actionSettings, QtCore.SIGNAL('triggered()'), self.settings_called)
