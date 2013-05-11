@@ -12,4 +12,4 @@ The name *Friture* is a french word for *frying*, also used for *noise* in a sou
 
 See the `project homepage`_ for screenshots and more information.
 
-.. _`project homepage`: http://tlecomte.github.com/friture/
+.. _`project homepage`: http://friture.org

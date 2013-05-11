@@ -80,7 +80,7 @@ setup(name = "friture",
 	license = "GNU GENERAL PUBLIC LICENSE",
 	author = 'Timothée Lecomte',
 	author_email = 'lecomte.timothee@gmail.com',
-	url='http://tlecomte.github.com/friture/',
+	url='http://friture.org',
 	keywords = ["audio", "spectrum", "spectrogram"],
 	classifiers = [
 	"Programming Language :: Python",
