@@ -91,7 +91,7 @@ class Friture(QMainWindow, ):
 		# Initialize the audio backend
 		self.audiobackend = AudioBackend(self.logger)
 
-		self.about_dialog = About_Dialog(self)
+		self.about_dialog = About_Dialog(self, self.logger)
 		self.settings_dialog = Settings_Dialog(self, self.logger, self.audiobackend)
 
 		# this timer is used to update widgets that just need to display as fast as they can
@@ -121,10 +121,6 @@ class Friture(QMainWindow, ):
 		self.connect(self.ui.actionAbout, QtCore.SIGNAL('triggered()'), self.about_called)
 		self.connect(self.ui.actionNew_dock, QtCore.SIGNAL('triggered()'), self.new_dock_called)
 
-		# log change
-		self.connect(self.logger, QtCore.SIGNAL('logChanged'), self.log_changed)
-		self.connect(self.about_dialog.log_scrollarea.verticalScrollBar(), QtCore.SIGNAL('rangeChanged(int,int)'), self.log_scroll_range_changed)
-
 		# restore the settings and widgets geometries
 		self.restoreAppState()
 
@@ -133,17 +129,6 @@ class Friture(QMainWindow, ):
 		self.slow_timer.start()
 		
 		self.logger.push("Init finished, entering the main loop")
-
-	# slot
-	# update the log widget with the new log content
-	def log_changed(self):
-		self.about_dialog.LabelLog.setText(self.logger.text())
-	
-	# slot
-	# scroll the log widget so that the last line is visible
-	def log_scroll_range_changed(self, min, max):
-		scrollbar = self.about_dialog.log_scrollarea.verticalScrollBar()
-		scrollbar.setValue(max)
 	
 	# slot
 	def settings_called(self):

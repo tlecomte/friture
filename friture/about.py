@@ -32,9 +32,11 @@ aboutText = """
 """ %(friture.__version__, friture.__releasedate__)
 
 class About_Dialog(QtGui.QDialog):
-	def __init__(self, parent):
+	def __init__(self, parent, logger):
 		QtGui.QDialog.__init__(self, parent)
 		
+		self.logger = logger
+
 		self.setObjectName("About_Dialog")
 		self.resize(400, 300)
 		self.setWindowTitle("About Friture")
@@ -123,3 +125,17 @@ class About_Dialog(QtGui.QDialog):
 		QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL("accepted()"), self.accept)
 		QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL("rejected()"), self.reject)
 		QtCore.QMetaObject.connectSlotsByName(self)
+
+		self.logger.logChanged.connect(self.log_changed)
+		self.log_scrollarea.verticalScrollBar().rangeChanged.connect(self.log_scroll_range_changed)
+
+	# slot
+	# update the log widget with the new log content
+	def log_changed(self):
+		self.LabelLog.setText(self.logger.text())
+	
+	# slot
+	# scroll the log widget so that the last line is visible
+	def log_scroll_range_changed(self, min, max):
+		scrollbar = self.log_scrollarea.verticalScrollBar()
+		scrollbar.setValue(max)

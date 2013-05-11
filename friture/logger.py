@@ -20,6 +20,9 @@
 from PyQt4 import QtCore
 
 class Logger(QtCore.QObject):
+	
+	logChanged = QtCore.pyqtSignal()
+
 	def __init__(self):
 		QtCore.QObject.__init__(self)
 		
@@ -33,7 +36,7 @@ class Logger(QtCore.QObject):
 		else:
 			self.log = "%s\n[%d] %s" %(self.log, self.count, text)
 		self.count += 1
-		self.emit(QtCore.SIGNAL('logChanged'))
+		self.logChanged.emit()
 
 	# return the current log
 	def text(self):
