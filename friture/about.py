@@ -20,6 +20,7 @@
 from PyQt4 import QtGui, QtCore
 import friture.friture_rc
 import friture
+import psutil # for CPU usage monitoring
 
 aboutText = """
 <p> <b>Friture %s</b> (dated %s)
@@ -32,10 +33,11 @@ aboutText = """
 """ %(friture.__version__, friture.__releasedate__)
 
 class About_Dialog(QtGui.QDialog):
-	def __init__(self, parent, logger):
+	def __init__(self, parent, logger, audiobackend, timer):
 		QtGui.QDialog.__init__(self, parent)
 		
 		self.logger = logger
+		self.audiobackend = audiobackend
 
 		self.setObjectName("About_Dialog")
 		self.resize(400, 300)
@@ -129,6 +131,8 @@ class About_Dialog(QtGui.QDialog):
 		self.logger.logChanged.connect(self.log_changed)
 		self.log_scrollarea.verticalScrollBar().rangeChanged.connect(self.log_scroll_range_changed)
 
+		timer.timeout.connect(self.statistics)
+
 	# slot
 	# update the log widget with the new log content
 	def log_changed(self):
@@ -139,3 +143,21 @@ class About_Dialog(QtGui.QDialog):
 	def log_scroll_range_changed(self, min, max):
 		scrollbar = self.log_scrollarea.verticalScrollBar()
 		scrollbar.setValue(max)
+
+	# method
+	def statistics(self):
+		if not self.LabelStats.isVisible():
+		    return
+		
+		cpu_percent = psutil.cpu_percent(0)
+
+		label = "Chunk #%d\n"\
+		"Audio buffer retrieval: %.02f ms\n"\
+		"Global CPU usage: %d %%\n"\
+		"Number of overflowed inputs (XRUNs): %d"\
+		% (self.audiobackend.chunk_number,
+			self.audiobackend.buffer_timer_time,
+			cpu_percent,
+			self.audiobackend.xruns)
+		
+		self.LabelStats.setText(label)

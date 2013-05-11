@@ -70,6 +70,10 @@ class AudioBackend(QtCore.QObject):
 		# counter for the number of input buffer overflows
 		self.xruns = 0
 
+		self.chunk_number = 0
+		
+		self.buffer_timer_time = 0.
+
 	# method
 	def get_readable_devices_list(self):
 		devices_list = []
@@ -339,7 +343,10 @@ class AudioBackend(QtCore.QObject):
 			ringbuffer.push(floatdata)
 			chunks += 1
 
-		return (chunks, t.elapsed(), chunks*FRAMES_PER_BUFFER)
+		self.chunk_number += chunks
+		self.buffer_timer_time = (95.*self.buffer_timer_time + 5.*t.elapsed())/100.
+
+		return chunks*FRAMES_PER_BUFFER
   
 	def set_single_input(self):
 		self.duo_input = False

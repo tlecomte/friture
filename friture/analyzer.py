@@ -30,7 +30,6 @@ from friture.audiobuffer import AudioBuffer # audio ring buffer class
 from friture.audiobackend import AudioBackend# audio backend class
 from friture.centralwidget import CentralWidget
 from friture.defaults import DEFAULT_DOCKS
-import psutil # for CPU usage monitoring
 
 # the display timer could be made faster when the processing
 # power allows it, firing down to every 10 ms
@@ -78,21 +77,12 @@ class Friture(QMainWindow, ):
 		# Setup the user interface
 		self.ui = Ui_MainWindow()
 		self.ui.setupUi(self)
-		
-		self.chunk_number = 0
-		
-		self.buffer_timer_time = 0.
-		
-		self.cpu_percent = 0.
 
 		# Initialize the audio data ring buffer
 		self.audiobuffer = AudioBuffer(self.logger)
 
 		# Initialize the audio backend
 		self.audiobackend = AudioBackend(self.logger)
-
-		self.about_dialog = About_Dialog(self, self.logger)
-		self.settings_dialog = Settings_Dialog(self, self.logger, self.audiobackend)
 
 		# this timer is used to update widgets that just need to display as fast as they can
 		self.display_timer = QtCore.QTimer()
@@ -102,6 +92,9 @@ class Friture(QMainWindow, ):
 		self.slow_timer = QtCore.QTimer()
 		self.slow_timer.setInterval(SLOW_TIMER_PERIOD_MS) # constant timing
 
+		self.about_dialog = About_Dialog(self, self.logger, self.audiobackend, self.slow_timer)
+		self.settings_dialog = Settings_Dialog(self, self.logger, self.audiobackend)
+
 		self.centralwidget = CentralWidget(self.ui.centralwidget, self.logger, "central_widget", 0)
 		self.centralLayout = QVBoxLayout(self.ui.centralwidget)
 		self.centralLayout.setContentsMargins(0, 0, 0, 0)
@@ -110,10 +103,6 @@ class Friture(QMainWindow, ):
 		# timer ticks
 		self.connect(self.display_timer, QtCore.SIGNAL('timeout()'), self.update_buffer)
 		self.connect(self.display_timer, QtCore.SIGNAL('timeout()'), self.centralwidget.update)
-
-		# timer ticks
-		self.connect(self.slow_timer, QtCore.SIGNAL('timeout()'), self.get_cpu_percent)
-		self.connect(self.slow_timer, QtCore.SIGNAL('timeout()'), self.statistics)
 
 		# toolbar clicks
 		self.connect(self.ui.actionStart, QtCore.SIGNAL('triggered()'), self.timer_toggle)
@@ -243,26 +232,8 @@ class Friture(QMainWindow, ):
 
 	# slot
 	def update_buffer(self):
-     		(chunks, t, newpoints) = self.audiobackend.update(self.audiobuffer.ringbuffer)
+     		newpoints = self.audiobackend.update(self.audiobuffer.ringbuffer)
      		self.audiobuffer.set_newdata(newpoints)
-		self.chunk_number += chunks
-		self.buffer_timer_time = (95.*self.buffer_timer_time + 5.*t)/100.
-
-	def get_cpu_percent(self):
-		self.cpu_percent = psutil.cpu_percent(0)
-
-	# method
-	def statistics(self):
-		if not self.about_dialog.LabelStats.isVisible():
-		    return
-		    
-		label = "Chunk #%d\n"\
-		"Audio buffer retrieval: %.02f ms\n"\
-		"Global CPU usage: %d %%\n"\
-		"Number of overflowed inputs (XRUNs): %d"\
-		% (self.chunk_number, self.buffer_timer_time, self.cpu_percent, self.audiobackend.xruns)
-		
-		self.about_dialog.LabelStats.setText(label)
 
 
 def main():
