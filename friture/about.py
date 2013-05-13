@@ -20,8 +20,8 @@
 from PyQt4 import QtGui, QtCore
 import friture.friture_rc
 import friture
-import psutil # for CPU usage monitoring
 from friture.logwidget import LogWidget
+from friture.statisticswidget import StatisticsWidget
 
 aboutText = """
 <p> <b>Friture %s</b> (dated %s)
@@ -36,8 +36,6 @@ aboutText = """
 class About_Dialog(QtGui.QDialog):
 	def __init__(self, parent, logger, audiobackend, timer):
 		QtGui.QDialog.__init__(self, parent)
-		
-		self.audiobackend = audiobackend
 
 		self.setObjectName("About_Dialog")
 		self.resize(400, 300)
@@ -70,30 +68,10 @@ class About_Dialog(QtGui.QDialog):
 		self.horizontalLayout.addWidget(self.label)
 		self.tabWidget.addTab(self.aboutTab, "About")
 		
-		self.tab_stats = QtGui.QWidget()
-		self.tab_stats_layout = QtGui.QGridLayout(self.tab_stats)
-		self.stats_scrollarea = QtGui.QScrollArea(self.tab_stats)		
-		self.stats_scrollarea.setWidgetResizable(True)
-		self.stats_scrollarea.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
-		self.stats_scrollarea.setObjectName("stats_scrollArea")
-		self.scrollAreaWidgetContents = QtGui.QWidget(self.stats_scrollarea)
-		self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 87, 220))
-		self.scrollAreaWidgetContents.setStyleSheet("""QWidget { background: white }""")
-		self.scrollAreaWidgetContents.setObjectName("stats_scrollAreaWidgetContents")
-		self.stats_layout = QtGui.QVBoxLayout(self.scrollAreaWidgetContents)
-		self.stats_layout.setObjectName("stats_layout")
-		self.LabelStats = QtGui.QLabel(self.scrollAreaWidgetContents)
-		self.LabelStats.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
-		self.LabelStats.setTextInteractionFlags(QtCore.Qt.LinksAccessibleByKeyboard|QtCore.Qt.LinksAccessibleByMouse|QtCore.Qt.TextBrowserInteraction|QtCore.Qt.TextSelectableByKeyboard|QtCore.Qt.TextSelectableByMouse)
-		self.LabelStats.setObjectName("LabelStats")
-		self.stats_layout.addWidget(self.LabelStats)
-		self.stats_scrollarea.setWidget(self.scrollAreaWidgetContents)
-		self.tab_stats_layout.addWidget(self.stats_scrollarea)
-		self.tab_stats.setObjectName("tab_stats")
+		self.tab_stats = StatisticsWidget(self, logger, timer, audiobackend)
 		self.tabWidget.addTab(self.tab_stats, "Statistics")
 		
 		self.tab_log = LogWidget(self, logger)
-
 		self.tabWidget.addTab(self.tab_log, "Log")
 		
 		self.tabWidget.setCurrentIndex(0)
@@ -110,23 +88,4 @@ class About_Dialog(QtGui.QDialog):
 		QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL("rejected()"), self.reject)
 		QtCore.QMetaObject.connectSlotsByName(self)
 
-		timer.timeout.connect(self.statistics)
 
-
-	# method
-	def statistics(self):
-		if not self.LabelStats.isVisible():
-		    return
-		
-		cpu_percent = psutil.cpu_percent(0)
-
-		label = "Chunk #%d\n"\
-		"Audio buffer retrieval: %.02f ms\n"\
-		"Global CPU usage: %d %%\n"\
-		"Number of overflowed inputs (XRUNs): %d"\
-		% (self.audiobackend.chunk_number,
-			self.audiobackend.buffer_timer_time,
-			cpu_percent,
-			self.audiobackend.xruns)
-		
-		self.LabelStats.setText(label)
