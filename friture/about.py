@@ -21,6 +21,7 @@ from PyQt4 import QtGui, QtCore
 import friture.friture_rc
 import friture
 import psutil # for CPU usage monitoring
+from friture.logwidget import LogWidget
 
 aboutText = """
 <p> <b>Friture %s</b> (dated %s)
@@ -36,7 +37,6 @@ class About_Dialog(QtGui.QDialog):
 	def __init__(self, parent, logger, audiobackend, timer):
 		QtGui.QDialog.__init__(self, parent)
 		
-		self.logger = logger
 		self.audiobackend = audiobackend
 
 		self.setObjectName("About_Dialog")
@@ -92,26 +92,8 @@ class About_Dialog(QtGui.QDialog):
 		self.tab_stats.setObjectName("tab_stats")
 		self.tabWidget.addTab(self.tab_stats, "Statistics")
 		
-		self.tab_log = QtGui.QWidget()
-		self.tab_log_layout = QtGui.QGridLayout(self.tab_log)
-		self.log_scrollarea = QtGui.QScrollArea(self.tab_log)		
-		self.log_scrollarea.setWidgetResizable(True)
-		self.log_scrollarea.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
-		self.log_scrollarea.setObjectName("log_scrollArea")
-		self.log_scrollAreaWidgetContents = QtGui.QWidget(self.log_scrollarea)
-		self.log_scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 87, 220))
-		self.log_scrollAreaWidgetContents.setStyleSheet("""QWidget { background: white }""")
-		self.log_scrollAreaWidgetContents.setObjectName("log_scrollAreaWidgetContents")
-		self.log_layout = QtGui.QVBoxLayout(self.log_scrollAreaWidgetContents)
-		self.log_layout.setObjectName("log_layout")
-		self.LabelLog = QtGui.QLabel(self.log_scrollAreaWidgetContents)
-		self.LabelLog.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
-		self.LabelLog.setTextInteractionFlags(QtCore.Qt.LinksAccessibleByKeyboard|QtCore.Qt.LinksAccessibleByMouse|QtCore.Qt.TextBrowserInteraction|QtCore.Qt.TextSelectableByKeyboard|QtCore.Qt.TextSelectableByMouse)
-		self.LabelLog.setObjectName("LabelLog")
-		self.log_layout.addWidget(self.LabelLog)
-		self.log_scrollarea.setWidget(self.log_scrollAreaWidgetContents)
-		self.tab_log_layout.addWidget(self.log_scrollarea)
-		self.tab_log.setObjectName("tab_log")
+		self.tab_log = LogWidget(self, logger)
+
 		self.tabWidget.addTab(self.tab_log, "Log")
 		
 		self.tabWidget.setCurrentIndex(0)
@@ -128,21 +110,8 @@ class About_Dialog(QtGui.QDialog):
 		QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL("rejected()"), self.reject)
 		QtCore.QMetaObject.connectSlotsByName(self)
 
-		self.logger.logChanged.connect(self.log_changed)
-		self.log_scrollarea.verticalScrollBar().rangeChanged.connect(self.log_scroll_range_changed)
-
 		timer.timeout.connect(self.statistics)
 
-	# slot
-	# update the log widget with the new log content
-	def log_changed(self):
-		self.LabelLog.setText(self.logger.text())
-	
-	# slot
-	# scroll the log widget so that the last line is visible
-	def log_scroll_range_changed(self, min, max):
-		scrollbar = self.log_scrollarea.verticalScrollBar()
-		scrollbar.setValue(max)
 
 	# method
 	def statistics(self):
