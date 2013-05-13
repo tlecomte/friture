@@ -28,6 +28,7 @@ from friture.delay_estimator import Delay_Estimator_Widget
 from friture.controlbar import ControlBar
 
 class Dock(QtGui.QDockWidget):
+
 	def __init__(self, parent, logger, name, type = 0):
 		QtGui.QDockWidget.__init__(self, name, parent)
 		
@@ -39,8 +40,6 @@ class Dock(QtGui.QDockWidget):
 				
 		self.connect(self.controlBar.comboBox_select, QtCore.SIGNAL('activated(int)'), self.widget_select)
 		self.connect(self.controlBar.settingsButton, QtCore.SIGNAL('clicked(bool)'), self.settings_slot)
-		
-		self.connect(self, QtCore.SIGNAL('closed'), self.parent().dock_closed)
 
 		self.dockwidget = QtGui.QWidget(self)
 		self.layout = QtGui.QVBoxLayout(self.dockwidget)
@@ -53,8 +52,9 @@ class Dock(QtGui.QDockWidget):
 		self.audiowidget = None
 		self.widget_select(type)
 
-	def closeEvent(self,event):
-		self.emit(QtCore.SIGNAL('closed'), self)
+	# note that by default the closeEvent is accepted, no need to do it explicitely
+	def closeEvent(self, event):
+		self.parent().dockmanager.close_dock(self)
 
 	# slot
 	def widget_select(self, item):

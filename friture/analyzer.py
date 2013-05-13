@@ -22,14 +22,13 @@ from PyQt4 import QtCore
 # specifically import from PyQt4.QtGui for startup time improvement :
 from PyQt4.QtGui import QMainWindow, QVBoxLayout, QErrorMessage, QApplication, QPixmap, QSplashScreen
 from friture.ui_friture import Ui_MainWindow
-from friture.dock import Dock
 from friture.about import About_Dialog # About dialog
 from friture.settings import Settings_Dialog # Setting dialog
 from friture.logger import Logger # Logging class
 from friture.audiobuffer import AudioBuffer # audio ring buffer class
 from friture.audiobackend import AudioBackend# audio backend class
 from friture.centralwidget import CentralWidget
-from friture.defaults import DEFAULT_DOCKS
+from friture.dockmanager import DockManager
 
 # the display timer could be made faster when the processing
 # power allows it, firing down to every 10 ms
@@ -100,15 +99,18 @@ class Friture(QMainWindow, ):
 		self.centralLayout.setContentsMargins(0, 0, 0, 0)
 		self.centralLayout.addWidget(self.centralwidget)
 
+		self.dockmanager = DockManager(self, self.logger)
+
 		# timer ticks
 		self.connect(self.display_timer, QtCore.SIGNAL('timeout()'), self.update_buffer)
 		self.connect(self.display_timer, QtCore.SIGNAL('timeout()'), self.centralwidget.update)
+		self.connect(self.display_timer, QtCore.SIGNAL('timeout()'), self.dockmanager.update)
 
 		# toolbar clicks
 		self.connect(self.ui.actionStart, QtCore.SIGNAL('triggered()'), self.timer_toggle)
 		self.connect(self.ui.actionSettings, QtCore.SIGNAL('triggered()'), self.settings_called)
 		self.connect(self.ui.actionAbout, QtCore.SIGNAL('triggered()'), self.about_called)
-		self.connect(self.ui.actionNew_dock, QtCore.SIGNAL('triggered()'), self.new_dock_called)
+		self.connect(self.ui.actionNew_dock, QtCore.SIGNAL('triggered()'), self.dockmanager.new_dock)
 
 		# restore the settings and widgets geometries
 		self.restoreAppState()
@@ -127,27 +129,6 @@ class Friture(QMainWindow, ):
 	def about_called(self):
 		self.about_dialog.show()
 	
-	# slot
-	def new_dock_called(self):
-		# the dock objectName is unique
-		docknames = [dock.objectName() for dock in self.docks]
-		dockindexes = [int(str(name).partition(' ')[-1]) for name in docknames]
-		if len(dockindexes) == 0:
-			index = 1
-		else:
-			index = max(dockindexes)+1
-		name = "Dock %d" %index
-		new_dock = Dock(self, self.logger, name)
-		self.connect(self.display_timer, QtCore.SIGNAL('timeout()'), new_dock.update)
-		self.addDockWidget(QtCore.Qt.TopDockWidgetArea, new_dock)
-		
-		self.docks += [new_dock]
-	
-	#slot
-	def dock_closed(self, dock):
-		self.docks.remove(dock)
-		dock.deleteLater()
-	
 	# event handler
 	def closeEvent(self, event):
 		self.saveAppState()
@@ -158,12 +139,7 @@ class Friture(QMainWindow, ):
 		settings = QtCore.QSettings("Friture", "Friture")
 		
 		settings.beginGroup("Docks")
-		docknames = [dock.objectName() for dock in self.docks]
-		settings.setValue("dockNames", docknames)
-		for dock in self.docks:
-			settings.beginGroup(dock.objectName())
-			dock.saveState(settings)
-			settings.endGroup()
+		self.dockmanager.saveState(settings)
 		settings.endGroup()
 		
 		settings.beginGroup("CentralWidget")
@@ -186,24 +162,7 @@ class Friture(QMainWindow, ):
 		settings = QtCore.QSettings("Friture", "Friture")
 
 		settings.beginGroup("Docks")
-		if settings.contains("dockNames"):
-			docknames = settings.value("dockNames", []).toList()
-			docknames = [dockname.toString() for dockname in docknames]
-			# list of docks
-			self.docks = [Dock(self, self.logger, name) for name in docknames]
-			for dock in self.docks:
-				settings.beginGroup(dock.objectName())
-				dock.restoreState(settings)
-				settings.endGroup()
-		else:
-			self.logger.push("First launch, display a default set of docks")
-			self.docks = [Dock(self, self.logger, "Dock %d" %(i), type = type) for i, type in enumerate(DEFAULT_DOCKS)]
-			for dock in self.docks:
-				self.addDockWidget(QtCore.Qt.TopDockWidgetArea, dock)
-
-		for dock in self.docks:
-			self.connect(self.display_timer, QtCore.SIGNAL('timeout()'), dock.update)
-
+		self.dockmanager.restoreState(settings)
 		settings.endGroup()
 
 		settings.beginGroup("CentralWidget")
