@@ -22,7 +22,7 @@ from numpy import log10, floor, zeros, float64, tile, array
 from friture.imageplot import ImagePlot
 from friture.audioproc import audioproc # audio processing class
 from friture.spectrogram_settings import Spectrogram_Settings_Dialog# settings dialog
-from friture.audiobackend import SAMPLING_RATE
+from friture.audiobackend import SAMPLING_RATE, FRAMES_PER_BUFFER
 from friture.logger import PrintLogger
 #from glrollingcanvaswidget import GLRollingCanvasWidget
 from fractions import Fraction
@@ -82,12 +82,15 @@ class Spectrogram_Widget(QtGui.QWidget):
         self.PlotZoneImage.setspecrange(self.spec_min, self.spec_max)
         self.PlotZoneImage.setweighting(self.weighting)
         self.PlotZoneImage.settimerange(self.timerange_s, self.dT_s)
+        self.update_jitter()
 
         sfft_rate_frac = Fraction(SAMPLING_RATE, self.fft_size)/(Fraction(1) - self.overlap_frac)/1000
         self.PlotZoneImage.set_sfft_rate(sfft_rate_frac)
         
         # initialize the settings dialog
         self.settings_dialog = Spectrogram_Settings_Dialog(self, self.logger)
+
+        self.audiobackend.underflow.connect(self.PlotZoneImage.plotImage.canvasscaledspectrogram.syncOffsets)
 
     # method
     def set_buffer(self, buffer):
@@ -151,6 +154,19 @@ class Spectrogram_Widget(QtGui.QWidget):
         # number of frequency columns that we keep depends on the time history that the user has chosen
         
         # actual displayed spectrogram is a scaled version of the time-frequency plane
+
+    def update_jitter(self):
+        audio_jitter = 2*float(FRAMES_PER_BUFFER)/SAMPLING_RATE
+        analysis_jitter = self.fft_size*(1. - self.overlap)/SAMPLING_RATE
+        canvas_jitter = audio_jitter + analysis_jitter
+        #print audio_jitter, analysis_jitter, canvas_jitter
+        self.PlotZoneImage.plotImage.set_jitter(canvas_jitter)
+
+    def pause(self):
+        self.PlotZoneImage.pause()        
+
+    def restart(self):
+        self.PlotZoneImage.restart()
         
     def setminfreq(self, freq):
         self.minfreq = freq
@@ -175,6 +191,8 @@ class Spectrogram_Widget(QtGui.QWidget):
 
         sfft_rate_frac = Fraction(SAMPLING_RATE, self.fft_size)/(Fraction(1) - self.overlap_frac)/1000
         self.PlotZoneImage.set_sfft_rate(sfft_rate_frac)
+
+        self.update_jitter()
 
     def setmin(self, value):
         self.spec_min = value

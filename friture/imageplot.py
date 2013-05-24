@@ -68,9 +68,16 @@ class PlotImage(Qwt.QwtPlotItem):
 		#self.previous_time = self.audiobackend.get_stream_time()
 		self.offset = 0 #self.audiobackend.get_stream_time()/self.dT
 		
+		self.jitter_s = 0.
+
+		self.isPlaying = True
+
 		self.sfft_rate_frac = Fraction(1, 1)
 		self.frequency_resampler = Frequency_Resampler()
 		self.resampler = Online_Linear_2D_resampler()
+
+		self.timer = QtCore.QElapsedTimer()
+		self.timer.start()
 
 	def addData(self, freq, xyzs, logfreqscale):
 		self.frequency_resampler.setlogfreqscale(logfreqscale)
@@ -94,18 +101,43 @@ class PlotImage(Qwt.QwtPlotItem):
 
 		self.canvasscaledspectrogram.addData(resampled_data)
 
+	def pause(self):
+		self.isPlaying = False
+
+	def restart(self):
+		self.isPlaying = True
+		self.timer.restart()
+
 	def draw(self, painter, xMap, yMap, rect):
 		# update the spectrogram according to possibly new canvas dimensions
 		self.frequency_resampler.setnsamples(rect.height())
 		self.resampler.set_height(rect.height())
 		self.canvasscaledspectrogram.setcanvas_height(rect.height())
-		self.canvasscaledspectrogram.setcanvas_width(rect.width())
+		#print self.jitter_s, self.T, rect.width(), rect.width()*(1 + self.jitter_s/self.T)
+		jitter_pix = rect.width()*self.jitter_s/self.T
+		self.canvasscaledspectrogram.setcanvas_width(rect.width() + jitter_pix)
 
 		screen_rate_frac = Fraction(rect.width(), int(self.T*1000))
 		self.resampler.set_ratio(self.sfft_rate_frac, screen_rate_frac)
 
+		# time advance
+		# FIXME ideally this function should be called at paintevent time, for better time sync
+		# but I'm not sure it is... maybe qwt does some sort of double-buffering
+		# and repaints its items outside of paintevents
+		# solution: look at PaintEvent
+
+		# FIXME there is a small bands of columns with jitter (on both sides of the spectrogram)
+		# solution: grow the rolling-canvas by a couple of columns,
+		# and slightly delay the spectrogram by the same number of columns
+
+		if self.isPlaying:
+			delta_t = self.timer.nsecsElapsed()*1e-9
+			self.timer.restart()
+			pixel_advance = delta_t/(self.T + self.jitter_s)*rect.width()
+			self.canvasscaledspectrogram.addPixelAdvance(pixel_advance)
+
 		pixmap = self.canvasscaledspectrogram.getpixmap()
-		offset = self.canvasscaledspectrogram.getpixmapoffset()
+		offset = self.canvasscaledspectrogram.getpixmapoffset(delay=jitter_pix/2)
 		
 		rolling = True
 		if rolling:
@@ -118,18 +150,6 @@ class PlotImage(Qwt.QwtPlotItem):
 			# since no transformation is needed in y, and the sampling rate is already known to be ok in x
 			sw = rect.width()
 			sh = rect.height()
-
-			# this function should be called by repaint, for better time sync
-
-			# FIXME the following is wrong when the display is paused !
-			# and even when not paused, it does not improve the smoothness
-			# and has a problem of offset
-			#current_time = self.audiobackend.get_stream_time()
-			#delay = sw*(current_time - self.previous_time)/self.T
-			#self.previous_time = current_time
-			#self.offset += delay
-			#self.offset = (self.offset % sw)
-			#offset = self.offset
 
 			source_rect = QtCore.QRectF(offset, 0, sw, sh)
 			# QRectF since the offset and width may be non-integer
@@ -155,6 +175,10 @@ class PlotImage(Qwt.QwtPlotItem):
 
 	def erase(self):
 		self.canvasscaledspectrogram.erase()
+
+	def set_jitter(self, jitter_s):
+		self.jitter_s = jitter_s
+		#print jitter_s
 
 class ImagePlot(Qwt.QwtPlot):
 
@@ -231,6 +255,12 @@ class ImagePlot(Qwt.QwtPlot):
 		
 		#print self.canvas().testPaintAttribute(Qwt.QwtPlotCanvas.PaintCached)
 		#print self.canvas().paintCache()
+
+	def pause(self):
+		self.plotImage.pause()
+
+	def restart(self):
+		self.plotImage.restart()
 
 	def setlinfreqscale(self):
 		self.plotImage.erase()

@@ -86,6 +86,20 @@ class CentralWidget(QtGui.QWidget):
 		if self.audiowidget <> None:
 			self.audiowidget.update()
 
+	def pause(self):
+		if self.audiowidget <> None:
+			try:
+				self.audiowidget.pause()
+			except AttributeError:
+				pass
+
+	def restart(self):
+		if self.audiowidget <> None:
+			try:
+				self.audiowidget.restart()
+			except AttributeError:
+				pass
+
 	# slot
 	def settings_slot(self, checked):
 		self.audiowidget.settings_called(checked)

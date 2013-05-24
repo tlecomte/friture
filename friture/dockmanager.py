@@ -82,3 +82,17 @@ class DockManager(QtCore.QObject):
 	def update(self):
 		for dock in self.docks:
 			dock.update()
+
+	def pause(self):
+		for dock in self.docks:
+			try:
+				dock.pause()
+			except AttributeError:
+				pass
+
+	def restart(self):
+		for dock in self.docks:
+			try:
+				dock.restart()
+			except AttributeError:
+				pass

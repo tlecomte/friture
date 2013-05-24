@@ -89,6 +89,14 @@ class Dock(QtGui.QDockWidget):
 		if self.audiowidget <> None:
 			self.audiowidget.update()
 
+	def pause(self):
+		if self.audiowidget <> None:
+			self.audiowidget.pause()
+
+	def restart(self):
+		if self.audiowidget <> None:
+			self.audiowidget.restart()
+
 	# slot
 	def settings_slot(self, checked):
 		self.audiowidget.settings_called(checked)

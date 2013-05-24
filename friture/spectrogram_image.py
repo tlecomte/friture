@@ -40,6 +40,7 @@ class CanvasScaledSpectrogram(QtCore.QObject):
 		self.pixmap.fill(QtGui.QColor("black"))
 		self.painter = QtGui.QPainter()
 		self.offset = 0
+		self.time_offset = 0
 		# prepare a custom colormap black->blue->green->yellow->red->white
 		self.colorMap = Qwt.QwtLinearColorMap(Qt.Qt.black, Qt.Qt.white)
 		self.colorMap.addColorStop(0.2, Qt.Qt.blue)
@@ -52,11 +53,14 @@ class CanvasScaledSpectrogram(QtCore.QObject):
 		self.time.start()
 		#self.logfile = open("latency_log.txt",'w')
 
+		self.resetBound = 20
+
 	def erase(self):
 		#self.fullspectrogram = numpy.zeros((self.canvas_height, self.time_bin_number(), 4), dtype = numpy.uint8)
 		self.pixmap = QtGui.QPixmap(2*self.canvas_width,  self.canvas_height)
 		self.pixmap.fill(QtGui.QColor("black"))
 		self.offset = 0
+		self.time_offset = 0
 
 	def setcanvas_height(self, canvas_height):
 		if self.canvas_height <> canvas_height:
@@ -70,6 +74,13 @@ class CanvasScaledSpectrogram(QtCore.QObject):
 			self.erase()
 			self.emit(QtCore.SIGNAL("canvasWidthChanged"), canvas_width)
 			self.logger.push("Spectrogram image: canvas_width changed, now: %d" %(canvas_width))
+
+	def addPixelAdvance(self, pixel_advance):
+		self.time_offset += pixel_advance
+
+		# avoid long-run drift between self.offset and self.time_offset
+		alpha = 0.98
+		self.time_offset = alpha*self.time_offset + (1.-alpha)*self.offset
 
 	def addData(self, xyzs):
 		# revert the frequency axis so that the larger frequencies
@@ -87,14 +98,16 @@ class CanvasScaledSpectrogram(QtCore.QObject):
 		# Now, draw the image onto the widget pixmap, which has
 		# the structure of a 2D ringbuffer
 
+		offset = self.offset % self.canvas_width
+
 		# first copy, always complete
 		source1 = QtCore.QRectF(0, 0, width, xyzs.shape[0])
-		target1 = QtCore.QRectF(self.offset, 0, width, xyzs.shape[0])
+		target1 = QtCore.QRectF(offset, 0, width, xyzs.shape[0])
 		# second copy, can be folded
-		direct = min(width, self.canvas_width - self.offset)
+		direct = min(width, self.canvas_width - offset)
 		folded = width - direct
 		source2a = QtCore.QRectF(0, 0, direct, xyzs.shape[0])
-		target2a = QtCore.QRectF(self.offset + self.canvas_width, 0, direct, xyzs.shape[0])
+		target2a = QtCore.QRectF(offset + self.canvas_width, 0, direct, xyzs.shape[0])
 		source2b = QtCore.QRectF(direct, 0, folded, xyzs.shape[0])
 		target2b = QtCore.QRectF(0, 0, folded, xyzs.shape[0])
 
@@ -105,7 +118,7 @@ class CanvasScaledSpectrogram(QtCore.QObject):
 		self.painter.end()
 
 		#updating the offset
-		self.offset = (self.offset + xyzs.shape[1]) % self.canvas_width
+		self.offset += width
 
 	def floats_to_bytes(self, data):
 		#dat1 = (255. * data).astype(numpy.uint8)
@@ -163,8 +176,20 @@ class CanvasScaledSpectrogram(QtCore.QObject):
 	def getpixmap(self):
 		return self.pixmap
 
-	def getpixmapoffset(self):
-		return self.offset
+	def getpixmapoffset(self, delay=0):
+		#return self.offset % self.canvas_width
+		# FIXME this should be always negative, but it is not !! Why ?? Because of the filter ?
+		#print self.offset - self.time_offset
+
+		#if abs(self.time_offset - self.offset) > self.resetBound:
+		#	print "resetting"
+		#	self.syncOffsets()
+
+		return (self.time_offset + delay) % self.canvas_width
+
+	# this is used when there is an underflow in the audio input
+	def syncOffsets(self):
+		self.time_offset = self.offset
 
 # plan :
 # 1. quickly convert each piece of data to a pixmap, with the right pixel size

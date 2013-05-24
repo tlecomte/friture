@@ -27,6 +27,9 @@ FRAMES_PER_BUFFER = 1024 # FIXME this parameter seems to have no effect on the
 # actual frames_per_buffer used by PortAudio. Is it a bug in PyAudio ?
 
 class AudioBackend(QtCore.QObject):
+
+	underflow = QtCore.pyqtSignal()
+
 	def __init__(self, logger):
 		QtCore.QObject.__init__(self)
 
@@ -321,6 +324,7 @@ class AudioBackend(QtCore.QObject):
 				# to treat overflow errors particularly
 				self.xruns += 1
 				print "Caught an IOError on stream read.", inst
+				self.underflow.emit()
 				break
 			
 			intdata_all_channels = fromstring(rawdata, int16)
