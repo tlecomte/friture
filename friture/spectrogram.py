@@ -18,7 +18,7 @@
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
 from PyQt4 import QtGui
-from numpy import log10, floor, zeros, float64, tile
+from numpy import log10, floor, zeros, float64, tile, array
 from friture.imageplot import ImagePlot
 from friture.audioproc import audioproc # audio processing class
 from friture.spectrogram_settings import Spectrogram_Settings_Dialog# settings dialog
@@ -192,7 +192,7 @@ class Spectrogram_Widget(QtGui.QWidget):
     def update_weighting(self):    
         A, B, C = self.proc.get_freq_weighting()
         if self.weighting is 0:
-            self.w = 0.
+            self.w = array([0.])
         elif self.weighting is 1:
             self.w = A
         elif self.weighting is 2:
