@@ -21,7 +21,16 @@ from PyQt4 import QtGui
 from numpy import log10, argmax, max
 from friture.spectplot import SpectPlot
 from friture.audioproc import audioproc # audio processing class
-from friture.spectrum_settings import Spectrum_Settings_Dialog # settings dialog
+from friture.spectrum_settings import (Spectrum_Settings_Dialog, # settings dialog
+                                       DEFAULT_FFT_SIZE,
+                                       DEFAULT_FREQ_SCALE,
+                                       DEFAULT_MAXFREQ,
+                                       DEFAULT_MINFREQ,
+                                       DEFAULT_SPEC_MIN,
+                                       DEFAULT_SPEC_MAX,
+                                       DEFAULT_WEIGHTING,
+                                       DEFAULT_SHOW_FREQ_LABELS)
+
 from friture.logger import PrintLogger
 
 from friture.qwtopenglplot import GLPlotWidget
@@ -34,16 +43,6 @@ QwtPlotCanvas {
 	stop: 0 #E0E0E0, stop: 0.5 #FFFFFF);
 }
 """
-
-# shared with spectrum_settings.py
-DEFAULT_FFT_SIZE = 7 #4096 points
-DEFAULT_FREQ_SCALE = 1 #log10
-DEFAULT_MAXFREQ = 20000
-DEFAULT_MINFREQ = 20
-DEFAULT_SPEC_MIN = -100
-DEFAULT_SPEC_MAX = -20
-DEFAULT_WEIGHTING = 1 #A
-DEFAULT_SHOW_FREQ_LABELS = True
 
 class Spectrum_Widget(QtGui.QWidget):
 	def __init__(self, parent, logger = PrintLogger()):
