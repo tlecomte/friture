@@ -21,7 +21,15 @@ from PyQt4 import QtGui
 from numpy import log10, array, arange, where
 from friture.logger import PrintLogger
 from friture.histplot import HistPlot
-from friture.octavespectrum_settings import OctaveSpectrum_Settings_Dialog # settings dialog
+from friture.octavespectrum_settings import (OctaveSpectrum_Settings_Dialog, # settings dialog
+                                             DEFAULT_SPEC_MIN,
+                                             DEFAULT_SPEC_MAX,
+                                             DEFAULT_WEIGHTING,
+                                             DEFAULT_BANDSPEROCTAVE,
+                                             DEFAULT_BANDSPEROCTAVE_INDEX,
+                                             DEFAULT_RESPONSE_TIME,
+                                             DEFAULT_RESPONSE_TIME_INDEX)
+
 from friture.filter import (octave_filter_bank_decimation, octave_frequencies,
                             octave_filter_bank_decimation_filtic, NOCTAVE)
 
@@ -43,15 +51,6 @@ QwtPlotCanvas {
 	stop: 0 #E0E0E0, stop: 0.5 #FFFFFF);
 }
 """
-
-# shared with octavespectrum_settings.py
-DEFAULT_SPEC_MIN = -80
-DEFAULT_SPEC_MAX = -20
-DEFAULT_WEIGHTING = 1 #A
-DEFAULT_BANDSPEROCTAVE = 3
-DEFAULT_BANDSPEROCTAVE_INDEX = 1
-DEFAULT_RESPONSE_TIME = 0.125 # FAST
-DEFAULT_RESPONSE_TIME_INDEX = 1 # FAST
 
 class OctaveSpectrum_Widget(QtGui.QWidget):
 	def __init__(self, parent, logger = PrintLogger()):
