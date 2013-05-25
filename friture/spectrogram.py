@@ -35,7 +35,7 @@ DEFAULT_MINFREQ = 20
 DEFAULT_SPEC_MIN = -140
 DEFAULT_SPEC_MAX = 0
 DEFAULT_TIMERANGE = 10.
-DEFAULT_WEIGHTING = 1 #A
+DEFAULT_WEIGHTING = 0 #None
 
 class Spectrogram_Widget(QtGui.QWidget):
     def __init__(self, parent, audiobackend, logger = PrintLogger()):
