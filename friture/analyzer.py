@@ -32,7 +32,7 @@ from friture.dockmanager import DockManager
 
 # the display timer could be made faster when the processing
 # power allows it, firing down to every 10 ms
-SMOOTH_DISPLAY_TIMER_PERIOD_MS = 25
+SMOOTH_DISPLAY_TIMER_PERIOD_MS = 10
 
 # the slow timer is used for text refresh
 # Text has to be refreshed slowly in order to be readable.
