@@ -37,22 +37,26 @@ def pyx_exp_smoothed_value_numpy(np.ndarray[dtype_t, ndim=1] kernel, dtype_t alp
 	cdef Py_ssize_t N = data.shape[1]
 	cdef Py_ssize_t Nf = data.shape[0]
 	cdef Py_ssize_t Nk = kernel.shape[0]
-	cdef Py_ssize_t i
+	cdef Py_ssize_t i, j
 	cdef np.ndarray[dtype_t, ndim=1] value, conv
-	
+	cdef double a = (1.-alpha)**N
+
 	# as we disable the cython bounds checking, do it by ourselves
 	# it is absolutely needed as the kernel is not of infinite size !!
 	if N > Nk:
 		N = Nk
 	
 	if N == 0:
-		value = previous
+		return previous
 	else:
 		conv = np.zeros(Nf)
+		value = np.zeros(Nf)
 		
 		for i in range(0, N):
-			conv = conv + kernel[Nk - N + i]*data[:, i]
+			for j in range(Nf):
+				conv[j] = conv[j] + kernel[Nk - N + i]*data[j, i]
 		
-		value = alpha * conv + previous*(1.-alpha)**N
+		for j in range(Nf):
+			value[j] = alpha * conv[j] + previous[j]*a
 	
-	return value
+		return value
