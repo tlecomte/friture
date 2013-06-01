@@ -235,15 +235,19 @@ class GLPlotWidget(QtGui.QWidget):
         
         return x1, x2, n
 
-    def tree_rebin(self, y, ns):
-        i = 0
-        y2 = array([])        
+    def tree_rebin(self, y, ns, N):
+        y2 = zeros(N)
+
+        n = 0
         for i in range(len(ns)-1):
             y3 = y[ns[i]:ns[i+1]]
-            y3.shape = (len(y3)/2**i, 2**i)
+            d = 2**i
+            l = len(y3)/d
+            y3.shape = (l, d)
             y3 = mean(y3, axis=1)
             #y3 = (y3[::2] + y3[1::2])*0.5
-            y2 = hstack((y2, y3))
+            y2[n:n+len(y3)] = y3
+            n += l
         
         return y2
 
@@ -256,6 +260,10 @@ class GLPlotWidget(QtGui.QWidget):
             if self.logx:
                 self.transformed_x1, self.transformed_x2, n = self.pre_tree_rebin(x1, x2)
                 self.n = [0] + n
+                self.N = 0
+                for i in range(len(self.n)-1):
+                    self.N += (self.n[i+1] - self.n[i])/2**i
+
             else:
                 self.transformed_x1 = x1
                 self.transformed_x2 = x2
@@ -277,7 +285,7 @@ class GLPlotWidget(QtGui.QWidget):
         x2 = self.transformed_x2
         
         if self.logx:
-            y = self.tree_rebin(self.y, self.n)
+            y = self.tree_rebin(self.y, self.n, self.N)
         else:
             n = floor(1./(x2[2] - x1[1]))
             if n>0:
@@ -311,12 +319,33 @@ class GLPlotWidget(QtGui.QWidget):
         if self.peaks_enabled:
             transformed_peak = self.ytransform(self.peak)        
         
-            x1_with_peaks = hstack((x1, x1))
-            x2_with_peaks = hstack((x2, x2))
-            y_with_peaks = hstack((transformed_peak, transformed_y))
-            r_with_peaks = hstack((1.*Ones, 0.*Ones))
-            g_with_peaks = hstack((1. - self.peak_int, 0.5*Ones_shaded))
-            b_with_peaks = hstack((1. - self.peak_int, 0.*Ones))
+            n = x1.size
+
+            # FIXME should be done conditionally to need_transform
+            x1_with_peaks = zeros((2*n))
+            x2_with_peaks = zeros((2*n))
+            y_with_peaks = zeros((2*n))
+            r_with_peaks = zeros((2*n))
+            g_with_peaks = zeros((2*n))
+            b_with_peaks = zeros((2*n))
+
+            x1_with_peaks[:n] = x1
+            x1_with_peaks[n:] = x1
+
+            x2_with_peaks[:n] = x2
+            x2_with_peaks[n:] = x2
+
+            y_with_peaks[:n] = transformed_peak
+            y_with_peaks[n:] = transformed_y
+
+            r_with_peaks[:n] = 1.*Ones
+            r_with_peaks[n:] = 0.*Ones
+
+            g_with_peaks[:n] = 1. - self.peak_int
+            g_with_peaks[n:] = 0.5*Ones_shaded
+
+            b_with_peaks[:n] = 1. - self.peak_int
+            b_with_peaks[n:] = 0.*Ones
         else:
             x1_with_peaks = x1
             x2_with_peaks = x2
@@ -653,6 +682,7 @@ class GLWidget(QtOpenGL.QGLWidget):
 
     def resizeGL(self, width, height):
         self.setupViewport(self.width(), self.height())
+        self.updateGrid()
 
     def setupViewport(self, width, height):
         GL.glViewport(0, 0, width, height)
