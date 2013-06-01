@@ -426,6 +426,8 @@ class GLWidget(QtOpenGL.QGLWidget):
         # when QPainter.begin() is called.
         self.setAutoFillBackground(False)
 
+        self.gridList = None
+
     def minimumSizeHint(self):
         return QtCore.QSize(50, 50)
 
@@ -433,6 +435,12 @@ class GLWidget(QtOpenGL.QGLWidget):
         return QtCore.QSize(400, 400)
 
     def initializeGL(self):
+        # display list used for the grid
+        self.gridList = GL.glGenLists(1)
+
+        if self.gridList == 0 or self.gridList == None:
+            raise RuntimeError( """Unable to generate a new display-list, context may not support display lists""")
+
         return
 
     def setfmax(self, xmax, fmax):
@@ -458,6 +466,47 @@ class GLWidget(QtOpenGL.QGLWidget):
         self.xMinorTick = xMinorTick
         self.yMajorTick = yMajorTick
         self.yMinorTick = yMinorTick
+
+        self.updateGrid()
+
+    def updateGrid(self):
+        if self.gridList == None:
+            return
+
+        w = self.width()
+        h = self.height()
+        
+        GL.glNewList(self.gridList, GL.GL_COMPILE)
+
+        self.qglColor(QtGui.QColor(Qt.Qt.gray))
+        for x in self.xMajorTick:        
+            GL.glBegin(GL.GL_LINES)
+            GL.glVertex2f(x, 0)
+            GL.glVertex2f(x, h)
+            GL.glEnd()
+        
+        self.qglColor(QtGui.QColor(Qt.Qt.lightGray))
+        for x in self.xMinorTick:        
+            GL.glBegin(GL.GL_LINES)
+            GL.glVertex2f(x, 0)
+            GL.glVertex2f(x, h)
+            GL.glEnd()
+            
+        self.qglColor(QtGui.QColor(Qt.Qt.gray))
+        for y in self.yMajorTick:        
+            GL.glBegin(GL.GL_LINES)
+            GL.glVertex2f(0, y)
+            GL.glVertex2f(w, y)
+            GL.glEnd()
+        
+        #GL.glColor3f(0.5, 0.5, 0.5)
+        #for y in self.yMinorTick:        
+        #    GL.glBegin(GL.GL_LINES)
+        #    GL.glVertex2f(0, y)
+        #    GL.glVertex2f(w, y)
+        #    GL.glEnd() 
+
+        GL.glEndList()
 
     #def paintGL(self):
     def paintEvent(self, event):
@@ -626,36 +675,7 @@ class GLWidget(QtOpenGL.QGLWidget):
         GL.glEnd()
 
     def drawGrid(self):
-        w = self.width()
-        h = self.height()
-        
-        self.qglColor(QtGui.QColor(Qt.Qt.gray))
-        for x in self.xMajorTick:        
-            GL.glBegin(GL.GL_LINES)
-            GL.glVertex2f(x, 0)
-            GL.glVertex2f(x, h)
-            GL.glEnd()
-        
-        self.qglColor(QtGui.QColor(Qt.Qt.lightGray))
-        for x in self.xMinorTick:        
-            GL.glBegin(GL.GL_LINES)
-            GL.glVertex2f(x, 0)
-            GL.glVertex2f(x, h)
-            GL.glEnd()
-            
-        self.qglColor(QtGui.QColor(Qt.Qt.gray))
-        for y in self.yMajorTick:        
-            GL.glBegin(GL.GL_LINES)
-            GL.glVertex2f(0, y)
-            GL.glVertex2f(w, y)
-            GL.glEnd()
-        
-        #GL.glColor3f(0.5, 0.5, 0.5)
-        #for y in self.yMinorTick:        
-        #    GL.glBegin(GL.GL_LINES)
-        #    GL.glVertex2f(0, y)
-        #    GL.glVertex2f(w, y)
-        #    GL.glEnd() 
+        GL.glCallList(self.gridList)
 
     def drawBorder(self):
         w = self.width()
