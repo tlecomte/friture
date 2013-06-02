@@ -80,17 +80,9 @@ class OctaveSpectrum_Widget(QtGui.QWidget):
 		#self.bankbuffers = [RingBuffer() for band in range(0, DEFAULT_BANDSPEROCTAVE*NOCTAVE)]
 		self.dispbuffers = [0]*DEFAULT_BANDSPEROCTAVE*NOCTAVE
 		
-		# an exponential smoothing filter is a simple IIR filter
-		# s_i = alpha*x_i + (1-alpha)*s_{i-1}
-		#we compute alpha so that the N most recent samples represent 100*w percent of the output
-		w = 0.65
-		decs = self.filters.get_decs()
-		ns = [self.response_time*SAMPLING_RATE/dec for dec in decs]
-		Ns = [2*4096/dec for dec in decs]
-		self.alphas = [1. - (1.-w)**(1./(n+1)) for n in ns]
-		#print ns, Ns
-		self.kernels = self.compute_kernels(self.alphas, Ns)
-		
+		# set kernel and parameters for the smoothing filter
+		self.setresponsetime(self.response_time)
+
 		# initialize the settings dialog
 		self.settings_dialog = OctaveSpectrum_Settings_Dialog(self, self.logger)
 
@@ -230,17 +222,8 @@ class OctaveSpectrum_Widget(QtGui.QWidget):
 		#recreate the ring buffers
 		#self.bankbuffers = [RingBuffer() for band in range(0, bandsperoctave*NOCTAVE)]
 		self.dispbuffers = [0]*bandsperoctave*NOCTAVE
-		
-		# an exponential smoothing filter is a simple IIR filter
-		# s_i = alpha*x_i + (1-alpha)*s_{i-1}
-		#we compute alpha so that the N most recent samples represent 100*w percent of the output
-		w = 0.65
-		decs = self.filters.get_decs()
-		ns = [self.response_time*SAMPLING_RATE/dec for dec in decs]
-		Ns = [2*4096/dec for dec in decs]
-		self.alphas = [1. - (1.-w)**(1./(n+1)) for n in ns]
-		#print ns, Ns
-		self.kernels = self.compute_kernels(self.alphas, Ns)
+		# reset kernel and parameters for the smoothing filter
+		self.setresponsetime(self.response_time)
 
 	def settings_called(self, checked):
 		self.settings_dialog.show()
