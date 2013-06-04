@@ -34,7 +34,7 @@ class OctaveSpectrum_Settings_Dialog(QtGui.QDialog):
 		
 		self.logger = logger
 		
-		self.setWindowTitle("Spectrum settings")
+		self.setWindowTitle("Octave Spectrum settings")
 		
 		self.formLayout = QtGui.QFormLayout(self)
 
