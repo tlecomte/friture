@@ -7,7 +7,7 @@
 !define /date PRODUCT_VERSION "%Y/%m/%d"
 !define PRODUCT_PUBLISHER "Timothée Lecomte"
 !define PRODUCT_DESCRIPTION "Real-time audio visualizations"
-!define PRODUCT_WEB_SITE "http://tlecomte.github.com/friture/"
+!define PRODUCT_WEB_SITE "http://www.friture.org"
 !define PRODUCT_DIR_REGKEY "Software\Microsoft\Windows\CurrentVersion\App Paths\friture.exe"
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
 !define PRODUCT_UNINST_ROOT_KEY "HKLM"
