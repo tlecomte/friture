@@ -219,8 +219,8 @@ class Levels_Widget(QtGui.QWidget):
 				else:
 					string_peak_2 = "-Inf"
 
-				self.label_rms.setText("Ch1:\n%s\n\nCh2:\n%s" %(string_rms, string_rms_2))
-				self.label_peak.setText("Ch1:\n%s\n\nCh2:\n%s" %(string_peak, string_peak_2))
+				self.label_rms.setText("1: %s\n2: %s" %(string_rms, string_rms_2))
+				self.label_peak.setText("1: %s\n2: %s" %(string_peak, string_peak_2))
 
 		if self.i == LEVEL_TEXT_LABEL_STEPS:
 			self.i = 0
