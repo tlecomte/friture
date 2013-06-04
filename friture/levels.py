@@ -88,6 +88,8 @@ class Levels_Widget(QtGui.QWidget):
 		self.label_peak.setText("-100.0")
 		self.label_rms_legend.setText("dB FS\n RMS")
 		self.label_peak_legend.setText("dB FS\n Peak")
+		self.label_rms.setTextFormat(QtCore.Qt.PlainText)
+		self.label_peak.setTextFormat(QtCore.Qt.PlainText)
 		#self.label_rms.setSizePolicy(QtGui.QSizePolicy(QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding))
 		#self.label_rms_legend.setSizePolicy(QtGui.QSizePolicy(QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding))
 		#self.label_peak.setSizePolicy(QtGui.QSizePolicy(QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding))
@@ -172,11 +174,11 @@ class Levels_Widget(QtGui.QWidget):
   
 		if self.i == LEVEL_TEXT_LABEL_STEPS:
 	    		if level_rms > -150.:
-	    			string_rms = "%.01f" % level_rms
+	    			string_rms = "%+05.01f" % level_rms
 	    		else:
 	    			string_rms = "-Inf"
 	    		if level_max > -150.:
-	    			string_peak = "%.01f" % level_max
+	    			string_peak = "%+05.01f" % level_max
 	    		else:
 	    			string_peak = "-Inf"
 
@@ -211,11 +213,11 @@ class Levels_Widget(QtGui.QWidget):
 
 			if self.i == LEVEL_TEXT_LABEL_STEPS:
 				if level_rms_2 > -150.:
-					string_rms_2 = "%.01f" % level_rms_2
+					string_rms_2 = "%+05.01f" % level_rms_2
 				else:
 					string_rms_2 = "-Inf"
 				if level_max > -150.:
-					string_peak_2 = "%.01f" % level_max_2
+					string_peak_2 = "%+05.01f" % level_max_2
 				else:
 					string_peak_2 = "-Inf"
 
