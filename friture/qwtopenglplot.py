@@ -18,6 +18,7 @@ except ImportError:
     sys.exit(1)
 
 from numpy import zeros, ones, log10, hstack, array, floor, mean, where, rint, inf
+import numpy as np
 
 # The peak decay rates (magic goes here :).
 PEAK_DECAY_RATE = 1.0 - 3E-6
@@ -244,8 +245,15 @@ class GLPlotWidget(QtGui.QWidget):
             d = 2**i
             l = len(y3)/d
             y3.shape = (l, d)
-            y3 = mean(y3, axis=1)
+
+            # Note: the FFT spectrum is mostly used to identify frequency content
+            # ans _peaks_ are particularly interesting (e.g. feedback frequencies)
+            # so we display the _max_ instead of the mean of each bin 
+            #y3 = mean(y3, axis=1)
             #y3 = (y3[::2] + y3[1::2])*0.5
+            
+            y3 = np.max(y3, axis=1)
+
             y2[n:n+len(y3)] = y3
             n += l
         
