@@ -29,11 +29,12 @@ from friture.controlbar import ControlBar
 
 class Dock(QtGui.QDockWidget):
 
-	def __init__(self, parent, logger, name, type = 0):
+	def __init__(self, parent, sharedGLWidget, logger, name, type = 0):
 		QtGui.QDockWidget.__init__(self, name, parent)
 		
 		self.setObjectName(name)
 		
+		self.sharedGLWidget = sharedGLWidget
 		self.logger = logger
 		
 		self.controlBar = ControlBar(self)
@@ -69,7 +70,7 @@ class Dock(QtGui.QDockWidget):
 		elif item is 1:
 			self.audiowidget = Scope_Widget(self, self.logger)
 		elif item is 2:
-			self.audiowidget = Spectrum_Widget(self, self.logger)
+			self.audiowidget = Spectrum_Widget(self, self.sharedGLWidget, self.logger)
 		elif item is 3:
 			self.audiowidget = Spectrogram_Widget(self, self.parent().audiobackend, self.logger)
 		elif item is 4:

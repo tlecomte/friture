@@ -26,10 +26,10 @@ PEAK_DECAY_RATE = 1.0 - 3E-6
 PEAK_FALLOFF_COUNT = 32 # default : 16
 
 class GLPlotWidget(QtGui.QWidget):
-    def __init__(self, parent=None, logger=None):
+    def __init__(self, parent, sharedGLWidget, logger=None):
         super(GLPlotWidget, self).__init__()
 
-        self.glWidget = GLWidget(self)
+        self.glWidget = GLWidget(self, sharedGLWidget)
         
         self.xmin = 0.1
         self.xmax = 1.
@@ -435,8 +435,8 @@ class GLPlotWidget(QtGui.QWidget):
 
 
 class GLWidget(QtOpenGL.QGLWidget):
-    def __init__(self, parent):
-        super(GLWidget, self).__init__(parent)
+    def __init__(self, parent, sharedGLWidget):
+        super(GLWidget, self).__init__(parent, shareWidget=sharedGLWidget)
 
         self.lastPos = QtCore.QPoint()
         
@@ -501,7 +501,7 @@ class GLWidget(QtOpenGL.QGLWidget):
         self.updateGrid()
 
     def updateGrid(self):
-        if self.gridList == None:
+        if self.gridList == None or self.gridList == 0:
             return
 
         w = self.width()
@@ -713,6 +713,8 @@ class GLWidget(QtOpenGL.QGLWidget):
 
             if self.gridList == 0 or self.gridList == None:
                 raise RuntimeError( """Unable to generate a new display-list, context may not support display lists""")
+
+            self.updateGrid()
 
         GL.glCallList(self.gridList)
 

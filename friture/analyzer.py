@@ -18,7 +18,7 @@
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
 import sys, os, platform
-from PyQt4 import QtCore
+from PyQt4 import QtCore, QtOpenGL
 # specifically import from PyQt4.QtGui for startup time improvement :
 from PyQt4.QtGui import QMainWindow, QVBoxLayout, QErrorMessage, QApplication, QPixmap, QSplashScreen
 from friture.ui_friture import Ui_MainWindow
@@ -77,6 +77,12 @@ class Friture(QMainWindow, ):
 		self.ui = Ui_MainWindow()
 		self.ui.setupUi(self)
 
+		# sharedGLWidget is a hidden GL widget that will be used as a parent
+		# to all QGLWidgets so that they have the same GL context, and can
+		# share display lists, etc.
+		self.sharedGLWidget = QtOpenGL.QGLWidget(self)
+		self.sharedGLWidget.hide()
+
 		# Initialize the audio data ring buffer
 		self.audiobuffer = AudioBuffer(self.logger)
 
@@ -94,12 +100,12 @@ class Friture(QMainWindow, ):
 		self.about_dialog = About_Dialog(self, self.logger, self.audiobackend, self.slow_timer)
 		self.settings_dialog = Settings_Dialog(self, self.logger, self.audiobackend)
 
-		self.centralwidget = CentralWidget(self.ui.centralwidget, self.logger, "central_widget", 0)
+		self.centralwidget = CentralWidget(self.ui.centralwidget, self.sharedGLWidget, self.logger, "central_widget", 0)
 		self.centralLayout = QVBoxLayout(self.ui.centralwidget)
 		self.centralLayout.setContentsMargins(0, 0, 0, 0)
 		self.centralLayout.addWidget(self.centralwidget)
 
-		self.dockmanager = DockManager(self, self.logger)
+		self.dockmanager = DockManager(self, self.sharedGLWidget, self.logger)
 
 		# timer ticks
 		self.connect(self.display_timer, QtCore.SIGNAL('timeout()'), self.update_buffer)

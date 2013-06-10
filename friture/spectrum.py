@@ -47,7 +47,7 @@ QwtPlotCanvas {
 """
 
 class Spectrum_Widget(QtGui.QWidget):
-	def __init__(self, parent, logger = PrintLogger()):
+	def __init__(self, parent, sharedGLWidget, logger = PrintLogger()):
 		QtGui.QWidget.__init__(self, parent)
 
 		self.logger = logger
@@ -57,7 +57,7 @@ class Spectrum_Widget(QtGui.QWidget):
 		self.gridLayout = QtGui.QGridLayout(self)
 		self.gridLayout.setObjectName("gridLayout")
 		#self.PlotZoneSpect = SpectPlot(self, self.logger)
-		self.PlotZoneSpect = GLPlotWidget(self, self.logger)
+		self.PlotZoneSpect = GLPlotWidget(self, sharedGLWidget, self.logger)
 		self.PlotZoneSpect.setObjectName("PlotZoneSpect")
 		self.gridLayout.addWidget(self.PlotZoneSpect, 0, 0, 1, 1)
 
