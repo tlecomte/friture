@@ -472,12 +472,6 @@ class GLWidget(QtOpenGL.QGLWidget):
         return QtCore.QSize(400, 400)
 
     def initializeGL(self):
-        # display list used for the grid
-        self.gridList = GL.glGenLists(1)
-
-        if self.gridList == 0 or self.gridList == None:
-            raise RuntimeError( """Unable to generate a new display-list, context may not support display lists""")
-
         return
 
     def setfmax(self, xmax, fmax):
@@ -713,6 +707,13 @@ class GLWidget(QtOpenGL.QGLWidget):
         GL.glEnd()
 
     def drawGrid(self):
+        if self.gridList == None:
+            # display list used for the grid
+            self.gridList = GL.glGenLists(1)
+
+            if self.gridList == 0 or self.gridList == None:
+                raise RuntimeError( """Unable to generate a new display-list, context may not support display lists""")
+
         GL.glCallList(self.gridList)
 
     def drawBorder(self):
