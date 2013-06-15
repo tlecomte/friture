@@ -41,8 +41,25 @@ if py2exe_build:
 			"_imaging","_ssl"]
 	#Note: unittest, inspect are needed by numpy
 	#exclude dlls that py2exe includes by error
-	dll_excludes += ["powrprof.dll", "msvcp90.dll", "winnsi.dll", "nsi.dll", "iphlpapi.dll",
-			"API-MS-Win-Core*.dll"]
+	#failure to exclude these dlls will prevent the executable to be run under XP for example
+	dll_excludes += ["powrprof.dll",
+					 "msvcp90.dll",
+					 "winnsi.dll",
+					 "nsi.dll",
+					 "iphlpapi.dll",
+					 "WTSAPI32.dll",
+					 "API-MS-Win-Core-ErrorHandling-L1-1-0.dll",
+					 "API-MS-Win-Core-Misc-L1-1-0.dll",
+					 "API-MS-Win-Core-ProcessThreads-L1-1-0.dll",
+					 "API-MS-Win-Core-File-L1-1-0.dll",
+					 "API-MS-Win-Core-Handle-L1-1-0.dll",
+					 "API-MS-Win-Core-Profile-L1-1-0.dll",
+					 "API-MS-Win-Core-IO-L1-1-0.dll",
+					 "API-MS-Win-Core-String-L1-1-0.dll",
+					 "API-MS-Win-Core-Interlocked-L1-1-0.dll",
+					 "API-MS-Win-Core-SysInfo-L1-1-0.dll",
+					 "API-MS-Win-Security-Base-L1-1-0.dll",
+					 "API-MS-Win-Core-LocalRegistry-L1-1-0.dll"]
 	#manually include python libraries that py2exe fails to detect
 	# for pyOpenGL : http://www.jstump.com/blog/archive/2009/06/30/py2exe-and-pyopengl-3x-with-no-manual-tinkering/
 	# + OpenGL_accelerate.formathandler that is imported by the Python/C
