@@ -69,9 +69,27 @@ VIAddVersionKey /LANG=${LANG_ENGLISH} "LegalCopyright" "© ${PRODUCT_PUBLISHER} 
 VIAddVersionKey /LANG=${LANG_ENGLISH} "FileDescription" "Installation for ${PRODUCT_NAME}"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "FileVersion" "${PRODUCT_VERSION}"
 
-; display a language selection dialog
 Function .onInit
+  ; display a language selection dialog
   !insertmacro MUI_LANGDLL_DISPLAY
+
+  ; detect if a previous version was installed
+  ReadRegStr $R0 ${PRODUCT_UNINST_ROOT_KEY} ${PRODUCT_UNINST_KEY} "UninstallString"
+  StrCmp $R0 "" done
+ 
+  ; ask the user to uninstall the previous version
+  MessageBox MB_OKCANCEL|MB_ICONEXCLAMATION \
+  "${PRODUCT_NAME} is already installed. $\n$\nClick `OK` to remove the \
+  previous version or `Cancel` to cancel this upgrade." \
+  IDOK uninst
+  Abort
+ 
+  ;Run the uninstaller
+  uninst:
+    ClearErrors
+    Exec $INSTDIR\uninst.exe
+
+  done:
 FunctionEnd
 
 Section "SectionPrincipale" SEC01
