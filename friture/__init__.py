@@ -19,4 +19,4 @@
 
 # version and date
 __version__ = "0.12"
-__releasedate__ = "2013-06-15"
+__releasedate__ = "2013-06-20"
