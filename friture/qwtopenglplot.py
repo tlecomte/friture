@@ -6,8 +6,10 @@
 import sys
 
 from PyQt4 import QtCore, QtGui, QtOpenGL, Qt
-import PyQt4.Qwt5 as Qwt
 from friture.audiobackend import SAMPLING_RATE
+from friture.plotting.scaleWidget import VerticalScaleWidget, HorizontalScaleWidget
+from friture.plotting.scaleDivision import ScaleDivision
+from friture.plotting.coordinateTransform import CoordinateTransform
 
 try:
     from OpenGL import GL
@@ -29,13 +31,6 @@ class GLPlotWidget(QtGui.QWidget):
     def __init__(self, parent, sharedGLWidget, logger=None):
         super(GLPlotWidget, self).__init__()
 
-        self.glWidget = GLWidget(self, sharedGLWidget)
-        
-        self.xmin = 0.1
-        self.xmax = 1.
-        self.ymin = 0.1
-        self.ymax = 1.
-        
         self.peaks_enabled = True
         self.peak = zeros((3,))
         self.peak_int = zeros((3,))
@@ -52,36 +47,22 @@ class GLPlotWidget(QtGui.QWidget):
         
         self.baseline_transformed = False
         self.baseline = 0.
-        
-        self.topDist = 0
-        self.bottomDist = 0
-        self.leftDist = 0
-        self.rightDist = 0
-        
+
         self.needtransform = False
 
-        self.verticalScaleEngine = Qwt.QwtLinearScaleEngine()
+        self.verticalScaleDivision = ScaleDivision(0, 1, 100)
+        self.verticalScaleTransform = CoordinateTransform(0, 1, 100, 0, 0)
 
-        self.verticalScale = Qwt.QwtScaleWidget(self)
-        vtitle = Qwt.QwtText("PSD (dB)")
-        vtitle.setFont(QtGui.QFont(8))
-        self.verticalScale.setTitle(vtitle)
-        self.verticalScale.setScaleDiv(self.verticalScaleEngine.transformation(),
-                                  self.verticalScaleEngine.divideScale(self.ymin, self.ymax, 8, 5))
-        self.verticalScale.setMargin(2)
+        self.verticalScale = VerticalScaleWidget(self, self.verticalScaleDivision, self.verticalScaleTransform)
+        self.verticalScale.setTitle("PSD (dB)")
 
-        self.logx = False
-        self.horizontalScaleEngine = Qwt.QwtLinearScaleEngine()
+        self.horizontalScaleDivision = ScaleDivision(0, 22000, 100)
+        self.horizontalScaleTransform = CoordinateTransform(0, 22000, 100, 0, 0)
 
-        self.horizontalScale = Qwt.QwtScaleWidget(self)
-        htitle = Qwt.QwtText("Frequency (Hz)")
-        htitle.setFont(QtGui.QFont(8))
-        self.horizontalScale.setTitle(htitle)
-        self.horizontalScale.setScaleDiv(self.horizontalScaleEngine.transformation(),
-                                  self.horizontalScaleEngine.divideScale(self.xmin, self.xmax, 8, 5))
-        self.horizontalScale.setAlignment(Qwt.QwtScaleDraw.BottomScale)
-        self.horizontalScale.setMargin(2)
-        self.horizontalScale.setSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Preferred)
+        self.horizontalScale = HorizontalScaleWidget(self, self.horizontalScaleDivision, self.horizontalScaleTransform)
+        self.horizontalScale.setTitle("Frequency (Hz)")
+
+        self.glWidget = GLWidget(self, sharedGLWidget, self.verticalScaleTransform, self.horizontalScaleTransform)
 
         plotLayout = QtGui.QGridLayout()
         plotLayout.setSpacing(0)
@@ -94,36 +75,46 @@ class GLPlotWidget(QtGui.QWidget):
 
     def setlinfreqscale(self):
         self.logx = False
-        self.horizontalScaleEngine = Qwt.QwtLinearScaleEngine()
-        self.horizontalScale.setScaleDiv(self.horizontalScaleEngine.transformation(),
-                                         self.horizontalScaleEngine.divideScale(self.xmin, self.xmax, 8, 5))
+
+        self.horizontalScaleTransform.setLinear()
+        self.horizontalScaleDivision.setLinear()
+
         self.needtransform = True
         self.draw()
 
     def setlogfreqscale(self):
         self.logx = True
-        self.horizontalScaleEngine = Qwt.QwtLog10ScaleEngine()
-        self.horizontalScale.setScaleDiv(self.horizontalScaleEngine.transformation(),
-                                         self.horizontalScaleEngine.divideScale(self.xmin, self.xmax, 8, 5))
+
+        self.horizontalScaleTransform.setLogarithmic()
+        self.horizontalScaleDivision.setLogarithmic()
+
         self.needtransform = True
-        self.draw() 
+        self.draw()
 
     def setfreqrange(self, minfreq, maxfreq):
         self.xmin = minfreq
         self.xmax = maxfreq
-        self.horizontalScale.setScaleDiv(self.horizontalScaleEngine.transformation(),
-                                  self.horizontalScaleEngine.divideScale(self.xmin, self.xmax, 8, 5))
+
+        self.horizontalScaleTransform.setRange(minfreq, maxfreq)
+        self.horizontalScaleDivision.setRange(minfreq, maxfreq)
+
+        # notify that sizeHint has changed (this should be done with a signal emitted from the scale division to the scale bar)
+        self.horizontalScale.scaleBar.updateGeometry()
+
+
         self.needtransform = True
         self.draw()
 
     def setspecrange(self, spec_min, spec_max):
-        self.ymin = spec_min
-        self.ymax = spec_max
-        self.verticalScale.setScaleDiv(self.verticalScaleEngine.transformation(),
-                                  self.verticalScaleEngine.divideScale(self.ymin, self.ymax, 8, 5))
-        self.needtransform = True        
+        self.verticalScaleTransform.setRange(spec_min, spec_max)
+        self.verticalScaleDivision.setRange(spec_min, spec_max)
+
+        # notify that sizeHint has changed (this should be done with a signal emitted from the scale division to the scale bar)
+        self.verticalScale.scaleBar.updateGeometry()
+
+        self.needtransform = True
         self.draw()
-    
+
     def setweighting(self, weighting):
         if weighting is 0:
             title = "PSD (dB)"
@@ -133,10 +124,8 @@ class GLPlotWidget(QtGui.QWidget):
             title = "PSD (dB B)"
         else:
             title = "PSD (dB C)"
-        
-        ytitle = Qwt.QwtText(title)
-        ytitle.setFont(QtGui.QFont(8))
-        self.verticalScale.setTitle(ytitle)
+
+        self.verticalScale.setTitle(title)
         self.needtransform = True
         self.draw()
     
@@ -153,33 +142,8 @@ class GLPlotWidget(QtGui.QWidget):
     def set_baseline_dataUnits(self, baseline):
         self.baseline_transformed = True
         self.baseline = baseline
-    
-    def xtransform(self, x):
-        verticalDists = self.verticalScale.getBorderDistHint()
-        horizontalDists = self.horizontalScale.getBorderDistHint()
-        self.topDist = verticalDists[0]
-        self.bottomDist = verticalDists[1]
-        self.leftDist = horizontalDists[0]
-        self.rightDist = horizontalDists[1]
-        
-        if self.logx:
-            return (log10(x/self.xmin))*(self.glWidget.width() - self.leftDist - self.rightDist)/log10(self.xmax/self.xmin) + self.leftDist
-        else:
-            return (x - self.xmin)*(self.glWidget.width() - self.leftDist - self.rightDist)/(self.xmax - self.xmin) + self.leftDist
 
-    def inverseXTransform(self, x):
-        if self.logx:
-            return 10**((x - self.leftDist)*log10(self.xmax/self.xmin)/(self.glWidget.width() - self.leftDist - self.rightDist))*self.xmin
-        else:
-            return (x - self.leftDist)*(self.xmax - self.xmin)/(self.glWidget.width() - self.leftDist - self.rightDist) + self.xmin
-
-    def ytransform(self, y):
-        return (y - self.ymin)*(self.glWidget.height() - self.topDist - self.bottomDist)/(self.ymax - self.ymin) + self.bottomDist - 1
-    
-    def inverseYTransform(self, y):
-        return (y + 1. - self.bottomDist)*(self.ymax - self.ymin)/(self.glWidget.height() - self.topDist - self.bottomDist) + self.ymin
-    
-    def setdata(self, x, y, fmax):        
+    def setdata(self, x, y, fmax):
         x1 = zeros(x.shape)
         x2 = zeros(x.shape)
         x1[0] = 1e-10
@@ -261,9 +225,23 @@ class GLPlotWidget(QtGui.QWidget):
 
     def draw(self):
         if self.needtransform:
+            self.verticalScaleDivision.setLength(self.glWidget.height())
+            self.verticalScaleTransform.setLength(self.glWidget.height())
+            startBorder, endBorder = self.verticalScale.spacingBorders()
+            self.verticalScaleTransform.setBorders(startBorder, endBorder)
+
+            self.verticalScale.update()
+
+            self.horizontalScaleDivision.setLength(self.glWidget.width())
+            self.horizontalScaleTransform.setLength(self.glWidget.width())
+            startBorder, endBorder = self.horizontalScale.spacingBorders()
+            self.horizontalScaleTransform.setBorders(startBorder, endBorder)
+
+            self.horizontalScale.update()
+
             # transform the coordinates only when needed
-            x1 = self.xtransform(self.x1)
-            x2 = self.xtransform(self.x2)
+            x1 = self.horizontalScaleTransform.toScreen(self.x1)
+            x2 = self.horizontalScaleTransform.toScreen(self.x2)
             
             if self.logx:
                 self.transformed_x1, self.transformed_x2, n = self.pre_tree_rebin(x1, x2)
@@ -276,14 +254,14 @@ class GLPlotWidget(QtGui.QWidget):
                 self.transformed_x1 = x1
                 self.transformed_x2 = x2
             
-            xMajorTick = self.horizontalScaleEngine.divideScale(self.xmin, self.xmax, 8, 5).ticks(2)
-            xMinorTick = self.horizontalScaleEngine.divideScale(self.xmin, self.xmax, 8, 5).ticks(0)
-            yMajorTick = self.verticalScaleEngine.divideScale(self.ymin, self.ymax, 8, 5).ticks(2)
-            yMinorTick = self.verticalScaleEngine.divideScale(self.ymin, self.ymax, 8, 5).ticks(0)                
-            self.glWidget.setGrid(self.xtransform(array(xMajorTick)),
-                                  self.xtransform(array(xMinorTick)),
-                                  self.ytransform(array(yMajorTick)),
-                                  self.ytransform(array(yMinorTick))
+            xMajorTick = self.horizontalScaleDivision.majorTicks()
+            xMinorTick = self.horizontalScaleDivision.minorTicks()
+            yMajorTick = self.verticalScaleDivision.majorTicks()
+            yMinorTick = self.verticalScaleDivision.minorTicks()
+            self.glWidget.setGrid(self.horizontalScaleTransform.toScreen(array(xMajorTick)),
+                                  self.horizontalScaleTransform.toScreen(array(xMinorTick)),
+                                  self.verticalScaleTransform.toScreen(array(yMajorTick)),
+                                  self.verticalScaleTransform.toScreen(array(yMinorTick))
                                   )
 
             self.needtransform = False
@@ -312,7 +290,7 @@ class GLPlotWidget(QtGui.QWidget):
         if self.peaks_enabled:
             self.compute_peaks(y)
         
-        transformed_y = self.ytransform(y)
+        transformed_y = self.verticalScaleTransform.toScreen(y)
         
         Ones = ones(x1.shape)
         Ones_shaded = Ones #.copy()
@@ -325,7 +303,7 @@ class GLPlotWidget(QtGui.QWidget):
         #    Ones_shaded[:i[0]:2] = 1.2            
         
         if self.peaks_enabled:
-            transformed_peak = self.ytransform(self.peak)        
+            transformed_peak = self.verticalScaleTransform.toScreen(self.peak)
         
             n = x1.size
 
@@ -364,12 +342,12 @@ class GLPlotWidget(QtGui.QWidget):
         
         if self.baseline_transformed:
             # used for dual channel response measurement
-            baseline = self.ytransform(self.baseline)
+            baseline = self.verticalScaleTransform.toScreen(self.baseline)
         else:
             # used for single channel analysis
             baseline = self.baseline
 
-        xmax = self.xtransform(self.fmax)
+        xmax = self.horizontalScaleTransform.toScreen(self.fmax)
         self.glWidget.setfmax(xmax, self.fmax)
 
         self.setQuadData(x1_with_peaks, y_with_peaks, x2_with_peaks - x1_with_peaks, baseline, r_with_peaks, g_with_peaks, b_with_peaks)
@@ -435,7 +413,7 @@ class GLPlotWidget(QtGui.QWidget):
 
 
 class GLWidget(QtOpenGL.QGLWidget):
-    def __init__(self, parent, sharedGLWidget):
+    def __init__(self, parent, sharedGLWidget, verticalScaleTransform, horizontalScaleTransform):
         super(GLWidget, self).__init__(parent, shareWidget=sharedGLWidget)
 
         self.lastPos = QtCore.QPoint()
@@ -463,13 +441,16 @@ class GLWidget(QtOpenGL.QGLWidget):
         # when QPainter.begin() is called.
         self.setAutoFillBackground(False)
 
+        # set proper size policy for this widget
+        self.setSizePolicy(QtGui.QSizePolicy(QtGui.QSizePolicy.MinimumExpanding, QtGui.QSizePolicy.MinimumExpanding))
+
         self.gridList = None
 
-    def minimumSizeHint(self):
-        return QtCore.QSize(50, 50)
+        self.horizontalScaleTransform = horizontalScaleTransform
+        self.verticalScaleTransform = verticalScaleTransform
 
     def sizeHint(self):
-        return QtCore.QSize(400, 400)
+        return QtCore.QSize(50, 50)
 
     def initializeGL(self):
         return
@@ -652,11 +633,11 @@ class GLWidget(QtOpenGL.QGLWidget):
     def drawTrackerText(self, painter): 
         if self.ruler:
             painter.setRenderHint(QtGui.QPainter.Antialiasing)
-            
-            x = self.parent().inverseXTransform(self.mousex)
-            y = self.parent().inverseYTransform(self.height() - self.mousey)
+
+            x = self.horizontalScaleTransform.toPlot(self.mousex)
+            y = self.verticalScaleTransform.toPlot(float(self.height() - self.mousey))
             text = "%d Hz, %.1f dB" %(x, y)
-            
+
             # compute tracker bounding rect
             painter.setPen(Qt.Qt.black)
             rect = painter.boundingRect(QtCore.QRect(self.mousex, self.mousey, 0, 0), Qt.Qt.AlignLeft, text)
