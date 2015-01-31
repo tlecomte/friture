@@ -19,7 +19,6 @@
 
 from PyQt4 import QtGui
 from numpy import log10, argmax, max, array, zeros, arange, floor, float64
-from friture.spectplot import SpectPlot
 from friture.audioproc import audioproc # audio processing class
 from friture.spectrum_settings import (Spectrum_Settings_Dialog, # settings dialog
 									   DEFAULT_FFT_SIZE,
@@ -37,15 +36,6 @@ from friture.audiobackend import SAMPLING_RATE
 from friture.qwtopenglplot import GLPlotWidget
 from friture.exp_smoothing_conv import pyx_exp_smoothed_value_numpy
 
-STYLESHEET = """
-QwtPlotCanvas {
-	border: 1px solid gray;
-	border-radius: 2px;
-	background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-	stop: 0 #E0E0E0, stop: 0.5 #FFFFFF);
-}
-"""
-
 class Spectrum_Widget(QtGui.QWidget):
 	def __init__(self, parent, sharedGLWidget, logger = PrintLogger()):
 		QtGui.QWidget.__init__(self, parent)
@@ -56,16 +46,13 @@ class Spectrum_Widget(QtGui.QWidget):
 		self.setObjectName("Spectrum_Widget")
 		self.gridLayout = QtGui.QGridLayout(self)
 		self.gridLayout.setObjectName("gridLayout")
-		#self.PlotZoneSpect = SpectPlot(self, self.logger)
 		self.PlotZoneSpect = GLPlotWidget(self, sharedGLWidget, self.logger)
 		self.PlotZoneSpect.setObjectName("PlotZoneSpect")
 		self.gridLayout.addWidget(self.PlotZoneSpect, 0, 0, 1, 1)
 
-		self.setStyleSheet(STYLESHEET)
-		
 		# initialize the class instance that will do the fft
 		self.proc = audioproc(self.logger)
-		
+
 		self.maxfreq = DEFAULT_MAXFREQ
 		self.proc.set_maxfreq(self.maxfreq)
 		self.minfreq = DEFAULT_MINFREQ
@@ -80,7 +67,7 @@ class Spectrum_Widget(QtGui.QWidget):
 		self.update_weighting()
 		self.freq = self.proc.get_freq_scale()
 
-		self.old_index = 0        
+		self.old_index = 0
 		self.overlap = 3./4.
 
 		self.update_display_buffers()
