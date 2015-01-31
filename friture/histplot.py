@@ -44,7 +44,6 @@ class HistogramItem:
     def __init__(self, *args):
 
         self.__color = Qt.QColor()
-        self.__reference = 0.0
 
         self.cached_bar_width = 1
         self.canvas_height = 2
@@ -55,8 +54,6 @@ class HistogramItem:
         self.fc = ["0"] # center frequencies
         self.y = array([0.])
         self.i = [0]
-        self.transform_slope = 1.
-        self.transform_origin = 0.
 
         self.pixmaps = [QtGui.QPixmap()]
         self.maxLabelPixHWidth = 0
@@ -98,11 +95,6 @@ class HistogramItem:
         if w < self.canvas_width - 1 or w > self.canvas_width + 1:
             self.canvas_width = w
             self.need_transform = True
-
-        # the transform parameters change when the scale changes
-        #if self.yMap <> yMap:
-        #    self.yMap = yMap
-        #    self.need_transform = True
 
         # update the cached pixmaps and coordinates if necessary
         if self.need_transform:
