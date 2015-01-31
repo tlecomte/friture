@@ -511,6 +511,7 @@ class GLWidget(QtOpenGL.QGLWidget):
             GL.glVertex2f(w, y)
             GL.glEnd()
         
+        # given the usual aspect ratio of the canvas, the vertical minor ticks would make it look crowded
         #GL.glColor3f(0.5, 0.5, 0.5)
         #for y in self.yMinorTick:        
         #    GL.glBegin(GL.GL_LINES)
