@@ -21,7 +21,7 @@ import numpy
 from PyQt4 import Qt, QtCore, QtGui
 import PyQt4.Qwt5 as Qwt
 from friture.audiobackend import SAMPLING_RATE
-
+from friture.plotting import cmrmap
 from friture.lookup_table import pyx_color_from_float_2D
 
 class CanvasScaledSpectrogram(QtCore.QObject):
@@ -41,13 +41,10 @@ class CanvasScaledSpectrogram(QtCore.QObject):
 		self.painter = QtGui.QPainter()
 		self.offset = 0
 		self.time_offset = 0
-		# prepare a custom colormap black->blue->green->yellow->red->white
-		self.colorMap = Qwt.QwtLinearColorMap(Qt.Qt.black, Qt.Qt.white)
-		self.colorMap.addColorStop(0.2, Qt.Qt.blue)
-		self.colorMap.addColorStop(0.4, Qt.Qt.green)
-		self.colorMap.addColorStop(0.6, Qt.Qt.yellow)
-		self.colorMap.addColorStop(0.8, Qt.Qt.red)
+
+		# prepare a custom colormap
 		self.prepare_palette()
+
 		# performance timer
 		self.time = QtCore.QTime()
 		self.time.start()
@@ -134,9 +131,22 @@ class CanvasScaledSpectrogram(QtCore.QObject):
 		return myimage
 
 	def prepare_palette(self):
-		self.colors = numpy.zeros((256), dtype=numpy.uint32)
-		for i in range(256):
-			self.colors[i] = self.colorMap.rgb(Qwt.QwtDoubleInterval(0,255), i)
+		print "palette preparation"
+
+		N = 256
+		cmap = cmrmap.compute_colors(N)
+
+		self.colors = numpy.zeros((N), dtype=numpy.uint32)
+
+		for i in range(N):
+			self.colors[i] = QtGui.QColor(cmap[i, 0]*255, cmap[i, 1]*255, cmap[i, 2]*255).rgb()
+
+		# this shall be removed once self.colorMap is no longer used from imageplot.py
+		self.colorMap = Qwt.QwtLinearColorMap(Qt.Qt.black, Qt.Qt.white)
+		self.colorMap.addColorStop(0.2, Qt.Qt.blue)
+		self.colorMap.addColorStop(0.4, Qt.Qt.green)
+		self.colorMap.addColorStop(0.6, Qt.Qt.yellow)
+		self.colorMap.addColorStop(0.8, Qt.Qt.red)
 
 	def color_from_float(self, v):
 		return pyx_color_from_float_2D(self.colors, v)
