@@ -33,7 +33,7 @@ from friture.spectrum_settings import (Spectrum_Settings_Dialog, # settings dial
 
 from friture.logger import PrintLogger
 from friture.audiobackend import SAMPLING_RATE
-from friture.qwtopenglplot import GLPlotWidget
+from friture.openglplot import GLPlotWidget
 from friture.exp_smoothing_conv import pyx_exp_smoothed_value_numpy
 
 class Spectrum_Widget(QtGui.QWidget):
