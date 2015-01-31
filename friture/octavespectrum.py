@@ -43,15 +43,6 @@ import friture.renard as renard
 
 SMOOTH_DISPLAY_TIMER_PERIOD_MS = 25
 
-STYLESHEET = """
-QwtPlotCanvas {
-	border: 1px solid gray;
-	border-radius: 2px;
-	background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-	stop: 0 #E0E0E0, stop: 0.5 #FFFFFF);
-}
-"""
-
 class OctaveSpectrum_Widget(QtGui.QWidget):
 	def __init__(self, parent, logger = PrintLogger()):
 		QtGui.QWidget.__init__(self, parent)
@@ -66,8 +57,6 @@ class OctaveSpectrum_Widget(QtGui.QWidget):
 		self.PlotZoneSpect.setObjectName("PlotZoneSpect")
 		self.gridLayout.addWidget(self.PlotZoneSpect, 0, 0, 1, 1)
 
-		self.setStyleSheet(STYLESHEET)
-				
 		self.spec_min = DEFAULT_SPEC_MIN
 		self.spec_max = DEFAULT_SPEC_MAX
 		self.weighting = DEFAULT_WEIGHTING

@@ -29,17 +29,6 @@ PEAK_DECAY_RATE = 1.0 - 3E-6
 # Number of cycles the peak stays on hold before fall-off.
 PEAK_FALLOFF_COUNT = 32 # default : 16
 
-#class FreqScaleDraw(Qwt.QwtScaleDraw):
-#    def __init__(self, *args):
-#        Qwt.QwtScaleDraw.__init__(self, *args)
-
-#    def label(self, value):
-#        #if value >= 1e3:
-#        #    label = "%gk" %(value/1e3)
-#        #else:
-#        label = "%d" %(value)
-#        return Qwt.QwtText(label)
-
 class HistogramItem:
     def __init__(self, *args):
 
@@ -284,11 +273,6 @@ class HistogramPeakBarItem:
             self.canvas_width = w
             self.need_transform = True
 
-        # the transform parameters change when the scale changes
-        if self.yMap <> yMap:
-            self.yMap = yMap
-            self.need_transform = True
-
         if self.need_transform:
             # round to pixels
             self.x1 = round(xMap.toScreen(array(self.fl))) + 1
@@ -337,10 +321,6 @@ class HistPlot(QtGui.QWidget):
 
         self.horizontalScaleTransform.setLogarithmic()
         self.horizontalScaleDivision.setLogarithmic()
-
-        #self.setAxisScaleDraw(Qwt.QwtPlot.xBottom, FreqScaleDraw())
-
-        self.paint_time = 0.
 
         # insert an additional plot item for the peak bar
         self.bar_peak = HistogramPeakBarItem()
