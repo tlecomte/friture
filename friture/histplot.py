@@ -307,6 +307,7 @@ class HistPlot(QtGui.QWidget):
         self.horizontalScale.setTitle("Frequency (Hz)")
 
         self.canvasWidget = CanvasWidget(self, self.verticalScaleTransform, self.horizontalScaleTransform)
+        self.canvasWidget.setTrackerFormatter(lambda x, y: "%d Hz, %.1f dB" %(x, y))
 
         plotLayout = QtGui.QGridLayout()
         plotLayout.setSpacing(0)

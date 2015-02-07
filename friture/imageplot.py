@@ -17,57 +17,33 @@
 # You should have received a copy of the GNU General Public License
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
-import PyQt4.Qwt5 as Qwt
 from PyQt4 import QtCore, QtGui, Qt
 from friture.spectrogram_image import CanvasScaledSpectrogram
 from online_linear_2D_resampler import Online_Linear_2D_resampler
 from fractions import Fraction
 from frequency_resampler import Frequency_Resampler
 import numpy as np
+from friture.plotting.scaleWidget import VerticalScaleWidget, HorizontalScaleWidget, ColorScaleWidget
+from friture.plotting.scaleDivision import ScaleDivision
+from friture.plotting.coordinateTransform import CoordinateTransform
+from friture.plotting.canvasWidget import CanvasWidget
 
-class FreqScaleDraw(Qwt.QwtScaleDraw):
-	def __init__(self, *args):
-		Qwt.QwtScaleDraw.__init__(self, *args)
+def tickFormatter(value, digits):
+	if value >= 1e3:
+		label = "%gk" %(value/1e3)
+	else:
+		label = "%d" %(value)
+	return label
 
-	def label(self, value):
-		if value >= 1e3:
-			label = "%gk" %(value/1e3)
-		else:
-			label = "%d" %(value)
-		return Qwt.QwtText(label)
-
-class picker(Qwt.QwtPlotPicker):
-	def __init__(self, *args):
-		Qwt.QwtPlotPicker.__init__(self, *args)
-		
-	def trackerText(self, pos):
-		pos2 = self.invTransform(pos)
-		return Qwt.QwtText("%.2f s, %d Hz" %(pos2.x(), pos2.y()))
-			
-	def drawTracker(self, painter):
-		textRect = self.trackerRect(painter.font())
-		if not textRect.isEmpty():
-		  	   label = self.trackerText(self.trackerPosition())
-		  	   if not label.isEmpty():
-		  	   	   painter.save()
-		  	   	   painter.setPen(Qt.Qt.NoPen)
-		  	   	   painter.setBrush(Qt.Qt.white)
-		  	   	   painter.drawRect(textRect)
-		  	   	   painter.setPen(Qt.Qt.black)
-		  	   	   #painter->setRenderHint(QPainter::TextAntialiasing, false);
-		  	   	   label.draw(painter, textRect)
-		  	   	   painter.restore()
-
-class PlotImage(Qwt.QwtPlotItem):
+class PlotImage:
 	def __init__(self, logger, audiobackend):
-		Qwt.QwtPlotItem.__init__(self)
 		self.canvasscaledspectrogram = CanvasScaledSpectrogram(logger)
 		self.T = 0.
 		self.dT = 1.
 		self.audiobackend = audiobackend
 		#self.previous_time = self.audiobackend.get_stream_time()
 		self.offset = 0 #self.audiobackend.get_stream_time()/self.dT
-		
+
 		self.jitter_s = 0.
 
 		self.isPlaying = True
@@ -122,9 +98,7 @@ class PlotImage(Qwt.QwtPlotItem):
 
 		# time advance
 		# FIXME ideally this function should be called at paintevent time, for better time sync
-		# but I'm not sure it is... maybe qwt does some sort of double-buffering
-		# and repaints its items outside of paintevents
-		# solution: look at PaintEvent
+		# but I'm not sure it is...
 
 		# FIXME there is a small bands of columns with jitter (on both sides of the spectrogram)
 		# solution: grow the rolling-canvas by a couple of columns,
@@ -138,7 +112,7 @@ class PlotImage(Qwt.QwtPlotItem):
 
 		pixmap = self.canvasscaledspectrogram.getpixmap()
 		offset = self.canvasscaledspectrogram.getpixmapoffset(delay=jitter_pix/2)
-		
+
 		rolling = True
 		if rolling:
 			# draw the whole canvas with a selected portion of the pixmap
@@ -180,81 +154,89 @@ class PlotImage(Qwt.QwtPlotItem):
 		self.jitter_s = jitter_s
 		#print jitter_s
 
-class ImagePlot(Qwt.QwtPlot):
-
+class ImagePlot(QtGui.QWidget):
 	def __init__(self, parent, logger, audiobackend):
-		Qwt.QwtPlot.__init__(self, parent)
+		super(ImagePlot, self).__init__(parent)
 
-		# we do not need caching
-		self.canvas().setPaintAttribute(Qwt.QwtPlotCanvas.PaintCached, False)
-		self.canvas().setPaintAttribute(Qwt.QwtPlotCanvas.PaintPacked, False)
-		# we do not need to have the background erased on each repaint
-		self.canvas().setAttribute(Qt.Qt.WA_NoSystemBackground)
+		self.verticalScaleDivision = ScaleDivision(20, 20000, 100)
+		self.verticalScaleTransform = CoordinateTransform(20, 20000, 100, 0, 0)
 
-		# set plot layout
-		self.plotLayout().setMargin(0)
-		self.plotLayout().setCanvasMargin(0)
-		self.plotLayout().setAlignCanvasToScales(True)
-		# use custom labelling for frequencies
-		self.setAxisScaleDraw(Qwt.QwtPlot.yLeft, FreqScaleDraw())
-		# set axis titles
-		xtitle = Qwt.QwtText('Time (s)')
-		xtitle.setFont(QtGui.QFont(8))
-		self.setAxisTitle(Qwt.QwtPlot.xBottom, xtitle)
-		# self.setAxisTitle(Qwt.QwtPlot.xBottom, 'Time (s)')
-		ytitle = Qwt.QwtText('Frequency (Hz)')
-		ytitle.setFont(QtGui.QFont(8))
-		self.setAxisTitle(Qwt.QwtPlot.yLeft, ytitle)
-		# self.setAxisTitle(Qwt.QwtPlot.yLeft, 'Frequency (Hz)')
-		
+		self.verticalScale = VerticalScaleWidget(self, self.verticalScaleDivision, self.verticalScaleTransform)
+		self.verticalScale.setTitle("Frequency (Hz)")
+		self.verticalScale.scaleBar.setTickFormatter(tickFormatter)
+
+		self.horizontalScaleDivision = ScaleDivision(0, 10, 100)
+		self.horizontalScaleTransform = CoordinateTransform(0, 10, 100, 0, 0)
+
+		self.horizontalScale = HorizontalScaleWidget(self, self.horizontalScaleDivision, self.horizontalScaleTransform)
+		self.horizontalScale.setTitle("Time (s)")
+
+		self.colorScaleDivision = ScaleDivision(-140, 0, 100)
+		self.colorScaleTransform = CoordinateTransform(-140, 0, 100, 0, 0)
+
+		self.colorScale = ColorScaleWidget(self, self.colorScaleDivision, self.colorScaleTransform)
+		self.colorScale.setTitle("PSD (dB A)")
+
+		self.canvasWidget = CanvasWidget(self, self.verticalScaleTransform, self.horizontalScaleTransform)
+		self.canvasWidget.setTrackerFormatter(lambda x, y: "%.2f s, %d Hz" %(x, y))
+
+		plotLayout = QtGui.QGridLayout()
+		plotLayout.setSpacing(0)
+		plotLayout.setContentsMargins(0, 0, 0, 0)
+		plotLayout.addWidget(self.verticalScale, 0, 0)
+		plotLayout.addWidget(self.canvasWidget, 0, 1)
+		plotLayout.addWidget(self.colorScale, 0, 2)
+		plotLayout.addWidget(self.horizontalScale, 1, 1)
+
+		self.setLayout(plotLayout)
+
+		self.needfullreplot = False
+
 		# attach a plot image
 		self.plotImage = PlotImage(logger, audiobackend)
-		self.plotImage.attach(self)
+		self.canvasWidget.attach(self.plotImage)
+
 		self.setlinfreqscale()
-		self.setfreqrange(20., 20000.)
-		
-		self.rightAxis = self.axisWidget(Qwt.QwtPlot.yRight)
-		ctitle = Qwt.QwtText("PSD (dB A)")
-		ctitle.setFont(QtGui.QFont(8))
-		self.setAxisTitle(Qwt.QwtPlot.yRight, ctitle)
-		self.rightAxis.setColorBarEnabled(True)
-		self.enableAxis(Qwt.QwtPlot.yRight)
+
 		self.setspecrange(-140., 0.)
 
-		self.setAxisScale(Qwt.QwtPlot.xBottom, 0., 10.)
-		
-		self.paint_time = 0.
-		
-		# picker used to display coordinates when clicking on the canvas
-		self.picker = picker(Qwt.QwtPlot.xBottom,
-                               Qwt.QwtPlot.yLeft,
-                               Qwt.QwtPicker.PointSelection,
-                               Qwt.QwtPlotPicker.CrossRubberBand,
-                               Qwt.QwtPicker.ActiveOnly,
-                               self.canvas())
-		
-		self.cached_canvas = self.canvas()
-		
-		# set the size policy to "Preferred" to allow the widget to be shrinked under the default size, which is quite big
-		self.setSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Preferred)
-		
 		#need to replot here for the size Hints to be computed correctly (depending on axis scales...)
-		self.replot()
+		self.update()
 
 	def addData(self, freq, xyzs):
 		self.plotImage.addData(freq, xyzs, self.logfreqscale)
 
-	def updatePlot(self):
-		# self.replot() would call updateAxes() which is dead slow (probably because it
-		# computes label sizes); instead, let's ask Qt to repaint the canvas only next time
-		# This works because we disable the cache
-		# TODO what happens when the cache is enabled ?
-		# Could that solve the perceived "unsmoothness" ?
-		
-		self.cached_canvas.update()
-		
-		#print self.canvas().testPaintAttribute(Qwt.QwtPlotCanvas.PaintCached)
-		#print self.canvas().paintCache()
+	def draw(self):
+		if self.needfullreplot:
+			self.needfullreplot = False
+
+			self.verticalScaleDivision.setLength(self.canvasWidget.height())
+			self.verticalScaleTransform.setLength(self.canvasWidget.height())
+			startBorder, endBorder = self.verticalScale.spacingBorders()
+			self.verticalScaleTransform.setBorders(startBorder, endBorder)
+
+			self.verticalScale.update()
+
+			self.horizontalScaleDivision.setLength(self.canvasWidget.width())
+			self.horizontalScaleTransform.setLength(self.canvasWidget.width())
+			startBorder, endBorder = self.horizontalScale.spacingBorders()
+			self.horizontalScaleTransform.setBorders(startBorder, endBorder)
+
+			self.horizontalScale.update()
+
+			self.colorScaleDivision.setLength(self.canvasWidget.height())
+			self.colorScaleTransform.setLength(self.canvasWidget.height())
+			startBorder, endBorder = self.colorScale.spacingBorders()
+			self.colorScaleTransform.setBorders(startBorder, endBorder)
+
+			self.colorScale.update()
+
+		self.canvasWidget.update()
+
+	# redraw when the widget is resized to update coordinates transformations
+	def resizeEvent(self, event):
+		self.needfullreplot = True
+		self.draw()
 
 	def pause(self):
 		self.plotImage.pause()
@@ -266,41 +248,67 @@ class ImagePlot(Qwt.QwtPlot):
 		self.plotImage.erase()
 		self.logfreqscale = 0
 		self.plotImage.setlogfreqscale(False)
-		self.setAxisScaleEngine(Qwt.QwtPlot.yLeft, Qwt.QwtLinearScaleEngine())
-		self.replot()
+
+		self.verticalScaleTransform.setLinear()
+		self.verticalScaleDivision.setLinear()
+
+		# notify that sizeHint has changed (this should be done with a signal emitted from the scale division to the scale bar)
+		self.verticalScale.scaleBar.updateGeometry()
+
+		self.needfullreplot = True
+		self.update()
 
 	def setlog10freqscale(self):
 		self.plotImage.erase()
 		self.logfreqscale = 1
 		self.plotImage.setlogfreqscale(True)
-		self.setAxisScaleEngine(Qwt.QwtPlot.yLeft, Qwt.QwtLog10ScaleEngine())
-		self.replot()
-		
-	#def setlog2freqscale(self):
-	#	self.plotImage.erase()
-	#	self.logfreqscale = 2
-	#	print "Warning: Frequency scales are not implemented in the spectrogram"
-	#	self.setAxisScaleEngine(Qwt.QwtPlot.yLeft, Qwt.QwtLog10ScaleEngine())
-	#	self.replot()
 
-	def settimerange(self, timerange_seconds, dT_seconds):   
+		self.verticalScaleTransform.setLogarithmic()
+		self.verticalScaleDivision.setLogarithmic()
+
+		# notify that sizeHint has changed (this should be done with a signal emitted from the scale division to the scale bar)
+		self.verticalScale.scaleBar.updateGeometry()
+
+		self.needfullreplot = True
+		self.update()
+
+	def settimerange(self, timerange_seconds, dT_seconds):
 		self.plotImage.settimerange(timerange_seconds, dT_seconds)
-		self.setAxisScale(Qwt.QwtPlot.xBottom, 0., timerange_seconds)
-		self.replot()
+
+		self.horizontalScaleTransform.setRange(0, timerange_seconds)
+		self.horizontalScaleDivision.setRange(0, timerange_seconds)
+
+		# notify that sizeHint has changed (this should be done with a signal emitted from the scale division to the scale bar)
+		self.horizontalScale.scaleBar.updateGeometry()
+
+		self.needfullreplot = True
+		self.update()
 
 	def set_sfft_rate(self, rate_frac):
 		self.plotImage.set_sfft_rate(rate_frac)
 
 	def setfreqrange(self, minfreq, maxfreq):
 		self.plotImage.setfreqrange(minfreq, maxfreq)
-		self.setAxisScale(Qwt.QwtPlot.yLeft, minfreq, maxfreq)
-		self.replot()
-	
+
+		self.verticalScaleTransform.setRange(minfreq, maxfreq)
+		self.verticalScaleDivision.setRange(minfreq, maxfreq)
+
+		# notify that sizeHint has changed (this should be done with a signal emitted from the scale division to the scale bar)
+		self.verticalScale.scaleBar.updateGeometry()
+
+		self.needfullreplot = True
+		self.update()
+
 	def setspecrange(self, spec_min, spec_max):
-		self.rightAxis.setColorMap(Qwt.QwtDoubleInterval(spec_min, spec_max), self.plotImage.canvasscaledspectrogram.colorMap)
-		self.setAxisScale(Qwt.QwtPlot.yRight, spec_min, spec_max)
-		self.replot()
-		
+		self.colorScaleTransform.setRange(spec_min, spec_max)
+		self.colorScaleDivision.setRange(spec_min, spec_max)
+
+		# notify that sizeHint has changed (this should be done with a signal emitted from the scale division to the scale bar)
+		self.colorScale.scaleBar.updateGeometry()
+
+		self.needfullreplot = True
+		self.update()
+
 	def setweighting(self, weighting):
 		if weighting is 0:
 			title = "PSD (dB)"
@@ -310,13 +318,5 @@ class ImagePlot(Qwt.QwtPlot):
 			title = "PSD (dB B)"
 		else:
 			title = "PSD (dB C)"
-		
-		ctitle = Qwt.QwtText(title)
-		ctitle.setFont(QtGui.QFont(8))
-		self.setAxisTitle(Qwt.QwtPlot.yRight, ctitle)
-	
-	def drawCanvas(self, painter):
-		t = QtCore.QTime()
-		t.start()
-		Qwt.QwtPlot.drawCanvas(self, painter)
-		self.paint_time = (95.*self.paint_time + 5.*t.elapsed())/100.
+
+		self.colorScale.setTitle(title)

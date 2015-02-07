@@ -1,5 +1,6 @@
 from PyQt4 import QtGui, QtCore
 from friture.plotting.scaleDivision import numberPrecision
+from friture.plotting import cmrmap
 
 # A widget canvas with a baseline, ticks and tick labels
 # The logic of the placement of scale min/max and ticks belongs to another class.
@@ -16,8 +17,13 @@ class VerticalScaleBar(QtGui.QWidget):
         self.labelSpacing = 2
         self.borderOffset = 3
 
+        self.tickFormatter = lambda tick, digits: '{0:.{1}f}'.format(tick, digits)
+
         # for vertical scale bar
         self.setSizePolicy(QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Minimum))
+
+    def setTickFormatter(self, formatter):
+        self.tickFormatter = formatter
 
     def sizeHint(self):
         # for vertical scale bar
@@ -31,7 +37,7 @@ class VerticalScaleBar(QtGui.QWidget):
             interval = majorTicks[1] - majorTicks[0]
             prec = numberPrecision(interval)
             digits = max(0, int(-prec))
-            maxLabelWidth = max([fm.width('{0:.{1}f}'.format(tick, digits)) for tick in majorTicks])
+            maxLabelWidth = max([fm.width(self.tickFormatter(tick, digits)) for tick in majorTicks])
 
         return QtCore.QSize(maxLabelWidth + self.tickLength + self.borderOffset + self.labelSpacing, 10)
 
@@ -79,7 +85,7 @@ class VerticalScaleBar(QtGui.QWidget):
             # for vertical scale we invert the coordinates
             y = self.height() - self.coordinateTransform.toScreen(tick)
             painter.drawLine(xt, y, xb, y)
-            tick_string = '{0:.{1}f}'.format(tick, digits)
+            tick_string = self.tickFormatter(tick, digits)
             painter.drawText(le - fm.width(tick_string), y + lh/2 - 2, tick_string)
 
         for tick in self.scaleDivision.minorTicks():
@@ -176,6 +182,111 @@ class HorizontalScaleBar(QtGui.QWidget):
             # for vertical scale we invert the coordinates
             x = self.coordinateTransform.toScreen(tick)
             painter.drawLine(x, ytm, x, yb)
+
+    def spacingBorders(self):
+        fm = QtGui.QFontMetrics(self.font())
+        # for vertical scale bar
+        return fm.height()/2, fm.height()/2
+
+
+
+class ColorScaleBar(QtGui.QWidget):
+    def __init__(self, parent, division, transform, logger=None):
+        super(ColorScaleBar, self).__init__()
+
+        self.scaleDivision = division
+        self.coordinateTransform = transform
+
+        # should be based on font size
+        self.tickLength = 8
+        self.labelSpacing = 2
+        self.borderOffset = 3
+        self.barSpacing = 1
+        self.colorBarWidth = self.tickLength*2
+
+        # should be shared with spectrogram_image in a dedicated class
+        N = 256
+        cmap = cmrmap.compute_colors(N)
+        self.colors = [QtGui.QColor(cmap[i, 0]*255, cmap[i, 1]*255, cmap[i, 2]*255) for i in range(N)]
+
+        # for vertical scale bar
+        self.setSizePolicy(QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Minimum))
+
+    def sizeHint(self):
+        # for vertical scale bar
+        majorTicks = self.scaleDivision.majorTicks()
+        fm = QtGui.QFontMetrics(self.font())
+
+        # label precision
+        if len(majorTicks) < 2:
+            maxLabelWidth = 0
+        else:
+            interval = majorTicks[1] - majorTicks[0]
+            prec = numberPrecision(interval)
+            digits = max(0, int(-prec))
+            maxLabelWidth = max([fm.width('{0:.{1}f}'.format(tick, digits)) for tick in majorTicks])
+
+        return QtCore.QSize(self.borderOffset + self.colorBarWidth + self.barSpacing + self.tickLength + self.labelSpacing + maxLabelWidth, 10)
+
+    def set_scale_properties(self, division, transform):
+        self.scaleDivision = division
+        self.coordinateTransform = transform
+
+        self.update()
+        # notify that sizeHint may have changed
+        self.updateGeometry()
+
+    def paintEvent(self, event):
+        painter = QtGui.QPainter(self)
+
+        fm = painter.fontMetrics()
+
+        # Note: if anti-aliasing is enabled here, then coordinates need to be aligned to half-pixels
+        # to get true pixel-aligned lines. Without anti-aliasing, integer coordinates are enough.
+        #painter.setRenderHint(QtGui.QPainter.Antialiasing)
+
+        # color bar
+        by = self.spacingBorders()[0]
+        for y in range(0, self.height() - 2*by):
+            yNorm = float(y)/(self.height() - 2*by)
+            color = self.colors[int(yNorm*(len(self.colors)-1))]
+            rect = QtCore.QRect(self.borderOffset, self.height() - by - y, self.colorBarWidth, 1)
+            painter.fillRect(rect, color)
+
+        # base line
+        xb = self.borderOffset + self.colorBarWidth + self.barSpacing
+        y0 = self.coordinateTransform.toScreen(self.coordinateTransform.min)
+        y1 = self.coordinateTransform.toScreen(self.coordinateTransform.max)
+        painter.drawLine(xb, y0, xb, y1)
+
+        # tick start
+        xt = xb + self.tickLength
+        xtm = xb + self.tickLength/2
+
+        # label start
+        ls = xt + self.labelSpacing
+        lh = fm.height()
+
+        # label precision
+        majorTicks = self.scaleDivision.majorTicks()
+        if len(majorTicks) < 2:
+            interval = 0
+        else:
+            interval = majorTicks[1] - majorTicks[0]
+        precision = numberPrecision(interval)
+        digits = max(0, int(-precision))
+
+        for tick in self.scaleDivision.majorTicks():
+            # for vertical scale we invert the coordinates
+            y = self.height() - self.coordinateTransform.toScreen(tick)
+            painter.drawLine(xt, y, xb, y)
+            tick_string = '{0:.{1}f}'.format(tick, digits)
+            painter.drawText(ls, y + lh/2 - 2, tick_string)
+
+        for tick in self.scaleDivision.minorTicks():
+            # for vertical scale we invert the coordinates
+            y = self.height() - self.coordinateTransform.toScreen(tick)
+            painter.drawLine(xtm, y, xb, y)
 
     def spacingBorders(self):
         fm = QtGui.QFontMetrics(self.font())

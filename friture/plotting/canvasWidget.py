@@ -42,6 +42,11 @@ class CanvasWidget(QtGui.QWidget):
         self.grid = Grid()
         self.background = CanvasBackground()
 
+        self.trackerFormatter = lambda x, y: "x=%d, y=%d" %(x, y)
+
+    def setTrackerFormatter(self, formatter):
+        self.trackerFormatter = formatter
+
     def sizeHint(self):
         return QtCore.QSize(50, 50)
 
@@ -70,7 +75,7 @@ class CanvasWidget(QtGui.QWidget):
 
             x = self.horizontalScaleTransform.toPlot(self.mousex)
             y = self.verticalScaleTransform.toPlot(float(self.height() - self.mousey))
-            text = "%d Hz, %.1f dB" %(x, y)
+            text = self.trackerFormatter(x, y)
 
             # compute tracker bounding rect
             painter.setPen(QtCore.Qt.black)

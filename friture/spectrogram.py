@@ -144,7 +144,7 @@ class Spectrogram_Widget(QtGui.QWidget):
             w = tile(self.w, (1, realizable))
             norm_spectrogram = self.scale_spectrogram(self.log_spectrogram(spn) + w)            
             self.PlotZoneImage.addData(self.freq, norm_spectrogram)
-        self.PlotZoneImage.updatePlot()
+        self.PlotZoneImage.draw()
             
         # thickness of a frequency column depends on FFT size and window overlap
         # hamming window with 75% overlap provides good quality (Perfect reconstruction,

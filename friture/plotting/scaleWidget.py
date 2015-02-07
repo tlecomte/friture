@@ -19,8 +19,8 @@
 
 from PyQt4 import QtGui
 
-from friture.plotting.titleWidget import VerticalTitleWidget, HorizontalTitleWidget
-from friture.plotting.scaleBar import VerticalScaleBar, HorizontalScaleBar
+from friture.plotting.titleWidget import VerticalTitleWidget, HorizontalTitleWidget, ColorTitleWidget
+from friture.plotting.scaleBar import VerticalScaleBar, HorizontalScaleBar, ColorScaleBar
 
 # A layout widget containing:
 # - a title
@@ -63,6 +63,31 @@ class HorizontalScaleWidget(QtGui.QWidget):
         plotLayout.setContentsMargins(0, 0, 0, 0)
         plotLayout.addWidget(self.scaleBar, 0, 0)
         plotLayout.addWidget(self.titleWidget, 1, 0)
+
+        self.setLayout(plotLayout)
+
+    def setTitle(self, title):
+        self.titleWidget.setTitle(title)
+
+    def setScaleProperties(self, transformation, scaleDivision):
+        self.scaleBar.set_scale_properties(transformation, scaleDivision)
+
+    def spacingBorders(self):
+        return self.scaleBar.spacingBorders()
+
+
+class ColorScaleWidget(QtGui.QWidget):
+    def __init__(self, parent, transformation, scaleDivision, logger=None):
+        super(ColorScaleWidget, self).__init__()
+
+        self.titleWidget = ColorTitleWidget("Scale Widget Title", self)
+        self.scaleBar = ColorScaleBar(self, transformation, scaleDivision)
+
+        plotLayout = QtGui.QGridLayout()
+        plotLayout.setSpacing(0)
+        plotLayout.setContentsMargins(0, 0, 0, 0)
+        plotLayout.addWidget(self.scaleBar, 0, 0)
+        plotLayout.addWidget(self.titleWidget, 0, 1)
 
         self.setLayout(plotLayout)
 
