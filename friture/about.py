@@ -26,7 +26,7 @@ from friture.statisticswidget import StatisticsWidget
 aboutText = """
 <p> <b>Friture %s</b> (dated %s)
 <p> Friture is an application for real-time audio analysis.
-<p> Written in Python, using PyQt, PyQwt, PyAudio, Numpy, SciPy, Cython, OpenGL, etc.
+<p> Written in Python, using PyQt, PyAudio, Numpy, SciPy, Cython, OpenGL.
 <p> License is GPLv3.
 <p> Homepage: <a href="http://friture.org">http://friture.org</a>
 <p> Send comments, ideas and bug reports to: <a href="mailto:contact@friture.org">contact@friture.org</a>
