@@ -17,10 +17,9 @@
 # You should have received a copy of the GNU General Public License
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
-from friture.classplot import ClassPlot
 import PyQt4.Qwt5 as Qwt
 from PyQt4 import QtCore, Qt, QtGui
-from numpy import log10, interp, linspace
+from numpy import log10, interp, linspace, sin
 
 class picker(Qwt.QwtPlotPicker):
 	def __init__(self, *args):
@@ -44,9 +43,9 @@ class picker(Qwt.QwtPlotPicker):
 		  	   	   label.draw(painter, textRect)
 		  	   	   painter.restore()
 
-class TimePlot(ClassPlot):
+class TimePlot(Qwt.QwtPlot):
 	def __init__(self, parent, logger):
-		ClassPlot.__init__(self)
+		Qwt.QwtPlot.__init__(self)
 
 		# store the logger instance
 		self.logger = logger
@@ -54,6 +53,26 @@ class TimePlot(ClassPlot):
 		# we do not need caching
 		self.canvas().setPaintAttribute(Qwt.QwtPlotCanvas.PaintCached, False)
 		self.canvas().setPaintAttribute(Qwt.QwtPlotCanvas.PaintPacked, False)
+
+		# set plot layout
+		self.plotLayout().setMargin(0)
+		self.plotLayout().setCanvasMargin(0)
+		self.plotLayout().setAlignCanvasToScales(True)
+
+		self.setAxisScale(Qwt.QwtPlot.yLeft, -1., 1.)
+
+		# insert a few curves
+		self.curve = Qwt.QwtPlotCurve()
+		self.curve.setPen(QtGui.QPen(Qt.Qt.red))
+		#self.curve.setRenderHint(Qwt.QwtPlotItem.RenderAntialiased)
+		self.curve.attach(self)
+
+		# temporarly initialize some data
+		x = linspace(0.0, 10.0, 11)
+		self.curve.setData(x, sin(x))
+
+		# set the size policy to "Preferred" to allow the widget to be shrinked under the default size, which is quite big
+		self.setSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Preferred)
 
 		# attach a grid
 		grid = Qwt.QwtPlotGrid()
@@ -134,7 +153,7 @@ class TimePlot(ClassPlot):
 			needfullreplot = True
 
 		y_interp = interp(self.xscaled, x_ms, y)
-		ClassPlot.setdata(self, self.xscaled, y_interp)
+		self.curve.setData(self.xscaled, y_interp)
 
 		if needfullreplot:
 			self.replot()
@@ -176,7 +195,7 @@ class TimePlot(ClassPlot):
   		#y_interp2 = interp(self.xscaled, x_ms, y2)
 		#ClassPlot.setdata(self, self.xscaled, y_interp)
 		#self.curve2.setData(self.xscaled, y_interp2)
-		ClassPlot.setdata(self, x_ms, y)
+		self.curve.setData(x_ms, y)
 		self.curve2.setData(x_ms, y2)
 
 		if needfullreplot:
