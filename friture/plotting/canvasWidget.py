@@ -65,6 +65,9 @@ class CanvasWidget(QtGui.QWidget):
     def attach(self, item):
         self.attachedItems.append(item)
 
+    def detach(self, item):
+        self.attachedItems.remove(item)
+
     def drawData(self, painter):
         for item in self.attachedItems:
             item.draw(painter, self.horizontalScaleTransform, self.verticalScaleTransform, self.rect())

@@ -26,15 +26,6 @@ from friture.logger import PrintLogger
 SMOOTH_DISPLAY_TIMER_PERIOD_MS = 25
 DEFAULT_TIMERANGE = 2*SMOOTH_DISPLAY_TIMER_PERIOD_MS
 
-STYLESHEET = """
-QwtPlotCanvas {
-    border: 1px solid gray;
-    border-radius: 2px;
-    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-    stop: 0 #E0E0E0, stop: 0.5 #FFFFFF);
-}
-"""
-
 class Scope_Widget(QtGui.QWidget):
     def __init__(self, parent = None, logger = PrintLogger()):
         QtGui.QWidget.__init__(self, parent)
@@ -48,8 +39,6 @@ class Scope_Widget(QtGui.QWidget):
         self.PlotZoneUp = TimePlot(self, self.logger)
         self.PlotZoneUp.setObjectName("PlotZoneUp")
         self.gridLayout.addWidget(self.PlotZoneUp, 0, 0, 1, 1)
-        
-        self.setStyleSheet(STYLESHEET)
 
         self.settings_dialog = Scope_Settings_Dialog(self, self.logger)
 
