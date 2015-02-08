@@ -27,7 +27,7 @@ SMOOTH_DISPLAY_TIMER_PERIOD_MS = 25
 DEFAULT_TIMERANGE = 2*SMOOTH_DISPLAY_TIMER_PERIOD_MS
 
 class Scope_Widget(QtGui.QWidget):
-    def __init__(self, parent = None, logger = PrintLogger()):
+    def __init__(self, parent, sharedGLWidget, logger = PrintLogger()):
         QtGui.QWidget.__init__(self, parent)
 
         self.audiobuffer = None
@@ -36,7 +36,7 @@ class Scope_Widget(QtGui.QWidget):
         self.setObjectName("Scope_Widget")
         self.gridLayout = QtGui.QGridLayout(self)
         self.gridLayout.setObjectName("gridLayout")
-        self.PlotZoneUp = TimePlot(self, self.logger)
+        self.PlotZoneUp = TimePlot(self, sharedGLWidget, self.logger)
         self.PlotZoneUp.setObjectName("PlotZoneUp")
         self.gridLayout.addWidget(self.PlotZoneUp, 0, 0, 1, 1)
 

@@ -255,15 +255,11 @@ class SpectrumPlotWidget(QtGui.QWidget):
             else:
                 self.transformed_x1 = x1
                 self.transformed_x2 = x2
-            
-            xMajorTick = self.horizontalScaleDivision.majorTicks()
-            xMinorTick = self.horizontalScaleDivision.minorTicks()
-            yMajorTick = self.verticalScaleDivision.majorTicks()
-            yMinorTick = self.verticalScaleDivision.minorTicks()
-            self.canvasWidget.setGrid(self.horizontalScaleTransform.toScreen(array(xMajorTick)),
-                                  self.horizontalScaleTransform.toScreen(array(xMinorTick)),
-                                  self.verticalScaleTransform.toScreen(array(yMajorTick)),
-                                  self.verticalScaleTransform.toScreen(array(yMinorTick))
+
+            self.canvasWidget.setGrid(array(self.horizontalScaleDivision.majorTicks()),
+                                  array(self.horizontalScaleDivision.minorTicks()),
+                                  array(self.verticalScaleDivision.majorTicks()),
+                                  array(self.verticalScaleDivision.minorTicks())
                                   )
 
             self.needtransform = False

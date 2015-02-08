@@ -26,7 +26,7 @@ class GlCanvasWidget(QtOpenGL.QGLWidget):
         self.mousex = 0
         self.mousey = 0
 
-        self.showFreqLabel = True
+        self.showFreqLabel = False
         self.xmax = 0
         self.fmax = 0.
 
@@ -81,10 +81,10 @@ class GlCanvasWidget(QtOpenGL.QGLWidget):
         self.update()
 
     def setGrid(self, xMajorTick, xMinorTick, yMajorTick, yMinorTick):
-        self.xMajorTick = xMajorTick
-        self.xMinorTick = xMinorTick
-        self.yMajorTick = yMajorTick
-        self.yMinorTick = yMinorTick
+        self.xMajorTick = self.horizontalScaleTransform.toScreen(xMajorTick)
+        self.xMinorTick = self.horizontalScaleTransform.toScreen(xMinorTick)
+        self.yMajorTick = self.verticalScaleTransform.toScreen(yMajorTick)
+        self.yMinorTick = self.verticalScaleTransform.toScreen(yMinorTick)
 
         self.updateGrid()
 

@@ -17,23 +17,34 @@
 # You should have received a copy of the GNU General Public License
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
+import sys
+
+try:
+    from OpenGL import GL
+except ImportError:
+    app = QtGui.QApplication(sys.argv)
+    QtGui.QMessageBox.critical(None, "OpenGL hellogl",
+            "PyOpenGL must be installed to run this example.")
+    sys.exit(1)
+
 from PyQt4 import QtCore, Qt, QtGui
-from numpy import log10, interp, linspace, sin, array
+from numpy import log10, interp, linspace, sin, array, ones, zeros
 from friture.plotting.scaleWidget import VerticalScaleWidget, HorizontalScaleWidget
 from friture.plotting.scaleDivision import ScaleDivision
 from friture.plotting.coordinateTransform import CoordinateTransform
-from friture.plotting.canvasWidget import CanvasWidget
+from friture.plotting.glCanvasWidget import GlCanvasWidget
 from friture.plotting.legendWidget import LegendWidget
 
 class CurveItem:
 	def __init__(self, *args):
 		self.x = array([0.])
 		self.y = array([0.])
-		self.canvas_width = 2
-		self.need_transform = False
+		self.xMap = None
 		self.yMap = None
 		self.__color = Qt.QColor()
 		self.__title = ""
+		self.vertices = array([])
+		self.colors = array([])
 
 	def setColor(self, color):
 		if self.__color != color:
@@ -46,35 +57,68 @@ class CurveItem:
 		self.x = x
 		self.y = y
 
+		if self.xMap == None or self.yMap == None:
+			return
+
+		n = x.shape[0] - 1
+
+		Ones = ones(n)
+		r = self.color().red()/255.*Ones
+		g = self.color().green()/255.*Ones
+		b = self.color().blue()/255.*Ones
+
+		x = self.xMap.toScreen(x)
+		y = self.yMap.toScreen(y)
+
+		self.vertices = zeros((n,2,2))
+		self.vertices[:,0,0] = x[:-1]
+		self.vertices[:,0,1] = y[:-1]
+		self.vertices[:,1,0] = x[1:]
+		self.vertices[:,1,1] = y[1:]
+
+		self.colors = zeros((n,2,3))
+		self.colors[:,0,0] = r
+		self.colors[:,1,0] = r
+		self.colors[:,0,1] = g
+		self.colors[:,1,1] = g
+		self.colors[:,0,2] = b
+		self.colors[:,1,2] = b
+
 	def setTitle(self, title):
 		self.__title = title
 
 	def title(self):
 		return self.__title
 
-	def draw(self, painter, xMap, yMap, rect):
-		# update the cache according to possibly new canvas dimensions
-		h = rect.height()
-		w = rect.width()
-		if w <> self.canvas_width:
-			self.canvas_width = w
-			self.need_transform = True
+	def glDraw(self, xMap, yMap, rect):
+		self.xMap = xMap
+		self.yMap = yMap
 
-		if self.need_transform:
-			#self.x1 = xMap.toScreen(array(self.fl))
-			self.need_transform = False
+		if self.vertices.size == 0 or self.colors.size == 0:
+			return
 
-		x = xMap.toScreen(self.x)
-		y = yMap.toScreen(self.y)
+		# TODO: instead of Arrays, VBOs should be used here, as a large part of
+		# the data does not have to be modified on every call (x coordinates,
+		# green colored quads)
 
-		# this should be maybe done by numpy instead
-		points = QtGui.QPolygonF(map(lambda p: QtCore.QPointF(p[0], p[1]), zip(x, y)))
+		# TODO: If the arrays could be drawn as SHORTs istead of FLOATs, it
+		# could also be dramatically faster
 
-		painter.setPen(self.color())
-		painter.drawPolyline(points)
+		GL.glVertexPointerd(self.vertices)
+		GL.glColorPointerd(self.colors)
+		GL.glEnableClientState(GL.GL_VERTEX_ARRAY)
+		GL.glEnableClientState(GL.GL_COLOR_ARRAY)
+
+		#GL.glDisable(GL.GL_LIGHTING)
+		GL.glDrawArrays(GL.GL_LINES, 0, 2*self.vertices.shape[0])
+		#GL.glEnable(GL.GL_LIGHTING)
+
+		GL.glDisableClientState(GL.GL_COLOR_ARRAY)
+		GL.glDisableClientState(GL.GL_VERTEX_ARRAY)
+
 
 class TimePlot(QtGui.QWidget):
-	def __init__(self, parent, logger):
+	def __init__(self, parent, sharedGLWidget, logger):
 		super(TimePlot, self).__init__()
 
 		# store the logger instance
@@ -92,7 +136,7 @@ class TimePlot(QtGui.QWidget):
 		self.horizontalScale = HorizontalScaleWidget(self, self.horizontalScaleDivision, self.horizontalScaleTransform)
 		self.horizontalScale.setTitle("Time (ms)")
 
-		self.canvasWidget = CanvasWidget(self, self.verticalScaleTransform, self.horizontalScaleTransform)
+		self.canvasWidget = GlCanvasWidget(self, sharedGLWidget, self.verticalScaleTransform, self.horizontalScaleTransform)
 		self.canvasWidget.setTrackerFormatter(lambda x, y: "%.3g ms, %.3g" %(x, y))
 
 		self.legendWidget = LegendWidget(self, self.canvasWidget)
@@ -110,13 +154,13 @@ class TimePlot(QtGui.QWidget):
 		self.needfullreplot = False
 
 		self.curve = CurveItem()
-		self.curve.setColor(Qt.Qt.red)
+		self.curve.setColor(QtGui.QColor(Qt.Qt.red))
 		# gives a title to the curve for the legend
 		self.curve.setTitle("Ch1")
 		self.canvasWidget.attach(self.curve)
 
 		self.curve2 = CurveItem()
-		self.curve2.setColor(Qt.Qt.blue)
+		self.curve2.setColor(QtGui.QColor(Qt.Qt.blue))
 		# gives a title to the curve for the legend
 		self.curve2.setTitle("Ch2")
 		# self.curve2 will be attached when needed

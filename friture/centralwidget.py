@@ -66,7 +66,7 @@ class CentralWidget(QtGui.QWidget):
 		if item is 0:
 			self.audiowidget = Levels_Widget(self, self.logger)
 		elif item is 1:
-			self.audiowidget = Scope_Widget(self, self.logger)
+			self.audiowidget = Scope_Widget(self, self.sharedGLWidget, self.logger)
 		elif item is 2:
 			self.audiowidget = Spectrum_Widget(self, self.sharedGLWidget, self.logger)
 		elif item is 3:
