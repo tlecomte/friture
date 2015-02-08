@@ -33,7 +33,7 @@ from friture.spectrum_settings import (Spectrum_Settings_Dialog, # settings dial
 
 from friture.logger import PrintLogger
 from friture.audiobackend import SAMPLING_RATE
-from friture.openglplot import GLPlotWidget
+from friture.spectrumPlotWidget import SpectrumPlotWidget
 from friture.exp_smoothing_conv import pyx_exp_smoothed_value_numpy
 
 class Spectrum_Widget(QtGui.QWidget):
@@ -46,7 +46,7 @@ class Spectrum_Widget(QtGui.QWidget):
 		self.setObjectName("Spectrum_Widget")
 		self.gridLayout = QtGui.QGridLayout(self)
 		self.gridLayout.setObjectName("gridLayout")
-		self.PlotZoneSpect = GLPlotWidget(self, sharedGLWidget, self.logger)
+		self.PlotZoneSpect = SpectrumPlotWidget(self, sharedGLWidget, self.logger)
 		self.PlotZoneSpect.setObjectName("PlotZoneSpect")
 		self.gridLayout.addWidget(self.PlotZoneSpect, 0, 0, 1, 1)
 

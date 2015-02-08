@@ -26,9 +26,9 @@ PEAK_DECAY_RATE = 1.0 - 3E-6
 # Number of cycles the peak stays on hold before fall-off.
 PEAK_FALLOFF_COUNT = 32 # default : 16
 
-class GLPlotWidget(QtGui.QWidget):
+class SpectrumPlotWidget(QtGui.QWidget):
     def __init__(self, parent, sharedGLWidget, logger=None):
-        super(GLPlotWidget, self).__init__()
+        super(SpectrumPlotWidget, self).__init__()
 
         self.peaks_enabled = True
         self.peak = zeros((3,))
