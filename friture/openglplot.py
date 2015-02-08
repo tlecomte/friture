@@ -62,13 +62,16 @@ class GLPlotWidget(QtGui.QWidget):
         self.horizontalScale = HorizontalScaleWidget(self, self.horizontalScaleDivision, self.horizontalScaleTransform)
         self.horizontalScale.setTitle("Frequency (Hz)")
 
-        self.glWidget = GLWidget(self, sharedGLWidget, self.verticalScaleTransform, self.horizontalScaleTransform)
+        self.canvasWidget = GlCanvasWidget(self, sharedGLWidget, self.verticalScaleTransform, self.horizontalScaleTransform)
+
+        self.quadsItem = QuadsItem()
+        self.canvasWidget.attach(self.quadsItem)
 
         plotLayout = QtGui.QGridLayout()
         plotLayout.setSpacing(0)
         plotLayout.setContentsMargins(0, 0, 0, 0)
         plotLayout.addWidget(self.verticalScale, 0, 0)
-        plotLayout.addWidget(self.glWidget, 0, 1)
+        plotLayout.addWidget(self.canvasWidget, 0, 1)
         plotLayout.addWidget(self.horizontalScale, 1, 1)
         
         self.setLayout(plotLayout)
@@ -101,7 +104,6 @@ class GLPlotWidget(QtGui.QWidget):
         # notify that sizeHint has changed (this should be done with a signal emitted from the scale division to the scale bar)
         self.horizontalScale.scaleBar.updateGeometry()
 
-
         self.needtransform = True
         self.draw()
 
@@ -130,7 +132,7 @@ class GLPlotWidget(QtGui.QWidget):
         self.draw()
     
     def setShowFreqLabel(self, showFreqLabel):
-        self.glWidget.setShowFreqLabel(showFreqLabel)
+        self.canvasWidget.setShowFreqLabel(showFreqLabel)
 
     def set_peaks_enabled(self, enabled):
         self.peaks_enabled = enabled
@@ -225,15 +227,15 @@ class GLPlotWidget(QtGui.QWidget):
 
     def draw(self):
         if self.needtransform:
-            self.verticalScaleDivision.setLength(self.glWidget.height())
-            self.verticalScaleTransform.setLength(self.glWidget.height())
+            self.verticalScaleDivision.setLength(self.canvasWidget.height())
+            self.verticalScaleTransform.setLength(self.canvasWidget.height())
             startBorder, endBorder = self.verticalScale.spacingBorders()
             self.verticalScaleTransform.setBorders(startBorder, endBorder)
 
             self.verticalScale.update()
 
-            self.horizontalScaleDivision.setLength(self.glWidget.width())
-            self.horizontalScaleTransform.setLength(self.glWidget.width())
+            self.horizontalScaleDivision.setLength(self.canvasWidget.width())
+            self.horizontalScaleTransform.setLength(self.canvasWidget.width())
             startBorder, endBorder = self.horizontalScale.spacingBorders()
             self.horizontalScaleTransform.setBorders(startBorder, endBorder)
 
@@ -258,7 +260,7 @@ class GLPlotWidget(QtGui.QWidget):
             xMinorTick = self.horizontalScaleDivision.minorTicks()
             yMajorTick = self.verticalScaleDivision.majorTicks()
             yMinorTick = self.verticalScaleDivision.minorTicks()
-            self.glWidget.setGrid(self.horizontalScaleTransform.toScreen(array(xMajorTick)),
+            self.canvasWidget.setGrid(self.horizontalScaleTransform.toScreen(array(xMajorTick)),
                                   self.horizontalScaleTransform.toScreen(array(xMinorTick)),
                                   self.verticalScaleTransform.toScreen(array(yMajorTick)),
                                   self.verticalScaleTransform.toScreen(array(yMinorTick))
@@ -348,10 +350,10 @@ class GLPlotWidget(QtGui.QWidget):
             baseline = self.baseline
 
         xmax = self.horizontalScaleTransform.toScreen(self.fmax)
-        self.glWidget.setfmax(xmax, self.fmax)
+        self.canvasWidget.setfmax(xmax, self.fmax)
 
-        self.setQuadData(x1_with_peaks, y_with_peaks, x2_with_peaks - x1_with_peaks, baseline, r_with_peaks, g_with_peaks, b_with_peaks)
-
+        self.quadsItem.setData(x1_with_peaks, y_with_peaks, x2_with_peaks - x1_with_peaks, baseline, r_with_peaks, g_with_peaks, b_with_peaks)
+        self.canvasWidget.update()
 
     # redraw when the widget is resized to update coordinates transformations
     def resizeEvent(self, event):
@@ -378,49 +380,70 @@ class GLPlotWidget(QtGui.QWidget):
 
         self.peak_int[mask1] = 1.
         self.peak_int[mask2_b] *= 0.975
-  
-    def setQuadData(self, x, y, w, baseline, r, g, b):
-        h = y - baseline
-        y = baseline
-        
-        n = x.shape[0]
-    
-        vertex = zeros((n,4,2))
-        vertex[:,0,0] = x
-        vertex[:,0,1] = y + h
-        vertex[:,1,0] = x + w
-        vertex[:,1,1] = y + h
-        vertex[:,2,0] = x + w
-        vertex[:,2,1] = y
-        vertex[:,3,0] = x
-        vertex[:,3,1] = y
-
-        color = zeros((n,4,3))
-        color[:,0,0] = r
-        color[:,1,0] = r
-        color[:,2,0] = r
-        color[:,3,0] = r
-        color[:,0,1] = g
-        color[:,1,1] = g
-        color[:,2,1] = g
-        color[:,3,1] = g
-        color[:,0,2] = b
-        color[:,1,2] = b
-        color[:,2,2] = b
-        color[:,3,2] = b
-        
-        self.glWidget.setQuadData(vertex, color)
 
 
-class GLWidget(QtOpenGL.QGLWidget):
-    def __init__(self, parent, sharedGLWidget, verticalScaleTransform, horizontalScaleTransform):
-        super(GLWidget, self).__init__(parent, shareWidget=sharedGLWidget)
-
-        self.lastPos = QtCore.QPoint()
-        
+class QuadsItem:
+    def __init__(self, *args):
         self.vertices = array([])
         self.colors = array([])
-        
+
+    def setData(self, x, y, w, baseline, r, g, b):
+        h = y - baseline
+        y = baseline
+
+        n = x.shape[0]
+
+        self.vertices = zeros((n,4,2))
+        self.vertices[:,0,0] = x
+        self.vertices[:,0,1] = y + h
+        self.vertices[:,1,0] = x + w
+        self.vertices[:,1,1] = y + h
+        self.vertices[:,2,0] = x + w
+        self.vertices[:,2,1] = y
+        self.vertices[:,3,0] = x
+        self.vertices[:,3,1] = y
+
+        self.colors = zeros((n,4,3))
+        self.colors[:,0,0] = r
+        self.colors[:,1,0] = r
+        self.colors[:,2,0] = r
+        self.colors[:,3,0] = r
+        self.colors[:,0,1] = g
+        self.colors[:,1,1] = g
+        self.colors[:,2,1] = g
+        self.colors[:,3,1] = g
+        self.colors[:,0,2] = b
+        self.colors[:,1,2] = b
+        self.colors[:,2,2] = b
+        self.colors[:,3,2] = b
+
+    def glDraw(self, xMap, yMap, rect):
+        # TODO: instead of Arrays, VBOs should be used here, as a large part of
+        # the data does not have to be modified on every call (x coordinates,
+        # green colored quads)
+
+        # TODO: If the arrays could be drawn as SHORTs istead of FLOATs, it
+        # could also be dramatically faster
+
+        GL.glVertexPointerd(self.vertices)
+        GL.glColorPointerd(self.colors)
+        GL.glEnableClientState(GL.GL_VERTEX_ARRAY)
+        GL.glEnableClientState(GL.GL_COLOR_ARRAY)
+
+        #GL.glDisable(GL.GL_LIGHTING)
+        GL.glDrawArrays(GL.GL_QUADS, 0, 4*self.vertices.shape[0])
+        #GL.glEnable(GL.GL_LIGHTING)
+
+        GL.glDisableClientState(GL.GL_COLOR_ARRAY)
+        GL.glDisableClientState(GL.GL_VERTEX_ARRAY)
+
+
+class GlCanvasWidget(QtOpenGL.QGLWidget):
+    def __init__(self, parent, sharedGLWidget, verticalScaleTransform, horizontalScaleTransform):
+        super(GlCanvasWidget, self).__init__(parent, shareWidget=sharedGLWidget)
+
+        self.lastPos = QtCore.QPoint()
+
         self.xMajorTick = array([])
         self.xMinorTick = array([])
         self.yMajorTick = array([])
@@ -444,10 +467,22 @@ class GLWidget(QtOpenGL.QGLWidget):
         # set proper size policy for this widget
         self.setSizePolicy(QtGui.QSizePolicy(QtGui.QSizePolicy.MinimumExpanding, QtGui.QSizePolicy.MinimumExpanding))
 
+        self.attachedItems = []
+
         self.gridList = None
 
         self.horizontalScaleTransform = horizontalScaleTransform
         self.verticalScaleTransform = verticalScaleTransform
+
+    def attach(self, item):
+        self.attachedItems.append(item)
+
+    def detach(self, item):
+        self.attachedItems.remove(item)
+
+    def drawGlData(self):
+        for item in self.attachedItems:
+            item.glDraw(self.horizontalScaleTransform, self.verticalScaleTransform, self.rect())
 
     def sizeHint(self):
         return QtCore.QSize(50, 50)
@@ -465,12 +500,6 @@ class GLWidget(QtOpenGL.QGLWidget):
     def setShowFreqLabel(self, showFreqLabel):
         self.showFreqLabel = showFreqLabel
         # ask for update so the the label is actually erased or painted
-        self.update()
-
-    def setQuadData(self, vertices, colors):
-        self.vertices = vertices
-        self.colors = colors 
-
         self.update()
 
     def setGrid(self, xMajorTick, xMinorTick, yMajorTick, yMinorTick):
@@ -543,7 +572,7 @@ class GLWidget(QtOpenGL.QGLWidget):
         
         self.drawBackground()       
         self.drawGrid()        
-        self.drawDataQuads()        
+        self.drawGlData()
         self.drawRuler()                
         self.drawBorder()
 
@@ -559,26 +588,6 @@ class GLWidget(QtOpenGL.QGLWidget):
         self.drawFreqMaxText(painter)
 
         painter.end()
-
-    def drawDataQuads(self):
-        # TODO: instead of Arrays, VBOs should be used here, as a large part of
-        # the data does not have to be modified on every call (x coordinates,
-        # green colored quads)
-        
-        # TODO: If the arrays could be drawn as SHORTs istead of FLOATs, it
-        # could also be dramatically faster
-
-        GL.glVertexPointerd(self.vertices)
-        GL.glColorPointerd(self.colors)
-        GL.glEnableClientState(GL.GL_VERTEX_ARRAY)
-        GL.glEnableClientState(GL.GL_COLOR_ARRAY)
-        
-        #GL.glDisable(GL.GL_LIGHTING)
-        GL.glDrawArrays(GL.GL_QUADS, 0, 4*self.vertices.shape[0])
-        #GL.glEnable(GL.GL_LIGHTING)
-        
-        GL.glDisableClientState(GL.GL_COLOR_ARRAY)
-        GL.glDisableClientState(GL.GL_VERTEX_ARRAY)
 
     def drawFreqMaxText(self, painter):
         if not self.showFreqLabel:
