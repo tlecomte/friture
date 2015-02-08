@@ -62,6 +62,7 @@ class SpectrumPlotWidget(QtGui.QWidget):
         self.horizontalScale.setTitle("Frequency (Hz)")
 
         self.canvasWidget = GlCanvasWidget(self, sharedGLWidget, self.verticalScaleTransform, self.horizontalScaleTransform)
+        self.canvasWidget.setTrackerFormatter(lambda x, y: "%d Hz, %.1f dB" %(x, y))
 
         self.quadsItem = QuadsItem()
         self.canvasWidget.attach(self.quadsItem)

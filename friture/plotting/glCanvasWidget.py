@@ -47,6 +47,11 @@ class GlCanvasWidget(QtOpenGL.QGLWidget):
         self.horizontalScaleTransform = horizontalScaleTransform
         self.verticalScaleTransform = verticalScaleTransform
 
+        self.trackerFormatter = lambda x, y: "x=%d, y=%d" %(x, y)
+
+    def setTrackerFormatter(self, formatter):
+        self.trackerFormatter = formatter
+
     def attach(self, item):
         self.attachedItems.append(item)
 
@@ -219,7 +224,7 @@ class GlCanvasWidget(QtOpenGL.QGLWidget):
 
             x = self.horizontalScaleTransform.toPlot(self.mousex)
             y = self.verticalScaleTransform.toPlot(float(self.height() - self.mousey))
-            text = "%d Hz, %.1f dB" %(x, y)
+            text = self.trackerFormatter(x, y)
 
             # compute tracker bounding rect
             painter.setPen(Qt.Qt.black)
