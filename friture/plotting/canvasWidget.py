@@ -23,6 +23,9 @@ from friture.plotting.grid import Grid
 from friture.plotting.canvasBackground import CanvasBackground
 
 class CanvasWidget(QtGui.QWidget):
+
+    resized = QtCore.pyqtSignal(int, int)
+
     def __init__(self, parent, verticalScaleTransform, horizontalScaleTransform):
         super(CanvasWidget, self).__init__(parent)
 
@@ -61,6 +64,10 @@ class CanvasWidget(QtGui.QWidget):
 
         self.drawTrackerText(painter)
         painter.end()
+
+    def resizeEvent(self, event):
+        # give the opportunity to the scales to adapt
+        self.resized.emit(self.width(), self.height())
 
     def attach(self, item):
         self.attachedItems.append(item)

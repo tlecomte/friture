@@ -12,6 +12,9 @@ except ImportError:
     sys.exit(1)
 
 class GlCanvasWidget(QtOpenGL.QGLWidget):
+
+    resized = QtCore.pyqtSignal(int, int)
+
     def __init__(self, parent, sharedGLWidget, verticalScaleTransform, horizontalScaleTransform):
         super(GlCanvasWidget, self).__init__(parent, shareWidget=sharedGLWidget)
 
@@ -250,6 +253,10 @@ class GlCanvasWidget(QtOpenGL.QGLWidget):
 
             painter.setPen(Qt.Qt.black)
             painter.drawText(rect, Qt.Qt.AlignLeft, text)
+
+    def resizeEvent(self, event):
+        # give the opportunity to the scales to adapt
+        self.resized.emit(self.width(), self.height())
 
     def resizeGL(self, width, height):
         self.setupViewport(self.width(), self.height())

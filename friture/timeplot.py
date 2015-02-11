@@ -150,6 +150,7 @@ class TimePlot(QtGui.QWidget):
 		plotLayout.addWidget(self.legendWidget, 0, 2)
 
 		self.setLayout(plotLayout)
+		self.legendWidget.hide()
 
 		self.needfullreplot = False
 
@@ -175,6 +176,8 @@ class TimePlot(QtGui.QWidget):
 
 		self.dual_channel = False
 
+		self.canvasWidget.resized.connect(self.canvasResized)
+
 	def setdata(self, x, y):
 		if self.canvas_width <> self.canvasWidget.width():
 			self.logger.push("timeplot : changed canvas width")
@@ -186,8 +189,7 @@ class TimePlot(QtGui.QWidget):
 			self.canvasWidget.detach(self.curve2)
 			# disable the legend, useless when one channel is active
 			self.legendWidget.hide()
-			self.needfullreplot = True
-			self.update()
+			# the canvas reisze event will trigger a full replot
 
 		x_ms =  1e3*x
 		if self.xmax <> x_ms[-1]:
@@ -235,7 +237,8 @@ class TimePlot(QtGui.QWidget):
 		self.canvasWidget.update()
 
 	# redraw when the widget is resized to update coordinates transformations
-	def resizeEvent(self, event):
+	# this is done instead of resizeEvent because the canvas can be resized independently of the whole plot (because the legend can disappear)
+	def canvasResized(self, canvasWidth, canvasHeight):
 		self.needfullreplot = True
 		self.draw()
 
@@ -250,8 +253,7 @@ class TimePlot(QtGui.QWidget):
 			self.canvasWidget.attach(self.curve2)
 			# enable the legend to discrimate between the two channels
 			self.legendWidget.show()
-			self.needfullreplot = True
-			self.update()
+			# the canvas reisze event will trigger a full replot
 
 		x_ms =  1e3*x
 		if self.xmax <> x_ms[-1]:
