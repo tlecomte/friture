@@ -37,8 +37,7 @@ from friture.plotting.legendWidget import LegendWidget
 
 class CurveItem:
 	def __init__(self, *args):
-		self.x = array([0.])
-		self.y = array([0.])
+		self.n = 0
 		self.xMap = None
 		self.yMap = None
 		self.__color = Qt.QColor()
@@ -50,39 +49,52 @@ class CurveItem:
 		if self.__color != color:
 			self.__color = color
 
+			if self.n > 0:
+				Ones = ones(self.n)
+				r = self.color().red()/255.*Ones
+				g = self.color().green()/255.*Ones
+				b = self.color().blue()/255.*Ones
+
+				self.colors[:,0,0] = r
+				self.colors[:,1,0] = r
+				self.colors[:,0,1] = g
+				self.colors[:,1,1] = g
+				self.colors[:,0,2] = b
+				self.colors[:,1,2] = b
+
 	def color(self):
 		return self.__color
 
 	def setData(self, x, y):
-		self.x = x
-		self.y = y
-
 		if self.xMap == None or self.yMap == None:
 			return
 
 		n = x.shape[0] - 1
+		if n != self.n:
+			self.n = n
 
-		Ones = ones(n)
-		r = self.color().red()/255.*Ones
-		g = self.color().green()/255.*Ones
-		b = self.color().blue()/255.*Ones
+			Ones = ones(n)
+			r = self.color().red()/255.*Ones
+			g = self.color().green()/255.*Ones
+			b = self.color().blue()/255.*Ones
+
+			self.colors = zeros((n,2,3))
+			self.colors[:,0,0] = r
+			self.colors[:,1,0] = r
+			self.colors[:,0,1] = g
+			self.colors[:,1,1] = g
+			self.colors[:,0,2] = b
+			self.colors[:,1,2] = b
+
+			self.vertices = zeros((n,2,2))
 
 		x = self.xMap.toScreen(x)
 		y = self.yMap.toScreen(y)
 
-		self.vertices = zeros((n,2,2))
 		self.vertices[:,0,0] = x[:-1]
 		self.vertices[:,0,1] = y[:-1]
 		self.vertices[:,1,0] = x[1:]
 		self.vertices[:,1,1] = y[1:]
-
-		self.colors = zeros((n,2,3))
-		self.colors[:,0,0] = r
-		self.colors[:,1,0] = r
-		self.colors[:,0,1] = g
-		self.colors[:,1,1] = g
-		self.colors[:,0,2] = b
-		self.colors[:,1,2] = b
 
 	def setTitle(self, title):
 		self.__title = title
