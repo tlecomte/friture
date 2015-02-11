@@ -20,7 +20,6 @@
 from PyQt4 import QtCore, QtGui
 
 from friture.plotting.grid import Grid
-from friture.plotting.canvasBackground import CanvasBackground
 
 class CanvasWidget(QtGui.QWidget):
 
@@ -43,7 +42,6 @@ class CanvasWidget(QtGui.QWidget):
         self.attachedItems = []
 
         self.grid = Grid()
-        self.background = CanvasBackground()
 
         self.trackerFormatter = lambda x, y: "x=%d, y=%d" %(x, y)
 
@@ -59,7 +57,6 @@ class CanvasWidget(QtGui.QWidget):
         painter = QtGui.QPainter(self)
 
         self.drawBackground(painter)
-        self.drawGrid(painter)
         self.drawData(painter)
         self.drawRuler(painter)
         self.drawBorder(painter)
@@ -127,12 +124,6 @@ class CanvasWidget(QtGui.QWidget):
             painter.drawText(rect, QtCore.Qt.AlignLeft, text)
 
     def drawBackground(self, painter):
-        if self.anyOpaqueItem:
-            return
-
-        self.background.draw(painter, self.rect())
-
-    def drawGrid(self, painter):
         if self.anyOpaqueItem:
             return
 

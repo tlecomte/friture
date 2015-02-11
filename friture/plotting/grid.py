@@ -19,6 +19,7 @@
 
 from PyQt4 import QtCore, QtGui
 import numpy as np
+from friture.plotting.canvasBackground import CanvasBackground
 
 class Grid:
     def __init__(self, *args):
@@ -33,6 +34,8 @@ class Grid:
         self.xMinorTick = np.array([])
         self.yMajorTick = np.array([])
         self.yMinorTick = np.array([])
+
+        self.background = CanvasBackground()
 
     def setGrid(self, xMajorTick, xMinorTick, yMajorTick, yMinorTick):
         self.xMajorTick = xMajorTick
@@ -55,6 +58,8 @@ class Grid:
         self.cache_pixmap.fill(QtCore.Qt.transparent)
 
         painter = QtGui.QPainter(self.cache_pixmap)
+
+        self.background.draw(painter, rect)
 
         painter.setPen(QtGui.QPen(QtGui.QColor(QtCore.Qt.gray)))
         for x in xMajorTick:
