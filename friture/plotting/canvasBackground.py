@@ -35,7 +35,9 @@ class CanvasBackground:
         self.cache_pixmap = QtGui.QPixmap(w, h)
 
         painter = QtGui.QPainter(self.cache_pixmap)
+        self.directDraw(painter, rect)
 
+    def directDraw(self, painter, rect):
         # verical gradient from top to bottom
         gradient = QtGui.QLinearGradient(rect.topLeft(), rect.bottomLeft())
         gradient.setColorAt(0, QtGui.QColor("#E0E0E0"))

@@ -59,7 +59,7 @@ class Grid:
 
         painter = QtGui.QPainter(self.cache_pixmap)
 
-        self.background.draw(painter, rect)
+        self.background.directDraw(painter, rect)
 
         painter.setPen(QtGui.QPen(QtGui.QColor(QtCore.Qt.gray)))
         for x in xMajorTick:
