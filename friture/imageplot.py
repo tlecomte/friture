@@ -150,6 +150,9 @@ class PlotImage:
 	def erase(self):
 		self.canvasscaledspectrogram.erase()
 
+	def isOpaque(self):
+		return True
+
 	def set_jitter(self, jitter_s):
 		self.jitter_s = jitter_s
 		#print jitter_s

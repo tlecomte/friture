@@ -47,6 +47,8 @@ class CanvasWidget(QtGui.QWidget):
 
         self.trackerFormatter = lambda x, y: "x=%d, y=%d" %(x, y)
 
+        self.anyOpaqueItem = False
+
     def setTrackerFormatter(self, formatter):
         self.trackerFormatter = formatter
 
@@ -71,9 +73,21 @@ class CanvasWidget(QtGui.QWidget):
 
     def attach(self, item):
         self.attachedItems.append(item)
+        self.reviewOpaqueItems()
 
     def detach(self, item):
         self.attachedItems.remove(item)
+        self.reviewOpaqueItems()
+
+    def reviewOpaqueItems(self):
+        self.anyOpaqueItem = False
+        for item in self.attachedItems:
+            try:
+                if item.isOpaque():
+                    self.anyOpaqueItem = True
+            except:
+                # do nothing
+                continue
 
     def drawData(self, painter):
         for item in self.attachedItems:
@@ -113,9 +127,15 @@ class CanvasWidget(QtGui.QWidget):
             painter.drawText(rect, QtCore.Qt.AlignLeft, text)
 
     def drawBackground(self, painter):
+        if self.anyOpaqueItem:
+            return
+
         self.background.draw(painter, self.rect())
 
     def drawGrid(self, painter):
+        if self.anyOpaqueItem:
+            return
+
         self.grid.draw(painter, self.horizontalScaleTransform, self.verticalScaleTransform, self.rect())
 
     def drawBorder(self, painter):

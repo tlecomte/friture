@@ -52,14 +52,28 @@ class GlCanvasWidget(QtOpenGL.QGLWidget):
 
         self.trackerFormatter = lambda x, y: "x=%d, y=%d" %(x, y)
 
+        self.anyOpaqueItem = False
+
     def setTrackerFormatter(self, formatter):
         self.trackerFormatter = formatter
 
     def attach(self, item):
         self.attachedItems.append(item)
+        self.reviewOpaqueItems()
 
     def detach(self, item):
         self.attachedItems.remove(item)
+        self.reviewOpaqueItems()
+
+    def reviewOpaqueItems(self):
+        self.anyOpaqueItem = False
+        for item in self.attachedItems:
+            try:
+                if item.isOpaque():
+                    self.anyOpaqueItem = True
+            except:
+                # do nothing
+                continue
 
     def drawGlData(self):
         for item in self.attachedItems:
@@ -271,6 +285,9 @@ class GlCanvasWidget(QtOpenGL.QGLWidget):
         GL.glTranslatef(0.375, 0.375, 0)
 
     def drawBackground(self):
+        if self.anyOpaqueItem:
+            return
+
         w = self.width()
         h = self.height()
         GL.glBegin(GL.GL_QUADS)
@@ -283,6 +300,9 @@ class GlCanvasWidget(QtOpenGL.QGLWidget):
         GL.glEnd()
 
     def drawGrid(self):
+        if self.anyOpaqueItem:
+            return
+
         if self.gridList == None:
             # display list used for the grid
             self.gridList = GL.glGenLists(1)
