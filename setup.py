@@ -26,6 +26,11 @@ except ImportError:
 # to create a bundled windows executable
 #       python setup.py py2exe
 
+#NOTE: by default scipy.interpolate.__init__.py and scipy.signal.__init__.py
+#import all of their submodules
+#To decrease the py2exe distributions dramatically, these import lines can
+#be commented out !
+
 data_files = []
 excludes = []
 dll_excludes = []
@@ -59,20 +64,26 @@ if py2exe_build:
 					 "API-MS-Win-Core-Interlocked-L1-1-0.dll",
 					 "API-MS-Win-Core-SysInfo-L1-1-0.dll",
 					 "API-MS-Win-Security-Base-L1-1-0.dll",
-					 "API-MS-Win-Core-LocalRegistry-L1-1-0.dll"]
+					 "API-MS-Win-Core-LocalRegistry-L1-1-0.dll",
+					 "SETUPAPI.dll",
+					 "PSAPI.dll",
+					 "libifcoremd.dll",
+					 "libiomp5md.dll",
+					 "libmmd.dll"]
 	#manually include python libraries that py2exe fails to detect
 	# for pyOpenGL : http://www.jstump.com/blog/archive/2009/06/30/py2exe-and-pyopengl-3x-with-no-manual-tinkering/
 	# + OpenGL_accelerate.formathandler that is imported by the Python/C
 	# API so that py2exe does not detect it
-	includes += ["sip", "PyQt4.QtSvg", "PyQt4.QtXml",
+	includes += ["sip",
+              "PyQt4.QtSvg",
+              "PyQt4.QtXml",
               "OpenGL.platform.win32",
               "OpenGL.arrays.ctypesarrays",
               "OpenGL.arrays.numpymodule",
               "OpenGL.arrays.lists",
               "OpenGL.arrays.numbers",
               "OpenGL.arrays.strings",
-              "OpenGL_accelerate.formathandler"
-              ]
+              "OpenGL_accelerate.formathandler"]
 
 	if os.name == 'nt':
 		if os.environ.has_key('CPATH'):
@@ -111,7 +122,7 @@ setup(name = "friture",
 	"Topic :: Multimedia :: Sound/Audio :: Analysis",
 	"Topic :: Multimedia :: Sound/Audio :: Speech"
 	],
-	packages = ['friture'],
+	packages = ['friture', 'friture.plotting'],
 	scripts = ['scripts/friture'],
 	windows = [{"script":'friture.py', "icon_resources":[(1, "resources/images/friture.ico")]}],
 	options = {"py2exe":{"includes":includes, "excludes":excludes, "dll_excludes":dll_excludes}},

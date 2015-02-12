@@ -29,7 +29,13 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 import numpy as np
-from scipy import interpolate
+
+# import directly from fitpack to avoid extra module imports that make the py2exe package grow
+from scipy.interpolate.fitpack import splrep, splev
+
+#NOTE: by default scipy.interpolate.__init__.py imports all of its submodules
+#To decrease the py2exe distributions dramatically, these import lines can
+#be commented out !
 
 #   Returns a colour map CMAP (varying black -
 #   purple - red - yellow - white) that is monochrome-
@@ -68,8 +74,8 @@ def compute_colors(N):
     cmap = np.zeros((N, 3))
 
     for i in range(3):
-        tck = interpolate.splrep(xref, CMRref[:,i], s=0) # cubic spline (default) without smoothing
-        cmap[:,i] = interpolate.splev(x, tck)
+        tck = splrep(xref, CMRref[:,i], s=0) # cubic spline (default) without smoothing
+        cmap[:,i] = splev(x, tck)
 
     # Limit to range [0,1]
     cmap -= np.min(cmap)

@@ -20,3 +20,5 @@
 # version and date
 __version__ = "0.13"
 __releasedate__ = "2015-02-11"
+
+__all__ = ["plotting"]

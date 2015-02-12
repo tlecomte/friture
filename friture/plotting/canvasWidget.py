@@ -19,7 +19,7 @@
 
 from PyQt4 import QtCore, QtGui
 
-from friture.plotting.grid import Grid
+from grid import Grid
 
 class CanvasWidget(QtGui.QWidget):
 

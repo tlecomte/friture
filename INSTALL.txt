@@ -14,6 +14,7 @@ Cython extension
 ----------------
 Friture uses Cython extensions where computing is a bottleneck. These extensions can be built automatically with:
 	python setup.py build_ext --inplace
+	(on Windows, if you use mingw: python setup.py build_ext --inplace --compiler=mingw32)
 Alternatively, to build the 'exp_smoothing_conv' extension manually on Linux, you can do:
 	cython exp_smoothing_conv.pyx
 	gcc -shared -pthread -fPIC -fwrapv -O2 -Wall -fno-strict-aliasing -I/usr/include/python2.6 -o exp_smoothing_conv.so exp_smoothing_conv.c
