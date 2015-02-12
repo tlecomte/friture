@@ -58,16 +58,23 @@ class CanvasScaledSpectrogram(QtCore.QObject):
 		self.offset = 0
 		self.time_offset = 0
 
+	# resize the pixmap and update the offsets accordingly
+	def resize(self, width, height):
+		oldWidth = self.pixmap.width()/2
+		self.offset = (self.offset % oldWidth) * width/oldWidth
+		self.time_offset = (self.time_offset % oldWidth) * width/oldWidth
+		self.pixmap = self.pixmap.scaled(2*width, height)
+
 	def setcanvas_height(self, canvas_height):
 		if self.canvas_height <> canvas_height:
 			self.canvas_height = canvas_height
-			self.erase()
+			self.resize(self.canvas_width, self.canvas_height)
 			self.logger.push("Spectrogram image: canvas_height changed, now: %d" %(canvas_height))
 
 	def setcanvas_width(self, canvas_width):
 		if self.canvas_width <> canvas_width:
 			self.canvas_width = canvas_width
-			self.erase()
+			self.resize(self.canvas_width, self.canvas_height)
 			self.emit(QtCore.SIGNAL("canvasWidthChanged"), canvas_width)
 			self.logger.push("Spectrogram image: canvas_width changed, now: %d" %(canvas_width))
 
