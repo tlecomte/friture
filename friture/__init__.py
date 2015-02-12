@@ -18,7 +18,7 @@
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
 # version and date
-__version__ = "0.13"
-__releasedate__ = "2015-02-11"
+__version__ = "0.14"
+__releasedate__ = "2015-02-12"
 
 __all__ = ["plotting"]
