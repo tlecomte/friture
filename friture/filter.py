@@ -145,7 +145,7 @@ def octave_filter_bank_decimation(blow, alow, forward, feedback, x, zis=None):
 		return y, dec, zfs
 
 def decimate(bdec, adec, x, zi=None):
-	if zi == None:
+	if zi is None:
 		# utiliser un décimateur polyphase ici !!!
 		x_dec = lfilter(bdec, adec, x)
 		zf = None
