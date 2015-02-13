@@ -158,14 +158,14 @@ class Settings_Dialog(QtGui.QDialog, Ui_Settings_Dialog):
 
 	# method
 	def restoreState(self, settings):
-		device_name = settings.value("deviceName", "").toString()
+		device_name = settings.value("deviceName", "")
 		id = self.comboBox_inputDevice.findText(device_name)
 		# change the device only if it exists in the device list
 		if id >= 0:
 			self.comboBox_inputDevice.setCurrentIndex(id)
-			(channel, ok) = settings.value("firstChannel", 0).toInt()
+			channel = settings.value("firstChannel", 0)
 			self.comboBox_firstChannel.setCurrentIndex(channel)
-			(channel, ok) = settings.value("secondChannel", 0).toInt()
+			channel = settings.value("secondChannel", 0)
 			self.comboBox_secondChannel.setCurrentIndex(channel)
-			(duo_input_id, ok) = settings.value("duoInput", 0).toInt()
+			duo_input_id = settings.value("duoInput", 0)
 			self.inputTypeButtonGroup.button(duo_input_id).setChecked(True)

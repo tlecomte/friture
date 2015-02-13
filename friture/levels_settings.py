@@ -51,6 +51,6 @@ class Levels_Settings_Dialog(QtGui.QDialog):
 
 	# method
 	def restoreState(self, settings):
-		#(timeRange, ok) = settings.value("timeRange", DEFAULT_TIMERANGE).toDouble()
+		#timeRange = float(settings.value("timeRange", DEFAULT_TIMERANGE))
 		#self.doubleSpinBox_timerange.setValue(timeRange)
 		return

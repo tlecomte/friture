@@ -394,18 +394,18 @@ class Generator_Widget(QtGui.QWidget):
         self.settings_dialog.saveState(settings)
 
     def restoreState(self, settings):
-        (generator_kind, ok) = settings.value("generator kind", DEFAULT_GENERATOR_KIND_INDEX).toInt()
+        generator_kind = settings.value("generator kind", DEFAULT_GENERATOR_KIND_INDEX)
         self.comboBox_generator_kind.setCurrentIndex(generator_kind)
         self.stackedLayout.setCurrentIndex(generator_kind)
-        (sine_freq, ok) = settings.value("sine frequency", DEFAULT_SINE_FREQUENCY).toDouble()
+        sine_freq = float(settings.value("sine frequency", DEFAULT_SINE_FREQUENCY))
         self.spinBox_sine_frequency.setValue(sine_freq)
-        (sweep_start_frequency, ok) = settings.value("sweep start frequency", DEFAULT_SWEEP_STARTFREQUENCY).toDouble()
+        sweep_start_frequency = float(settings.value("sweep start frequency", DEFAULT_SWEEP_STARTFREQUENCY))
         self.spinBox_sweep_startfrequency.setValue(sweep_start_frequency)
-        (sweep_stop_frequency, ok) = settings.value("sweep stop frequency", DEFAULT_SWEEP_STOPFREQUENCY).toDouble()
+        sweep_stop_frequency = float(settings.value("sweep stop frequency", DEFAULT_SWEEP_STOPFREQUENCY))
         self.spinBox_sweep_stopfrequency.setValue(sweep_stop_frequency)
-        (sweep_period, ok) = settings.value("sweep period", DEFAULT_BURST_PERIOD_S).toDouble()
+        sweep_period = float(settings.value("sweep period", DEFAULT_BURST_PERIOD_S))
         self.spinBox_sweep_period.setValue(sweep_period)
-        (burst_period, ok) = settings.value("burst period", DEFAULT_SWEEP_PERIOD_S).toDouble()
+        burst_period = float(settings.value("burst period", DEFAULT_SWEEP_PERIOD_S))
         self.spinBox_burst_period.setValue(burst_period)
         
         self.settings_dialog.restoreState(settings)
@@ -433,7 +433,7 @@ class Generator_Settings_Dialog(QtGui.QDialog):
         settings.setValue("deviceName", self.comboBox_outputDevice.currentText())
 
     def restoreState(self, settings):
-        device_name = settings.value("deviceName", "").toString()
+        device_name = settings.value("deviceName", "")
         id = self.comboBox_outputDevice.findText(device_name)
         # change the device only if it exists in the device list
         if id >= 0:

@@ -122,13 +122,13 @@ class OctaveSpectrum_Settings_Dialog(QtGui.QDialog):
 
 	# method
 	def restoreState(self, settings):
-		(bandsPerOctave, ok) = settings.value("bandsPerOctave", DEFAULT_BANDSPEROCTAVE_INDEX).toInt()
+		bandsPerOctave = settings.value("bandsPerOctave", DEFAULT_BANDSPEROCTAVE_INDEX)
 		self.comboBox_bandsperoctave.setCurrentIndex(bandsPerOctave)
-		(colorMin, ok) = settings.value("Min", DEFAULT_SPEC_MIN).toInt()
+		colorMin = settings.value("Min", DEFAULT_SPEC_MIN)
 		self.spinBox_specmin.setValue(colorMin)
-		(colorMax, ok) = settings.value("Max", DEFAULT_SPEC_MAX).toInt()
+		colorMax = settings.value("Max", DEFAULT_SPEC_MAX)
 		self.spinBox_specmax.setValue(colorMax)
-		(weighting, ok) = settings.value("weighting", DEFAULT_WEIGHTING).toInt()
+		weighting = settings.value("weighting", DEFAULT_WEIGHTING)
 		self.comboBox_weighting.setCurrentIndex(weighting)
-		(response_time_index, ok) = settings.value("response_time", DEFAULT_RESPONSE_TIME_INDEX).toInt()
+		response_time_index = settings.value("response_time", DEFAULT_RESPONSE_TIME_INDEX)
 		self.comboBox_response_time.setCurrentIndex(response_time_index)
