@@ -28,7 +28,7 @@ yf, zf = lfilter(b, a, y, zi=zeros(max(len(a),len(b))-1))
 yf2, zf = lfilter(b, a, 0.*y, zi=zf)
 yf3, zf = lfilter(b, a, 0.*y, zi=zf)
 
-print x[-1]+x, yf2
+print(x[-1]+x, yf2)
 
 clf()
 subplot(211); plot(x,y); plot(x, yf); plot(x[-1]+x, yf2); plot(2*x[-1]+x, yf3)

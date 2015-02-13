@@ -41,7 +41,7 @@ for i in range(Ntest):
 
 t0b = time.time()
 
-print np.sum(c)
+print(np.sum(c))
 
 t1 = time.time()
 
@@ -51,7 +51,7 @@ for i in range(Ntest):
 
 t1b = time.time()
 
-print np.sum(a1)
+print(np.sum(a1))
 
 t2 = time.time()
 
@@ -61,7 +61,7 @@ for i in range(Ntest):
 
 t2b = time.time()
 
-print np.sum(a2)
+print(np.sum(a2))
 
 t3 = time.time()
 
@@ -84,7 +84,7 @@ for i in range(Ntest):
 
 t4b = time.time()
 
-print np.sum(c)
+print(np.sum(c))
 
 t5 = time.time()
 
@@ -94,7 +94,7 @@ for i in range(Ntest):
 
 t5b = time.time()
 
-print np.sum(a1)
+print(np.sum(a1))
 
 t_pyfftw = t0b - t0
 t_scipy = t1b - t1
@@ -102,8 +102,8 @@ t_anfft = t2b - t2
 t_pyfftw3 = t4b - t4
 t_numfft = t5b - t5
 
-print "pyfftw:", t_pyfftw
-print "scipy fftpack:", t_scipy
-print "anfft", t_anfft
-print "pyfftw3:", t_pyfftw3
-print "numpy fft:", t_numfft
+print("pyfftw:", t_pyfftw)
+print("scipy fftpack:", t_scipy)
+print("anfft", t_anfft)
+print("pyfftw3:", t_pyfftw3)
+print("numpy fft:", t_numfft)

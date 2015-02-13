@@ -24,7 +24,7 @@ y *= window
 Ntaps = 512
 b_fir = remez(numtaps=Ntaps, bands=[0., 0.49/2., 0.51/2., 1./2.], desired=[1.,0.])#, maxiter=250, grid_density=64)
 a_fir = [1.]
-print "FIR coeff created", len(b_fir), len(a_fir)
+print("FIR coeff created", len(b_fir), len(a_fir))
 
 def fft_overlap_add_lfilter(b, x, zi):  
     # Evaluate the best value of N and L
@@ -61,7 +61,7 @@ yf_fir_oa, zf = fft_overlap_add_lfilter(b_fir, y, zi=zeros(max(len(a_fir),len(b_
 t2 = time.time()
 tlin = t1 - t0
 toa = t2 - t1
-print "lin", tlin, "o-a", toa, "lin/o-a", tlin/toa
+print("lin", tlin, "o-a", toa, "lin/o-a", tlin/toa)
 
 impulse = zeros(N); impulse[0] = 1.
 yf_imp_fir, zf = lfilter(b_fir, a_fir, impulse, zi=zeros(max(len(a_fir),len(b_fir))-1))

@@ -47,7 +47,7 @@ class Logger(QtCore.QObject):
 class PrintLogger:
 	# push some text to the log
 	def push(self, text):
-		print text
+		print(text)
 
 	# return the current log
 	def text(self):

@@ -12,7 +12,7 @@ py2exe_build = True
 try:
 	import py2exe
 except ImportError:
-	print "Cannot find py2exe"
+	print("Cannot find py2exe")
 	py2exe_build = False
 
 # see INSTALL file for details

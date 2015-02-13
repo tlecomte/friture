@@ -347,7 +347,7 @@ class Generator_Widget(QtGui.QWidget):
             floatdata[ind_plus] = 1.
             #floatdata[ind_minus] = -1.
         else:
-            print "generator error : index of signal type not found"
+            print("generator error : index of signal type not found")
             return
 
         # add smooth ramps at start/stop to avoid undesirable bursts

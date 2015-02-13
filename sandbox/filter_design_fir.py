@@ -222,9 +222,9 @@ def main():
 	
 	[B, A, fi, fl, fh] = octave_filters(Nbands, BandsPerOctave)
 	y, zfs = octave_filter_bank(B, A, impulse)
-	print "Filter lengths without decimation"
+	print("Filter lengths without decimation")
 	for b, a in zip(B, A):
-		print len(b), len(a)
+		print(len(b), len(a))
 	
 	
 	response = 20.*log10(abs(fft(y)))
@@ -292,10 +292,10 @@ def main():
 	
 	[boct, aoct, fi, flow, fhigh] = octave_filters_oneoctave(Nbands, BandsPerOctave)
 	y, dec, zfs = octave_filter_bank_decimation(bdec, adec, boct, aoct, impulse)
-	print "Filter lengths with decimation"
-	print len(bdec), len(adec)
+	print("Filter lengths with decimation")
+	print(len(bdec), len(adec))
 	for b, a in zip(boct, aoct):
-		print len(b), len(a)
+		print(len(b), len(a))
 
 	figure()
 	subplot(211)

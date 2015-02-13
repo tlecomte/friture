@@ -31,13 +31,13 @@ R80 = R40 + R80a
 R80.sort()
 
 if __name__ == "__main__":
-	print "R5", R5
-	print
-	print "R10", R10
-	print
-	print "R20", R20
-	print
-	print "R40", R40
-	print
-	print "R80", R80
+	print("R5", R5)
+	print()
+	print("R10", R10)
+	print()
+	print("R20", R20)
+	print()
+	print("R40", R40)
+	print()
+	print("R80", R80)
 	

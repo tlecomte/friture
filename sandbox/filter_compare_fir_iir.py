@@ -19,12 +19,12 @@ window = np.hanning(N)
 y *= window
 
 (b_iir, a_iir) = iirdesign(0.49, 0.51, 0.05, 70, analog=0, ftype='ellip', output='ba')
-print "IIR coeff created", len(b_iir), len(a_iir)
+print("IIR coeff created", len(b_iir), len(a_iir))
 
 Ntaps = 512
 b_fir = remez(numtaps=Ntaps, bands=[0., 0.49/2., 0.51/2., 1./2.], desired=[1.,0.])#, maxiter=250, grid_density=64)
 a_fir = [1.]
-print "FIR coeff created", len(b_fir), len(a_fir)
+print("FIR coeff created", len(b_fir), len(a_fir))
 
 import time
 t0 = time.time()
@@ -34,7 +34,7 @@ yf_iir, zf = lfilter(b_iir, a_iir, y, zi=np.zeros(max(len(a_iir),len(b_iir))-1))
 t2 = time.time()
 tfir = t1 - t0
 tiir = t2 - t1
-print "fir", tfir, "iir", tiir, "fir/iir", tfir/tiir
+print("fir", tfir, "iir", tiir, "fir/iir", tfir/tiir)
 
 impulse = np.zeros(N); impulse[N/2] = 1.
 yf_imp_fir, zf = lfilter(b_fir, a_fir, impulse, zi=np.zeros(max(len(a_fir),len(b_fir))-1))

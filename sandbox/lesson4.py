@@ -251,6 +251,6 @@ def main():
     glutMainLoop()
 
 # Print message to console, and kick off the main to get it rolling.
-print "Hit ESC key to quit."
+print("Hit ESC key to quit.")
 main()
         

@@ -231,7 +231,7 @@ class Levels_Widget(QtGui.QWidget):
 			fft_size = time*SAMPLING_RATE #1024
 			maxfreq = SAMPLING_RATE/2
 			sp, freq, A, B, C = self.proc.analyzelive(floatdata, fft_size, maxfreq)
-			print level_rms, 10*log10((sp**2).sum()*2.), freq.max()
+			print(level_rms, 10*log10((sp**2).sum()*2.), freq.max())
 
 	# slot
 	def settings_called(self, checked):

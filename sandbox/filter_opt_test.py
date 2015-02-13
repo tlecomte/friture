@@ -155,7 +155,7 @@ def octave_filter_bank_decimation(blow, alow, forward, feedback, x, zis, filter_
 			for i in range(0, BandsPerOctave)[::-1]:
 				#filt, zf = lfilter(forward[i], feedback[i], x_dec, zi=zis[m])
 				filt, zf = filter_func(forward[i], feedback[i], x, zis[m])
-				print forward[i], feedback[i]
+				print(forward[i], feedback[i])
 				#filt = lfilter(forward[i], feedback[i], x_dec)
 				m += 1
 				# zf can be reused to restart the filter
@@ -166,7 +166,7 @@ def octave_filter_bank_decimation(blow, alow, forward, feedback, x, zis, filter_
 				k -= 1
 			#x_dec, zf = lfilter(blow, alow, x_dec, zi=zis[m])
 			x_dec, zf = filter_func(blow, alow, x_dec, zis[m])
-			print blow, alow
+			print(blow, alow)
 			#x_dec = lfilter(blow, alow, x_dec)
 			m += 1
 			# zf can be reused to restart the filter
@@ -253,7 +253,7 @@ def main():
 	#octave_filter_bank_decimation(blow, alow, forward, feedback, x, zis, filter_func)
 	
 	(bdec, adec) = iirdesign(0.48, 0.50, 0.05, 70, analog=0, ftype='ellip', output='ba')
-	print len(bdec), len(adec)
+	print(len(bdec), len(adec))
 	
 	for i in range(0, len(B)):
 		B[i], A[i] = prepare_coefficients(B[i], A[i])

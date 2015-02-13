@@ -67,7 +67,7 @@ def generalized_cross_correlation(d0, d1):
 def main():
     Ns = 44100*400 #44100*60*3 #3000000
 
-    print "Loading data"
+    print("Loading data")
 
     # load data
     #fname = 'sandbox/test_cpea_20120602_part3.wav' # delay = 45.2 ms = 1993 samples (from Friture cross-correlation measurements)
@@ -77,7 +77,7 @@ def main():
     #data, fs, enc = wavread(fname)
     SAMPLING_RATE, data = wavfile.read(fname)
 
-    print data.shape, data.dtype
+    print(data.shape, data.dtype)
     data = data.astype(np.float64) # convert from integer to floats for computations
 
     ht = None
@@ -92,7 +92,7 @@ def main():
     # measured signal
     m = data[:Ns,1]
 
-    print "Data loaded"
+    print("Data loaded")
 
     # We will decimate several times
     # no decimation => 1/fs = 23 µs resolution
@@ -115,9 +115,9 @@ def main():
     x0 = x
     x1 = m
     #subsample them
-    print "subsampling x0"
+    print("subsampling x0")
     x0_dec, zfs0 = subsampler(Ndec, bdec, adec, x0, zfs0)
-    print "subsampling x1"
+    print("subsampling x1")
     x1_dec, zfs1 = subsampler(Ndec, bdec, adec, x1, zfs1)
 
     time = 2*delayrange_s
@@ -128,10 +128,10 @@ def main():
 
     old_Xcorr = np.zeros((length), np.complex128)
 
-    print "time =", time
-    print "length =", length
-    print "Ns_dec = ", Ns_dec
-    print "Nb =", Nb
+    print("time =", time)
+    print("length =", length)
+    print("Ns_dec = ", Ns_dec)
+    print("Nb =", Nb)
 
     # Hann window to mitigate non-periodicity effects
     window = numpy.hanning(length)
@@ -146,7 +146,7 @@ def main():
     #plt2 = f2.add_subplot(1,1,1)
 
     for i in range(Nb):
-        print i
+        print(i)
         # retrieve last one-second of data
 
         d0 = x0_dec[i*length*overlap:i*length*overlap + length]
@@ -227,7 +227,7 @@ def main():
         else:
             polarity_message = "Reversed phase"
 
-        print ind, delay_message, correlation_message, polarity_message
+        print(ind, delay_message, correlation_message, polarity_message)
 
     plt.show()
 

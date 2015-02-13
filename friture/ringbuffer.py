@@ -104,7 +104,7 @@ class RingBuffer():
 			if self.logger <> None:
 				self.logger.push(message)
 			else:
-				print message
+				print(message)
 			
 			#create new buffer
 			newbuffer = zeros((self.buffer.shape[0], 2*new_length))

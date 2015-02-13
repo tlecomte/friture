@@ -323,7 +323,7 @@ class AudioBackend(QtCore.QObject):
 				# FIXME specialize this exception handling code
 				# to treat overflow errors particularly
 				self.xruns += 1
-				print "Caught an IOError on stream read.", inst
+				print("Caught an IOError on stream read.", inst)
 				self.underflow.emit()
 				break
 			

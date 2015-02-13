@@ -137,7 +137,7 @@ class CanvasScaledSpectrogram(QtCore.QObject):
 		return myimage
 
 	def prepare_palette(self):
-		print "palette preparation"
+		print("palette preparation")
 
 		N = 256
 		cmap = cmrmap.compute_colors(N)

@@ -27,7 +27,7 @@ class QwtLog10ScaleEngine(QwtScaleEngine):
 	#\param x2 Second limit of the interval (In/Out)
 	#\param stepSize Step size (Out)
 	def autoScale(self, maxSteps, x1, x2):#, stepSize):
-		print "plouf autoScale"
+		print("plouf autoScale")
 		if ( x1 > x2 ):
 			y = x2.copy()
 			x2 = x1
@@ -75,7 +75,7 @@ class QwtLog10ScaleEngine(QwtScaleEngine):
 	#\param maxMinSteps Maximum number of minor steps
 	#\param stepSize Step size. If stepSize == 0, the scaleEngine calculates one.
 	def divideScale(self, x1, x2, maxMajSteps, maxMinSteps, stepSize = 0.0):
-		print "plouf divideScale", x1, x2, maxMajSteps, maxMinSteps, stepSize
+		print("plouf divideScale", x1, x2, maxMajSteps, maxMinSteps, stepSize)
 		#return QwtScaleDiv(0.,1.,[1,2,3],[],[])
 		
 		interval = QwtDoubleInterval(x1, x2).normalized().limited(LOG_MIN, LOG_MAX)
@@ -106,10 +106,10 @@ class QwtLog10ScaleEngine(QwtScaleEngine):
 		if x1 > x2:
 			scaleDiv.invert()
 		
-		print scaleDiv.ticks(QwtScaleDiv.MajorTick)
-		print scaleDiv.ticks(QwtScaleDiv.MediumTick)
-		print scaleDiv.ticks(QwtScaleDiv.MinorTick)
-		print "plouf finished divideScale"
+		print(scaleDiv.ticks(QwtScaleDiv.MajorTick))
+		print(scaleDiv.ticks(QwtScaleDiv.MediumTick))
+		print(scaleDiv.ticks(QwtScaleDiv.MinorTick))
+		print("plouf finished divideScale")
 		
 		return scaleDiv
 	
@@ -117,7 +117,7 @@ class QwtLog10ScaleEngine(QwtScaleEngine):
 	def transformation(self):
 		import sip
 		sip.dump(self.transf)
-		print "plouf transformation"
+		print("plouf transformation")
 		return self.transf
 	
 	# Return the interval [log10(interval.minValue(), log10(interval.maxValue]
@@ -132,7 +132,7 @@ class QwtLog10ScaleEngine(QwtScaleEngine):
 	#The limits of an interval are aligned that both are integer
 	#multiples of the step size.
 	def align(self, interval, stepSize):
-		print "plouf align"
+		print("plouf align")
 		intv = self.log10(interval)
 
 		x1 = QwtScaleArithmetic.floorEps(intv.minValue(), stepSize)
@@ -153,13 +153,13 @@ class QwtLog10ScaleEngine(QwtScaleEngine):
 		for  i in range(0, QwtScaleDiv.NTickTypes):
 			ticks[i] = self.strip(ticks[i], interval)
 
-		print "buildTicks"
+		print("buildTicks")
 
 		return ticks
 
 	# Remove ticks from a list, that are not inside an interval
 	def strip(self, ticks, interval):
-		print "strip"
+		print("strip")
 		if (not interval.isValid()) or (len(ticks) == 0) :
 			return []
 
@@ -254,5 +254,5 @@ class QwtLog10ScaleEngine(QwtScaleEngine):
 
 		return ticks
 	def copy(self):
-		print "plouf copy"
+		print("plouf copy")
 		return self

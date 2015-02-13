@@ -207,7 +207,7 @@ class Friture(QMainWindow, ):
 
 def main():
 	if platform.system() == "Windows":
-		print "Running on Windows"
+		print("Running on Windows")
 		# On Windows, redirect stderr to a file
 		import imp, ctypes
 		if (hasattr(sys, "frozen") or # new py2exe
@@ -220,7 +220,7 @@ def main():
 		try:
 			ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
 		except:
-			print "Could not set the app model ID. If the plaftorm is older than Windows 7, this is normal."
+			print("Could not set the app model ID. If the plaftorm is older than Windows 7, this is normal.")
 
 	app = QApplication(sys.argv)
 
@@ -254,7 +254,7 @@ def main():
 		elif sys.argv[1] == "--no":
 			profile = "no"
 		else:
-			print "command-line arguments (%s) not recognized" %sys.argv[1:]
+			print("command-line arguments (%s) not recognized" %sys.argv[1:])
 
 	if profile == "python":
 		import cProfile
