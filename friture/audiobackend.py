@@ -149,7 +149,7 @@ class AudioBackend(QtCore.QObject):
 	# returns a list of input devices index, starting with the system default
 	def get_input_devices(self):
 		device_count = self.get_device_count()
-		device_range = range(0, device_count)
+		device_range = list(range(0, device_count))
 
 		default_input_device = self.get_default_input_device()
 
@@ -171,7 +171,7 @@ class AudioBackend(QtCore.QObject):
 	# returns a list of output devices index, starting with the system default
 	def get_output_devices(self):
 		device_count = self.get_device_count()
-		device_range = range(0, device_count)
+		device_range = list(range(0, device_count))
 
 		default_output_device = self.get_default_output_device()
 

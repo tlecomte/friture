@@ -271,7 +271,7 @@ def main():
 	response = 20.*log10(abs(fft(ydec)))
 	plot(fftshift(freqScale), fftshift(response), label="lowpass + dec2 + repeat2")
 	
-	ydec2 = interp(range(0, len(y)), range(0, len(y), 2), y[::2])
+	ydec2 = interp(list(range(0, len(y))), list(range(0, len(y), 2)), y[::2])
 	response = 20.*log10(abs(fft(ydec2)))
 	plot(fftshift(freqScale), fftshift(response), label="lowpass + dec2 + interp2")
 	
@@ -283,11 +283,11 @@ def main():
 	legend(loc="lower left")
 	
 	subplot(212)
-	plot(range(0, len(impulse)), impulse, label="impulse")
-	plot(range(0, len(impulse)), y, label="lowpass")
-	plot(range(0, len(impulse)), ydec, label="lowpass + dec2 + repeat2")
-	plot(range(0, len(impulse)), ydec2, label="lowpass + dec2 + interp2")
-	plot(range(0, len(impulse), 2), ydec3, label="lowpass + dec2")
+	plot(list(range(0, len(impulse))), impulse, label="impulse")
+	plot(list(range(0, len(impulse))), y, label="lowpass")
+	plot(list(range(0, len(impulse))), ydec, label="lowpass + dec2 + repeat2")
+	plot(list(range(0, len(impulse))), ydec2, label="lowpass + dec2 + interp2")
+	plot(list(range(0, len(impulse), 2)), ydec3, label="lowpass + dec2")
 	legend()
 	
 	[boct, aoct, fi, flow, fhigh] = octave_filters_oneoctave(Nbands, BandsPerOctave)

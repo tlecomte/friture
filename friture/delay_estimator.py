@@ -45,7 +45,7 @@ def subsampler(Ndec, bdec, adec, x, zis):
         return x_dec, None
     else:
         zfs = []
-        for i, zi in zip(range(Ndec), zis):
+        for i, zi in zip(list(range(Ndec)), zis):
             x_dec, zf = decimate(bdec, adec, x_dec, zi=zi)
             # zf can be reused to restart the filter
             zfs += [zf]

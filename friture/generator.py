@@ -39,7 +39,7 @@ PINK_FIDELITY = 100.
 
 RAMP_LENGTH = 10e-3 # 10 ms
 
-(stopped, starting, playing, stopping) = range(0, 4)
+(stopped, starting, playing, stopping) = list(range(0, 4))
 
 def pinknoise(n, rvs=standard_normal):
     if n==0:
