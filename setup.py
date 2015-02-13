@@ -86,7 +86,7 @@ if py2exe_build:
               "OpenGL_accelerate.formathandler"]
 
 	if os.name == 'nt':
-		if os.environ.has_key('CPATH'):
+		if 'CPATH' in os.environ:
 			os.environ['CPATH'] = os.environ['CPATH'] + numpy.get_include()
 		else:
 			os.environ['CPATH'] = numpy.get_include()
