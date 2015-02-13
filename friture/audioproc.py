@@ -61,7 +61,7 @@ class audioproc():
 
 	def decimate(self, samples):
 		# first we remove as much points as possible
- 		if self.decimation > 1:
+		if self.decimation > 1:
 			samples.shape = len(samples)/self.decimation, self.decimation
 			#the full way
 			#samples = samples.mean(axis=1)
