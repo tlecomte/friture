@@ -8,7 +8,7 @@ UI and resource files
 If friture.ui or resource.qrc are changed, the corresponding python files need to be rebuilt:
 	pyuic4 ui/friture.ui > friture/ui_friture.py
 	pyuic4 ui/settings.ui > friture/ui_settings.py
-	pyrcc4 resources/friture.qrc -o friture/friture_rc.py
+	pyrcc4 -py3 resources/friture.qrc -o friture/friture_rc.py
 
 Cython extension
 ----------------
