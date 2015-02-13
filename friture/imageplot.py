@@ -18,11 +18,11 @@
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
 from PyQt4 import QtCore, QtGui, Qt
-from friture.spectrogram_image import CanvasScaledSpectrogram
-from online_linear_2D_resampler import Online_Linear_2D_resampler
 from fractions import Fraction
-from frequency_resampler import Frequency_Resampler
 import numpy as np
+from friture.spectrogram_image import CanvasScaledSpectrogram
+from friture.online_linear_2D_resampler import Online_Linear_2D_resampler
+from friture.frequency_resampler import Frequency_Resampler
 from friture.plotting.scaleWidget import VerticalScaleWidget, HorizontalScaleWidget, ColorScaleWidget
 from friture.plotting.scaleDivision import ScaleDivision
 from friture.plotting.coordinateTransform import CoordinateTransform
