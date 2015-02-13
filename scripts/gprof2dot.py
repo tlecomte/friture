@@ -679,7 +679,7 @@ class XmlTokenizer:
                 self.tokens.append(token)
             self.character_data = ''
     
-    def next(self):
+    def __next__(self):
         size = 16*1024
         while self.index >= len(self.tokens) and not self.final:
             self.tokens = []
@@ -725,7 +725,7 @@ class XmlParser(Parser):
         self.consume()
     
     def consume(self):
-        self.token = self.tokenizer.next()
+        self.token = next(self.tokenizer)
 
     def match_element_start(self, name):
         return self.token.type == XML_ELEMENT_START and self.token.name_or_data == name
