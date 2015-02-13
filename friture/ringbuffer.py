@@ -37,7 +37,7 @@ class RingBuffer():
 		dim = floatdata.shape[0]
 		l = floatdata.shape[1]
 
-		if dim <> self.buffer.shape[0]:
+		if dim != self.buffer.shape[0]:
 			# switched from single to dual channels or vice versa  
 			self.buffer = zeros((dim, 2*self.buffer_length))
 
@@ -101,7 +101,7 @@ class RingBuffer():
 			new_length = int(1.5*length)
 
 			message = "Ringbuffer: growing buffer for length %d" %(new_length)
-			if self.logger <> None:
+			if self.logger != None:
 				self.logger.push(message)
 			else:
 				print(message)

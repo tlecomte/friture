@@ -55,7 +55,7 @@ class HistogramItem:
         self.Vpixmaps = [[QtGui.QPixmap(), QtGui.QPixmap()]]
 
     def setData(self, fl, fh, fc, y):
-        if len(self.y) <> len(y):
+        if len(self.y) != len(y):
             self.fl = fl
             self.fh = fh
             self.fc = fc
@@ -77,7 +77,7 @@ class HistogramItem:
     def draw(self, painter, xMap, yMap, rect):
         # update the cache according to possibly new canvas dimensions
         h = rect.height()
-        if h <> self.canvas_height:
+        if h != self.canvas_height:
             self.canvas_height = h
             self.need_transform = True
         w = rect.width()
@@ -256,7 +256,7 @@ class HistogramPeakBarItem:
         self.palette = [Qt.QColor(255, gb, gb) for gb in range(0,256)]
 
     def setData(self, fl, fh, peaks, peaks_int, y):
-        if len(self.peaks) <> len(peaks):
+        if len(self.peaks) != len(peaks):
             self.fl = fl
             self.fh = fh
             self.need_transform = True
@@ -269,7 +269,7 @@ class HistogramPeakBarItem:
         # update the cache according to possibly new canvas dimensions
         h = rect.height()
         w = rect.width()
-        if w <> self.canvas_width:
+        if w != self.canvas_width:
             self.canvas_width = w
             self.need_transform = True
 
@@ -381,7 +381,7 @@ class HistPlot(QtGui.QWidget):
         self.draw()
 
     def compute_peaks(self, y):
-        if len(self.peak) <> len(y):
+        if len(self.peak) != len(y):
             y_ones = ones(y.shape)
             self.peak = y_ones*(-500.)
             self.peak_int = zeros(y.shape)

@@ -153,7 +153,7 @@ class SpectrumPlotWidget(QtGui.QWidget):
         x2[:-1] = x1[1:]
         x2[-1] = float(SAMPLING_RATE/2)
         
-        if len(x1) <> len(self.x1):
+        if len(x1) != len(self.x1):
             self.needtransform = True
             # save data for resizing
             self.x1 = x1
@@ -357,7 +357,7 @@ class SpectrumPlotWidget(QtGui.QWidget):
         self.draw()
         
     def compute_peaks(self, y):
-        if len(self.peak) <> len(y):
+        if len(self.peak) != len(y):
             y_ones = ones(y.shape)
             self.peak = y_ones*(-500.)
             self.peak_int = zeros(y.shape)

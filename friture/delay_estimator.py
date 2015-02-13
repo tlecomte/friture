@@ -184,7 +184,7 @@ class Delay_Estimator_Widget(QtGui.QWidget):
 with two channels.
 Select two-channels mode
 in the setup window."""
-            if message <> self.previous_channelInfo_message:
+            if message != self.previous_channelInfo_message:
                 self.previous_delay_message = "N/A ms\n(N/A m)"
                 self.delay_label.setText(self.previous_delay_message)
                 self.previous_correlation_message = "N/A %"
@@ -291,16 +291,16 @@ in the setup window."""
                     polarity_message = "Reversed phase"                
                 channelInfo_message = ""
 
-                if delay_message <> self.previous_delay_message:
+                if delay_message != self.previous_delay_message:
                     self.delay_label.setText(delay_message)
                     self.previous_delay_message = delay_message
-                if correlation_message <> self.previous_correlation_message:
+                if correlation_message != self.previous_correlation_message:
                     self.correlation_label.setText(correlation_message)
                     self.previous_correlation_message = correlation_message
-                if polarity_message <> self.previous_polarity_message:
+                if polarity_message != self.previous_polarity_message:
                     self.polarity_label.setText(polarity_message)
                     self.previous_polarity_message = polarity_message
-                if channelInfo_message <> self.previous_channelInfo_message:
+                if channelInfo_message != self.previous_channelInfo_message:
                     self.channelInfo_label.setText(channelInfo_message)
                     self.previous_channelInfo_message = channelInfo_message
     

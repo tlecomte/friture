@@ -31,13 +31,13 @@ class Frequency_Resampler:
             self.xscaled = np.linspace(self.minfreq, self.maxfreq, self.nsamples)
 
     def setnsamples(self, nsamples):
-        if self.nsamples <> nsamples:
+        if self.nsamples != nsamples:
             self.nsamples = nsamples
             self.update_xscale()
             print("nsamples changed, now: %d" %(nsamples))
 
     def setlogfreqscale(self, logfreqscale):
-        if logfreqscale <> self.logfreqscale:
+        if logfreqscale != self.logfreqscale:
             print("freq scale changed", logfreqscale)
             self.logfreqscale = logfreqscale
             self.update_xscale()

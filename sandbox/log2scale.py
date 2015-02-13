@@ -90,7 +90,7 @@ class CustomScaleEngine(Qwt.QwtScaleEngine):
 		
 		scaleDiv = Qwt.QwtScaleDiv()
 		
-		if stepSize <> 0.:
+		if stepSize != 0.:
 			ticks = self.buildTicks(interval, stepSize, maxMinSteps)
 			scaleDiv = Qwt.QwtScaleDiv(interval, ticks[0], ticks[1], ticks[2])
 		

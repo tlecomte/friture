@@ -70,14 +70,14 @@ class audioproc():
 		return samples
 
 	def set_fftsize(self, fft_size):
-		if fft_size <> self.fft_size:
+		if fft_size != self.fft_size:
 			self.fft_size = fft_size
 			self.update_freq_cache()
 			self.update_window()
 			self.update_size()
 
 	def set_maxfreq(self, maxfreq):
-		if maxfreq <> self.maxfreq:
+		if maxfreq != self.maxfreq:
 			self.maxfreq = maxfreq
 			decimation = SAMPLING_RATE / (2*maxfreq)
 			self.decimation = 2**(floor(log2(decimation)))
@@ -108,7 +108,7 @@ class audioproc():
 		self.logger.push("audioproc: updating window")
 
 	def update_freq_cache(self):
-		if len(self.freq) <> self.fft_size/(2*self.decimation) + 1 :
+		if len(self.freq) != self.fft_size/(2*self.decimation) + 1 :
 			self.logger.push("audioproc: updating self.freq cache")
 			self.freq = linspace(0, SAMPLING_RATE/(2*self.decimation), self.fft_size/(2*self.decimation) + 1)
 

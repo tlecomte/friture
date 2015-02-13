@@ -99,7 +99,7 @@ class QwtLog10ScaleEngine(QwtScaleEngine):
 			stepSize = max(stepSize, 1.) # major step must be >= 1 decade
 		
 		scaleDiv = QwtScaleDiv()
-		if stepSize <> 0.:
+		if stepSize != 0.:
 			ticks = self.buildTicks(interval, stepSize, maxMinSteps)
 			scaleDiv = QwtScaleDiv(interval, ticks[QwtScaleDiv.MajorTick], ticks[QwtScaleDiv.MediumTick], ticks[QwtScaleDiv.MinorTick])
 		

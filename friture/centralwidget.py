@@ -85,18 +85,18 @@ class CentralWidget(QtGui.QWidget):
 		self.controlBar.comboBox_select.setCurrentIndex(item)
 
 	def update(self):
-		if self.audiowidget <> None:
+		if self.audiowidget != None:
 			self.audiowidget.update()
 
 	def pause(self):
-		if self.audiowidget <> None:
+		if self.audiowidget != None:
 			try:
 				self.audiowidget.pause()
 			except AttributeError:
 				pass
 
 	def restart(self):
-		if self.audiowidget <> None:
+		if self.audiowidget != None:
 			try:
 				self.audiowidget.restart()
 			except AttributeError:

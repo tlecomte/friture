@@ -24,7 +24,7 @@ class Online_Linear_2D_resampler:
         self.resampled_data = np.zeros((self.height, 1))
     
     def set_ratio(self, interp_factor_L, decim_factor_M):
-        if self.interp_factor_L <> interp_factor_L or self.decim_factor_M <> decim_factor_M:
+        if self.interp_factor_L != interp_factor_L or self.decim_factor_M != decim_factor_M:
             self.interp_factor_L = interp_factor_L
             self.decim_factor_M  = decim_factor_M
             self.resampling_ratio = float(interp_factor_L)/decim_factor_M
@@ -33,7 +33,7 @@ class Online_Linear_2D_resampler:
             self.resampled_index = 0.
 
     def set_height(self, height):
-        if self.height <> height:
+        if self.height != height:
             self.height = height        
             
             self.orig_index = 0.

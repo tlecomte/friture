@@ -191,7 +191,7 @@ class TimePlot(QtGui.QWidget):
 		self.canvasWidget.resized.connect(self.canvasResized)
 
 	def setdata(self, x, y):
-		if self.canvas_width <> self.canvasWidget.width():
+		if self.canvas_width != self.canvasWidget.width():
 			self.logger.push("timeplot : changed canvas width")
 			self.canvas_width = self.canvasWidget.width()
 			self.update_xscale()
@@ -204,13 +204,13 @@ class TimePlot(QtGui.QWidget):
 			# the canvas reisze event will trigger a full replot
 
 		x_ms =  1e3*x
-		if self.xmax <> x_ms[-1]:
+		if self.xmax != x_ms[-1]:
 			self.logger.push("timeplot : changing x max")
 			self.xmax = x_ms[-1]
 			self.settimerange(self.xmin, self.xmax)
 			self.update_xscale()
 			self.needfullreplot = True
-		if self.xmin <> x_ms[0]:
+		if self.xmin != x_ms[0]:
 			self.logger.push("timeplot : changing x min")
 			self.xmin = x_ms[0]
 			self.settimerange(self.xmin, self.xmax)
@@ -255,7 +255,7 @@ class TimePlot(QtGui.QWidget):
 		self.draw()
 
 	def setdataTwoChannels(self, x, y, y2):
-		if self.canvas_width <> self.canvasWidget.width():
+		if self.canvas_width != self.canvasWidget.width():
 			self.logger.push("timeplot : changed canvas width")
 			self.canvas_width = self.canvasWidget.width()
 			self.update_xscale()
@@ -268,13 +268,13 @@ class TimePlot(QtGui.QWidget):
 			# the canvas reisze event will trigger a full replot
 
 		x_ms =  1e3*x
-		if self.xmax <> x_ms[-1]:
+		if self.xmax != x_ms[-1]:
 			self.logger.push("timeplot : changing x max")
 			self.xmax = x_ms[-1]
 			self.settimerange(self.xmin, self.xmax)
 			self.update_xscale()
 			self.needfullreplot = True
-		if self.xmin <> x_ms[0]:
+		if self.xmin != x_ms[0]:
 			self.logger.push("timeplot : changing x min")
 			self.xmin = x_ms[0]
 			self.settimerange(self.xmin, self.xmax)

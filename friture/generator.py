@@ -206,7 +206,7 @@ class Generator_Widget(QtGui.QWidget):
         for device in devices:
             self.settings_dialog.comboBox_outputDevice.addItem(device)
 
-        if self.device <> None:
+        if self.device != None:
             self.settings_dialog.comboBox_outputDevice.setCurrentIndex(self.audiobackend.output_devices.index(self.device))
 
         self.connect(self.settings_dialog.comboBox_outputDevice, QtCore.SIGNAL('currentIndexChanged(int)'), self.device_changed)
