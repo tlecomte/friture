@@ -46,14 +46,15 @@ def ERBFilterBank(forward, feedback, x):
 #     b is the bandwidth designator and equals 1 for octave, 1/3 for 1/3 octave, 1/6 for 1/6 octave, 1/12 for 1/12 octave, and 1/24 for 1/24 octave.
 def octave_frequencies(Nbands, BandsPerOctave):
 	f0 = 1000. # audio reference frequency is 1 kHz
-	
+
 	b = 1./BandsPerOctave
-	
-	imax = Nbands/2
+
+	imax = Nbands//2
 	if Nbands%2 == 0:
 		i = arange(-imax, imax)
 	else:
 		i = arange(-imax, imax + 1)
+
 
 	if BandsPerOctave%2 == 1:
 		fi = f0 * 2**(i*b)
@@ -63,7 +64,7 @@ def octave_frequencies(Nbands, BandsPerOctave):
 
 	f_low = fi * sqrt(2**(-b))
 	f_high = fi * sqrt(2**b)
-	
+
 	return fi, f_low, f_high
 
 def octave_filter_bank(forward, feedback, x, zis=None):
