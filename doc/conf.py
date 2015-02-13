@@ -41,8 +41,8 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'Friture'
-copyright = u'2012, Timothée Lecomte'
+project = 'Friture'
+copyright = '2012, Timothée Lecomte'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -179,8 +179,8 @@ htmlhelp_basename = 'Frituredoc'
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'Friture.tex', u'Friture Documentation',
-   u'Timothée Lecomte', 'manual'),
+  ('index', 'Friture.tex', 'Friture Documentation',
+   'Timothée Lecomte', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -212,6 +212,6 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'friture', u'Friture Documentation',
-     [u'Timothée Lecomte'], 1)
+    ('index', 'friture', 'Friture Documentation',
+     ['Timothée Lecomte'], 1)
 ]
