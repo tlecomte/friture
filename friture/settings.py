@@ -95,8 +95,8 @@ class Settings_Dialog(QtGui.QDialog, Ui_Settings_Dialog):
 		first_channel = self.audiobackend.get_current_first_channel()
 		self.comboBox_firstChannel.setCurrentIndex(first_channel)
 		second_channel = self.audiobackend.get_current_second_channel()
-		self.comboBox_secondChannel.setCurrentIndex(second_channel)  
-  
+		self.comboBox_secondChannel.setCurrentIndex(second_channel)
+
 		self.parent().ui.actionStart.setChecked(True)
 
 	# slot
@@ -151,7 +151,7 @@ class Settings_Dialog(QtGui.QDialog, Ui_Settings_Dialog):
 	def saveState(self, settings):
 		# for the input device, we search by name instead of index, since
 		# we do not know if the device order stays the same between sessions
-  		settings.setValue("deviceName", self.comboBox_inputDevice.currentText())
+		settings.setValue("deviceName", self.comboBox_inputDevice.currentText())
 		settings.setValue("firstChannel", self.comboBox_firstChannel.currentIndex())
 		settings.setValue("secondChannel", self.comboBox_secondChannel.currentIndex())
 		settings.setValue("duoInput", self.inputTypeButtonGroup.checkedId())
@@ -160,7 +160,7 @@ class Settings_Dialog(QtGui.QDialog, Ui_Settings_Dialog):
 	def restoreState(self, settings):
 		device_name = settings.value("deviceName", "").toString()
 		id = self.comboBox_inputDevice.findText(device_name)
-  		# change the device only if it exists in the device list
+		# change the device only if it exists in the device list
 		if id >= 0:
 			self.comboBox_inputDevice.setCurrentIndex(id)
 			(channel, ok) = settings.value("firstChannel", 0).toInt()
