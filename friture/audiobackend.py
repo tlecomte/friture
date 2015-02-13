@@ -34,7 +34,7 @@ class AudioBackend(QtCore.QObject):
 		QtCore.QObject.__init__(self)
 
 		self.logger = logger
-  
+
 		self.duo_input = False
 
 		self.logger.push("Initializing PyAudio")
@@ -65,10 +65,10 @@ class AudioBackend(QtCore.QObject):
 		if self.device != None:
 			self.first_channel = 0
 			nchannels = self.get_current_device_nchannels()
-	  		if nchannels == 1:
+			if nchannels == 1:
 				self.second_channel = 0
 			else:
-	   			self.second_channel = 1
+				self.second_channel = 1
 
 		# counter for the number of input buffer overflows
 		self.xruns = 0
@@ -93,10 +93,10 @@ class AudioBackend(QtCore.QObject):
 				extra_info = ''
 			
 			nchannels = self.pa.get_device_info_by_index(device)['maxInputChannels']
-   
+
 			desc = "%s (%d channels) (%s) %s" %(dev_info['name'], nchannels, api, extra_info)
 			
-			devices_list += [desc]			
+			devices_list += [desc]
 
 		return devices_list
 
@@ -116,10 +116,10 @@ class AudioBackend(QtCore.QObject):
 				extra_info = ''
 			
 			nchannels = self.pa.get_device_info_by_index(device)['maxOutputChannels']
-   
+
 			desc = "%s (%d channels) (%s) %s" %(dev_info['name'], nchannels, api, extra_info)
 			
-			devices_list += [desc]			
+			devices_list += [desc]
 
 		return devices_list
 
@@ -138,7 +138,7 @@ class AudioBackend(QtCore.QObject):
 			index = self.pa.get_default_output_device_info()['index']
 		except IOError:
 			index = None
-		return 
+		return
 
 	# method
 	def get_device_count(self):
@@ -160,7 +160,7 @@ class AudioBackend(QtCore.QObject):
 
 		# select only the input devices by looking at the number of input channels
 		input_devices = []
-  		for device in device_range:
+		for device in device_range:
 			n_input_channels = self.pa.get_device_info_by_index(device)['maxInputChannels']
 			if n_input_channels > 0:
 				input_devices += [device]
@@ -182,7 +182,7 @@ class AudioBackend(QtCore.QObject):
 
 		# select only the output devices by looking at the number of output channels
 		output_devices = []
-  		for device in device_range:
+		for device in device_range:
 			n_output_channels = self.pa.get_device_info_by_index(device)['maxOutputChannels']
 			if n_output_channels > 0:
 				output_devices += [device]
@@ -202,14 +202,14 @@ class AudioBackend(QtCore.QObject):
 		if self.try_input_stream(self.stream):
 			self.logger.push("Success")
 			previous_stream.close()
-			success = True   
-   
+			success = True
+
 			self.first_channel = 0
 			nchannels = self.get_current_device_nchannels()
-  			if nchannels == 1:				
+			if nchannels == 1:
 				self.second_channel = 0
 			else:
-   				self.second_channel = 1
+				self.second_channel = 1
 		else:
 			self.logger.push("Fail")
 			self.stream.close()
@@ -262,7 +262,7 @@ class AudioBackend(QtCore.QObject):
 			channels = ['L', 'R']
 		else:
 			channels = []
-   			for channel in range(0, dev_info['maxInputChannels']):
+			for channel in range(0, dev_info['maxInputChannels']):
 				channels += ["%d" %channel]			
 			
 		return channels
@@ -293,7 +293,7 @@ class AudioBackend(QtCore.QObject):
 			self.logger.push("Device claims %d ms latency" %(lat_ms))
 			return True
 
-  	# try to update the audio buffer
+	# try to update the audio buffer
 	# return the number of chunks retrieved, and the time elapsed
 	def update(self, ringbuffer):
 		t = QtCore.QTime()
@@ -301,8 +301,8 @@ class AudioBackend(QtCore.QObject):
 
 		channel = self.get_current_first_channel()
 		nchannels = self.get_current_device_nchannels()
-  		if self.duo_input:
-                            channel_2 = self.get_current_second_channel()
+		if self.duo_input:
+			channel_2 = self.get_current_second_channel()
 		
 		chunks = 0
 		
@@ -336,12 +336,12 @@ class AudioBackend(QtCore.QObject):
 
 			floatdata1 = floatdata_all_channels[channel::nchannels]
 
-			if self.duo_input:                            			
-                                       floatdata2 = floatdata_all_channels[channel_2::nchannels]
-                                       floatdata = vstack((floatdata1, floatdata2))
-			else:  
-                                       floatdata = floatdata1
-                                       floatdata.shape = (1, FRAMES_PER_BUFFER)
+			if self.duo_input:
+				floatdata2 = floatdata_all_channels[channel_2::nchannels]
+				floatdata = vstack((floatdata1, floatdata2))
+			else:
+				floatdata = floatdata1
+				floatdata.shape = (1, FRAMES_PER_BUFFER)
 			
 			# update the circular buffer
 			ringbuffer.push(floatdata)
@@ -351,7 +351,7 @@ class AudioBackend(QtCore.QObject):
 		self.buffer_timer_time = (95.*self.buffer_timer_time + 5.*t.elapsed())/100.
 
 		return chunks*FRAMES_PER_BUFFER
-  
+
 	def set_single_input(self):
 		self.duo_input = False
 
