@@ -179,8 +179,8 @@ class Friture(QMainWindow, ):
 		self.restoreGeometry(settings.value("windowGeometry").toByteArray())
 		self.restoreState(settings.value("windowState").toByteArray())
 		settings.endGroup()
-  
-  		settings.beginGroup("AudioBackend")
+
+		settings.beginGroup("AudioBackend")
 		self.settings_dialog.restoreState(settings)
 		settings.endGroup()
 
@@ -201,8 +201,8 @@ class Friture(QMainWindow, ):
 
 	# slot
 	def update_buffer(self):
-     		newpoints = self.audiobackend.update(self.audiobuffer.ringbuffer)
-     		self.audiobuffer.set_newdata(newpoints)
+		newpoints = self.audiobackend.update(self.audiobuffer.ringbuffer)
+		self.audiobuffer.set_newdata(newpoints)
 
 
 def main():
@@ -265,7 +265,7 @@ def main():
 		stats = pstats.Stats("friture.cprof")
 		stats.strip_dirs().sort_stats('time').print_stats(20)
 		stats.strip_dirs().sort_stats('cumulative').print_stats(20)  
-  
+
 		sys.exit(0)
 	#elif profile == "kcachegrind":
 		#import cProfile
