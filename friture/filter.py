@@ -56,10 +56,10 @@ def octave_frequencies(Nbands, BandsPerOctave):
 		i = arange(-imax, imax + 1)
 
 	if BandsPerOctave%2 == 1:
-	 	fi = f0 * 2**(i*b)
+		fi = f0 * 2**(i*b)
 	else:
-	 	# FIXME the official formula does not seem to work !
-	 	fi = f0 * 2**(i*b) #fi = f0 * 2**((2*i+1)*b/2.)
+		# FIXME the official formula does not seem to work !
+		fi = f0 * 2**(i*b) #fi = f0 * 2**((2*i+1)*b/2.)
 
 	f_low = fi * sqrt(2**(-b))
 	f_high = fi * sqrt(2**b)
@@ -117,7 +117,7 @@ def octave_filter_bank_decimation(blow, alow, forward, feedback, x, zis=None):
 				y[k] = filt
 				dec[k] = 2**j
 				k -= 1
-   			x_dec, zf = decimate(blow, alow, x_dec)
+			x_dec, zf = decimate(blow, alow, x_dec)
 		
 		return y, dec, None
 	else:
@@ -144,7 +144,7 @@ def octave_filter_bank_decimation(blow, alow, forward, feedback, x, zis=None):
 		return y, dec, zfs
 
 def decimate(bdec, adec, x, zi=None):
-    	if zi == None:
+	if zi == None:
 		# utiliser un décimateur polyphase ici !!!
 		x_dec = lfilter(bdec, adec, x)
 		zf = None

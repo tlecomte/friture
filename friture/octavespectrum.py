@@ -86,7 +86,7 @@ class OctaveSpectrum_Widget(QtGui.QWidget):
 		return kernels
 
 	def get_kernel(self, kernel, N):
-		return 
+		return
 
 	def get_conv(self, kernel, data):
 		return kernel*data
@@ -102,7 +102,7 @@ class OctaveSpectrum_Widget(QtGui.QWidget):
 	# method
 	def update(self):
 		if not self.isVisible():
-		    return
+			return
 		
 		#get the fresh data
 		floatdata = self.audiobuffer.newdata()
@@ -232,8 +232,8 @@ class octave_filters():
 	def filter(self, floatdata):
 		#y, dec, zfs = octave_filter_bank_decimation(self.bdec, self.adec, self.boct, self.aoct, floatdata)
 		y, dec, zfs = octave_filter_bank_decimation(self.bdec, self.adec,
-                                                                   self.boct, self.aoct,
-                                                                   floatdata, zis=self.zfs)
+													self.boct, self.aoct,
+													floatdata, zis=self.zfs)
 		#y, zfs = octave_filter_bank(self.b_nodec, self.a_nodec, floatdata); dec = [1.]*len(y)
 		#y, zfs = octave_filter_bank(self.b_nodec, self.a_nodec, floatdata, zis=self.zfs); dec = [1.]*len(y)
 		
