@@ -96,7 +96,7 @@ class VerticalScaleBar(QtGui.QWidget):
     def spacingBorders(self):
         fm = QtGui.QFontMetrics(self.font())
         # for vertical scale bar
-        return fm.height()/2, fm.height()/2
+        return fm.height()//2, fm.height()//2
 
 
 
@@ -186,7 +186,7 @@ class HorizontalScaleBar(QtGui.QWidget):
     def spacingBorders(self):
         fm = QtGui.QFontMetrics(self.font())
         # for vertical scale bar
-        return fm.height()/2, fm.height()/2
+        return fm.height()//2, fm.height()//2
 
 
 
@@ -291,4 +291,4 @@ class ColorScaleBar(QtGui.QWidget):
     def spacingBorders(self):
         fm = QtGui.QFontMetrics(self.font())
         # for vertical scale bar
-        return fm.height()/2, fm.height()/2
+        return fm.height()//2, fm.height()//2
