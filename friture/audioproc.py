@@ -20,7 +20,16 @@
 from numpy import linspace, log2, floor, log10, cos, arange, pi
 from numpy.fft import rfft
 from friture.audiobackend import SAMPLING_RATE
-from friture.norm_square import pyx_norm_square
+
+try:
+	from friture.norm_square import pyx_norm_square
+except ImportError as e:
+	import sys
+	from PyQt4 import QtGui
+	app = QtGui.QApplication(sys.argv)
+	QtGui.QMessageBox.critical(None, "Friture",
+		"Error when loading one of the Cython extensions. Please make sure they are built, or rebuild them. See INSTALL.txt for details.")
+	raise(e)
 
 #from cochlear import MakeERBFilters, ERBFilterBank, frequencies
 
