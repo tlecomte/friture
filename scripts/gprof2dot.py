@@ -1983,7 +1983,7 @@ class DotWriter:
     def id(self, id):
         if isinstance(id, (int, float)):
             s = str(id)
-        elif isinstance(id, basestring):
+        elif isinstance(id, str):
             if id.isalnum():
                 s = id
             else:
