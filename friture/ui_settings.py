@@ -89,4 +89,4 @@ class Ui_Settings_Dialog(object):
     def retranslateUi(self, Settings_Dialog):
         pass
 
-import friture_rc
+import friture.friture_rc
