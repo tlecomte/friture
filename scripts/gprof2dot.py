@@ -1668,7 +1668,8 @@ class PstatsParser:
         self.profile = Profile()
         self.function_ids = {}
 
-    def get_function_name(self, (filename, line, name)):
+    def get_function_name(self, xxx_todo_changeme):
+        (filename, line, name) = xxx_todo_changeme
         module = os.path.splitext(filename)[0]
         module = os.path.basename(module)
         return "%s:%d:%s" % (module, line, name)
@@ -1992,8 +1993,9 @@ class DotWriter:
             raise TypeError
         self.write(s)
 
-    def color(self, (r, g, b)):
+    def color(self, xxx_todo_changeme1):
 
+        (r, g, b) = xxx_todo_changeme1
         def float2int(f):
             if f <= 0.0:
                 return 0
