@@ -176,8 +176,8 @@ class Friture(QMainWindow, ):
 		settings.endGroup()
 
 		settings.beginGroup("MainWindow")
-		self.restoreGeometry(settings.value("windowGeometry").toByteArray())
-		self.restoreState(settings.value("windowState").toByteArray())
+		self.restoreGeometry(settings.value("windowGeometry", type=QtCore.QByteArray))
+		self.restoreState(settings.value("windowState", type=QtCore.QByteArray))
 		settings.endGroup()
 
 		settings.beginGroup("AudioBackend")

@@ -212,5 +212,5 @@ class Spectrum_Settings_Dialog(QtGui.QDialog):
 		self.comboBox_weighting.setCurrentIndex(weighting)
 		responseTime = settings.value("responseTime", DEFAULT_RESPONSE_TIME_INDEX)
 		self.comboBox_response_time.setCurrentIndex(responseTime)
-		showFreqLabels = settings.value("showFreqLabels", DEFAULT_SHOW_FREQ_LABELS)
+		showFreqLabels = settings.value("showFreqLabels", DEFAULT_SHOW_FREQ_LABELS, type=bool)
 		self.checkBox_showFreqLabels.setChecked(showFreqLabels)
