@@ -105,7 +105,6 @@ Section "SectionPrincipale" SEC01
   File "${PROJECT_PATH}\dist\*.pyd"
   File "${PROJECT_PATH}\dist\*.dll"
   File "${PROJECT_PATH}\dist\friture.exe"
-  File "${PROJECT_PATH}\dist\w9xpopen.exe"
   File "${PROJECT_PATH}\COPYING.txt"
   File "${PROJECT_PATH}\README.rst"
   File "${PROJECT_PATH}\TODO.txt"
