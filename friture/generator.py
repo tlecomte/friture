@@ -81,14 +81,14 @@ class Generator_Widget(QtWidgets.QWidget):
         sweepPageWidget = QtWidgets.QWidget(self)
         burstPageWidget = QtWidgets.QWidget(self)
 
-        self.stackedLayout = QtGui.QStackedLayout()
+        self.stackedLayout = QtWidgets.QStackedLayout()
         self.stackedLayout.addWidget(sinePageWidget)
         self.stackedLayout.addWidget(whitePageWidget)
         self.stackedLayout.addWidget(pinkPageWidget)
         self.stackedLayout.addWidget(sweepPageWidget)
         self.stackedLayout.addWidget(burstPageWidget)
 
-        self.spinBox_sine_frequency = QtGui.QSpinBox(sinePageWidget)
+        self.spinBox_sine_frequency = QtWidgets.QSpinBox(sinePageWidget)
         self.spinBox_sine_frequency.setKeyboardTracking(False)
         self.spinBox_sine_frequency.setMinimum(20)
         self.spinBox_sine_frequency.setMaximum(22000)
@@ -99,7 +99,7 @@ class Generator_Widget(QtWidgets.QWidget):
         self.sineLayout = QtWidgets.QFormLayout(sinePageWidget)
         self.sineLayout.addRow("Frequency:", self.spinBox_sine_frequency)
 
-        self.spinBox_sweep_startfrequency = QtGui.QSpinBox(sweepPageWidget)
+        self.spinBox_sweep_startfrequency = QtWidgets.QSpinBox(sweepPageWidget)
         self.spinBox_sweep_startfrequency.setKeyboardTracking(False)
         self.spinBox_sweep_startfrequency.setMinimum(20)
         self.spinBox_sweep_startfrequency.setMaximum(22000)
@@ -107,7 +107,7 @@ class Generator_Widget(QtWidgets.QWidget):
         self.spinBox_sweep_startfrequency.setObjectName("spinBox_sweep_startfrequency")
         self.spinBox_sweep_startfrequency.setSuffix(" Hz")
 
-        self.spinBox_sweep_stopfrequency = QtGui.QSpinBox(sweepPageWidget)
+        self.spinBox_sweep_stopfrequency = QtWidgets.QSpinBox(sweepPageWidget)
         self.spinBox_sweep_stopfrequency.setKeyboardTracking(False)
         self.spinBox_sweep_stopfrequency.setMinimum(20)
         self.spinBox_sweep_stopfrequency.setMaximum(22000)
@@ -172,7 +172,7 @@ class Generator_Widget(QtWidgets.QWidget):
         #stream.close()
         #self.p.terminate()
 
-        self.startStopButton = QtGui.QPushButton(self)
+        self.startStopButton = QtWidgets.QPushButton(self)
 
         startStopIcon = QtGui.QIcon()
         startStopIcon.addPixmap(QtGui.QPixmap(":/images-src/start.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
@@ -276,7 +276,7 @@ class Generator_Widget(QtWidgets.QWidget):
         if not success:
             # Note: the error message is a child of the settings dialog, so that
             # that dialog remains on top when the error message is closed
-            error_message = QtGui.QErrorMessage(self.settings_dialog)
+            error_message = QtWidgets.QErrorMessage(self.settings_dialog)
             error_message.setWindowTitle("Output device error")
             error_message.showMessage("Impossible to use the selected output device, reverting to the previous one")
 

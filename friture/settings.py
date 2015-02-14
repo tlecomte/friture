@@ -44,7 +44,7 @@ class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
 
 		if devices == []:
 			# no audio input device: display a message and exit
-			QtGui.QMessageBox.critical(self, no_input_device_title, no_input_device_message)
+			QtWidgets.QMessageBox.critical(self, no_input_device_title, no_input_device_message)
 			QtCore.QTimer.singleShot(0, self.exitOnInit)
 			return
 
@@ -74,7 +74,7 @@ class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
 	# slot
 	# used when no audio input device has been found, to exit immediately
 	def exitOnInit(self):
-		QtGui.QApplication.instance().quit()
+		QtWidgets.QApplication.instance().quit()
 
 	# slot
 	def input_device_changed(self, index):

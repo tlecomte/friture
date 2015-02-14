@@ -18,15 +18,6 @@
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
 import sys
-
-try:
-    from OpenGL import GL
-except ImportError:
-    app = QtGui.QApplication(sys.argv)
-    QtGui.QMessageBox.critical(None, "OpenGL hellogl",
-            "PyOpenGL must be installed to run this example.")
-    sys.exit(1)
-
 from PyQt5 import QtCore, Qt, QtGui, QtWidgets
 from numpy import log10, interp, linspace, sin, array, ones, zeros
 from friture.plotting.scaleWidget import VerticalScaleWidget, HorizontalScaleWidget
@@ -34,6 +25,14 @@ from friture.plotting.scaleDivision import ScaleDivision
 from friture.plotting.coordinateTransform import CoordinateTransform
 from friture.plotting.glCanvasWidget import GlCanvasWidget
 from friture.plotting.legendWidget import LegendWidget
+
+try:
+    from OpenGL import GL
+except ImportError:
+    app = QtWidgets.QApplication(sys.argv)
+    QtWidgets.QMessageBox.critical(None, "OpenGL hellogl",
+            "PyOpenGL must be installed to run this example.")
+    sys.exit(1)
 
 class CurveItem:
 	def __init__(self, *args):

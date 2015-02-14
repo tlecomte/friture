@@ -13,8 +13,8 @@ from friture.plotting.glCanvasWidget import GlCanvasWidget
 try:
     from OpenGL import GL
 except ImportError:
-    app = QtGui.QApplication(sys.argv)
-    QtGui.QMessageBox.critical(None, "OpenGL hellogl",
+    app = QtWidgets.QApplication(sys.argv)
+    QtWidgets.QMessageBox.critical(None, "OpenGL hellogl",
             "PyOpenGL must be installed to run this example.")
     sys.exit(1)
 
