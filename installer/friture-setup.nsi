@@ -140,7 +140,8 @@ Function un.onInit
 FunctionEnd
 
 LangString STR_remove_settings ${LANG_ENGLISH} "Do you want to remove Friture saved settings ?"
-LangString STR_remove_settings ${LANG_FRENCH} "Voulez-vous supprimer les rÃ©glages de Friture prÃ©cÃ©demment sauvegardÃ©s ?"
+; Warning: the following line should be encoded in CP1252
+LangString STR_remove_settings ${LANG_FRENCH} "Voulez-vous supprimer les réglages de Friture précédemment sauvegardés ?"
 
 Section Uninstall
   RMDir /r "$INSTDIR"
