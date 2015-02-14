@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt4 import QtCore
-from PyQt4.QtGui import QMainWindow
+from PyQt5 import QtCore
+from PyQt5.QtWidgets import QMainWindow
 from friture.defaults import DEFAULT_DOCKS
 from friture.dock import Dock
 

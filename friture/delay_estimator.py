@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt4 import QtGui, QtCore
+from PyQt5 import QtGui, QtCore, QtWidgets
 from numpy import argmax
 import numpy
 from numpy.fft import rfft, irfft
@@ -88,9 +88,9 @@ def generalized_cross_correlation(d0, d1):
 
     return Xcorr
 
-class Delay_Estimator_Widget(QtGui.QWidget):
+class Delay_Estimator_Widget(QtWidgets.QWidget):
     def __init__(self, parent = None, logger = PrintLogger()):
-        QtGui.QWidget.__init__(self, parent)
+        super().__init__(parent)
 
         self.audiobuffer = None
         self.logger = logger
@@ -109,30 +109,30 @@ class Delay_Estimator_Widget(QtGui.QWidget):
         font.setWeight(75)
         font.setBold(True)
         
-        self.delay_label = QtGui.QLabel(self)
+        self.delay_label = QtWidgets.QLabel(self)
         self.delay_label.setFont(font)
         self.delay_label.setObjectName("delay_label")
         
-        self.delayText_label = QtGui.QLabel(self)
+        self.delayText_label = QtWidgets.QLabel(self)
         self.delayText_label.setObjectName("delayText_label")
         self.delayText_label.setText("Delay:")
 
-        self.correlation_label = QtGui.QLabel(self)
+        self.correlation_label = QtWidgets.QLabel(self)
         self.correlation_label.setObjectName("Correlation_label")
         
-        self.correlationText_label = QtGui.QLabel(self)
+        self.correlationText_label = QtWidgets.QLabel(self)
         self.correlationText_label.setObjectName("correlationText_label")
         self.correlationText_label.setText("Confidence:")
 
-        self.polarity_label = QtGui.QLabel(self)
+        self.polarity_label = QtWidgets.QLabel(self)
         self.polarity_label.setFont(font)
         self.polarity_label.setObjectName("polarity_label")
         
-        self.polarityText_label = QtGui.QLabel(self)
+        self.polarityText_label = QtWidgets.QLabel(self)
         self.polarityText_label.setObjectName("polarityText_label")
         self.polarityText_label.setText("Polarity:")
         
-        self.channelInfo_label = QtGui.QLabel(self)
+        self.channelInfo_label = QtWidgets.QLabel(self)
         self.channelInfo_label.setObjectName("channelInfo_label")
         
         self.layout.addRow(self.delayText_label, self.delay_label)
@@ -319,9 +319,9 @@ in the setup window."""
     def restoreState(self, settings):
         self.settings_dialog.restoreState(settings)
 
-class Delay_Estimator_Settings_Dialog(QtGui.QDialog):
+class Delay_Estimator_Settings_Dialog(QtWidgets.QDialog):
     def __init__(self, parent, logger):
-        QtGui.QDialog.__init__(self, parent)
+        super().__init__(self, parent)
         
         self.logger = logger
         

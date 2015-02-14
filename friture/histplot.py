@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt4 import QtCore, Qt, QtGui
+from PyQt5 import QtCore, Qt, QtGui, QtWidgets
 from numpy import zeros, ones, log10, linspace, logspace, log2, array, round
 from friture.plotting.scaleWidget import VerticalScaleWidget, HorizontalScaleWidget
 from friture.plotting.scaleDivision import ScaleDivision
@@ -287,7 +287,7 @@ class HistogramPeakBarItem:
             painter.fillRect(x1-1, peak, x2-x1+2, y-peak+1, self.palette[index])
 
 
-class HistPlot(QtGui.QWidget):
+class HistPlot(QtWidgets.QWidget):
     def __init__(self, parent, logger):
         super(HistPlot, self).__init__()
 

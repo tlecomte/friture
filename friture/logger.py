@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt4 import QtCore
+from PyQt5 import QtCore
 
 class Logger(QtCore.QObject):
 	

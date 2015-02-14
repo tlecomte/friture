@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt4 import QtGui, QtCore
+from PyQt5 import QtGui, QtCore, QtWidgets
 from friture.ui_settings import Ui_Settings_Dialog
 
 no_input_device_title = "No audio input device found"
@@ -29,9 +29,9 @@ Please check your audio configuration.
 Friture will now exit.
 """
 
-class Settings_Dialog(QtGui.QDialog, Ui_Settings_Dialog):
+class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
 	def __init__(self, parent, logger, audiobackend):
-		QtGui.QDialog.__init__(self, parent)
+		QtWidgets.QDialog.__init__(self, parent)
 		Ui_Settings_Dialog.__init__(self)
 		
 		# Setup the user interface

@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt4 import QtGui
+from PyQt5 import QtGui, QtWidgets
 from numpy import log10, array, arange, where
 from friture.logger import PrintLogger
 from friture.histplot import HistPlot
@@ -43,9 +43,9 @@ import friture.renard as renard
 
 SMOOTH_DISPLAY_TIMER_PERIOD_MS = 25
 
-class OctaveSpectrum_Widget(QtGui.QWidget):
+class OctaveSpectrum_Widget(QtWidgets.QWidget):
 	def __init__(self, parent, logger = PrintLogger()):
-		QtGui.QWidget.__init__(self, parent)
+		super().__init__(parent)
 
 		self.logger = logger
 		self.audiobuffer = None

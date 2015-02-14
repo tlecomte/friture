@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt4 import QtGui
+from PyQt5 import QtGui, QtWidgets
 from numpy import log10, argmax, max, array, zeros, arange, floor, float64
 from friture.audioproc import audioproc # audio processing class
 from friture.spectrum_settings import (Spectrum_Settings_Dialog, # settings dialog
@@ -36,9 +36,9 @@ from friture.audiobackend import SAMPLING_RATE
 from friture.spectrumPlotWidget import SpectrumPlotWidget
 from friture.exp_smoothing_conv import pyx_exp_smoothed_value_numpy
 
-class Spectrum_Widget(QtGui.QWidget):
+class Spectrum_Widget(QtWidgets.QWidget):
 	def __init__(self, parent, sharedGLWidget, logger = PrintLogger()):
-		QtGui.QWidget.__init__(self, parent)
+		super().__init__(parent)
 
 		self.logger = logger
 		self.audiobuffer = None

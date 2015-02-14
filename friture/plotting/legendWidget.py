@@ -1,7 +1,7 @@
-from PyQt4 import QtGui, QtCore
+from PyQt5 import QtGui, QtCore, QtWidgets
 
 #a widget for the items' legends
-class LegendWidget(QtGui.QWidget):
+class LegendWidget(QtWidgets.QWidget):
     def __init__(self, parent, canvasWidget):
         super(LegendWidget, self).__init__(parent)
 

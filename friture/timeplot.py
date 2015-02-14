@@ -27,7 +27,7 @@ except ImportError:
             "PyOpenGL must be installed to run this example.")
     sys.exit(1)
 
-from PyQt4 import QtCore, Qt, QtGui
+from PyQt5 import QtCore, Qt, QtGui, QtWidgets
 from numpy import log10, interp, linspace, sin, array, ones, zeros
 from friture.plotting.scaleWidget import VerticalScaleWidget, HorizontalScaleWidget
 from friture.plotting.scaleDivision import ScaleDivision
@@ -129,7 +129,7 @@ class CurveItem:
 		GL.glDisableClientState(GL.GL_VERTEX_ARRAY)
 
 
-class TimePlot(QtGui.QWidget):
+class TimePlot(QtWidgets.QWidget):
 	def __init__(self, parent, sharedGLWidget, logger):
 		super(TimePlot, self).__init__()
 

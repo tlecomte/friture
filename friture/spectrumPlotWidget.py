@@ -3,7 +3,7 @@
 
 import sys
 
-from PyQt4 import QtCore, QtGui, QtOpenGL, Qt
+from PyQt5 import QtCore, QtGui, QtOpenGL, Qt, QtWidgets
 from friture.audiobackend import SAMPLING_RATE
 from friture.plotting.scaleWidget import VerticalScaleWidget, HorizontalScaleWidget
 from friture.plotting.scaleDivision import ScaleDivision
@@ -26,7 +26,7 @@ PEAK_DECAY_RATE = 1.0 - 3E-6
 # Number of cycles the peak stays on hold before fall-off.
 PEAK_FALLOFF_COUNT = 32 # default : 16
 
-class SpectrumPlotWidget(QtGui.QWidget):
+class SpectrumPlotWidget(QtWidgets.QWidget):
     def __init__(self, parent, sharedGLWidget, logger=None):
         super(SpectrumPlotWidget, self).__init__()
 

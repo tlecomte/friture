@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt4 import QtGui, QtCore
+from PyQt5 import QtGui, QtCore, QtWidgets
 from friture.levels import Levels_Widget
 from friture.spectrum import Spectrum_Widget
 from friture.spectrogram import Spectrogram_Widget
@@ -27,10 +27,10 @@ from friture.generator import Generator_Widget
 from friture.delay_estimator import Delay_Estimator_Widget
 from friture.controlbar import ControlBar
 
-class Dock(QtGui.QDockWidget):
+class Dock(QtWidgets.QDockWidget):
 
 	def __init__(self, parent, sharedGLWidget, logger, name, type = 0):
-		QtGui.QDockWidget.__init__(self, name, parent)
+		super().__init__(name, parent)
 		
 		self.setObjectName(name)
 		
@@ -42,8 +42,8 @@ class Dock(QtGui.QDockWidget):
 		self.connect(self.controlBar.comboBox_select, QtCore.SIGNAL('activated(int)'), self.widget_select)
 		self.connect(self.controlBar.settingsButton, QtCore.SIGNAL('clicked(bool)'), self.settings_slot)
 
-		self.dockwidget = QtGui.QWidget(self)
-		self.layout = QtGui.QVBoxLayout(self.dockwidget)
+		self.dockwidget = QtWidgets.QWidget(self)
+		self.layout = QtWidgets.QVBoxLayout(self.dockwidget)
 		self.layout.addWidget(self.controlBar)
 		self.layout.setContentsMargins(0, 0, 0, 0)
 		self.dockwidget.setLayout(self.layout)

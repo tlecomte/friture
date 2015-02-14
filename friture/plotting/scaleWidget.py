@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt4 import QtGui
+from PyQt5 import QtGui, QtWidgets
 
 from friture.plotting.titleWidget import VerticalTitleWidget, HorizontalTitleWidget, ColorTitleWidget
 from friture.plotting.scaleBar import VerticalScaleBar, HorizontalScaleBar, ColorScaleBar
@@ -26,7 +26,7 @@ from friture.plotting.scaleBar import VerticalScaleBar, HorizontalScaleBar, Colo
 # - a title
 # - a scale bar with a baseline, ticks and tick labels
 # The logic of the placement of scale min/max and ticks belongs to another class
-class VerticalScaleWidget(QtGui.QWidget):
+class VerticalScaleWidget(QtWidgets.QWidget):
     def __init__(self, parent, transformation, scaleDivision, logger=None):
         super(VerticalScaleWidget, self).__init__()
 
@@ -51,7 +51,7 @@ class VerticalScaleWidget(QtGui.QWidget):
         return self.scaleBar.spacingBorders()
 
 
-class HorizontalScaleWidget(QtGui.QWidget):
+class HorizontalScaleWidget(QtWidgets.QWidget):
     def __init__(self, parent, transformation, scaleDivision, logger=None):
         super(HorizontalScaleWidget, self).__init__()
 
@@ -76,7 +76,7 @@ class HorizontalScaleWidget(QtGui.QWidget):
         return self.scaleBar.spacingBorders()
 
 
-class ColorScaleWidget(QtGui.QWidget):
+class ColorScaleWidget(QtWidgets.QWidget):
     def __init__(self, parent, transformation, scaleDivision, logger=None):
         super(ColorScaleWidget, self).__init__()
 

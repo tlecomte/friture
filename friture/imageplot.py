@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt4 import QtCore, QtGui, Qt
+from PyQt5 import QtCore, QtGui, Qt, QtWidgets
 from fractions import Fraction
 import numpy as np
 from friture.spectrogram_image import CanvasScaledSpectrogram
@@ -157,7 +157,7 @@ class PlotImage:
 		self.jitter_s = jitter_s
 		#print jitter_s
 
-class ImagePlot(QtGui.QWidget):
+class ImagePlot(QtWidgets.QWidget):
 	def __init__(self, parent, logger, audiobackend):
 		super(ImagePlot, self).__init__(parent)
 

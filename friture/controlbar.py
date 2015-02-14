@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt4 import QtGui, QtCore
+from PyQt5 import QtGui, QtCore, QtWidgets
 
 STYLESHEET = """
 """
@@ -106,9 +106,9 @@ STYLESHEET = """
 #}
 #"""
 
-class ControlBar(QtGui.QWidget):
+class ControlBar(QtWidgets.QWidget):
 	def __init__(self, parent):
-		QtGui.QWidget.__init__(self, parent)
+		super().__init__(parent)
 		
 		self.setObjectName("controlBar")
 		

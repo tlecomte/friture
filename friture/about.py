@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt4 import QtGui, QtCore
+from PyQt5 import QtGui, QtCore, QtWidgets
 import friture.friture_rc
 import friture
 from friture.logwidget import LogWidget
@@ -33,9 +33,9 @@ aboutText = """
 <p> Splash screen photo credit: <a href="http://www.flickr.com/photos/visual_dichotomy/3623619145/">visual.dichotomy</a> (CC BY 2.0)
 """ %(friture.__version__, friture.__releasedate__)
 
-class About_Dialog(QtGui.QDialog):
+class About_Dialog(QtWidgets.QDialog):
 	def __init__(self, parent, logger, audiobackend, timer):
-		QtGui.QDialog.__init__(self, parent)
+		super().__init__(parent)
 
 		self.setObjectName("About_Dialog")
 		self.resize(400, 300)
@@ -44,23 +44,23 @@ class About_Dialog(QtGui.QDialog):
 		icon = QtGui.QIcon()
 		icon.addPixmap(QtGui.QPixmap(":/images-src/window-icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
 		self.setWindowIcon(icon)
-		self.verticalLayout = QtGui.QVBoxLayout(self)
+		self.verticalLayout = QtWidgets.QVBoxLayout(self)
 		self.verticalLayout.setObjectName("verticalLayout")
 		
-		self.tabWidget = QtGui.QTabWidget(self)
+		self.tabWidget = QtWidgets.QTabWidget(self)
 		self.tabWidget.setObjectName("tabWidget")
-		self.aboutTab = QtGui.QWidget()
+		self.aboutTab = QtWidgets.QWidget()
 		self.aboutTab.setObjectName("aboutTab")
-		self.horizontalLayout = QtGui.QHBoxLayout(self.aboutTab)
+		self.horizontalLayout = QtWidgets.QHBoxLayout(self.aboutTab)
 		self.horizontalLayout.setObjectName("horizontalLayout")
-		self.label_2 = QtGui.QLabel(self.aboutTab)
+		self.label_2 = QtWidgets.QLabel(self.aboutTab)
 		self.label_2.setMinimumSize(QtCore.QSize(128, 128))
 		self.label_2.setMaximumSize(QtCore.QSize(128, 128))
 		self.label_2.setPixmap(QtGui.QPixmap(":/images-src/window-icon.svg"))
 		self.label_2.setScaledContents(True)
 		self.label_2.setObjectName("label_2")
 		self.horizontalLayout.addWidget(self.label_2)
-		self.label = QtGui.QLabel(self.aboutTab)
+		self.label = QtWidgets.QLabel(self.aboutTab)
 		self.label.setOpenExternalLinks( True ) 
 		self.label.setObjectName("label")
 		self.label.setText(aboutText)
@@ -76,9 +76,9 @@ class About_Dialog(QtGui.QDialog):
 		
 		self.tabWidget.setCurrentIndex(0)
 		
-		self.buttonBox = QtGui.QDialogButtonBox(self)
+		self.buttonBox = QtWidgets.QDialogButtonBox(self)
 		self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
-		self.buttonBox.setStandardButtons(QtGui.QDialogButtonBox.Close)
+		self.buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.Close)
 		self.buttonBox.setObjectName("buttonBox")
 		
 		self.verticalLayout.addWidget(self.tabWidget)

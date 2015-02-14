@@ -1,7 +1,7 @@
-from PyQt4 import QtGui, QtCore
+from PyQt5 import QtGui, QtCore, QtWidgets
 
 #a widget for the axis title, can be horizontal or vertical
-class VerticalTitleWidget(QtGui.QWidget):
+class VerticalTitleWidget(QtWidgets.QWidget):
     def __init__(self, title, parent):
         super(VerticalTitleWidget, self).__init__(parent)
 
@@ -39,7 +39,7 @@ class VerticalTitleWidget(QtGui.QWidget):
         painter.drawText(0, 0, self.title)
 
 
-class HorizontalTitleWidget(QtGui.QWidget):
+class HorizontalTitleWidget(QtWidgets.QWidget):
     def __init__(self, title, parent):
         super(HorizontalTitleWidget, self).__init__(parent)
 
@@ -74,7 +74,7 @@ class HorizontalTitleWidget(QtGui.QWidget):
         painter.drawText(0, 0, self.title)
 
 
-class ColorTitleWidget(QtGui.QWidget):
+class ColorTitleWidget(QtWidgets.QWidget):
     def __init__(self, title, parent):
         super(ColorTitleWidget, self).__init__(parent)
 

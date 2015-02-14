@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt4 import QtGui, QtCore
+from PyQt5 import QtGui, QtCore, QtWidgets
 from numpy import log10, where, linspace, sign, arange
 from friture.timeplot import TimePlot
 from friture.audiobackend import SAMPLING_RATE
@@ -26,9 +26,9 @@ from friture.logger import PrintLogger
 SMOOTH_DISPLAY_TIMER_PERIOD_MS = 25
 DEFAULT_TIMERANGE = 2*SMOOTH_DISPLAY_TIMER_PERIOD_MS
 
-class Scope_Widget(QtGui.QWidget):
+class Scope_Widget(QtWidgets.QWidget):
     def __init__(self, parent, sharedGLWidget, logger = PrintLogger()):
-        QtGui.QWidget.__init__(self, parent)
+        super().__init__(parent)
 
         self.audiobuffer = None
         self.logger = logger
@@ -131,9 +131,9 @@ class Scope_Widget(QtGui.QWidget):
         self.settings_dialog.restoreState(settings)
 
 
-class Scope_Settings_Dialog(QtGui.QDialog):
+class Scope_Settings_Dialog(QtWidgets.QDialog):
     def __init__(self, parent, logger):
-        QtGui.QDialog.__init__(self, parent)
+        super().__init__(parent)
         
         self.logger = logger
         

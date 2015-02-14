@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt4 import QtGui
+from PyQt5 import QtGui, QtWidgets
 from numpy import log10, floor, zeros, float64, tile, array
 from friture.imageplot import ImagePlot
 from friture.audioproc import audioproc # audio processing class
@@ -36,9 +36,9 @@ from friture.logger import PrintLogger
 #from glrollingcanvaswidget import GLRollingCanvasWidget
 from fractions import Fraction
 
-class Spectrogram_Widget(QtGui.QWidget):
+class Spectrogram_Widget(QtWidgets.QWidget):
     def __init__(self, parent, audiobackend, logger = PrintLogger()):
-        QtGui.QWidget.__init__(self, parent)
+        super().__init__(parent)
 
         self.logger = logger
 

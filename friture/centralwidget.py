@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt4 import QtGui, QtCore
+from PyQt5 import QtGui, QtCore, QtWidgets
 from friture.levels import Levels_Widget
 from friture.spectrum import Spectrum_Widget
 from friture.spectrogram import Spectrogram_Widget
@@ -28,9 +28,9 @@ from friture.delay_estimator import Delay_Estimator_Widget
 from friture.controlbar import ControlBar
 from friture.defaults import DEFAULT_CENTRAL_WIDGET
 
-class CentralWidget(QtGui.QWidget):
+class CentralWidget(QtWidgets.QWidget):
 	def __init__(self, parent, sharedGLWidget, logger, name, type = 0):
-		QtGui.QWidget.__init__(self, parent)
+		super().__init__(parent)
 		
 		self.setObjectName(name)
 		
@@ -43,11 +43,11 @@ class CentralWidget(QtGui.QWidget):
 		self.connect(self.controlBar.comboBox_select, QtCore.SIGNAL('activated(int)'), self.widget_select)
 		self.connect(self.controlBar.settingsButton, QtCore.SIGNAL('clicked(bool)'), self.settings_slot)
 
-		self.label = QtGui.QLabel(self)
+		self.label = QtWidgets.QLabel(self)
 		self.label.setText(" Central dock ") # spaces before and after for nicer alignment
 		self.controlBar.layout.insertWidget(0, self.label)
 		
-		self.layout = QtGui.QVBoxLayout(self)
+		self.layout = QtWidgets.QVBoxLayout(self)
 		self.layout.addWidget(self.controlBar)
 		self.layout.setContentsMargins(0, 0, 0, 0)
 		self.setLayout(self.layout)

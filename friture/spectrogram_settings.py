@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt4 import QtGui, QtCore
+from PyQt5 import QtGui, QtCore, QtWidgets
 from friture.audiobackend import SAMPLING_RATE
 
 # shared with spectrogram.py
@@ -30,9 +30,9 @@ DEFAULT_SPEC_MAX = 0
 DEFAULT_TIMERANGE = 10.
 DEFAULT_WEIGHTING = 0 #None
 
-class Spectrogram_Settings_Dialog(QtGui.QDialog):
+class Spectrogram_Settings_Dialog(QtWidgets.QDialog):
 	def __init__(self, parent, logger):
-		QtGui.QDialog.__init__(self, parent)
+		super().__init__(parent)
 		
 		self.logger = logger
 		

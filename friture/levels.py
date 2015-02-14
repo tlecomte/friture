@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt4 import QtCore, QtGui
+from PyQt5 import QtCore, QtGui, QtWidgets
 from numpy import log10, abs, arange
 from friture.levels_settings import Levels_Settings_Dialog # settings dialog
 from friture.qsynthmeter import qsynthMeter
@@ -41,12 +41,12 @@ LEVEL_TEXT_LABEL_PERIOD_MS = 250
 
 LEVEL_TEXT_LABEL_STEPS = LEVEL_TEXT_LABEL_PERIOD_MS/SMOOTH_DISPLAY_TIMER_PERIOD_MS
 
-class Levels_Widget(QtGui.QWidget):
+class Levels_Widget(QtWidgets.QWidget):
 	def __init__(self, parent = None, logger = PrintLogger()):
-		QtGui.QWidget.__init__(self, parent)
+		super().__init__(parent)
 		self.setObjectName("Levels_Widget")
 		
-		self.gridLayout = QtGui.QGridLayout(self)
+		self.gridLayout = QtWidgets.QGridLayout(self)
 		self.gridLayout.setObjectName("gridLayout")
 
 		font = QtGui.QFont()
@@ -54,22 +54,22 @@ class Levels_Widget(QtGui.QWidget):
 		font.setWeight(75)
 		font.setBold(True)
 
-		self.label_peak = QtGui.QLabel(self)
+		self.label_peak = QtWidgets.QLabel(self)
 		self.label_peak.setFont(font)
 		#QtCore.Qt.AlignBottom|QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft
 		self.label_peak.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignRight)
 		self.label_peak.setObjectName("label_peak")
 
-		self.label_peak_legend = QtGui.QLabel(self)
+		self.label_peak_legend = QtWidgets.QLabel(self)
 		self.label_peak_legend.setAlignment(QtCore.Qt.AlignTop|QtCore.Qt.AlignRight)
 		self.label_peak_legend.setObjectName("label_peak_legend")
 
-		self.label_rms = QtGui.QLabel(self)
+		self.label_rms = QtWidgets.QLabel(self)
 		self.label_rms.setFont(font)
 		self.label_rms.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignRight)
 		self.label_rms.setObjectName("label_rms")
 
-		self.label_rms_legend = QtGui.QLabel(self)
+		self.label_rms_legend = QtWidgets.QLabel(self)
 		self.label_rms_legend.setAlignment(QtCore.Qt.AlignTop|QtCore.Qt.AlignRight)
 		self.label_rms_legend.setObjectName("label_rms_legend")
 

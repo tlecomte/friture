@@ -17,11 +17,11 @@
 # You should have received a copy of the GNU General Public License
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt4 import QtCore, QtGui
+from PyQt5 import QtCore, QtGui, QtWidgets
 
 from .grid import Grid
 
-class CanvasWidget(QtGui.QWidget):
+class CanvasWidget(QtWidgets.QWidget):
 
     resized = QtCore.pyqtSignal(int, int)
 

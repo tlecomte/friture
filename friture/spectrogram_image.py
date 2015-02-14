@@ -18,7 +18,7 @@
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
 import numpy
-from PyQt4 import Qt, QtCore, QtGui
+from PyQt5 import Qt, QtCore, QtGui
 from friture.audiobackend import SAMPLING_RATE
 from friture.plotting import cmrmap
 from friture.lookup_table import pyx_color_from_float_2D

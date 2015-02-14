@@ -1,6 +1,6 @@
 import sys
 
-from PyQt4 import QtCore, QtGui, QtOpenGL, Qt
+from PyQt5 import QtCore, QtGui, QtOpenGL, Qt
 import numpy as np
 
 try:

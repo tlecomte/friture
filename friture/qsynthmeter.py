@@ -18,7 +18,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Friture.  If not, see <http:#www.gnu.org/licenses/>.
 
-from PyQt4 import QtCore, QtGui
+from PyQt5 import QtCore, QtGui, QtWidgets
 from numpy import log10
 
 # Meter level limits (in dB).
@@ -34,12 +34,12 @@ PEAK_FALLOFF = 32 # default : 16
 #----------------------------------------------------------------------------
 # MeterScale -- Meter bridge scale widget.
 
-class MeterScale(QtGui.QWidget):
+class MeterScale(QtWidgets.QWidget):
 	SEGMENTS_LEFT = 0
 	SEGMENTS_BOTH  = 1
 
 	def __init__(self, meter, segmentsConf = SEGMENTS_LEFT):
-		QtGui.QWidget.__init__(self, meter)
+		super().__init__(meter)
 		self.meter = meter
 		self.lastY = 0
 	
@@ -144,10 +144,10 @@ class BallisticPeak:
 
 #----------------------------------------------------------------------------
 # MeterValue -- Meter bridge value widget.
-class MeterValue(QtGui.QFrame):
+class MeterValue(QtWidgets.QFrame):
 	
 	def __init__(self, meter):
-		QtGui.QFrame.__init__(self, meter)
+		super().__init__(meter)
 		
 		self.meter      = meter
 		self.dBValue    = 0.0
@@ -223,17 +223,17 @@ class MeterValue(QtGui.QFrame):
 	def resizeEvent(self, resizeEvent):
 		self.peak.reset()
 
-		QtGui.QWidget.resizeEvent(self, resizeEvent)
-		#QtGui.QWidget.repaint(True)
+		QtWidgets.QWidget.resizeEvent(self, resizeEvent)
+		#QtWidgets.QWidget.repaint(True)
 
 
 #----------------------------------------------------------------------------
 # qsynthMeter -- Meter bridge slot widget.
 
-class qsynthMeter(QtGui.QFrame):
+class qsynthMeter(QtWidgets.QFrame):
 	
 	def __init__(self, parent):
-		QtGui.QFrame.__init__(self, parent)
+		super().__init__(parent)
 		
 		self.portCount  = 1
 

@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt4 import QtGui, QtCore
+from PyQt5 import QtGui, QtCore, QtWidgets
 from friture.audiobackend import SAMPLING_RATE
 
 # shared with spectrum_settings.py
@@ -32,9 +32,9 @@ DEFAULT_SHOW_FREQ_LABELS = True
 DEFAULT_RESPONSE_TIME = 0.025
 DEFAULT_RESPONSE_TIME_INDEX = 0
 
-class Spectrum_Settings_Dialog(QtGui.QDialog):
+class Spectrum_Settings_Dialog(QtWidgets.QDialog):
 	def __init__(self, parent, logger):
-		QtGui.QDialog.__init__(self, parent)
+		super().__init__(parent)
 		
 		self.logger = logger
 		

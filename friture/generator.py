@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt4 import QtGui, QtCore
+from PyQt5 import QtGui, QtCore, QtWidgets
 import numpy as np
 import pyaudio
 from numpy.random import standard_normal
@@ -55,9 +55,9 @@ def pinknoise(n, rvs=standard_normal):
 
     return pink/k
 
-class Generator_Widget(QtGui.QWidget):
+class Generator_Widget(QtWidgets.QWidget):
     def __init__(self, parent, audiobackend, logger = PrintLogger()):
-        QtGui.QWidget.__init__(self, parent)
+        super().__init__(parent)
 
         self.logger = logger
         self.audiobuffer = None
@@ -75,11 +75,11 @@ class Generator_Widget(QtGui.QWidget):
         self.comboBox_generator_kind.addItem("Burst")
         self.comboBox_generator_kind.setCurrentIndex(DEFAULT_GENERATOR_KIND_INDEX)
 
-        sinePageWidget = QtGui.QWidget(self)
-        whitePageWidget = QtGui.QWidget(self)
-        pinkPageWidget = QtGui.QWidget(self)
-        sweepPageWidget = QtGui.QWidget(self)
-        burstPageWidget = QtGui.QWidget(self)
+        sinePageWidget = QtWidgets.QWidget(self)
+        whitePageWidget = QtWidgets.QWidget(self)
+        pinkPageWidget = QtWidgets.QWidget(self)
+        sweepPageWidget = QtWidgets.QWidget(self)
+        burstPageWidget = QtWidgets.QWidget(self)
 
         self.stackedLayout = QtGui.QStackedLayout()
         self.stackedLayout.addWidget(sinePageWidget)
@@ -410,9 +410,9 @@ class Generator_Widget(QtGui.QWidget):
         
         self.settings_dialog.restoreState(settings)
 
-class Generator_Settings_Dialog(QtGui.QDialog):
+class Generator_Settings_Dialog(QtWidgets.QDialog):
     def __init__(self, parent, logger):
-        QtGui.QDialog.__init__(self, parent)
+        super().__init__(self, parent)
 
         self.logger = logger
 

@@ -18,9 +18,10 @@
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
 import sys, os, platform
-from PyQt4 import QtCore, QtOpenGL
-# specifically import from PyQt4.QtGui for startup time improvement :
-from PyQt4.QtGui import QMainWindow, QVBoxLayout, QErrorMessage, QApplication, QPixmap, QSplashScreen
+from PyQt5 import QtCore, QtOpenGL
+# specifically import from PyQt5.QtGui and QWidgets for startup time improvement :
+from PyQt5.QtWidgets import QMainWindow, QVBoxLayout, QErrorMessage, QApplication, QSplashScreen
+from PyQt5.QtGui import QPixmap
 from friture.ui_friture import Ui_MainWindow
 from friture.about import About_Dialog # About dialog
 from friture.settings import Settings_Dialog # Setting dialog

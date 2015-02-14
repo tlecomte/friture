@@ -1,11 +1,11 @@
-from PyQt4 import QtGui, QtCore
+from PyQt5 import QtGui, QtCore, QtWidgets
 from friture.plotting.scaleDivision import numberPrecision
 from friture.plotting import cmrmap
 
 # A widget canvas with a baseline, ticks and tick labels
 # The logic of the placement of scale min/max and ticks belongs to another class.
 # The title belongs to another class.
-class VerticalScaleBar(QtGui.QWidget):
+class VerticalScaleBar(QtWidgets.QWidget):
     def __init__(self, parent, division, transform, logger=None):
         super(VerticalScaleBar, self).__init__()
 
@@ -100,7 +100,7 @@ class VerticalScaleBar(QtGui.QWidget):
 
 
 
-class HorizontalScaleBar(QtGui.QWidget):
+class HorizontalScaleBar(QtWidgets.QWidget):
     def __init__(self, parent, division, transform, logger=None):
         super(HorizontalScaleBar, self).__init__()
 
@@ -190,7 +190,7 @@ class HorizontalScaleBar(QtGui.QWidget):
 
 
 
-class ColorScaleBar(QtGui.QWidget):
+class ColorScaleBar(QtWidgets.QWidget):
     def __init__(self, parent, division, transform, logger=None):
         super(ColorScaleBar, self).__init__()
 
