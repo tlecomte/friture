@@ -24,6 +24,8 @@ from friture.plotting import cmrmap
 from friture.lookup_table import pyx_color_from_float_2D
 
 class CanvasScaledSpectrogram(QtCore.QObject):
+	canvasWidthChanged = QtCore.pyqtSignal(int)
+
 	def __init__(self, logger, canvas_height = 2,  canvas_width = 2):
 		QtCore.QObject.__init__(self)
 
@@ -75,7 +77,7 @@ class CanvasScaledSpectrogram(QtCore.QObject):
 		if self.canvas_width != canvas_width:
 			self.canvas_width = canvas_width
 			self.resize(self.canvas_width, self.canvas_height)
-			self.emit(QtCore.SIGNAL("canvasWidthChanged"), canvas_width)
+			self.canvasWidthChanged.emit(canvas_width)
 			self.logger.push("Spectrogram image: canvas_width changed, now: %d" %(canvas_width))
 
 	def addPixelAdvance(self, pixel_advance):
