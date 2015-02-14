@@ -341,7 +341,7 @@ class Delay_Estimator_Settings_Dialog(QtWidgets.QDialog):
         
         self.setLayout(self.formLayout)
         
-        self.connect(self.doubleSpinBox_delayrange, QtCore.SIGNAL('valueChanged(double)'), self.parent().set_delayrange)
+        self.doubleSpinBox_delayrange.valueChanged.connect(self.parent().set_delayrange)
 
     # method
     def saveState(self, settings):

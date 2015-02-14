@@ -192,8 +192,8 @@ class Generator_Widget(QtWidgets.QWidget):
         self.gridLayout.addWidget(self.comboBox_generator_kind, 1, 0, 1, 1)
         self.gridLayout.addLayout(self.stackedLayout, 2, 0, 1, 1)
 
-        self.connect(self.comboBox_generator_kind, QtCore.SIGNAL('activated(int)'), self.stackedLayout.setCurrentIndex)
-        self.connect(self.startStopButton, QtCore.SIGNAL('toggled(bool)'), self.startStopButton_toggle)
+        self.comboBox_generator_kind.activated.connect(self.stackedLayout.setCurrentIndex)
+        self.startStopButton.toggled.connect(self.startStopButton_toggle)
 
         #self.setStyleSheet(STYLESHEET)
 
@@ -209,12 +209,12 @@ class Generator_Widget(QtWidgets.QWidget):
         if self.device != None:
             self.settings_dialog.comboBox_outputDevice.setCurrentIndex(self.audiobackend.output_devices.index(self.device))
 
-        self.connect(self.settings_dialog.comboBox_outputDevice, QtCore.SIGNAL('currentIndexChanged(int)'), self.device_changed)
+        self.settings_dialog.comboBox_outputDevice.currentIndexChanged.connect(self.device_changed)
 
         self.sweepGenerator = SweepGenerator()
-        self.connect(self.spinBox_sweep_startfrequency, QtCore.SIGNAL('valueChanged(int)'), self.sweepGenerator.setf1)
-        self.connect(self.spinBox_sweep_stopfrequency, QtCore.SIGNAL('valueChanged(int)'), self.sweepGenerator.setf2)
-        self.connect(self.spinBox_sweep_period, QtCore.SIGNAL('valueChanged(double)'), self.sweepGenerator.setT)
+        self.spinBox_sweep_startfrequency.valueChanged.connect(self.sweepGenerator.setf1)
+        self.spinBox_sweep_stopfrequency.valueChanged.connect(self.sweepGenerator.setf2)
+        self.spinBox_sweep_period.valueChanged.connect(self.sweepGenerator.setT)
         
 #        channels = self.audiobackend.get_readable_current_output_channels()
 #        for channel in channels:

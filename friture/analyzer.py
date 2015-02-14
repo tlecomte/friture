@@ -109,15 +109,15 @@ class Friture(QMainWindow, ):
 		self.dockmanager = DockManager(self, self.sharedGLWidget, self.logger)
 
 		# timer ticks
-		self.connect(self.display_timer, QtCore.SIGNAL('timeout()'), self.update_buffer)
-		self.connect(self.display_timer, QtCore.SIGNAL('timeout()'), self.centralwidget.update)
-		self.connect(self.display_timer, QtCore.SIGNAL('timeout()'), self.dockmanager.update)
+		self.display_timer.timeout.connect(self.update_buffer)
+		self.display_timer.timeout.connect(self.centralwidget.update)
+		self.display_timer.timeout.connect(self.dockmanager.update)
 
 		# toolbar clicks
-		self.connect(self.ui.actionStart, QtCore.SIGNAL('triggered()'), self.timer_toggle)
-		self.connect(self.ui.actionSettings, QtCore.SIGNAL('triggered()'), self.settings_called)
-		self.connect(self.ui.actionAbout, QtCore.SIGNAL('triggered()'), self.about_called)
-		self.connect(self.ui.actionNew_dock, QtCore.SIGNAL('triggered()'), self.dockmanager.new_dock)
+		self.ui.actionStart.triggered.connect(self.timer_toggle)
+		self.ui.actionSettings.triggered.connect(self.settings_called)
+		self.ui.actionAbout.triggered.connect(self.about_called)
+		self.ui.actionNew_dock.triggered.connect(self.dockmanager.new_dock)
 
 		# restore the settings and widgets geometries
 		self.restoreAppState()

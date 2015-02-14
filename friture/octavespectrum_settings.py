@@ -87,11 +87,11 @@ class OctaveSpectrum_Settings_Dialog(QtWidgets.QDialog):
 		
 		self.setLayout(self.formLayout)
 
-		self.connect(self.comboBox_bandsperoctave, QtCore.SIGNAL('currentIndexChanged(int)'), self.bandsperoctavechanged)
-		self.connect(self.spinBox_specmin, QtCore.SIGNAL('valueChanged(int)'), self.parent().setmin)
-		self.connect(self.spinBox_specmax, QtCore.SIGNAL('valueChanged(int)'), self.parent().setmax)
-		self.connect(self.comboBox_weighting, QtCore.SIGNAL('currentIndexChanged(int)'), self.parent().setweighting)
-		self.connect(self.comboBox_response_time, QtCore.SIGNAL('currentIndexChanged(int)'), self.responsetimechanged)
+		self.comboBox_bandsperoctave.currentIndexChanged.connect(self.bandsperoctavechanged)
+		self.spinBox_specmin.valueChanged.connect(self.parent().setmin)
+		self.spinBox_specmax.valueChanged.connect(self.parent().setmax)
+		self.comboBox_weighting.currentIndexChanged.connect(self.parent().setweighting)
+		self.comboBox_response_time.currentIndexChanged.connect(self.responsetimechanged)
 
 	# slot
 	def bandsperoctavechanged(self, index):

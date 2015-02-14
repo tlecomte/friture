@@ -42,7 +42,7 @@ class Levels_Settings_Dialog(QtWidgets.QDialog):
 		
 		self.setLayout(self.formLayout)
 
-		#self.connect(self.doubleSpinBox_timerange, QtCore.SIGNAL('valueChanged(double)'), self.parent().timerangechanged)
+		#self.doubleSpinBox_timerange.valueChanged.connect(self.parent().timerangechanged)
 
 	# method
 	def saveState(self, settings):

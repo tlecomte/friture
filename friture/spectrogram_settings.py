@@ -119,14 +119,14 @@ class Spectrogram_Settings_Dialog(QtWidgets.QDialog):
 		
 		self.setLayout(self.formLayout)
 
-		self.connect(self.comboBox_fftsize, QtCore.SIGNAL('currentIndexChanged(int)'), self.fftsizechanged)
-		self.connect(self.comboBox_freqscale, QtCore.SIGNAL('currentIndexChanged(int)'), self.freqscalechanged)
-		self.connect(self.spinBox_minfreq, QtCore.SIGNAL('valueChanged(int)'), self.parent().setminfreq)
-		self.connect(self.spinBox_maxfreq, QtCore.SIGNAL('valueChanged(int)'), self.parent().setmaxfreq)
-		self.connect(self.spinBox_specmin, QtCore.SIGNAL('valueChanged(int)'), self.parent().setmin)
-		self.connect(self.spinBox_specmax, QtCore.SIGNAL('valueChanged(int)'), self.parent().setmax)
-		self.connect(self.doubleSpinBox_timerange, QtCore.SIGNAL('valueChanged(double)'), self.parent().timerangechanged)
-		self.connect(self.comboBox_weighting, QtCore.SIGNAL('currentIndexChanged(int)'), self.parent().setweighting)
+		self.comboBox_fftsize.currentIndexChanged.connect(self.fftsizechanged)
+		self.comboBox_freqscale.currentIndexChanged.connect(self.freqscalechanged)
+		self.spinBox_minfreq.valueChanged.connect(self.parent().setminfreq)
+		self.spinBox_maxfreq.valueChanged.connect(self.parent().setmaxfreq)
+		self.spinBox_specmin.valueChanged.connect(self.parent().setmin)
+		self.spinBox_specmax.valueChanged.connect(self.parent().setmax)
+		self.doubleSpinBox_timerange.valueChanged.connect(self.parent().timerangechanged)
+		self.comboBox_weighting.currentIndexChanged.connect(self.parent().setweighting)
 
 	# slot
 	def fftsizechanged(self, index):
