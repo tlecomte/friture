@@ -269,7 +269,7 @@ class qsynthMeter(QtWidgets.QFrame):
 		self.setBackgroundRole(QtGui.QPalette.NoRole)
 
 		self.HBoxLayout = QtWidgets.QHBoxLayout()
-		self.HBoxLayout.setMargin(0)
+		self.HBoxLayout.setContentsMargins(0, 0, 0, 0)
 		self.HBoxLayout.setSpacing(0)
 		self.setLayout(self.HBoxLayout)
 
