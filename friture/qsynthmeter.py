@@ -91,7 +91,7 @@ class MeterScale(QtWidgets.QWidget):
 
 		self.lastY = 0
 
-		painter.setPen(self.palette().mid().color().dark(200))
+		painter.setPen(self.palette().mid().color().darker(200))
 
 		for dB in [0, -3, -6, -10, -20, -30, -40, -50, -60]:
 			self.drawLineLabel(painter, self.meter.iec_scale(dB), str(abs(dB)))
@@ -205,7 +205,7 @@ class MeterValue(QtWidgets.QFrame):
 			painter.setPen(self.meter.color(self.meter.ColorFore))
 			painter.drawLine(0, h - y, w, h - y)
 		else:
-			painter.fillRect(0, 0, w, h, self.palette().dark().color())
+			painter.fillRect(0, 0, w, h, self.palette().darker().color())
 
 		if self.pixelValue2 != None:
 			painter.drawPixmap(0, h - self.pixelValue2,
