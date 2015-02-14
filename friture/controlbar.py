@@ -112,9 +112,9 @@ class ControlBar(QtWidgets.QWidget):
 		
 		self.setObjectName("controlBar")
 		
-		self.layout = QtGui.QHBoxLayout(self)
+		self.layout = QtWidgets.QHBoxLayout(self)
 		
-		self.comboBox_select = QtGui.QComboBox(self)
+		self.comboBox_select = QtWidgets.QComboBox(self)
 		self.comboBox_select.addItem("Levels")
 		self.comboBox_select.addItem("Scope")
 		self.comboBox_select.addItem("FFT Spectrum")
@@ -125,7 +125,7 @@ class ControlBar(QtWidgets.QWidget):
 		self.comboBox_select.setCurrentIndex(0)
 		self.comboBox_select.setToolTip("Select the type of audio widget")
 		
-		self.settingsButton = QtGui.QToolButton (self)
+		self.settingsButton = QtWidgets.QToolButton (self)
 		self.settingsButton.setToolTip("Customize the audio widget")
 				
 		settings_icon = QtGui.QIcon()

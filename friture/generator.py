@@ -63,10 +63,10 @@ class Generator_Widget(QtWidgets.QWidget):
         self.audiobuffer = None
 
         self.setObjectName("Generator_Widget")
-        self.gridLayout = QtGui.QGridLayout(self)
+        self.gridLayout = QtWidgets.QGridLayout(self)
         self.gridLayout.setObjectName("gridLayout")
 
-        self.comboBox_generator_kind = QtGui.QComboBox(self)
+        self.comboBox_generator_kind = QtWidgets.QComboBox(self)
         self.comboBox_generator_kind.setObjectName("comboBox_generator_kind")
         self.comboBox_generator_kind.addItem("Sine")
         self.comboBox_generator_kind.addItem("White noise")
@@ -420,7 +420,7 @@ class Generator_Settings_Dialog(QtWidgets.QDialog):
 
         self.formLayout = QtGui.QFormLayout(self)
 
-        self.comboBox_outputDevice = QtGui.QComboBox(self)
+        self.comboBox_outputDevice = QtWidgets.QComboBox(self)
         self.comboBox_outputDevice.setObjectName("comboBox_outputDevice")
 
         self.formLayout.addRow("Select the output device:", self.comboBox_outputDevice)

@@ -38,7 +38,7 @@ class OctaveSpectrum_Settings_Dialog(QtWidgets.QDialog):
 		
 		self.formLayout = QtGui.QFormLayout(self)
 
-		self.comboBox_bandsperoctave = QtGui.QComboBox(self)
+		self.comboBox_bandsperoctave = QtWidgets.QComboBox(self)
 		self.comboBox_bandsperoctave.setObjectName("comboBox_bandsperoctave")
 		self.comboBox_bandsperoctave.addItem("1")
 		self.comboBox_bandsperoctave.addItem("3")
@@ -47,7 +47,7 @@ class OctaveSpectrum_Settings_Dialog(QtWidgets.QDialog):
 		self.comboBox_bandsperoctave.addItem("24")
 		self.comboBox_bandsperoctave.setCurrentIndex(DEFAULT_BANDSPEROCTAVE_INDEX)
 
-		self.spinBox_specmin = QtGui.QSpinBox(self)
+		self.spinBox_specmin = QtWidgets.QSpinBox(self)
 		self.spinBox_specmin.setKeyboardTracking(False)
 		self.spinBox_specmin.setMinimum(-200)
 		self.spinBox_specmin.setMaximum(200)
@@ -55,7 +55,7 @@ class OctaveSpectrum_Settings_Dialog(QtWidgets.QDialog):
 		self.spinBox_specmin.setObjectName("spinBox_specmin")
 		self.spinBox_specmin.setSuffix(" dB")
 
-		self.spinBox_specmax = QtGui.QSpinBox(self)
+		self.spinBox_specmax = QtWidgets.QSpinBox(self)
 		self.spinBox_specmax.setKeyboardTracking(False)
 		self.spinBox_specmax.setMinimum(-200)
 		self.spinBox_specmax.setMaximum(200)
@@ -63,7 +63,7 @@ class OctaveSpectrum_Settings_Dialog(QtWidgets.QDialog):
 		self.spinBox_specmax.setObjectName("spinBox_specmax")
 		self.spinBox_specmax.setSuffix(" dB")
 		
-		self.comboBox_weighting = QtGui.QComboBox(self)
+		self.comboBox_weighting = QtWidgets.QComboBox(self)
 		self.comboBox_weighting.setObjectName("weighting")
 		self.comboBox_weighting.addItem("None")
 		self.comboBox_weighting.addItem("A")
@@ -71,7 +71,7 @@ class OctaveSpectrum_Settings_Dialog(QtWidgets.QDialog):
 		self.comboBox_weighting.addItem("C")
 		self.comboBox_weighting.setCurrentIndex(DEFAULT_WEIGHTING)
 		
-		self.comboBox_response_time = QtGui.QComboBox(self)
+		self.comboBox_response_time = QtWidgets.QComboBox(self)
 		self.comboBox_response_time.setObjectName("response_time")
 		self.comboBox_response_time.addItem("25 ms (Impulse)")
 		self.comboBox_response_time.addItem("125 ms (Fast)")

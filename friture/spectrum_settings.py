@@ -42,13 +42,13 @@ class Spectrum_Settings_Dialog(QtWidgets.QDialog):
 		
 		self.formLayout = QtGui.QFormLayout(self)
 
-		self.comboBox_dual_channel = QtGui.QComboBox(self)
+		self.comboBox_dual_channel = QtWidgets.QComboBox(self)
 		self.comboBox_dual_channel.setObjectName("dual")
 		self.comboBox_dual_channel.addItem("Single-channel")
 		self.comboBox_dual_channel.addItem("Dual-channel")
 		self.comboBox_dual_channel.setCurrentIndex(0)
 		
-		self.comboBox_fftsize = QtGui.QComboBox(self)
+		self.comboBox_fftsize = QtWidgets.QComboBox(self)
 		self.comboBox_fftsize.setObjectName("comboBox_fftsize")
 		self.comboBox_fftsize.addItem("32 points")
 		self.comboBox_fftsize.addItem("64 points")
@@ -62,13 +62,13 @@ class Spectrum_Settings_Dialog(QtWidgets.QDialog):
 		self.comboBox_fftsize.addItem("16384 points")
 		self.comboBox_fftsize.setCurrentIndex(DEFAULT_FFT_SIZE)
 
-		self.comboBox_freqscale = QtGui.QComboBox(self)
+		self.comboBox_freqscale = QtWidgets.QComboBox(self)
 		self.comboBox_freqscale.setObjectName("comboBox_freqscale")
 		self.comboBox_freqscale.addItem("Linear")
 		self.comboBox_freqscale.addItem("Logarithmic")
 		self.comboBox_freqscale.setCurrentIndex(DEFAULT_FREQ_SCALE)
 
-		self.spinBox_minfreq = QtGui.QSpinBox(self)
+		self.spinBox_minfreq = QtWidgets.QSpinBox(self)
 		self.spinBox_minfreq.setMinimum(20)
 		self.spinBox_minfreq.setMaximum(SAMPLING_RATE/2)
 		self.spinBox_minfreq.setSingleStep(10)
@@ -76,7 +76,7 @@ class Spectrum_Settings_Dialog(QtWidgets.QDialog):
 		self.spinBox_minfreq.setObjectName("spinBox_minfreq")
 		self.spinBox_minfreq.setSuffix(" Hz")
 		
-		self.spinBox_maxfreq = QtGui.QSpinBox(self)
+		self.spinBox_maxfreq = QtWidgets.QSpinBox(self)
 		self.spinBox_maxfreq.setMinimum(20)
 		self.spinBox_maxfreq.setMaximum(SAMPLING_RATE/2)
 		self.spinBox_maxfreq.setSingleStep(1000)
@@ -84,7 +84,7 @@ class Spectrum_Settings_Dialog(QtWidgets.QDialog):
 		self.spinBox_maxfreq.setObjectName("spinBox_maxfreq")
 		self.spinBox_maxfreq.setSuffix(" Hz")
 
-		self.spinBox_specmin = QtGui.QSpinBox(self)
+		self.spinBox_specmin = QtWidgets.QSpinBox(self)
 		self.spinBox_specmin.setKeyboardTracking(False)
 		self.spinBox_specmin.setMinimum(-200)
 		self.spinBox_specmin.setMaximum(200)
@@ -92,7 +92,7 @@ class Spectrum_Settings_Dialog(QtWidgets.QDialog):
 		self.spinBox_specmin.setObjectName("spinBox_specmin")
 		self.spinBox_specmin.setSuffix(" dB")
 
-		self.spinBox_specmax = QtGui.QSpinBox(self)
+		self.spinBox_specmax = QtWidgets.QSpinBox(self)
 		self.spinBox_specmax.setKeyboardTracking(False)
 		self.spinBox_specmax.setMinimum(-200)
 		self.spinBox_specmax.setMaximum(200)
@@ -100,7 +100,7 @@ class Spectrum_Settings_Dialog(QtWidgets.QDialog):
 		self.spinBox_specmax.setObjectName("spinBox_specmax")
 		self.spinBox_specmax.setSuffix(" dB")
 		
-		self.comboBox_weighting = QtGui.QComboBox(self)
+		self.comboBox_weighting = QtWidgets.QComboBox(self)
 		self.comboBox_weighting.setObjectName("weighting")
 		self.comboBox_weighting.addItem("None")
 		self.comboBox_weighting.addItem("A")
@@ -108,7 +108,7 @@ class Spectrum_Settings_Dialog(QtWidgets.QDialog):
 		self.comboBox_weighting.addItem("C")
 		self.comboBox_weighting.setCurrentIndex(DEFAULT_WEIGHTING)
 
-		self.comboBox_response_time = QtGui.QComboBox(self)
+		self.comboBox_response_time = QtWidgets.QComboBox(self)
 		self.comboBox_response_time.setObjectName("response_time")
 		self.comboBox_response_time.addItem("25 ms (Impulse)")
 		self.comboBox_response_time.addItem("125 ms (Fast)")
@@ -116,7 +116,7 @@ class Spectrum_Settings_Dialog(QtWidgets.QDialog):
 		self.comboBox_response_time.addItem("1s (Slow)")
 		self.comboBox_response_time.setCurrentIndex(DEFAULT_RESPONSE_TIME_INDEX)
 
-		self.checkBox_showFreqLabels = QtGui.QCheckBox(self)
+		self.checkBox_showFreqLabels = QtWidgets.QCheckBox(self)
 		self.checkBox_showFreqLabels.setObjectName("showFreqLabels")
 		self.checkBox_showFreqLabels.setChecked(DEFAULT_SHOW_FREQ_LABELS)
 

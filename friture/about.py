@@ -84,8 +84,8 @@ class About_Dialog(QtWidgets.QDialog):
 		self.verticalLayout.addWidget(self.tabWidget)
 		self.verticalLayout.addWidget(self.buttonBox)
 		
-		QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL("accepted()"), self.accept)
-		QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL("rejected()"), self.reject)
+		self.buttonBox.accepted.connect(self.accept)
+		self.buttonBox.rejected.connect(self.reject)
 		QtCore.QMetaObject.connectSlotsByName(self)
 
 
