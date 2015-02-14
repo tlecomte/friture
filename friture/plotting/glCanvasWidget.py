@@ -1,6 +1,6 @@
 import sys
 
-from PyQt5 import QtCore, QtGui, QtOpenGL, Qt
+from PyQt5 import QtCore, QtGui, QtOpenGL, Qt, QtWidgets
 import numpy as np
 
 try:
@@ -41,7 +41,7 @@ class GlCanvasWidget(QtOpenGL.QGLWidget):
         self.setAutoFillBackground(False)
 
         # set proper size policy for this widget
-        self.setSizePolicy(QtGui.QSizePolicy(QtGui.QSizePolicy.MinimumExpanding, QtGui.QSizePolicy.MinimumExpanding))
+        self.setSizePolicy(QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.MinimumExpanding))
 
         self.attachedItems = []
 

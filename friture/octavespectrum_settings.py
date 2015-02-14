@@ -36,7 +36,7 @@ class OctaveSpectrum_Settings_Dialog(QtWidgets.QDialog):
 		
 		self.setWindowTitle("Octave Spectrum settings")
 		
-		self.formLayout = QtGui.QFormLayout(self)
+		self.formLayout = QtWidgets.QFormLayout(self)
 
 		self.comboBox_bandsperoctave = QtWidgets.QComboBox(self)
 		self.comboBox_bandsperoctave.setObjectName("comboBox_bandsperoctave")

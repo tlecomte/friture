@@ -29,7 +29,7 @@ class CanvasWidget(QtWidgets.QWidget):
         super(CanvasWidget, self).__init__(parent)
 
         # set proper size policy for this widget
-        self.setSizePolicy(QtGui.QSizePolicy(QtGui.QSizePolicy.MinimumExpanding, QtGui.QSizePolicy.MinimumExpanding))
+        self.setSizePolicy(QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.MinimumExpanding))
 
         self.horizontalScaleTransform = horizontalScaleTransform
         self.verticalScaleTransform = verticalScaleTransform

@@ -20,7 +20,7 @@ class VerticalScaleBar(QtWidgets.QWidget):
         self.tickFormatter = lambda tick, digits: '{0:.{1}f}'.format(tick, digits)
 
         # for vertical scale bar
-        self.setSizePolicy(QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Minimum))
+        self.setSizePolicy(QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum))
 
     def setTickFormatter(self, formatter):
         self.tickFormatter = formatter
@@ -112,7 +112,7 @@ class HorizontalScaleBar(QtWidgets.QWidget):
         self.labelSpacing = 2
         self.borderOffset = 3
 
-        self.setSizePolicy(QtGui.QSizePolicy(QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Fixed))
+        self.setSizePolicy(QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed))
 
     def sizeHint(self):
         # for vertical scale bar
@@ -210,7 +210,7 @@ class ColorScaleBar(QtWidgets.QWidget):
         self.colors = [QtGui.QColor(cmap[i, 0]*255, cmap[i, 1]*255, cmap[i, 2]*255) for i in range(N)]
 
         # for vertical scale bar
-        self.setSizePolicy(QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Minimum))
+        self.setSizePolicy(QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum))
 
     def sizeHint(self):
         # for vertical scale bar

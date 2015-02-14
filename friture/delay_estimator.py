@@ -101,7 +101,7 @@ class Delay_Estimator_Widget(QtWidgets.QWidget):
         self.previous_channelInfo_message = ""
         
         self.setObjectName("Delay_Estimator_Widget")
-        self.layout = QtGui.QFormLayout(self)
+        self.layout = QtWidgets.QFormLayout(self)
         self.layout.setObjectName("layout")
         
         font = QtGui.QFont()
@@ -327,9 +327,9 @@ class Delay_Estimator_Settings_Dialog(QtWidgets.QDialog):
         
         self.setWindowTitle("Delay estimator settings")
         
-        self.formLayout = QtGui.QFormLayout(self)
+        self.formLayout = QtWidgets.QFormLayout(self)
         
-        self.doubleSpinBox_delayrange = QtGui.QDoubleSpinBox(self)
+        self.doubleSpinBox_delayrange = QtWidgets.QDoubleSpinBox(self)
         self.doubleSpinBox_delayrange.setDecimals(1)
         self.doubleSpinBox_delayrange.setMinimum(0.1)
         self.doubleSpinBox_delayrange.setMaximum(1000.0)

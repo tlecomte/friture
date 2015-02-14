@@ -309,7 +309,7 @@ class HistPlot(QtWidgets.QWidget):
         self.canvasWidget = CanvasWidget(self, self.verticalScaleTransform, self.horizontalScaleTransform)
         self.canvasWidget.setTrackerFormatter(lambda x, y: "%d Hz, %.1f dB" %(x, y))
 
-        plotLayout = QtGui.QGridLayout()
+        plotLayout = QtWidgets.QGridLayout()
         plotLayout.setSpacing(0)
         plotLayout.setContentsMargins(0, 0, 0, 0)
         plotLayout.addWidget(self.verticalScale, 0, 0)

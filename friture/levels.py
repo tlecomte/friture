@@ -90,10 +90,10 @@ class Levels_Widget(QtWidgets.QWidget):
 		self.label_peak_legend.setText("dB FS\n Peak")
 		self.label_rms.setTextFormat(QtCore.Qt.PlainText)
 		self.label_peak.setTextFormat(QtCore.Qt.PlainText)
-		#self.label_rms.setSizePolicy(QtGui.QSizePolicy(QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding))
-		#self.label_rms_legend.setSizePolicy(QtGui.QSizePolicy(QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding))
-		#self.label_peak.setSizePolicy(QtGui.QSizePolicy(QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding))
-		#self.label_peak_legend.setSizePolicy(QtGui.QSizePolicy(QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding))
+		#self.label_rms.setSizePolicy(QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding))
+		#self.label_rms_legend.setSizePolicy(QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding))
+		#self.label_peak.setSizePolicy(QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding))
+		#self.label_peak_legend.setSizePolicy(QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding))
 		
 		self.logger = logger
 		self.audiobuffer = None

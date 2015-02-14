@@ -96,7 +96,7 @@ class Generator_Widget(QtWidgets.QWidget):
         self.spinBox_sine_frequency.setObjectName("spinBox_sine_frequency")
         self.spinBox_sine_frequency.setSuffix(" Hz")
 
-        self.sineLayout = QtGui.QFormLayout(sinePageWidget)
+        self.sineLayout = QtWidgets.QFormLayout(sinePageWidget)
         self.sineLayout.addRow("Frequency:", self.spinBox_sine_frequency)
 
         self.spinBox_sweep_startfrequency = QtGui.QSpinBox(sweepPageWidget)
@@ -115,7 +115,7 @@ class Generator_Widget(QtWidgets.QWidget):
         self.spinBox_sweep_stopfrequency.setObjectName("spinBox_sweep_stopfrequency")
         self.spinBox_sweep_stopfrequency.setSuffix(" Hz")
 
-        self.spinBox_sweep_period = QtGui.QDoubleSpinBox(sweepPageWidget)
+        self.spinBox_sweep_period = QtWidgets.QDoubleSpinBox(sweepPageWidget)
         self.spinBox_sweep_period.setKeyboardTracking(False)
         self.spinBox_sweep_period.setDecimals(2)
         self.spinBox_sweep_period.setSingleStep(1)
@@ -125,12 +125,12 @@ class Generator_Widget(QtWidgets.QWidget):
         self.spinBox_sweep_period.setObjectName("spinBox_sweep_period")
         self.spinBox_sweep_period.setSuffix(" s")
 
-        self.sweepLayout = QtGui.QFormLayout(sweepPageWidget)
+        self.sweepLayout = QtWidgets.QFormLayout(sweepPageWidget)
         self.sweepLayout.addRow("Start frequency:", self.spinBox_sweep_startfrequency)
         self.sweepLayout.addRow("Stop frequency:", self.spinBox_sweep_stopfrequency)
         self.sweepLayout.addRow("Period:", self.spinBox_sweep_period)
 
-        self.spinBox_burst_period = QtGui.QDoubleSpinBox(burstPageWidget)
+        self.spinBox_burst_period = QtWidgets.QDoubleSpinBox(burstPageWidget)
         self.spinBox_burst_period.setKeyboardTracking(False)
         self.spinBox_burst_period.setDecimals(2)
         self.spinBox_burst_period.setSingleStep(1)
@@ -140,7 +140,7 @@ class Generator_Widget(QtWidgets.QWidget):
         self.spinBox_burst_period.setObjectName("spinBox_burst_period")
         self.spinBox_burst_period.setSuffix(" s")
 
-        self.burstLayout = QtGui.QFormLayout(burstPageWidget)
+        self.burstLayout = QtWidgets.QFormLayout(burstPageWidget)
         self.burstLayout.addRow("Period:", self.spinBox_burst_period)
 
         self.t = 0.
@@ -418,7 +418,7 @@ class Generator_Settings_Dialog(QtWidgets.QDialog):
 
         self.setWindowTitle("Spectrum settings")
 
-        self.formLayout = QtGui.QFormLayout(self)
+        self.formLayout = QtWidgets.QFormLayout(self)
 
         self.comboBox_outputDevice = QtWidgets.QComboBox(self)
         self.comboBox_outputDevice.setObjectName("comboBox_outputDevice")

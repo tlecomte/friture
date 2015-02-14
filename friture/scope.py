@@ -34,7 +34,7 @@ class Scope_Widget(QtWidgets.QWidget):
         self.logger = logger
         
         self.setObjectName("Scope_Widget")
-        self.gridLayout = QtGui.QGridLayout(self)
+        self.gridLayout = QtWidgets.QGridLayout(self)
         self.gridLayout.setObjectName("gridLayout")
         self.PlotZoneUp = TimePlot(self, sharedGLWidget, self.logger)
         self.PlotZoneUp.setObjectName("PlotZoneUp")
@@ -139,9 +139,9 @@ class Scope_Settings_Dialog(QtWidgets.QDialog):
         
         self.setWindowTitle("Scope settings")
         
-        self.formLayout = QtGui.QFormLayout(self)
+        self.formLayout = QtWidgets.QFormLayout(self)
         
-        self.doubleSpinBox_timerange = QtGui.QDoubleSpinBox(self)
+        self.doubleSpinBox_timerange = QtWidgets.QDoubleSpinBox(self)
         self.doubleSpinBox_timerange.setDecimals(1)
         self.doubleSpinBox_timerange.setMinimum(0.1)
         self.doubleSpinBox_timerange.setMaximum(1000.0)

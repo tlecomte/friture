@@ -11,7 +11,7 @@ class LegendWidget(QtWidgets.QWidget):
         self.margin = 4
         self.spacing = 4
 
-        self.setSizePolicy(QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Minimum))
+        self.setSizePolicy(QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum))
 
     def sizeHint(self):
         fm = QtGui.QFontMetrics(self.font())

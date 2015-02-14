@@ -27,9 +27,9 @@ class Levels_Settings_Dialog(QtWidgets.QDialog):
 		
 		self.setWindowTitle("Levels settings")
 		
-		self.formLayout = QtGui.QFormLayout(self)
+		self.formLayout = QtWidgets.QFormLayout(self)
 		
-		#self.doubleSpinBox_timerange = QtGui.QDoubleSpinBox(self)
+		#self.doubleSpinBox_timerange = QtWidgets.QDoubleSpinBox(self)
 		#self.doubleSpinBox_timerange.setDecimals(1)
 		#self.doubleSpinBox_timerange.setMinimum(0.1)
 		#self.doubleSpinBox_timerange.setMaximum(1000.0)

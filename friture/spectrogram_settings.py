@@ -38,7 +38,7 @@ class Spectrogram_Settings_Dialog(QtWidgets.QDialog):
 		
 		self.setWindowTitle("Spectrogram settings")
 		
-		self.formLayout = QtGui.QFormLayout(self)
+		self.formLayout = QtWidgets.QFormLayout(self)
 		
 		self.doubleSpinBox_timerange = QtWidgets.QDoubleSpinBox(self)
 		self.doubleSpinBox_timerange.setDecimals(1)

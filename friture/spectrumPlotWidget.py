@@ -67,7 +67,7 @@ class SpectrumPlotWidget(QtWidgets.QWidget):
         self.quadsItem = QuadsItem()
         self.canvasWidget.attach(self.quadsItem)
 
-        plotLayout = QtGui.QGridLayout()
+        plotLayout = QtWidgets.QGridLayout()
         plotLayout.setSpacing(0)
         plotLayout.setContentsMargins(0, 0, 0, 0)
         plotLayout.addWidget(self.verticalScale, 0, 0)

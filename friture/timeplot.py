@@ -153,7 +153,7 @@ class TimePlot(QtWidgets.QWidget):
 
 		self.legendWidget = LegendWidget(self, self.canvasWidget)
 
-		plotLayout = QtGui.QGridLayout()
+		plotLayout = QtWidgets.QGridLayout()
 		plotLayout.setSpacing(0)
 		plotLayout.setContentsMargins(0, 0, 0, 0)
 		plotLayout.addWidget(self.verticalScale, 0, 0)

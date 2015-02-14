@@ -276,7 +276,7 @@ class qsynthMeter(QtWidgets.QFrame):
 		self.build()
 
 		self.setSizePolicy(
-			QtGui.QSizePolicy(QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding))
+			QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding))
 
 	# build the widget layout depending on the port count.
 	def build(self):

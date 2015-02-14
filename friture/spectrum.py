@@ -44,7 +44,7 @@ class Spectrum_Widget(QtWidgets.QWidget):
 		self.audiobuffer = None
 
 		self.setObjectName("Spectrum_Widget")
-		self.gridLayout = QtGui.QGridLayout(self)
+		self.gridLayout = QtWidgets.QGridLayout(self)
 		self.gridLayout.setObjectName("gridLayout")
 		self.PlotZoneSpect = SpectrumPlotWidget(self, sharedGLWidget, self.logger)
 		self.PlotZoneSpect.setObjectName("PlotZoneSpect")

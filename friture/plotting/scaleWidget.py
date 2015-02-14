@@ -33,7 +33,7 @@ class VerticalScaleWidget(QtWidgets.QWidget):
         self.titleWidget = VerticalTitleWidget("Scale Widget Title", self)
         self.scaleBar = VerticalScaleBar(self, transformation, scaleDivision)
 
-        plotLayout = QtGui.QGridLayout()
+        plotLayout = QtWidgets.QGridLayout()
         plotLayout.setSpacing(0)
         plotLayout.setContentsMargins(0, 0, 0, 0)
         plotLayout.addWidget(self.titleWidget, 0, 0)
@@ -58,7 +58,7 @@ class HorizontalScaleWidget(QtWidgets.QWidget):
         self.titleWidget = HorizontalTitleWidget("Scale Widget Title", self)
         self.scaleBar = HorizontalScaleBar(self, transformation, scaleDivision)
 
-        plotLayout = QtGui.QGridLayout()
+        plotLayout = QtWidgets.QGridLayout()
         plotLayout.setSpacing(0)
         plotLayout.setContentsMargins(0, 0, 0, 0)
         plotLayout.addWidget(self.scaleBar, 0, 0)
@@ -83,7 +83,7 @@ class ColorScaleWidget(QtWidgets.QWidget):
         self.titleWidget = ColorTitleWidget("Scale Widget Title", self)
         self.scaleBar = ColorScaleBar(self, transformation, scaleDivision)
 
-        plotLayout = QtGui.QGridLayout()
+        plotLayout = QtWidgets.QGridLayout()
         plotLayout.setSpacing(0)
         plotLayout.setContentsMargins(0, 0, 0, 0)
         plotLayout.addWidget(self.scaleBar, 0, 0)

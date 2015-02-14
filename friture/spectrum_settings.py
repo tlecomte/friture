@@ -40,7 +40,7 @@ class Spectrum_Settings_Dialog(QtWidgets.QDialog):
 		
 		self.setWindowTitle("Spectrum settings")
 		
-		self.formLayout = QtGui.QFormLayout(self)
+		self.formLayout = QtWidgets.QFormLayout(self)
 
 		self.comboBox_dual_channel = QtWidgets.QComboBox(self)
 		self.comboBox_dual_channel.setObjectName("dual")

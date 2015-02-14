@@ -43,7 +43,7 @@ class Spectrogram_Widget(QtWidgets.QWidget):
         self.logger = logger
 
         self.setObjectName("Spectrogram_Widget")
-        self.gridLayout = QtGui.QGridLayout(self)
+        self.gridLayout = QtWidgets.QGridLayout(self)
         self.gridLayout.setObjectName("gridLayout")
         self.PlotZoneImage = ImagePlot(self, self.logger, audiobackend)
         #self.PlotZoneImage = GLRollingCanvasWidget(self, self.logger)

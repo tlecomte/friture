@@ -8,7 +8,7 @@ class VerticalTitleWidget(QtWidgets.QWidget):
         self.title = title
 
         # for vertical title
-        self.setSizePolicy(QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Minimum))
+        self.setSizePolicy(QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum))
 
     def setTitle(self, title):
         self.title = title
@@ -45,7 +45,7 @@ class HorizontalTitleWidget(QtWidgets.QWidget):
 
         self.title = title
 
-        self.setSizePolicy(QtGui.QSizePolicy(QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Fixed))
+        self.setSizePolicy(QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed))
 
     def setTitle(self, title):
         self.title = title
@@ -81,7 +81,7 @@ class ColorTitleWidget(QtWidgets.QWidget):
         self.title = title
 
         # for vertical title
-        self.setSizePolicy(QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Minimum))
+        self.setSizePolicy(QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum))
 
     def setTitle(self, title):
         self.title = title
