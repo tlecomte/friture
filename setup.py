@@ -4,7 +4,7 @@ from distutils.extension import Extension
 from Cython.Distutils import build_ext
 from glob import glob
 import os
-from os.path import join, dirname # for README content reading
+from os.path import join, dirname # for README content reading and py2exe fix
 import numpy
 import friture # for the version number
 
@@ -69,7 +69,9 @@ if py2exe_build:
 					 "PSAPI.dll",
 					 "libifcoremd.dll",
 					 "libiomp5md.dll",
-					 "libmmd.dll"]
+					 "libmmd.dll",
+					 "msvcp*.dll",
+					 "msvcr*.dll"]
 	#manually include python libraries that py2exe fails to detect
 	# for pyOpenGL : http://www.jstump.com/blog/archive/2009/06/30/py2exe-and-pyopengl-3x-with-no-manual-tinkering/
 	# + OpenGL_accelerate.formathandler that is imported by the Python/C
@@ -130,3 +132,12 @@ setup(name = "friture",
 	cmdclass = {"build_ext": build_ext},
 	ext_modules = ext_modules,
 	)
+
+# py2exe (0.9.2.2 at least on Python 3.4) does not seem to respect the dll_excludes option
+# so we manually remove them from the dist directory
+if py2exe_build:
+	for filenamePattern in dll_excludes:
+		path = join("dist", filenamePattern)
+		for filename in glob(path):
+			print("Remove %s that py2exe should have excluded." %(filename))
+			os.remove(filename)
