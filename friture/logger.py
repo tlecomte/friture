@@ -24,7 +24,7 @@ class Logger(QtCore.QObject):
 	logChanged = QtCore.pyqtSignal()
 
 	def __init__(self):
-		QtCore.QObject.__init__(self)
+		super().__init__()
 		
 		self.count = 0
 		self.log = ""

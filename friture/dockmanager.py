@@ -24,7 +24,7 @@ from friture.dock import Dock
 
 class DockManager(QtCore.QObject):
 	def __init__(self, parent, sharedGLWidget, logger):
-		QtCore.QObject.__init__(self, parent)
+		super().__init__(parent)
 
 		# the parent must of the QMainWindow so that docks are created as children of it
 		assert(isinstance(parent, QMainWindow))

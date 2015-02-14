@@ -321,7 +321,7 @@ in the setup window."""
 
 class Delay_Estimator_Settings_Dialog(QtWidgets.QDialog):
     def __init__(self, parent, logger):
-        super().__init__(self, parent)
+        super().__init__(parent)
         
         self.logger = logger
         

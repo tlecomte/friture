@@ -27,7 +27,7 @@ class CanvasScaledSpectrogram(QtCore.QObject):
 	canvasWidthChanged = QtCore.pyqtSignal(int)
 
 	def __init__(self, logger, canvas_height = 2,  canvas_width = 2):
-		QtCore.QObject.__init__(self)
+		super().__init__()
 
 		# store the logger instance
 		self.logger = logger
