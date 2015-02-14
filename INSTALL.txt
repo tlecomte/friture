@@ -3,6 +3,17 @@ Instructions to get Friture running
 
 Most of Friture code-base is written in Python. As such, it is interpreted and does not need compilation, apart from the special cases below.
 
+Dependencies
+------------
+
+Python3 (3.4 or later recommended)
+PyQt4
+PyAudio
+PyOpenGL
+Numpy
+Scipy
+Cython
+
 UI and resource files
 ---------------------
 If friture.ui or resource.qrc are changed, the corresponding python files need to be rebuilt:
@@ -30,18 +41,3 @@ To build an executable for Windows, with the python interpreter included, run:
 	python setup.py py2exe
 You get a 'dist' directory with friture.exe and a collection of dependencies (dlls and compiled python extensions), that can be
 bundled together in an installer.
-
-PyQwt
------
-In some cases (old versions in distribution repository), you may want to build PyQwt from source.
-In ubuntu, this can be done this way:
-	First:
-		sudo ln -s libqwt-qt4.so libqwt.so
-	Then, in the pyqwt configure subdirectory (for ubuntu lucid lynx):
-		python configure.py -Q ../qwt-5.2 -4 --module-install-path=/usr/lib/pymodules/python2.6/PyQt4/Qwt5
-		make
-		sudo make install
-Or, alternatively :
-	sudo apt-get build-dep python-qwt5-qt4
-	sudo apt-get -b source python-qwt5-qt4
-	sudo dpkg -i *.deb
