@@ -115,7 +115,7 @@ Section MSVC
   InitPluginsDir
   SetOutPath $PLUGINSDIR
   File "${PROJECT_PATH}\installer\vcredist_x86.exe"
-  DetailPrint "Installing Visual C++ 2008 Libraries"
+  DetailPrint "Installing Visual C++ 2010 Libraries"
   ExecWait '"$PLUGINSDIR\vcredist_x86.exe" /qb!"'
 SectionEnd
 
