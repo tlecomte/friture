@@ -4,15 +4,19 @@
 
 ; HM NIS Edit Wizard helper defines
 !define PRODUCT_NAME "Friture"
-!define /date PRODUCT_VERSION "%Y/%m/%d"
-!define PRODUCT_PUBLISHER "TimothÃ©e Lecomte"
+!define PRODUCT_PUBLISHER "Timothée Lecomte"
 !define PRODUCT_DESCRIPTION "Real-time audio visualizations"
 !define PRODUCT_WEB_SITE "http://www.friture.org"
 !define PRODUCT_DIR_REGKEY "Software\Microsoft\Windows\CurrentVersion\App Paths\friture.exe"
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
 !define PRODUCT_UNINST_ROOT_KEY "HKLM"
+!define PRODUCT_LICENSE "GNU GPL v3"
 
 !define /date TIMESTAMP "%Y%m%d"
+
+; read version from Python source file
+!searchparse /noerrors /file ${PROJECT_PATH}\friture\__init__.py '__version__ = "' VERSION_SHORT '"'
+!searchparse /noerrors /file ${PROJECT_PATH}\friture\__init__.py '__versionXXXX__ = "' VERSION_XXXX '"'
 
 SetCompressor lzma
 
@@ -53,21 +57,22 @@ SetCompressor lzma
 
 ; MUI end ------
 
-Name "${PRODUCT_NAME} ${PRODUCT_VERSION}"
-OutFile "friture-setup-${TIMESTAMP}.exe"
+Name "${PRODUCT_NAME} ${VERSION_SHORT}"
+OutFile "friture-setup-${VERSION_SHORT}-${TIMESTAMP}.exe"
 InstallDir "$PROGRAMFILES\Friture"
 InstallDirRegKey HKLM "${PRODUCT_DIR_REGKEY}" ""
 ShowInstDetails show
 ShowUnInstDetails show
 
 ; Adds info to installer
-VIProductVersion "0.0.0.0"
+VIProductVersion "${VERSION_XXXX}"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductName" "${PRODUCT_NAME}"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "Comments" "${PRODUCT_DESCRIPTION}"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "CompanyName" "${PRODUCT_PUBLISHER}"
-VIAddVersionKey /LANG=${LANG_ENGLISH} "LegalCopyright" "Â© ${PRODUCT_PUBLISHER} under the GNU GPLv3."
-VIAddVersionKey /LANG=${LANG_ENGLISH} "FileDescription" "Installation for ${PRODUCT_NAME}"
-VIAddVersionKey /LANG=${LANG_ENGLISH} "FileVersion" "${PRODUCT_VERSION}"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "LegalCopyright" "© ${PRODUCT_PUBLISHER} under the ${PRODUCT_LICENSE}."
+VIAddVersionKey /LANG=${LANG_ENGLISH} "FileDescription" "${PRODUCT_NAME} installer"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "FileVersion" "${VERSION_XXXX}"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductVersion" "${VERSION_XXXX}"
 
 Function .onInit
   ; display a language selection dialog
@@ -76,14 +81,14 @@ Function .onInit
   ; detect if a previous version was installed
   ReadRegStr $R0 ${PRODUCT_UNINST_ROOT_KEY} ${PRODUCT_UNINST_KEY} "UninstallString"
   StrCmp $R0 "" done
- 
+
   ; ask the user to uninstall the previous version
   MessageBox MB_OKCANCEL|MB_ICONEXCLAMATION \
   "${PRODUCT_NAME} is already installed. $\n$\nClick `OK` to remove the \
   previous version or `Cancel` to cancel this upgrade." \
   IDOK uninst
   Abort
- 
+
   ;Run the uninstaller
   uninst:
     ClearErrors
@@ -128,7 +133,7 @@ Section -Post
   WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayName" "$(^Name)"
   WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "UninstallString" "$INSTDIR\uninst.exe"
   WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayIcon" "$INSTDIR\friture.exe"
-  WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayVersion" "${PRODUCT_VERSION}"
+  WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayVersion" "${VERSION_SHORT}"
   WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "URLInfoAbout" "${PRODUCT_WEB_SITE}"
   WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "Publisher" "${PRODUCT_PUBLISHER}"
 SectionEnd
@@ -153,9 +158,9 @@ Section Uninstall
 
   DeleteRegKey ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}"
   DeleteRegKey HKLM "${PRODUCT_DIR_REGKEY}"
-  
+
   MessageBox MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2 $(STR_remove_settings) IDNO +2
   DeleteRegKey HKCU "Software\Friture"
-  
+
   SetAutoClose true
 SectionEnd
