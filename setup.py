@@ -5,6 +5,7 @@ from Cython.Distutils import build_ext
 from glob import glob
 import os
 from os.path import join, dirname # for README content reading and py2exe fix
+import os.path
 import numpy
 import friture # for the version number
 
@@ -37,8 +38,17 @@ dll_excludes = []
 includes = []
 
 if py2exe_build:
-	#include the QT svg plugin to render the icons
-	data_files += [("imageformats", glob(r'C:\Python*\Lib\site-packages\PyQt4\plugins\imageformats\qsvg4.dll'))]
+	# find path to PyQt5 module dir
+	import PyQt5
+	pyqt5_path = os.path.abspath(PyQt5.__file__)
+	pyqt5_dir = os.path.dirname(pyqt5_path)
+
+	#include the Qt SVG plugin to render the icons, and the Qt Windows platform plugin
+	svg_plugin = os.path.join(pyqt5_dir, "plugins", "imageformats", "qsvg.dll")
+	windows_plugin = os.path.join(pyqt5_dir, "plugins", "platforms", "qwindows.dll")
+	data_files += [("imageformats", [svg_plugin]),
+					("platforms", [windows_plugin])]
+
 	#exclude some python libraries that py2exe includes by error
 	excludes += ["matplotlib","_ssl","Tkconstants","Tkinter","tcl","email","pyreadline","nose",\
 			"doctest", "pdb", "pydoc", "_hashlib", "bz2","httplib","cookielib","cookielib","urllib","urllib2","Image",\
