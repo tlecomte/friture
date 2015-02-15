@@ -230,7 +230,8 @@ class Spectrum_Widget(QtWidgets.QWidget):
 			self.w = B
 		else:
 			self.w = C
-		self.w.shape = (1, len(self.w))
+
+		self.w.shape = (1, self.w.size)
 
 	def setdualchannels(self, dual_enabled):
 		self.dual_channels = dual_enabled
