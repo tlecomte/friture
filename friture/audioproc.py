@@ -126,9 +126,10 @@ class audioproc():
 			Rc = 12200.**2*f**2 / ((f**2 + 20.6**2)*(f**2 + 12200.**2))
 			Rb = 12200.**2*f**3 / ((f**2 + 20.6**2)*(f**2 + 12200.**2)*((f**2 + 158.5**2)**0.5))
 			Ra = 12200.**2*f**4 / ((f**2 + 20.6**2)*(f**2 + 12200.**2)*((f**2 + 107.7**2)**0.5) * ((f**2 + 737.9**2)**0.5))
-			self.C = 0.06 + 20.*log10(Rc)
-			self.B = 0.17 + 20.*log10(Rb)
-			self.A = 2.0  + 20.*log10(Ra)
+			eps = 1e-50
+			self.C = 0.06 + 20.*log10(Rc + eps)
+			self.B = 0.17 + 20.*log10(Rb + eps)
+			self.A = 2.0  + 20.*log10(Ra + eps)
 
 
 	# above is done a FFT of the signal. This is ok for linear frequency scale, but
