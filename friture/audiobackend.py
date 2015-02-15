@@ -62,7 +62,7 @@ class AudioBackend(QtCore.QObject):
 			else:
 				self.logger.push("Fail")
 
-		if self.device != None:
+		if self.device is not None:
 			self.first_channel = 0
 			nchannels = self.get_current_device_nchannels()
 			if nchannels == 1:
@@ -153,7 +153,7 @@ class AudioBackend(QtCore.QObject):
 
 		default_input_device = self.get_default_input_device()
 
-		if default_input_device	!= None:
+		if default_input_device	is not None:
 			# start by the default input device
 			device_range.remove(default_input_device)
 			device_range = [default_input_device] + device_range
@@ -175,7 +175,7 @@ class AudioBackend(QtCore.QObject):
 
 		default_output_device = self.get_default_output_device()
 
-		if default_output_device != None:
+		if default_output_device is not None:
 			# start by the default input device
 			device_range.remove(default_output_device)
 			device_range = [default_output_device] + device_range

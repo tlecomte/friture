@@ -174,7 +174,7 @@ class MeterValue(QtWidgets.QFrame):
 		self.dBValue = min(self.dBValue, MAXDB)
 
 		self.dBValue2 = secondaryValue
-		if self.dBValue2 != None:
+		if self.dBValue2 is not None:
 			self.dBValue2 = max(self.dBValue2, MINDB)
 			self.dBValue2 = min(self.dBValue2, MAXDB)
 
@@ -182,7 +182,7 @@ class MeterValue(QtWidgets.QFrame):
 
 	def refresh(self):
 		self.pixelValue = self.meter.iec_scale(self.dBValue)
-		if self.dBValue2 != None:
+		if self.dBValue2 is not None:
 			self.pixelValue2 = self.meter.iec_scale(self.dBValue2)
 			self.peak.refresh(max(self.pixelValue, self.pixelValue2))
 		else:
@@ -207,7 +207,7 @@ class MeterValue(QtWidgets.QFrame):
 		else:
 			painter.fillRect(0, 0, w, h, self.palette().darker().color())
 
-		if self.pixelValue2 != None:
+		if self.pixelValue2 is not None:
 			painter.drawPixmap(0, h - self.pixelValue2,
 				self.meter.darkPixmap(), 0, h - self.pixelValue2, w, self.pixelValue2 + 1)
 

@@ -106,7 +106,7 @@ class GlCanvasWidget(QtOpenGL.QGLWidget):
         self.updateGrid()
 
     def updateGrid(self):
-        if self.gridList == None or self.gridList == 0:
+        if self.gridList is None or self.gridList == 0:
             return
 
         w = self.width()
@@ -303,11 +303,11 @@ class GlCanvasWidget(QtOpenGL.QGLWidget):
         if self.anyOpaqueItem:
             return
 
-        if self.gridList == None:
+        if self.gridList is None:
             # display list used for the grid
             self.gridList = GL.glGenLists(1)
 
-            if self.gridList == 0 or self.gridList == None:
+            if self.gridList == 0 or self.gridList is None:
                 raise RuntimeError( """Unable to generate a new display-list, context may not support display lists""")
 
             self.updateGrid()

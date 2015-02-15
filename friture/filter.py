@@ -78,7 +78,7 @@ def octave_filter_bank(forward, feedback, x, zis=None):
 	zfs = []
 	y = []
 	
-	if zis == None:
+	if zis is None:
 		zis = []
 		for i in range(0, Nbank):
 			zis += [zeros(max(len(forward[i]), len(feedback[i]))-1)] 
@@ -109,7 +109,7 @@ def octave_filter_bank_decimation(blow, alow, forward, feedback, x, zis=None):
 	
 	zfs = []
 	
-	if zis == None:
+	if zis is None:
 		k = Nbank - 1
 	
 		for j in range(0, NOCTAVE):

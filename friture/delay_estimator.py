@@ -39,7 +39,7 @@ def subsampler(Ndec, bdec, adec, x, zis):
     if x.size == 0:
         return x, zis
     
-    if zis == None:
+    if zis is None:
         for i in range(Ndec):
             x_dec, zf = decimate(bdec, adec, x_dec)
         return x_dec, None
@@ -239,7 +239,7 @@ in the setup window."""
                 if std0>0. and std1>0.:
                     Xcorr = generalized_cross_correlation(d0, d1)
 
-                    if self.old_Xcorr != None and self.old_Xcorr.shape == Xcorr.shape:
+                    if self.old_Xcorr is not None and self.old_Xcorr.shape == Xcorr.shape:
                         # smoothing
                         alpha = 0.3
                         smoothed_Xcorr = alpha*Xcorr + (1. - alpha)*self.old_Xcorr

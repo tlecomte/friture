@@ -206,7 +206,7 @@ class Generator_Widget(QtWidgets.QWidget):
         for device in devices:
             self.settings_dialog.comboBox_outputDevice.addItem(device)
 
-        if self.device != None:
+        if self.device is not None:
             self.settings_dialog.comboBox_outputDevice.setCurrentIndex(self.audiobackend.output_devices.index(self.device))
 
         self.settings_dialog.comboBox_outputDevice.currentIndexChanged.connect(self.device_changed)
@@ -305,7 +305,7 @@ class Generator_Widget(QtWidgets.QWidget):
         if self.state == stopped:
             return
 
-        if self.stream == None:
+        if self.stream is None:
             return
 
         # play

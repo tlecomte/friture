@@ -101,7 +101,7 @@ class RingBuffer():
 			new_length = int(1.5*length)
 
 			message = "Ringbuffer: growing buffer for length %d" %(new_length)
-			if self.logger != None:
+			if self.logger is not None:
 				self.logger.push(message)
 			else:
 				print(message)

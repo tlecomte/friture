@@ -87,15 +87,15 @@ class Dock(QtWidgets.QDockWidget):
 		self.controlBar.comboBox_select.setCurrentIndex(item)
 
 	def update(self):
-		if self.audiowidget != None:
+		if self.audiowidget is not None:
 			self.audiowidget.update()
 
 	def pause(self):
-		if self.audiowidget != None:
+		if self.audiowidget is not None:
 			self.audiowidget.pause()
 
 	def restart(self):
-		if self.audiowidget != None:
+		if self.audiowidget is not None:
 			self.audiowidget.restart()
 
 	# slot

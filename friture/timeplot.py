@@ -65,7 +65,7 @@ class CurveItem:
 		return self.__color
 
 	def setData(self, x, y):
-		if self.xMap == None or self.yMap == None:
+		if self.xMap is None or self.yMap is None:
 			return
 
 		n = x.shape[0] - 1
