@@ -39,6 +39,9 @@ class CanvasWidget(QtWidgets.QWidget):
         self.mousex = 0
         self.mousey = 0
 
+        # use a cross cursor to easily select a point on the graph
+        self.setCursor(QtCore.Qt.CrossCursor)
+
         self.attachedItems = []
 
         self.grid = Grid()
