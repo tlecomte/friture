@@ -275,8 +275,8 @@ class HistogramPeakBarItem:
 
         if self.need_transform:
             # round to pixels
-            self.x1 = round(xMap.toScreen(array(self.fl))) + 1
-            self.x2 = round(xMap.toScreen(array(self.fh))) - 1
+            self.x1 = round(xMap.toScreen(array(self.fl)))
+            self.x2 = round(xMap.toScreen(array(self.fh)))
 
             self.need_transform = False
 
@@ -284,7 +284,7 @@ class HistogramPeakBarItem:
         ys  = h - yMap.toScreen(self.y)
 
         for x1, x2, peak, index, y in zip(self.x1, self.x2, peaks, self.palette_index, ys):
-            painter.fillRect(x1-1, peak, x2-x1+2, y-peak+1, self.palette[index])
+            painter.fillRect(x1, peak, x2-x1, y-peak+1, self.palette[index])
 
 
 class HistPlot(QtWidgets.QWidget):
