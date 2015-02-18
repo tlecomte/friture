@@ -121,7 +121,8 @@ class ScaleDivision(object):
             if approx_interval == 0:
                 return []
 
-            N = int(math.floor(rang/approx_interval))
+            # add ticks up to the max
+            N = int(math.floor((trueMax - rmin)/approx_interval))
             ticks = [rmin + approx_interval*i for i in range(N+1)]
 
             self.majorTickInterval = approx_interval
