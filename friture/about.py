@@ -17,21 +17,47 @@
 # You should have received a copy of the GNU General Public License
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
+import sys
 from PyQt5 import QtGui, QtCore, QtWidgets
+import pyaudio
+import numpy
+import scipy
+import Cython
+import OpenGL
 import friture.friture_rc
 import friture
 from friture.logwidget import LogWidget
 from friture.statisticswidget import StatisticsWidget
 
 aboutText = """
-<p> <b>Friture %s</b> (dated %s)
-<p> Friture is an application for real-time audio analysis.
-<p> Written in Python, using PyQt, PyAudio, Numpy, SciPy, Cython, OpenGL.
-<p> License is GPLv3.
-<p> Homepage: <a href="http://friture.org">http://friture.org</a>
-<p> Send comments, ideas and bug reports to: <a href="mailto:contact@friture.org">contact@friture.org</a>
-<p> Splash screen photo credit: <a href="http://www.flickr.com/photos/visual_dichotomy/3623619145/">visual.dichotomy</a> (CC BY 2.0)
-""" %(friture.__version__, friture.__releasedate__)
+<p> <b>Friture %s</b> (dated %s)</p>
+<p> Friture is an application for real-time audio analysis.</p>
+<p> License is GPLv3.</p>
+<p> Homepage: <a href="http://friture.org">http://friture.org</a></p>
+<p> Send comments, ideas and bug reports to: <a href="mailto:contact@friture.org">contact@friture.org</a></p>
+<p> Splash screen photo credit: <a href="http://www.flickr.com/photos/visual_dichotomy/3623619145/">visual.dichotomy</a> (CC BY 2.0)</p>
+<p>This instance of Friture runs thanks to the following external projects:</p>
+
+<ul>
+	<li>Python %s</li>
+	<li>PyQt %s (Qt %s)</li>
+	<li>PyAudio %s (%s)</li>
+	<li>Numpy %s</li>
+	<li>Scipy %s</li>
+	<li>Cython %s</li>
+	<li>PyOpenGL %s</li>
+</ul>
+""" %(friture.__version__,
+	friture.__releasedate__,
+	sys.winver,
+	QtCore.PYQT_VERSION_STR,
+	QtCore.qVersion(),
+	pyaudio.__version__,
+	pyaudio.pa.get_version_text(),
+	numpy.__version__,
+	scipy.__version__,
+	Cython.__version__,
+	OpenGL.__version__)
 
 class About_Dialog(QtWidgets.QDialog):
 	def __init__(self, parent, logger, audiobackend, timer):
