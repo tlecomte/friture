@@ -98,15 +98,8 @@ class OctaveSpectrum_Widget(QtWidgets.QWidget):
 		else:
 			value = alpha * (kernel[-N:]*data).sum() + previous*(1.-alpha)**N
 			return value
-	
-	# method
-	def update(self):
-		if not self.isVisible():
-			return
-		
-		#get the fresh data
-		floatdata = self.audiobuffer.newdata()
 
+	def handle_new_data(self, floatdata):
 		#the behaviour of the filters functions is sometimes
 		#unexpected when they are called on empty arrays
 		if floatdata.shape[1] == 0:
@@ -175,6 +168,13 @@ class OctaveSpectrum_Widget(QtWidgets.QWidget):
 		epsilon = 1e-30
 		db_spectrogram = 10*log10(sp + epsilon) + w
 		self.PlotZoneSpect.setdata(self.filters.flow, self.filters.fhigh, self.filters.f_nominal, db_spectrogram)
+
+	# method
+	def update(self):
+		if not self.isVisible():
+			return
+
+		self.PlotZoneSpect.draw()
 
 	def setmin(self, value):
 		self.spec_min = value

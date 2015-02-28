@@ -62,11 +62,9 @@ class StatisticsWidget(QtWidgets.QWidget):
 		cpu_percent = psutil.cpu_percent(0)
 
 		label = "Chunk #%d\n"\
-		"Audio buffer retrieval: %.02f ms\n"\
 		"Global CPU usage: %d %%\n"\
 		"Number of overflowed inputs (XRUNs): %d"\
 		% (self.audiobackend.chunk_number,
-			self.audiobackend.buffer_timer_time,
 			cpu_percent,
 			self.audiobackend.xruns)
 		

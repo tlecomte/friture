@@ -79,6 +79,7 @@ class CentralWidget(QtWidgets.QWidget):
 			self.audiowidget = Delay_Estimator_Widget(self, self.logger)
 
 		self.audiowidget.set_buffer(self.parent().parent().audiobuffer)
+		self.parent().parent().audiobuffer.new_data_available.connect(self.audiowidget.handle_new_data)
 
 		self.layout.addWidget(self.audiowidget)
 		

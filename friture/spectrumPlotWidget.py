@@ -163,7 +163,8 @@ class SpectrumPlotWidget(QtWidgets.QWidget):
         self.y = y
         self.fmax = fmax
         
-        self.draw()
+        # only redraw on demand
+        #self.draw()
         
         # TODO :
         # - Fix peaks loss when resizing

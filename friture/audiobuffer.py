@@ -17,13 +17,19 @@
 # You should have received a copy of the GNU General Public License
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
+from PyQt5 import QtCore
+import numpy as np
 from friture.ringbuffer import RingBuffer
 from friture.audiobackend import SAMPLING_RATE
 
 FRAMES_PER_BUFFER = 1024
 
-class AudioBuffer():
+class AudioBuffer(QtCore.QObject):
+	new_data_available = QtCore.pyqtSignal(np.ndarray)
+
 	def __init__(self, logger):
+		super().__init__()
+
 		self.ringbuffer = RingBuffer(logger)
 		self.newpoints = 0
 
@@ -41,3 +47,8 @@ class AudioBuffer():
 
 	def data_indexed(self, start, length):
 		return self.ringbuffer.data_indexed(start, length)
+
+	def handle_new_data(self, floatdata, time_info, status):
+		self.ringbuffer.push(floatdata)
+		self.set_newdata(floatdata.shape[1])
+		self.new_data_available.emit(floatdata)

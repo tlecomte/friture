@@ -18,8 +18,8 @@
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
 from PyQt5 import QtCore
-from pyaudio import PyAudio, paInt16
-from numpy import floor, int16, fromstring, vstack, iinfo, float64
+from pyaudio import PyAudio, paInt16, paInputOverflow
+from numpy import ndarray, floor, int16, fromstring, vstack, iinfo, float64
 
 # the sample rate below should be dynamic, taken from PyAudio/PortAudio
 SAMPLING_RATE = 48000
@@ -29,6 +29,13 @@ FRAMES_PER_BUFFER = 1024 # FIXME this parameter seems to have no effect on the
 class AudioBackend(QtCore.QObject):
 
 	underflow = QtCore.pyqtSignal()
+	new_data_available_from_callback = QtCore.pyqtSignal(bytes, int, dict, int)
+	new_data_available = QtCore.pyqtSignal(ndarray, dict, int)
+
+	def callback(self, in_data, frame_count, time_info, status):
+		#do the minimum from here to prevent overflows, just pass the data to the main thread
+		self.new_data_available_from_callback.emit(in_data, frame_count, time_info, status)
+		return (None, 0)
 
 	def __init__(self, logger):
 		QtCore.QObject.__init__(self)
@@ -52,7 +59,7 @@ class AudioBackend(QtCore.QObject):
 		# works, starting by the default input device
 		for device in self.input_devices:
 			self.logger.push("Opening the stream")
-			self.stream = self.open_stream(device)
+			self.stream = self.open_stream_no_callback(device)
 			self.device = device
 
 			self.logger.push("Trying to read from input device %d" %device)
@@ -63,6 +70,10 @@ class AudioBackend(QtCore.QObject):
 				self.logger.push("Fail")
 
 		if self.device is not None:
+			# reopen with the callback function
+			self.stream.close()
+			self.stream = self.open_stream(self.device)
+			self.stream.start_stream()
 			self.first_channel = 0
 			nchannels = self.get_current_device_nchannels()
 			if nchannels == 1:
@@ -74,8 +85,13 @@ class AudioBackend(QtCore.QObject):
 		self.xruns = 0
 
 		self.chunk_number = 0
-		
-		self.buffer_timer_time = 0.
+
+		self.new_data_available_from_callback.connect(self.handle_new_data)
+
+	def close(self):
+		self.stream.stop_stream()
+		self.stream.close()
+		self.stream = None
 
 	# method
 	def get_readable_devices_list(self):
@@ -195,13 +211,18 @@ class AudioBackend(QtCore.QObject):
 		previous_stream = self.stream
 		previous_device = self.device
 
-		self.stream = self.open_stream(device)
+		self.stream = self.open_stream_no_callback(device)
 		self.device = device
 
 		self.logger.push("Trying to read from input device #%d" % (device))
 		if self.try_input_stream(self.stream):
 			self.logger.push("Success")
 			previous_stream.close()
+
+			self.stream.close()
+			self.stream = self.open_stream(self.device)
+			self.stream.start_stream()
+
 			success = True
 
 			self.first_channel = 0
@@ -232,12 +253,21 @@ class AudioBackend(QtCore.QObject):
 		return success, self.second_channel
 
 	# method
-	def open_stream(self, device):
+	def open_stream_no_callback(self, device):
 		# by default we open the device stream with all the channels
 		# (interleaved in the data buffer)
 		maxInputChannels = self.pa.get_device_info_by_index(device)['maxInputChannels']
 		stream = self.pa.open(format=paInt16, channels=maxInputChannels, rate=SAMPLING_RATE, input=True,
 				frames_per_buffer=FRAMES_PER_BUFFER, input_device_index=device)
+		return stream
+
+	# method
+	def open_stream(self, device):
+		# by default we open the device stream with all the channels
+		# (interleaved in the data buffer)
+		maxInputChannels = self.pa.get_device_info_by_index(device)['maxInputChannels']
+		stream = self.pa.open(format=paInt16, channels=maxInputChannels, rate=SAMPLING_RATE, input=True,
+				input_device_index=device, stream_callback=self.callback)
 		return stream
 
 	# method
@@ -293,64 +323,35 @@ class AudioBackend(QtCore.QObject):
 			self.logger.push("Device claims %d ms latency" %(lat_ms))
 			return True
 
-	# try to update the audio buffer
-	# return the number of chunks retrieved, and the time elapsed
-	def update(self, ringbuffer):
-		t = QtCore.QTime()
-		t.start()
+	def handle_new_data(self, in_data, frame_count, time_info, status):
+		if (status & paInputOverflow):
+			print("Stream overflow!")
+			self.xruns += 1
+			self.underflow.emit()
+
+		intdata_all_channels = fromstring(in_data, int16)
+
+		int16info = iinfo(int16)
+		norm_coeff = max(abs(int16info.min), int16info.max)
+		floatdata_all_channels = intdata_all_channels.astype(float64)/float(norm_coeff)
 
 		channel = self.get_current_first_channel()
 		nchannels = self.get_current_device_nchannels()
 		if self.duo_input:
 			channel_2 = self.get_current_second_channel()
-		
-		chunks = 0
-		
-		# ask for how much data is available
-		available = self.stream.get_read_available()
 
-		# read what is available
-		# we read by multiples of FRAMES_PER_BUFFER, otherwise segfaults !
+		floatdata1 = floatdata_all_channels[channel::nchannels]
 
-		#print available, int(floor(available/FRAMES_PER_BUFFER))
-		#FIXME no less than 2048 samples at each stream read ??
+		if self.duo_input:
+			floatdata2 = floatdata_all_channels[channel_2::nchannels]
+			floatdata = vstack((floatdata1, floatdata2))
+		else:
+			floatdata = floatdata1
+			floatdata.shape = (1, floatdata.size)
 
-		available = int(floor(available/FRAMES_PER_BUFFER))
-		for j in range(0, available):
-			try:
-				rawdata = self.stream.read(FRAMES_PER_BUFFER)
-			except IOError as inst:
-				# FIXME specialize this exception handling code
-				# to treat overflow errors particularly
-				self.xruns += 1
-				print("Caught an IOError on stream read.", inst)
-				self.underflow.emit()
-				break
-			
-			intdata_all_channels = fromstring(rawdata, int16)
+		self.new_data_available.emit(floatdata, time_info, status)
 
-			int16info = iinfo(int16)
-			norm_coeff = max(abs(int16info.min), int16info.max)
-			floatdata_all_channels = intdata_all_channels.astype(float64)/float(norm_coeff)
-
-
-			floatdata1 = floatdata_all_channels[channel::nchannels]
-
-			if self.duo_input:
-				floatdata2 = floatdata_all_channels[channel_2::nchannels]
-				floatdata = vstack((floatdata1, floatdata2))
-			else:
-				floatdata = floatdata1
-				floatdata.shape = (1, FRAMES_PER_BUFFER)
-			
-			# update the circular buffer
-			ringbuffer.push(floatdata)
-			chunks += 1
-
-		self.chunk_number += chunks
-		self.buffer_timer_time = (95.*self.buffer_timer_time + 5.*t.elapsed())/100.
-
-		return chunks*FRAMES_PER_BUFFER
+		self.chunk_number += 1
 
 	def set_single_input(self):
 		self.duo_input = False

@@ -118,9 +118,13 @@ class Levels_Widget(QtWidgets.QWidget):
 		self.alpha = 1. - (1.-w)**(1./(n+1))
 		self.kernel = (1. - self.alpha)**(arange(0, N)[::-1])
 		# first channel
+		self.level_rms = -30.
+		self.level_max = -30.
 		self.old_rms = 1e-30
 		self.old_max = 1e-30
 		# second channel
+		self.level_rms2 = -30.
+		self.level_max2 = -30.
 		self.old_rms_2 = 1e-30
 		self.old_max_2 = 1e-30
 		
@@ -136,16 +140,7 @@ class Levels_Widget(QtWidgets.QWidget):
 	def set_buffer(self, buffer):
 		self.audiobuffer = buffer
 
-	# method
-	def update(self):
-		if not self.isVisible():
-			return
-
-		self.i += 1		
-
-		# get the fresh data
-		floatdata = self.audiobuffer.newdata()
-
+	def handle_new_data(self, floatdata):
 		if floatdata.shape[0] > 1 and self.two_channels == False:
 			self.meter.setPortCount(2)
 			self.two_channels = True
@@ -169,25 +164,10 @@ class Levels_Widget(QtWidgets.QWidget):
 		value_rms = pyx_exp_smoothed_value(self.kernel, self.alpha, y1**2, self.old_rms)
 		self.old_rms = value_rms
 		
-		level_rms = 10.*log10(value_rms + 0.*1e-80)
-		level_max = 20.*log10(self.old_max + 0.*1e-80)
-  
-		if self.i == LEVEL_TEXT_LABEL_STEPS:
-	    		if level_rms > -150.:
-	    			string_rms = "%+05.01f" % level_rms
-	    		else:
-	    			string_rms = "-Inf"
-	    		if level_max > -150.:
-	    			string_peak = "%+05.01f" % level_max
-	    		else:
-	    			string_peak = "-Inf"
+		self.level_rms = 10.*log10(value_rms + 0.*1e-80)
+		self.level_max = 20.*log10(self.old_max + 0.*1e-80)
 
-		if not self.two_channels:
-			self.meter.setValue(0, level_rms, level_max)
-			if self.i == LEVEL_TEXT_LABEL_STEPS:
-				self.label_rms.setText(string_rms)
-				self.label_peak.setText(string_peak)
-		else:
+		if self.two_channels:
 			# second channel
 			y2 = floatdata[1,:]
 		
@@ -204,20 +184,43 @@ class Levels_Widget(QtWidgets.QWidget):
 			value_rms = pyx_exp_smoothed_value(self.kernel, self.alpha, y2**2, self.old_rms_2)
 			self.old_rms_2 = value_rms
 			
-			level_rms_2 = 10.*log10(value_rms + 0.*1e-80)
-			level_max_2 = 20.*log10(self.old_max_2 + 0.*1e-80)
+			self.level_rms_2 = 10.*log10(value_rms + 0.*1e-80)
+			self.level_max_2 = 20.*log10(self.old_max_2 + 0.*1e-80)
 
+	# method
+	def update(self):
+		if not self.isVisible():
+			return
+
+		self.i += 1		
+
+		if self.i == LEVEL_TEXT_LABEL_STEPS:
+	    		if self.level_rms > -150.:
+	    			string_rms = "%+05.01f" % self.level_rms
+	    		else:
+	    			string_rms = "-Inf"
+	    		if self.level_max > -150.:
+	    			string_peak = "%+05.01f" % self.level_max
+	    		else:
+	    			string_peak = "-Inf"
+
+		if not self.two_channels:
+			self.meter.setValue(0, self.level_rms, self.level_max)
+			if self.i == LEVEL_TEXT_LABEL_STEPS:
+				self.label_rms.setText(string_rms)
+				self.label_peak.setText(string_peak)
+		else:
 			#self.meter.m_iPortCount = 3
-			self.meter.setValue(0, level_rms, level_max)
-			self.meter.setValue(1, level_rms_2, level_max_2)
+			self.meter.setValue(0, self.level_rms, self.level_max)
+			self.meter.setValue(1, self.level_rms_2, self.level_max_2)
 
 			if self.i == LEVEL_TEXT_LABEL_STEPS:
-				if level_rms_2 > -150.:
-					string_rms_2 = "%+05.01f" % level_rms_2
+				if self.level_rms_2 > -150.:
+					string_rms_2 = "%+05.01f" % self.level_rms_2
 				else:
 					string_rms_2 = "-Inf"
-				if level_max > -150.:
-					string_peak_2 = "%+05.01f" % level_max_2
+				if self.level_max > -150.:
+					string_peak_2 = "%+05.01f" % self.level_max_2
 				else:
 					string_peak_2 = "-Inf"
 

@@ -167,35 +167,22 @@ class Delay_Estimator_Widget(QtWidgets.QWidget):
 
         self.old_index = 0
 
+        self.two_channels = False
+        self.delay_ms = 0.
+        self.distance_m = 0.
+        self.correlation = 0.
+        self.Xcorr_extremum = 0.
+
     # method
     def set_buffer(self, buffer):
         self.audiobuffer = buffer
 
-    # method
-    def update(self):
-        if not self.isVisible():
-            return
-
-        # temporary buffer just to check the data shape
-        floatdata = self.audiobuffer.data(2)
-
+    def handle_new_data(self, floatdata):
         if floatdata.shape[0] == 1:
-            message = """Delay estimator only works
-with two channels.
-Select two-channels mode
-in the setup window."""
-            if message != self.previous_channelInfo_message:
-                self.previous_delay_message = "N/A ms\n(N/A m)"
-                self.delay_label.setText(self.previous_delay_message)
-                self.previous_correlation_message = "N/A %"
-                self.correlation_label.setText(self.previous_correlation_message)
-                self.previous_polarity_message = "N/A"
-                self.polarity_label.setText(self.previous_polarity_message)
-                self.channelInfo_label.setText(message)
-                self.previous_channelInfo_message = message
+            self.two_channels = False
         else:
-            #get the fresh data
-            floatdata = self.audiobuffer.newdata()
+            self.two_channels = True
+
             # separate the channels
             x0 = floatdata[0,:]
             x1 = floatdata[1,:]
@@ -245,65 +232,85 @@ in the setup window."""
                         smoothed_Xcorr = alpha*Xcorr + (1. - alpha)*self.old_Xcorr
                     else:
                         smoothed_Xcorr = Xcorr
-                    
+
                     absXcorr = numpy.abs(smoothed_Xcorr)
                     i = argmax(absXcorr)
 
                     # normalize
                     #Xcorr_max_norm = Xcorr_unweighted[i]/(d0.size*std0*std1)
-                    Xcorr_extremum = smoothed_Xcorr[i]
+                    self.Xcorr_extremum = smoothed_Xcorr[i]
                     Xcorr_max_norm = abs(smoothed_Xcorr[i])/(3*numpy.std(smoothed_Xcorr))
-                    delay_ms = 1e3*float(i)/self.subsampled_sampling_rate
+                    self.delay_ms = 1e3*float(i)/self.subsampled_sampling_rate
 
                     # delays larger than the half of the window most likely are actually negative
-                    if delay_ms > 1e3*time/2.:
-                        delay_ms -= 1e3*time
-                
+                    if self.delay_ms > 1e3*time/2.:
+                        self.delay_ms -= 1e3*time
+
                     #numpy.save("Xcorr_%d_%.1f.npy" %(i,delay_ms), Xcorr)
                     #numpy.save("smoothed_Xcorr%d_%.1f.npy" %(i,delay_ms), smoothed_Xcorr)
 
                     # store for smoothing
                     self.old_Xcorr = smoothed_Xcorr
                 else:
-                    delay_ms = 0.
+                    self.delay_ms = 0.
                     Xcorr_max_norm = 0.
-                    Xcorr_extremum = 0.
+                    self.Xcorr_extremum = 0.
 
                 # debug wrong phase detection
                 #if Xcorr[i] < 0.:
                 #    numpy.save("Xcorr.npy", Xcorr)
 
                 c = 340. # speed of sound, in meters per second (approximate)
-                distance_m = delay_ms*1e-3*c
+                self.distance_m = self.delay_ms*1e-3*c
 
                 # home-made measure of the significance
                 slope = 0.12
                 p = 3
                 x = (Xcorr_max_norm>1.)*(Xcorr_max_norm-1.)
                 x = (slope*x)**p
-                correlation = int((x/(1. + x))*100)
-                
-                delay_message = "%.1f ms\n= %.2f m" %(delay_ms, distance_m)
-                correlation_message = "%d%%" %(correlation)
-                if Xcorr_extremum >= 0:
-                    polarity_message = "In-phase"
-                else:
-                    polarity_message = "Reversed phase"                
-                channelInfo_message = ""
+                self.correlation = int((x/(1. + x))*100)
 
-                if delay_message != self.previous_delay_message:
-                    self.delay_label.setText(delay_message)
-                    self.previous_delay_message = delay_message
-                if correlation_message != self.previous_correlation_message:
-                    self.correlation_label.setText(correlation_message)
-                    self.previous_correlation_message = correlation_message
-                if polarity_message != self.previous_polarity_message:
-                    self.polarity_label.setText(polarity_message)
-                    self.previous_polarity_message = polarity_message
-                if channelInfo_message != self.previous_channelInfo_message:
-                    self.channelInfo_label.setText(channelInfo_message)
-                    self.previous_channelInfo_message = channelInfo_message
-    
+    # method
+    def update(self):
+        if not self.isVisible():
+            return
+
+        if self.two_channels:
+            delay_message = "%.1f ms\n= %.2f m" %(self.delay_ms, self.distance_m)
+            correlation_message = "%d%%" %(self.correlation)
+            if self.Xcorr_extremum >= 0:
+                polarity_message = "In-phase"
+            else:
+                polarity_message = "Reversed phase"
+            channelInfo_message = ""
+
+            if delay_message != self.previous_delay_message:
+                self.delay_label.setText(delay_message)
+                self.previous_delay_message = delay_message
+            if correlation_message != self.previous_correlation_message:
+                self.correlation_label.setText(correlation_message)
+                self.previous_correlation_message = correlation_message
+            if polarity_message != self.previous_polarity_message:
+                self.polarity_label.setText(polarity_message)
+                self.previous_polarity_message = polarity_message
+            if channelInfo_message != self.previous_channelInfo_message:
+                self.channelInfo_label.setText(channelInfo_message)
+                self.previous_channelInfo_message = channelInfo_message
+        else:
+            message = """Delay estimator only works
+with two channels.
+Select two-channels mode
+in the setup window."""
+            if message != self.previous_channelInfo_message:
+                self.previous_delay_message = "N/A ms\n(N/A m)"
+                self.delay_label.setText(self.previous_delay_message)
+                self.previous_correlation_message = "N/A %"
+                self.correlation_label.setText(self.previous_correlation_message)
+                self.previous_polarity_message = "N/A"
+                self.polarity_label.setText(self.previous_polarity_message)
+                self.channelInfo_label.setText(message)
+                self.previous_channelInfo_message = message
+
     def set_delayrange(self, delay_s):
         self.delayrange_s = delay_s
     

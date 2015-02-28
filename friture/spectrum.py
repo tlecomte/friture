@@ -99,11 +99,7 @@ class Spectrum_Widget(QtWidgets.QWidget):
 		epsilon = 1e-30
 		return 10.*log10(sp + epsilon)
 
-	# method
-	def update(self):
-		if not self.isVisible():
-			return
-
+	def handle_new_data(self, floatdata):
 		# we need to maintain an index of where we are in the buffer
 		index = self.audiobuffer.ringbuffer.offset
 
@@ -157,7 +153,15 @@ class Spectrum_Widget(QtWidgets.QWidget):
 
 			i = argmax(dB_spectrogram)
 			fmax = self.freq[i]
+
 			self.PlotZoneSpect.setdata(self.freq, dB_spectrogram, fmax)
+
+	# method
+	def update(self):
+		if not self.isVisible():
+			return
+
+		self.PlotZoneSpect.draw()
 
 	def setresponsetime(self, response_time):
 		#time = SMOOTH_DISPLAY_TIMER_PERIOD_MS/1000. #DISPLAY

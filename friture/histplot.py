@@ -343,7 +343,8 @@ class HistPlot(QtWidgets.QWidget):
         self.compute_peaks(y)
         self.bar_peak.setData(fl, fh, self.peak, self.peak_int, y)
 
-        self.draw()
+        # only draw on demand
+        #self.draw()
 
     def draw(self):
         if self.needfullreplot:

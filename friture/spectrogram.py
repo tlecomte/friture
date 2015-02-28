@@ -104,15 +104,11 @@ class Spectrogram_Widget(QtWidgets.QWidget):
         epsilon = 1e-30
         return 10.*log10(sp + epsilon)
 
-    # scale the db spectrum from [- spec_range db ... 0 db] > [0..1]    
+    # scale the db spectrum from [- spec_range db ... 0 db] > [0..1]
     def scale_spectrogram(self, sp):
         return (sp.clip(min = self.spec_min, max = self.spec_max) - self.spec_min)/(self.spec_max - self.spec_min)
 
-    # method
-    def update(self):
-        if not self.isVisible():
-            return        
-        
+    def handle_new_data(self, floatdata):
         # we need to maintain an index of where we are in the buffer
         index = self.audiobuffer.ringbuffer.offset
 
@@ -122,37 +118,43 @@ class Spectrogram_Widget(QtWidgets.QWidget):
             #ringbuffer must have grown or something...
             available = 0
             self.old_index = index
-    
+
         # if we have enough data to add a frequency column in the time-frequency plane, compute it
-        needed = self.fft_size*(1. - self.overlap)        
+        needed = self.fft_size*(1. - self.overlap)
         realizable = int(floor(available/needed))
 
         if realizable > 0:
             spn = zeros((len(self.freq), realizable), dtype=float64)
-        
+
             for i in range(realizable):
                 floatdata = self.audiobuffer.data_indexed(self.old_index, self.fft_size)
-    
+
                 # for now, take the first channel only
                 floatdata = floatdata[0,:]
-    
+
                 # FIXME We should allow here for more intelligent transforms, especially when the log freq scale is selected
                 spn[:, i] = self.proc.analyzelive(floatdata)
-    
+
                 self.old_index += int(needed)
-                    
+
             w = tile(self.w, (1, realizable))
-            norm_spectrogram = self.scale_spectrogram(self.log_spectrogram(spn) + w)            
+            norm_spectrogram = self.scale_spectrogram(self.log_spectrogram(spn) + w)
             self.PlotZoneImage.addData(self.freq, norm_spectrogram)
-        self.PlotZoneImage.draw()
-            
+
         # thickness of a frequency column depends on FFT size and window overlap
         # hamming window with 75% overlap provides good quality (Perfect reconstruction,
         # aliasing from side lobes only, 42 dB channel isolation)
-        
+
         # number of frequency columns that we keep depends on the time history that the user has chosen
-        
+
         # actual displayed spectrogram is a scaled version of the time-frequency plane
+
+    # method
+    def update(self):
+        if not self.isVisible():
+            return
+
+        self.PlotZoneImage.draw()
 
     def update_jitter(self):
         audio_jitter = 2*float(FRAMES_PER_BUFFER)/SAMPLING_RATE

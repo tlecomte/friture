@@ -90,6 +90,9 @@ class Friture(QMainWindow, ):
 		# Initialize the audio backend
 		self.audiobackend = AudioBackend(self.logger)
 
+		# signal containing new data from the audio callback thread, processed as numpy array
+		self.audiobackend.new_data_available.connect(self.audiobuffer.handle_new_data)
+
 		# this timer is used to update widgets that just need to display as fast as they can
 		self.display_timer = QtCore.QTimer()
 		self.display_timer.setInterval(SMOOTH_DISPLAY_TIMER_PERIOD_MS) # constant timing
@@ -109,7 +112,6 @@ class Friture(QMainWindow, ):
 		self.dockmanager = DockManager(self, self.sharedGLWidget, self.logger)
 
 		# timer ticks
-		self.display_timer.timeout.connect(self.update_buffer)
 		self.display_timer.timeout.connect(self.centralwidget.update)
 		self.display_timer.timeout.connect(self.dockmanager.update)
 
@@ -138,6 +140,7 @@ class Friture(QMainWindow, ):
 	
 	# event handler
 	def closeEvent(self, event):
+		self.audiobackend.close()
 		self.saveAppState()
 		event.accept()
 	
@@ -199,11 +202,6 @@ class Friture(QMainWindow, ):
 			self.ui.actionStart.setText("Stop")
 			self.centralwidget.restart()
 			self.dockmanager.restart()
-
-	# slot
-	def update_buffer(self):
-		newpoints = self.audiobackend.update(self.audiobuffer.ringbuffer)
-		self.audiobuffer.set_newdata(newpoints)
 
 
 def main():

@@ -300,6 +300,10 @@ class Generator_Widget(QtWidgets.QWidget):
                 self.state = stopping
                 self.t_stop = RAMP_LENGTH
 
+    def handle_new_data(self, floatdata):
+        # we do not make anything of the input data in the generator...
+        return
+
     # method
     def update(self):
         if self.state == stopped:

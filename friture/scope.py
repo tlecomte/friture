@@ -18,7 +18,7 @@
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
 from PyQt5 import QtGui, QtCore, QtWidgets
-from numpy import log10, where, linspace, sign, arange
+from numpy import log10, where, linspace, sign, arange, zeros
 from friture.timeplot import TimePlot
 from friture.audiobackend import SAMPLING_RATE
 from friture.logger import PrintLogger
@@ -32,7 +32,7 @@ class Scope_Widget(QtWidgets.QWidget):
 
         self.audiobuffer = None
         self.logger = logger
-        
+
         self.setObjectName("Scope_Widget")
         self.gridLayout = QtWidgets.QGridLayout(self)
         self.gridLayout.setObjectName("gridLayout")
@@ -44,15 +44,15 @@ class Scope_Widget(QtWidgets.QWidget):
 
         self.timerange = DEFAULT_TIMERANGE
 
+        self.time = zeros(10)
+        self.y = zeros(10)
+        self.y2 = zeros(10)
+
     # method
     def set_buffer(self, buffer):
         self.audiobuffer = buffer
 
-    # method
-    def update(self):
-        if not self.isVisible():
-            return
-
+    def handle_new_data(self, floatdata):
         time = self.timerange*1e-3
         width = int(time*SAMPLING_RATE)
         #basic trigger capability on leading edge
@@ -65,7 +65,7 @@ class Scope_Widget(QtWidgets.QWidget):
         # because of the buffering, sometimes we have not got any data
         #if newpoints==0:
         #    return
-        
+
         #floatdata = self.audiobuffer.data(newpoints + width)
 
         twoChannels = False
@@ -86,7 +86,7 @@ class Scope_Widget(QtWidgets.QWidget):
 
         if len(trigger_pos)==0:
             return
-        
+
         if len(trigger_pos) > 0:
             shift = trigger_pos[0]
         else:
@@ -95,24 +95,33 @@ class Scope_Widget(QtWidgets.QWidget):
         shift += trig_search_start
         datarange = width
         floatdata = floatdata[:, shift -  datarange/2: shift +  datarange/2]
- 
-        y = floatdata[0,:] #- floatdata.mean()
+
+        self.y = floatdata[0,:] #- floatdata.mean()
         if twoChannels:
-            y2 = floatdata[1,:] #- floatdata.mean()
-        
+            self.y2 = floatdata[1,:] #- floatdata.mean()
+        else:
+            self.y2 = None
+
         dBscope = False
         if dBscope:
             dBmin = -50.
-            y = sign(y)*(20*log10(abs(y))).clip(dBmin, 0.)/(-dBmin) + sign(y)*1.
+            self.y = sign(self.y)*(20*log10(abs(self.y))).clip(dBmin, 0.)/(-dBmin) + sign(self.y)*1.
             if twoChannels:
-                y2 = sign(y2)*(20*log10(abs(y2))).clip(dBmin, 0.)/(-dBmin) + sign(y2)*1.
-    
-        time = (arange(len(y)) - datarange/2)/float(SAMPLING_RATE)
-        
-        if twoChannels:
-            self.PlotZoneUp.setdataTwoChannels(time, y, y2)
+                self.y2 = sign(self.y2)*(20*log10(abs(self.y2))).clip(dBmin, 0.)/(-dBmin) + sign(self.y2)*1.
+            else:
+                self.y2 = None
+
+        self.time = (arange(len(self.y)) - datarange/2)/float(SAMPLING_RATE)
+
+    # method
+    def update(self):
+        if not self.isVisible():
+            return
+
+        if self.y2 is not None:
+            self.PlotZoneUp.setdataTwoChannels(self.time, self.y, self.y2)
         else:
-            self.PlotZoneUp.setdata(time, y)
+            self.PlotZoneUp.setdata(self.time, self.y)
 
     # slot
     def set_timerange(self, timerange):
