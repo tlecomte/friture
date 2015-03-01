@@ -87,7 +87,7 @@ class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
 		if not success:
 			# Note: the error message is a child of the settings dialog, so that
 			# that dialog remains on top when the error message is closed
-			error_message = QErrorMessage(self)
+			error_message = QtWidgets.QErrorMessage(self)
 			error_message.setWindowTitle("Input device error")
 			error_message.showMessage("Impossible to use the selected input device, reverting to the previous one")
 		
@@ -110,7 +110,7 @@ class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
 		if not success:
 			# Note: the error message is a child of the settings dialog, so that
 			# that dialog remains on top when the error message is closed
-			error_message = QErrorMessage(self)
+			error_message = QtWidgets.QErrorMessage(self)
 			error_message.setWindowTitle("Input device error")
 			error_message.showMessage("Impossible to use the selected channel as the first channel, reverting to the previous one")
 		
@@ -127,7 +127,7 @@ class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
 		if not success:
 			# Note: the error message is a child of the settings dialog, so that
 			# that dialog remains on top when the error message is closed
-			error_message = QErrorMessage(self)
+			error_message = QtWidgets.QErrorMessage(self)
 			error_message.setWindowTitle("Input device error")
 			error_message.showMessage("Impossible to use the selected channel as the second channel, reverting to the previous one")
 		
