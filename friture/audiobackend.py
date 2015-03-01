@@ -59,21 +59,16 @@ class AudioBackend(QtCore.QObject):
 		# works, starting by the default input device
 		for device in self.input_devices:
 			self.logger.push("Opening the stream")
-			self.stream = self.open_stream_no_callback(device)
-			self.device = device
-
-			self.logger.push("Trying to read from input device %d" %device)
-			if self.try_input_stream(self.stream):
+			try:
+				self.stream = self.open_stream(device)
+				self.stream.start_stream()
+				self.device = device
 				self.logger.push("Success")
 				break
-			else:
+			except:
 				self.logger.push("Fail")
 
 		if self.device is not None:
-			# reopen with the callback function
-			self.stream.close()
-			self.stream = self.open_stream(self.device)
-			self.stream.start_stream()
 			self.first_channel = 0
 			nchannels = self.get_current_device_nchannels()
 			if nchannels == 1:
@@ -180,7 +175,7 @@ class AudioBackend(QtCore.QObject):
 			n_input_channels = self.pa.get_device_info_by_index(device)['maxInputChannels']
 			if n_input_channels > 0:
 				input_devices += [device]
-		
+
 		return input_devices
 
 	# method
@@ -205,25 +200,35 @@ class AudioBackend(QtCore.QObject):
 		
 		return output_devices
 
-	# method
-	def select_input_device(self, device):
+	# method.
+	# The index parameter is the index in the self.input_devices list of devices !
+	# The return parameter is also an index in the same list.
+	def select_input_device(self, index):
+		device = self.input_devices[index]
+
 		# save current stream in case we need to restore it
 		previous_stream = self.stream
 		previous_device = self.device
 
-		self.stream = self.open_stream_no_callback(device)
-		self.device = device
+		self.logger.push("Trying to open input device #%d" % (index))
 
-		self.logger.push("Trying to read from input device #%d" % (device))
-		if self.try_input_stream(self.stream):
+		try:
+			self.stream = self.open_stream(device)
+			self.device = device
+			self.stream.start_stream()
+			success = True
+		except:
+			self.logger.push("Fail")
+			success = False
+			if self.stream is not None:
+				self.stream.close()
+			# restore previous stream
+			self.stream = previous_stream
+			self.device = previous_device
+
+		if success:
 			self.logger.push("Success")
 			previous_stream.close()
-
-			self.stream.close()
-			self.stream = self.open_stream(self.device)
-			self.stream.start_stream()
-
-			success = True
 
 			self.first_channel = 0
 			nchannels = self.get_current_device_nchannels()
@@ -231,14 +236,8 @@ class AudioBackend(QtCore.QObject):
 				self.second_channel = 0
 			else:
 				self.second_channel = 1
-		else:
-			self.logger.push("Fail")
-			self.stream.close()
-			self.stream = previous_stream
-			self.device = previous_device
-			success = False
 
-		return success, self.device
+		return success, self.input_devices.index(self.device)
 
 	# method
 	def select_first_channel(self, index):
@@ -253,21 +252,16 @@ class AudioBackend(QtCore.QObject):
 		return success, self.second_channel
 
 	# method
-	def open_stream_no_callback(self, device):
-		# by default we open the device stream with all the channels
-		# (interleaved in the data buffer)
-		maxInputChannels = self.pa.get_device_info_by_index(device)['maxInputChannels']
-		stream = self.pa.open(format=paInt16, channels=maxInputChannels, rate=SAMPLING_RATE, input=True,
-				frames_per_buffer=FRAMES_PER_BUFFER, input_device_index=device)
-		return stream
-
-	# method
 	def open_stream(self, device):
 		# by default we open the device stream with all the channels
 		# (interleaved in the data buffer)
 		maxInputChannels = self.pa.get_device_info_by_index(device)['maxInputChannels']
 		stream = self.pa.open(format=paInt16, channels=maxInputChannels, rate=SAMPLING_RATE, input=True,
 				input_device_index=device, stream_callback=self.callback)
+
+		lat_ms = 1000*stream.get_input_latency()
+		self.logger.push("Device claims %d ms latency" %(lat_ms))
+
 		return stream
 
 	# method
@@ -275,13 +269,7 @@ class AudioBackend(QtCore.QObject):
 	# (not the same as the PortAudio index, since the latter is the index
 	# in the list of *all* devices, not only input ones)
 	def get_readable_current_device(self):
-		i = 0
-		for device in self.input_devices:
-			if device == self.device:
-				break
-			else:
-				i += 1
-		return i
+		return self.input_devices.index(self.device)
 
 	# method
 	def get_readable_current_channels(self):			
@@ -308,20 +296,6 @@ class AudioBackend(QtCore.QObject):
 	# method	
 	def get_current_device_nchannels(self):
 		return self.pa.get_device_info_by_index(self.device)['maxInputChannels']
-
-	# method
-	# return True on success
-	def try_input_stream(self, stream):
-		n_try = 0
-		while stream.get_read_available() < FRAMES_PER_BUFFER and n_try < 1000000:
-			n_try +=1
-
-		if n_try == 1000000:
-			return False
-		else:
-			lat_ms = 1000*stream.get_input_latency()
-			self.logger.push("Device claims %d ms latency" %(lat_ms))
-			return True
 
 	def handle_new_data(self, in_data, frame_count, time_info, status):
 		if (status & paInputOverflow):
