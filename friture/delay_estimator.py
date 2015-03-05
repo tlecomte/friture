@@ -271,7 +271,7 @@ class Delay_Estimator_Widget(QtWidgets.QWidget):
                 self.correlation = int((x/(1. + x))*100)
 
     # method
-    def update(self):
+    def canvasUpdate(self):
         if not self.isVisible():
             return
 

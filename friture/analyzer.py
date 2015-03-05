@@ -112,8 +112,8 @@ class Friture(QMainWindow, ):
 		self.dockmanager = DockManager(self, self.sharedGLWidget, self.logger)
 
 		# timer ticks
-		self.display_timer.timeout.connect(self.centralwidget.update)
-		self.display_timer.timeout.connect(self.dockmanager.update)
+		self.display_timer.timeout.connect(self.centralwidget.canvasUpdate)
+		self.display_timer.timeout.connect(self.dockmanager.canvasUpdate)
 
 		# toolbar clicks
 		self.ui.actionStart.triggered.connect(self.timer_toggle)

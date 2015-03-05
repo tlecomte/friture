@@ -29,12 +29,22 @@ FRAMES_PER_BUFFER = 1024 # FIXME this parameter seems to have no effect on the
 class AudioBackend(QtCore.QObject):
 
 	underflow = QtCore.pyqtSignal()
-	new_data_available_from_callback = QtCore.pyqtSignal(bytes, int, dict, int)
-	new_data_available = QtCore.pyqtSignal(ndarray, dict, int)
+	new_data_available_from_callback = QtCore.pyqtSignal(bytes, int, float, int)
+	new_data_available = QtCore.pyqtSignal(ndarray, float, int)
 
 	def callback(self, in_data, frame_count, time_info, status):
 		#do the minimum from here to prevent overflows, just pass the data to the main thread
-		self.new_data_available_from_callback.emit(in_data, frame_count, time_info, status)
+
+		input_time = time_info['input_buffer_adc_time']
+
+		# some API drivers in PortAudio do not return a valid time, so fallback to the current stream time
+		if input_time == 0.:
+			input_time = time_info['current_time']
+		if input_time == 0.:
+			input_time = self.stream.get_time()
+
+		self.new_data_available_from_callback.emit(in_data, frame_count, input_time, status)
+
 		return (None, 0)
 
 	def __init__(self, logger):
@@ -297,7 +307,7 @@ class AudioBackend(QtCore.QObject):
 	def get_current_device_nchannels(self):
 		return self.pa.get_device_info_by_index(self.device)['maxInputChannels']
 
-	def handle_new_data(self, in_data, frame_count, time_info, status):
+	def handle_new_data(self, in_data, frame_count, input_time, status):
 		if (status & paInputOverflow):
 			print("Stream overflow!")
 			self.xruns += 1
@@ -323,7 +333,7 @@ class AudioBackend(QtCore.QObject):
 			floatdata = floatdata1
 			floatdata.shape = (1, floatdata.size)
 
-		self.new_data_available.emit(floatdata, time_info, status)
+		self.new_data_available.emit(floatdata, input_time, status)
 
 		self.chunk_number += 1
 

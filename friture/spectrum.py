@@ -157,7 +157,7 @@ class Spectrum_Widget(QtWidgets.QWidget):
 			self.PlotZoneSpect.setdata(self.freq, dB_spectrogram, fmax)
 
 	# method
-	def update(self):
+	def canvasUpdate(self):
 		if not self.isVisible():
 			return
 

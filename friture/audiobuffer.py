@@ -32,6 +32,7 @@ class AudioBuffer(QtCore.QObject):
 
 		self.ringbuffer = RingBuffer(logger)
 		self.newpoints = 0
+		self.lastDataTime = 0.
 
 	def data(self, length):
 		return self.ringbuffer.data(length)
@@ -48,7 +49,8 @@ class AudioBuffer(QtCore.QObject):
 	def data_indexed(self, start, length):
 		return self.ringbuffer.data_indexed(start, length)
 
-	def handle_new_data(self, floatdata, time_info, status):
+	def handle_new_data(self, floatdata, input_time, status):
 		self.ringbuffer.push(floatdata)
 		self.set_newdata(floatdata.shape[1])
 		self.new_data_available.emit(floatdata)
+		self.lastDataTime = input_time

@@ -31,6 +31,10 @@ class CanvasWidget(QtWidgets.QWidget):
         # set proper size policy for this widget
         self.setSizePolicy(QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.MinimumExpanding))
 
+        self.setAutoFillBackground(False)
+        self.setAttribute(QtCore.Qt.WA_NoSystemBackground, True)
+        self.setAttribute(QtCore.Qt.WA_PaintOnScreen, True)
+
         self.horizontalScaleTransform = horizontalScaleTransform
         self.verticalScaleTransform = verticalScaleTransform
 

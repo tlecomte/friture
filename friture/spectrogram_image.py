@@ -196,7 +196,9 @@ class CanvasScaledSpectrogram(QtCore.QObject):
 		#	print "resetting"
 		#	self.syncOffsets()
 
-		return (self.time_offset + delay) % self.canvas_width
+		return self.offset % self.canvas_width
+
+		#return (self.time_offset + delay) % self.canvas_width
 
 	# this is used when there is an underflow in the audio input
 	def syncOffsets(self):

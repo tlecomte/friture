@@ -78,9 +78,9 @@ class DockManager(QtCore.QObject):
 				self.parent().addDockWidget(QtCore.Qt.TopDockWidgetArea, dock)
 
 
-	def update(self):
+	def canvasUpdate(self):
 		for dock in self.docks:
-			dock.update()
+			dock.canvasUpdate()
 
 	def pause(self):
 		for dock in self.docks:

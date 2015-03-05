@@ -46,6 +46,8 @@ class PlotImage:
 
 		self.jitter_s = 0.
 
+		self.last_data_time = 0.
+
 		self.isPlaying = True
 
 		self.sfft_rate_frac = Fraction(1, 1)
@@ -55,7 +57,9 @@ class PlotImage:
 		self.timer = QtCore.QElapsedTimer()
 		self.timer.start()
 
-	def addData(self, freq, xyzs, logfreqscale):
+		self.last_time = 0.
+
+	def addData(self, freq, xyzs, logfreqscale, last_data_time):
 		self.frequency_resampler.setlogfreqscale(logfreqscale)
 
 		# Note: both the frequency and the time resampler work
@@ -76,6 +80,9 @@ class PlotImage:
 			i += data.shape[1]
 
 		self.canvasscaledspectrogram.addData(resampled_data)
+
+		if i > 0:
+			self.last_data_time = last_data_time
 
 	def pause(self):
 		self.isPlaying = False
@@ -104,14 +111,25 @@ class PlotImage:
 		# solution: grow the rolling-canvas by a couple of columns,
 		# and slightly delay the spectrogram by the same number of columns
 
+		pixmap = self.canvasscaledspectrogram.getpixmap()
+		offset = self.canvasscaledspectrogram.getpixmapoffset(delay=jitter_pix/2)
+
 		if self.isPlaying:
 			delta_t = self.timer.nsecsElapsed()*1e-9
 			self.timer.restart()
 			pixel_advance = delta_t/(self.T + self.jitter_s)*rect.width()
 			self.canvasscaledspectrogram.addPixelAdvance(pixel_advance)
 
-		pixmap = self.canvasscaledspectrogram.getpixmap()
-		offset = self.canvasscaledspectrogram.getpixmapoffset(delay=jitter_pix/2)
+			time = self.audiobackend.get_stream_time()
+			time_delay = time - self.last_data_time
+			pixel_delay = rect.width()*time_delay/self.T
+
+			draw_delay = time - self.last_time
+			# delta_t and draw_delay are almost equal => the problem does not come from PortAudio !
+			#print(draw_delay, draw_delay*rect.width()/self.T, delta_t)
+			self.last_time = time
+
+			offset += pixel_delay
 
 		rolling = True
 		if rolling:
@@ -206,8 +224,8 @@ class ImagePlot(QtWidgets.QWidget):
 		#need to replot here for the size Hints to be computed correctly (depending on axis scales...)
 		self.update()
 
-	def addData(self, freq, xyzs):
-		self.plotImage.addData(freq, xyzs, self.logfreqscale)
+	def addData(self, freq, xyzs, last_data_time):
+		self.plotImage.addData(freq, xyzs, self.logfreqscale, last_data_time)
 
 	def draw(self):
 		if self.needfullreplot:

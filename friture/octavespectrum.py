@@ -170,7 +170,7 @@ class OctaveSpectrum_Widget(QtWidgets.QWidget):
 		self.PlotZoneSpect.setdata(self.filters.flow, self.filters.fhigh, self.filters.f_nominal, db_spectrogram)
 
 	# method
-	def update(self):
+	def canvasUpdate(self):
 		if not self.isVisible():
 			return
 

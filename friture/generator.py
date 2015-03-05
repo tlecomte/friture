@@ -305,7 +305,7 @@ class Generator_Widget(QtWidgets.QWidget):
         return
 
     # method
-    def update(self):
+    def canvasUpdate(self):
         if self.state == stopped:
             return
 

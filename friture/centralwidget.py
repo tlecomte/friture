@@ -85,9 +85,9 @@ class CentralWidget(QtWidgets.QWidget):
 		
 		self.controlBar.comboBox_select.setCurrentIndex(item)
 
-	def update(self):
+	def canvasUpdate(self):
 		if self.audiowidget is not None:
-			self.audiowidget.update()
+			self.audiowidget.canvasUpdate()
 
 	def pause(self):
 		if self.audiowidget is not None:

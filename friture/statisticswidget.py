@@ -51,11 +51,11 @@ class StatisticsWidget(QtWidgets.QWidget):
 		self.tab_stats_layout = QtWidgets.QGridLayout(self)
 		self.tab_stats_layout.addWidget(self.stats_scrollarea)
 
-		timer.timeout.connect(self.update)
+		timer.timeout.connect(self.stats_update)
 
 
 	# method
-	def update(self):
+	def stats_update(self):
 		if not self.LabelStats.isVisible():
 		    return
 		

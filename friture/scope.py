@@ -114,7 +114,7 @@ class Scope_Widget(QtWidgets.QWidget):
         self.time = (arange(len(self.y)) - datarange/2)/float(SAMPLING_RATE)
 
     # method
-    def update(self):
+    def canvasUpdate(self):
         if not self.isVisible():
             return
 

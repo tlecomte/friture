@@ -91,6 +91,8 @@ class Spectrogram_Widget(QtWidgets.QWidget):
 
         self.audiobackend.underflow.connect(self.PlotZoneImage.plotImage.canvasscaledspectrogram.syncOffsets)
 
+        self.last_data_time = 0.
+
     # method
     def set_buffer(self, buffer):
         self.audiobuffer = buffer
@@ -111,6 +113,7 @@ class Spectrogram_Widget(QtWidgets.QWidget):
     def handle_new_data(self, floatdata):
         # we need to maintain an index of where we are in the buffer
         index = self.audiobuffer.ringbuffer.offset
+        self.last_data_time = self.audiobuffer.lastDataTime
 
         available = index - self.old_index
 
@@ -139,7 +142,7 @@ class Spectrogram_Widget(QtWidgets.QWidget):
 
             w = tile(self.w, (1, realizable))
             norm_spectrogram = self.scale_spectrogram(self.log_spectrogram(spn) + w)
-            self.PlotZoneImage.addData(self.freq, norm_spectrogram)
+            self.PlotZoneImage.addData(self.freq, norm_spectrogram, self.last_data_time)
 
         # thickness of a frequency column depends on FFT size and window overlap
         # hamming window with 75% overlap provides good quality (Perfect reconstruction,
@@ -149,8 +152,7 @@ class Spectrogram_Widget(QtWidgets.QWidget):
 
         # actual displayed spectrogram is a scaled version of the time-frequency plane
 
-    # method
-    def update(self):
+    def canvasUpdate(self):
         if not self.isVisible():
             return
 

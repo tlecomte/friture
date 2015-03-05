@@ -188,7 +188,7 @@ class Levels_Widget(QtWidgets.QWidget):
 			self.level_max_2 = 20.*log10(self.old_max_2 + 0.*1e-80)
 
 	# method
-	def update(self):
+	def canvasUpdate(self):
 		if not self.isVisible():
 			return
 
