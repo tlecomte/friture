@@ -1,6 +1,6 @@
 import sys
 
-from PyQt5 import QtCore, QtGui, QtOpenGL, Qt, QtWidgets
+from PyQt5 import QtCore, QtGui, Qt, QtWidgets
 import numpy as np
 
 try:
@@ -11,12 +11,12 @@ except ImportError:
             "PyOpenGL must be installed to run this example.")
     sys.exit(1)
 
-class GlCanvasWidget(QtOpenGL.QGLWidget):
+class GlCanvasWidget(QtWidgets.QOpenGLWidget):
 
     resized = QtCore.pyqtSignal(int, int)
 
-    def __init__(self, parent, sharedGLWidget, verticalScaleTransform, horizontalScaleTransform):
-        super(GlCanvasWidget, self).__init__(parent, shareWidget=sharedGLWidget)
+    def __init__(self, parent, verticalScaleTransform, horizontalScaleTransform):
+        super(GlCanvasWidget, self).__init__(parent)
 
         self.lastPos = QtCore.QPoint()
 
@@ -35,10 +35,6 @@ class GlCanvasWidget(QtOpenGL.QGLWidget):
 
         # use a cross cursor to easily select a point on the graph
         self.setCursor(Qt.Qt.CrossCursor)
-
-        # instruct OpenGL not to paint a background for the widget
-        # when QPainter.begin() is called.
-        self.setAutoFillBackground(False)
 
         # set proper size policy for this widget
         self.setSizePolicy(QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.MinimumExpanding))
@@ -114,21 +110,24 @@ class GlCanvasWidget(QtOpenGL.QGLWidget):
 
         GL.glNewList(self.gridList, GL.GL_COMPILE)
 
-        self.qglColor(QtGui.QColor(Qt.Qt.gray))
+        color = QtGui.QColor(Qt.Qt.gray)
+        GL.glColor3f(color.redF(), color.greenF(), color.blueF())
         for x in self.xMajorTick:
             GL.glBegin(GL.GL_LINES)
             GL.glVertex2f(x, 0)
             GL.glVertex2f(x, h)
             GL.glEnd()
 
-        self.qglColor(QtGui.QColor(Qt.Qt.lightGray))
+        color = QtGui.QColor(Qt.Qt.lightGray)
+        GL.glColor3f(color.redF(), color.greenF(), color.blueF())
         for x in self.xMinorTick:
             GL.glBegin(GL.GL_LINES)
             GL.glVertex2f(x, 0)
             GL.glVertex2f(x, h)
             GL.glEnd()
 
-        self.qglColor(QtGui.QColor(Qt.Qt.gray))
+        color = QtGui.QColor(Qt.Qt.gray)
+        GL.glColor3f(color.redF(), color.greenF(), color.blueF())
         for y in self.yMajorTick:
             GL.glBegin(GL.GL_LINES)
             GL.glVertex2f(0, y)
@@ -145,10 +144,7 @@ class GlCanvasWidget(QtOpenGL.QGLWidget):
 
         GL.glEndList()
 
-    #def paintGL(self):
-    def paintEvent(self, event):
-        self.makeCurrent()
-
+    def paintGL(self):
         GL.glMatrixMode(GL.GL_PROJECTION)
         GL.glPushMatrix()
 
@@ -268,11 +264,10 @@ class GlCanvasWidget(QtOpenGL.QGLWidget):
             painter.setPen(Qt.Qt.black)
             painter.drawText(rect, Qt.Qt.AlignLeft, text)
 
-    def resizeEvent(self, event):
+    def resizeGL(self, width, height):
         # give the opportunity to the scales to adapt
         self.resized.emit(self.width(), self.height())
 
-    def resizeGL(self, width, height):
         self.setupViewport(self.width(), self.height())
         self.updateGrid()
 
@@ -317,7 +312,8 @@ class GlCanvasWidget(QtOpenGL.QGLWidget):
     def drawBorder(self):
         w = self.width()
         h = self.height()
-        self.qglColor(QtGui.QColor(Qt.Qt.gray))
+        color = QtGui.QColor(Qt.Qt.gray)
+        GL.glColor3f(color.redF(), color.greenF(), color.blueF())
         GL.glBegin(GL.GL_LINE_LOOP)
         GL.glVertex2f(0, 0)
         GL.glVertex2f(0, h-1)
@@ -329,7 +325,8 @@ class GlCanvasWidget(QtOpenGL.QGLWidget):
         if self.ruler:
             w = self.width()
             h = self.height()
-            self.qglColor(QtGui.QColor(Qt.Qt.black))
+            color = QtGui.QColor(Qt.Qt.black)
+            GL.glColor3f(color.redF(), color.greenF(), color.blueF())
             GL.glBegin(GL.GL_LINES)
             GL.glVertex2f(self.mousex, 0)
             GL.glVertex2f(self.mousex, h)

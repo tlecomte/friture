@@ -23,7 +23,7 @@ from friture.defaults import DEFAULT_DOCKS
 from friture.dock import Dock
 
 class DockManager(QtCore.QObject):
-	def __init__(self, parent, sharedGLWidget, logger):
+	def __init__(self, parent, logger):
 		super().__init__(parent)
 
 		# the parent must of the QMainWindow so that docks are created as children of it
@@ -31,7 +31,6 @@ class DockManager(QtCore.QObject):
 
 		self.docks = []
 		self.logger = logger
-		self.sharedGLWidget = sharedGLWidget
 
 	# slot
 	def new_dock(self):
@@ -43,7 +42,7 @@ class DockManager(QtCore.QObject):
 		else:
 			index = max(dockindexes)+1
 		name = "Dock %d" %index
-		new_dock = Dock(self.parent(), self.sharedGLWidget, self.logger, name)
+		new_dock = Dock(self.parent(), self.logger, name)
 		self.parent().addDockWidget(QtCore.Qt.TopDockWidgetArea, new_dock)
 		
 		self.docks += [new_dock]
@@ -66,14 +65,14 @@ class DockManager(QtCore.QObject):
 		if settings.contains("dockNames"):
 			docknames = settings.value("dockNames", [])
 			# list of docks
-			self.docks = [Dock(self.parent(), self.sharedGLWidget, self.logger, name) for name in docknames]
+			self.docks = [Dock(self.parent(), self.logger, name) for name in docknames]
 			for dock in self.docks:
 				settings.beginGroup(dock.objectName())
 				dock.restoreState(settings)
 				settings.endGroup()
 		else:
 			self.logger.push("First launch, display a default set of docks")
-			self.docks = [Dock(self.parent(), self.sharedGLWidget, self.logger, "Dock %d" %(i), type = type) for i, type in enumerate(DEFAULT_DOCKS)]
+			self.docks = [Dock(self.parent(), self.logger, "Dock %d" %(i), type = type) for i, type in enumerate(DEFAULT_DOCKS)]
 			for dock in self.docks:
 				self.parent().addDockWidget(QtCore.Qt.TopDockWidgetArea, dock)
 

@@ -129,7 +129,7 @@ class CurveItem:
 
 
 class TimePlot(QtWidgets.QWidget):
-	def __init__(self, parent, sharedGLWidget, logger):
+	def __init__(self, parent, logger):
 		super(TimePlot, self).__init__()
 
 		# store the logger instance
@@ -147,7 +147,7 @@ class TimePlot(QtWidgets.QWidget):
 		self.horizontalScale = HorizontalScaleWidget(self, self.horizontalScaleDivision, self.horizontalScaleTransform)
 		self.horizontalScale.setTitle("Time (ms)")
 
-		self.canvasWidget = GlCanvasWidget(self, sharedGLWidget, self.verticalScaleTransform, self.horizontalScaleTransform)
+		self.canvasWidget = GlCanvasWidget(self, self.verticalScaleTransform, self.horizontalScaleTransform)
 		self.canvasWidget.setTrackerFormatter(lambda x, y: "%.3g ms, %.3g" %(x, y))
 
 		self.legendWidget = LegendWidget(self, self.canvasWidget)

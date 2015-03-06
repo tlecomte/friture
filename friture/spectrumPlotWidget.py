@@ -27,7 +27,7 @@ PEAK_DECAY_RATE = 1.0 - 3E-6
 PEAK_FALLOFF_COUNT = 32 # default : 16
 
 class SpectrumPlotWidget(QtWidgets.QWidget):
-    def __init__(self, parent, sharedGLWidget, logger=None):
+    def __init__(self, parent, logger=None):
         super(SpectrumPlotWidget, self).__init__()
 
         self.peaks_enabled = True
@@ -61,7 +61,7 @@ class SpectrumPlotWidget(QtWidgets.QWidget):
         self.horizontalScale = HorizontalScaleWidget(self, self.horizontalScaleDivision, self.horizontalScaleTransform)
         self.horizontalScale.setTitle("Frequency (Hz)")
 
-        self.canvasWidget = GlCanvasWidget(self, sharedGLWidget, self.verticalScaleTransform, self.horizontalScaleTransform)
+        self.canvasWidget = GlCanvasWidget(self, self.verticalScaleTransform, self.horizontalScaleTransform)
         self.canvasWidget.setTrackerFormatter(lambda x, y: "%d Hz, %.1f dB" %(x, y))
 
         self.quadsItem = QuadsItem()

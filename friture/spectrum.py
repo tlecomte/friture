@@ -37,7 +37,7 @@ from friture.spectrumPlotWidget import SpectrumPlotWidget
 from friture.exp_smoothing_conv import pyx_exp_smoothed_value_numpy
 
 class Spectrum_Widget(QtWidgets.QWidget):
-	def __init__(self, parent, sharedGLWidget, logger = PrintLogger()):
+	def __init__(self, parent, logger = PrintLogger()):
 		super().__init__(parent)
 
 		self.logger = logger
@@ -46,7 +46,7 @@ class Spectrum_Widget(QtWidgets.QWidget):
 		self.setObjectName("Spectrum_Widget")
 		self.gridLayout = QtWidgets.QGridLayout(self)
 		self.gridLayout.setObjectName("gridLayout")
-		self.PlotZoneSpect = SpectrumPlotWidget(self, sharedGLWidget, self.logger)
+		self.PlotZoneSpect = SpectrumPlotWidget(self, self.logger)
 		self.PlotZoneSpect.setObjectName("PlotZoneSpect")
 		self.gridLayout.addWidget(self.PlotZoneSpect, 0, 0, 1, 1)
 

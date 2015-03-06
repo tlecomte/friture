@@ -78,12 +78,6 @@ class Friture(QMainWindow, ):
 		self.ui = Ui_MainWindow()
 		self.ui.setupUi(self)
 
-		# sharedGLWidget is a hidden GL widget that will be used as a parent
-		# to all QGLWidgets so that they have the same GL context, and can
-		# share display lists, etc.
-		self.sharedGLWidget = QtOpenGL.QGLWidget(self)
-		self.sharedGLWidget.hide()
-
 		# Initialize the audio data ring buffer
 		self.audiobuffer = AudioBuffer(self.logger)
 
@@ -104,12 +98,12 @@ class Friture(QMainWindow, ):
 		self.about_dialog = About_Dialog(self, self.logger, self.audiobackend, self.slow_timer)
 		self.settings_dialog = Settings_Dialog(self, self.logger, self.audiobackend)
 
-		self.centralwidget = CentralWidget(self.ui.centralwidget, self.sharedGLWidget, self.logger, "central_widget", 0)
+		self.centralwidget = CentralWidget(self.ui.centralwidget, self.logger, "central_widget", 0)
 		self.centralLayout = QVBoxLayout(self.ui.centralwidget)
 		self.centralLayout.setContentsMargins(0, 0, 0, 0)
 		self.centralLayout.addWidget(self.centralwidget)
 
-		self.dockmanager = DockManager(self, self.sharedGLWidget, self.logger)
+		self.dockmanager = DockManager(self, self.logger)
 
 		# timer ticks
 		self.display_timer.timeout.connect(self.centralwidget.canvasUpdate)
