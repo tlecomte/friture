@@ -26,6 +26,62 @@ PEAK_DECAY_RATE = 1.0 - 3E-6
 # Number of cycles the peak stays on hold before fall-off.
 PEAK_FALLOFF_COUNT = 32 # default : 16
 
+def pre_tree_rebin(x1, x2):
+    if len(x2) == 0:
+        # enf of recursion !
+        return x1, x2, 0
+
+    n0 = max(where(x2 - x1 >= 0.5)[0])
+
+    # leave untouched the frequency bins that span more than half a pixel
+    # and first make sure that what will be left can be decimated by two
+    rest = len(x2) - n0 - ((len(x2) - n0)//2)*2
+
+    n0 += rest
+
+    x1_0 = x1[:n0]
+    x2_0 = x2[:n0]
+
+    # decimate the rest
+    x1_2 = x1[n0::2]
+    x2_2 = x2[n0 + 1::2]
+
+    # recursive !!
+    x1_2, x2_2, n2 = pre_tree_rebin(x1_2, x2_2)
+
+    if n2 == 0.:
+        n = [n0]
+    else:
+        n = [n0] + [i*2 + n0 for i in n2]
+
+    x1 = hstack((x1_0, x1_2))
+    x2 = hstack((x2_0, x2_2))
+
+    return x1, x2, n
+
+def tree_rebin(y, ns, N):
+    y2 = zeros(N)
+
+    n = 0
+    for i in range(len(ns)-1):
+        y3 = y[ns[i]:ns[i+1]]
+        d = 2**i
+        l = len(y3)/d
+        y3.shape = (l, d)
+
+        # Note: the FFT spectrum is mostly used to identify frequency content
+        # ans _peaks_ are particularly interesting (e.g. feedback frequencies)
+        # so we display the _max_ instead of the mean of each bin
+        #y3 = mean(y3, axis=1)
+        #y3 = (y3[::2] + y3[1::2])*0.5
+
+        y3 = np.max(y3, axis=1)
+
+        y2[n:n+len(y3)] = y3
+        n += l
+
+    return y2
+
 class SpectrumPlotWidget(QtWidgets.QWidget):
     def __init__(self, parent, logger=None):
         super(SpectrumPlotWidget, self).__init__()
@@ -170,62 +226,6 @@ class SpectrumPlotWidget(QtWidgets.QWidget):
         # - Fix peaks loss when resizing
         # - optimize if further needed
 
-    def pre_tree_rebin(self, x1, x2):
-        if len(x2) == 0:
-            # enf of recursion !
-            return x1, x2, 0
-        
-        n0 = max(where(x2 - x1 >= 0.5)[0])
-        
-        # leave untouched the frequency bins that span more than half a pixel
-        # and first make sure that what will be left can be decimated by two
-        rest = len(x2) - n0 - ((len(x2) - n0)//2)*2
-        
-        n0 += rest
-        
-        x1_0 = x1[:n0]
-        x2_0 = x2[:n0]
-        
-        # decimate the rest
-        x1_2 = x1[n0::2]
-        x2_2 = x2[n0 + 1::2]
-        
-        # recursive !!
-        x1_2, x2_2, n2 = self.pre_tree_rebin(x1_2, x2_2)
-        
-        if n2 == 0.:
-            n = [n0]
-        else:
-            n = [n0] + [i*2 + n0 for i in n2]
-            
-        x1 = hstack((x1_0, x1_2))
-        x2 = hstack((x2_0, x2_2))
-        
-        return x1, x2, n
-
-    def tree_rebin(self, y, ns, N):
-        y2 = zeros(N)
-
-        n = 0
-        for i in range(len(ns)-1):
-            y3 = y[ns[i]:ns[i+1]]
-            d = 2**i
-            l = len(y3)/d
-            y3.shape = (l, d)
-
-            # Note: the FFT spectrum is mostly used to identify frequency content
-            # ans _peaks_ are particularly interesting (e.g. feedback frequencies)
-            # so we display the _max_ instead of the mean of each bin 
-            #y3 = mean(y3, axis=1)
-            #y3 = (y3[::2] + y3[1::2])*0.5
-            
-            y3 = np.max(y3, axis=1)
-
-            y2[n:n+len(y3)] = y3
-            n += l
-        
-        return y2
-
     def draw(self):
         if self.needtransform:
             self.verticalScaleDivision.setLength(self.canvasWidget.height())
@@ -243,19 +243,15 @@ class SpectrumPlotWidget(QtWidgets.QWidget):
             self.horizontalScale.update()
 
             # transform the coordinates only when needed
-            x1 = self.horizontalScaleTransform.toScreen(self.x1)
-            x2 = self.horizontalScaleTransform.toScreen(self.x2)
-            
+            self.transformed_x1 = self.horizontalScaleTransform.toScreen(self.x1)
+            self.transformed_x2 = self.horizontalScaleTransform.toScreen(self.x2)
+
             if self.logx:
-                self.transformed_x1, self.transformed_x2, n = self.pre_tree_rebin(x1, x2)
+                self.transformed_x1, self.transformed_x2, n = pre_tree_rebin(self.transformed_x1, self.transformed_x2)
                 self.n = [0] + n
                 self.N = 0
                 for i in range(len(self.n)-1):
                     self.N += (self.n[i+1] - self.n[i])/2**i
-
-            else:
-                self.transformed_x1 = x1
-                self.transformed_x2 = x2
 
             self.canvasWidget.setGrid(array(self.horizontalScaleDivision.majorTicks()),
                                   array(self.horizontalScaleDivision.minorTicks()),
@@ -270,7 +266,7 @@ class SpectrumPlotWidget(QtWidgets.QWidget):
         x2 = self.transformed_x2
         
         if self.logx:
-            y = self.tree_rebin(self.y, self.n, self.N)
+            y = tree_rebin(self.y, self.n, self.N)
         else:
             n = floor(1./(x2[2] - x1[1]))
             if n>0:
