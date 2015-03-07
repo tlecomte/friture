@@ -50,6 +50,8 @@ class GlCanvasWidget(QtWidgets.QOpenGLWidget):
 
         self.anyOpaqueItem = False
 
+        self.paused = False
+
     def setTrackerFormatter(self, formatter):
         self.trackerFormatter = formatter
 
@@ -60,6 +62,12 @@ class GlCanvasWidget(QtWidgets.QOpenGLWidget):
     def detach(self, item):
         self.attachedItems.remove(item)
         self.reviewOpaqueItems()
+
+    def pause(self):
+        self.paused = True
+
+    def restart(self):
+        self.paused = False
 
     def reviewOpaqueItems(self):
         self.anyOpaqueItem = False
@@ -81,11 +89,7 @@ class GlCanvasWidget(QtWidgets.QOpenGLWidget):
     def initializeGL(self):
         return
 
-    def setfmax(self, xmax, fmax):
-        if xmax==np.inf or xmax==-np.inf:
-            self.xmax = 0
-        else:
-            self.xmax = int(xmax)
+    def setfmax(self, fmax):
         self.fmax = fmax
 
     def setShowFreqLabel(self, showFreqLabel):
@@ -180,6 +184,10 @@ class GlCanvasWidget(QtWidgets.QOpenGLWidget):
 
         painter.end()
 
+        if not self.paused:
+            # schedule a repaint !
+            self.update()
+
     def drawFreqMaxText(self, painter):
         if not self.showFreqLabel:
             return
@@ -190,9 +198,15 @@ class GlCanvasWidget(QtWidgets.QOpenGLWidget):
         else:
             text = "%d Hz" %(np.rint(self.fmax))
 
+        xmax = self.horizontalScaleTransform.toScreen(self.fmax)
+        if xmax==np.inf or xmax==-np.inf:
+            xmax = 0
+        else:
+            xmax = int(xmax)
+
         # compute tracker bounding rect
         painter.setPen(Qt.Qt.black)
-        rect = painter.boundingRect(QtCore.QRect(self.xmax, 0, 0, 0), Qt.Qt.AlignHCenter, text)
+        rect = painter.boundingRect(QtCore.QRect(xmax, 0, 0, 0), Qt.Qt.AlignHCenter, text)
 
         # avoid crossing the left and top borders
         dx = - min(rect.x()-2, 0)

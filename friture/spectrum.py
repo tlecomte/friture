@@ -161,7 +161,11 @@ class Spectrum_Widget(QtWidgets.QWidget):
 		if not self.isVisible():
 			return
 
-		self.PlotZoneSpect.draw()
+	def pause(self):
+		self.PlotZoneSpect.pause()
+
+	def restart(self):
+		self.PlotZoneSpect.restart()
 
 	def setresponsetime(self, response_time):
 		#time = SMOOTH_DISPLAY_TIMER_PERIOD_MS/1000. #DISPLAY

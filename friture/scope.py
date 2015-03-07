@@ -113,15 +113,20 @@ class Scope_Widget(QtWidgets.QWidget):
 
         self.time = (arange(len(self.y)) - datarange/2)/float(SAMPLING_RATE)
 
-    # method
-    def canvasUpdate(self):
-        if not self.isVisible():
-            return
-
         if self.y2 is not None:
             self.PlotZoneUp.setdataTwoChannels(self.time, self.y, self.y2)
         else:
             self.PlotZoneUp.setdata(self.time, self.y)
+
+    # method
+    def canvasUpdate(self):
+        return
+
+    def pause(self):
+        self.PlotZoneUp.pause()
+
+    def restart(self):
+        self.PlotZoneUp.restart()
 
     # slot
     def set_timerange(self, timerange):

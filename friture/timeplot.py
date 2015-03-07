@@ -41,8 +41,10 @@ class CurveItem:
 		self.yMap = None
 		self.__color = Qt.QColor()
 		self.__title = ""
-		self.vertices = array([])
-		self.colors = array([])
+		self.vertices = zeros((1,2,2))
+		self.colors = zeros((1,2,3))
+		self.x = array([0., 1.])
+		self.y = array([0., 0.])
 
 	def setColor(self, color):
 		if self.__color != color:
@@ -65,8 +67,9 @@ class CurveItem:
 		return self.__color
 
 	def setData(self, x, y):
-		if self.xMap is None or self.yMap is None:
-			return
+		# make a copy so that pause works as expected
+		self.x = array(x)
+		self.y = array(y)
 
 		n = x.shape[0] - 1
 		if n != self.n:
@@ -87,14 +90,6 @@ class CurveItem:
 
 			self.vertices = zeros((n,2,2))
 
-		x = self.xMap.toScreen(x)
-		y = self.yMap.toScreen(y)
-
-		self.vertices[:,0,0] = x[:-1]
-		self.vertices[:,0,1] = y[:-1]
-		self.vertices[:,1,0] = x[1:]
-		self.vertices[:,1,1] = y[1:]
-
 	def setTitle(self, title):
 		self.__title = title
 
@@ -102,8 +97,14 @@ class CurveItem:
 		return self.__title
 
 	def glDraw(self, xMap, yMap, rect):
-		self.xMap = xMap
-		self.yMap = yMap
+		x = xMap.toScreen(self.x)
+		y = yMap.toScreen(self.y)
+
+		self.vertices[:,0,0] = x[:-1]
+		self.vertices[:,0,1] = y[:-1]
+		self.vertices[:,1,0] = x[1:]
+		self.vertices[:,1,1] = y[1:]
+
 
 		if self.vertices.size == 0 or self.colors.size == 0:
 			return
@@ -187,6 +188,8 @@ class TimePlot(QtWidgets.QWidget):
 
 		self.dual_channel = False
 
+		self.paused = False
+
 		self.canvasWidget.resized.connect(self.canvasResized)
 
 	def setdata(self, x, y):
@@ -216,8 +219,9 @@ class TimePlot(QtWidgets.QWidget):
 			self.update_xscale()
 			self.needfullreplot = True
 
-		y_interp = interp(self.xscaled, x_ms, y)
-		self.curve.setData(self.xscaled, y_interp)
+		if not self.paused:
+			y_interp = interp(self.xscaled, x_ms, y)
+			self.curve.setData(self.xscaled, y_interp)
 
 		self.draw()
 
@@ -245,7 +249,13 @@ class TimePlot(QtWidgets.QWidget):
 										array(self.verticalScaleDivision.minorTicks())
 										)
 
-		self.canvasWidget.update()
+	def pause(self):
+		self.paused = True
+		self.canvasWidget.pause()
+
+	def restart(self):
+		self.paused = False
+		self.canvasWidget.restart()
 
 	# redraw when the widget is resized to update coordinates transformations
 	# this is done instead of resizeEvent because the canvas can be resized independently of the whole plot (because the legend can disappear)
@@ -280,12 +290,13 @@ class TimePlot(QtWidgets.QWidget):
 			self.update_xscale()
 			self.needfullreplot = True
 
-		#y_interp = interp(self.xscaled, x_ms, y)
-		#y_interp2 = interp(self.xscaled, x_ms, y2)
-		#ClassPlot.setdata(self, self.xscaled, y_interp)
-		#self.curve2.setData(self.xscaled, y_interp2)
-		self.curve.setData(x_ms, y)
-		self.curve2.setData(x_ms, y2)
+		if not self.paused:
+			#y_interp = interp(self.xscaled, x_ms, y)
+			#y_interp2 = interp(self.xscaled, x_ms, y2)
+			#ClassPlot.setdata(self, self.xscaled, y_interp)
+			#self.curve2.setData(self.xscaled, y_interp2)
+			self.curve.setData(x_ms, y)
+			self.curve2.setData(x_ms, y2)
 
 		self.draw()
 
@@ -300,4 +311,4 @@ class TimePlot(QtWidgets.QWidget):
 		self.horizontalScale.scaleBar.updateGeometry()
 
 		self.needfullreplot = True
-		self.update()
+		self.draw()
