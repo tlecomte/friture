@@ -6,6 +6,9 @@ Created on Sat Apr 21 16:12:12 2012
 """
 
 import numpy as np
+# import just the precise function to avoid having to distribute all of Scipy
+from scipy.signal.signaltools import resample
+
 from friture.linear_interp import pyx_linear_interp_2D
 
 class Online_Linear_2D_resampler:
@@ -38,9 +41,11 @@ class Online_Linear_2D_resampler:
             
             self.orig_index = 0.
             self.resampled_index = 0.
-                    
-            self.old_data = np.zeros((self.height))
-            self.resampled_data = np.zeros((self.height, self.resampled_data.shape[1]))
+
+            # we resample here instead of just restarting with zeros to avoid black vertical lines
+            # in the spectrogram
+            self.old_data = resample(self.old_data, self.height)
+            self.resampled_data = resample(self.resampled_data, self.height) # resample on the first axis
     
     def processable(self, m):
         return int(np.ceil((self.orig_index + m - (self.resampled_index + self.resampling_ratio))/self.resampling_ratio))

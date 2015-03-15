@@ -63,7 +63,8 @@ class CanvasScaledSpectrogram(QtCore.QObject):
 	# resize the pixmap and update the offsets accordingly
 	def resize(self, width, height):
 		oldWidth = self.pixmap.width()/2
-		self.offset = (self.offset % oldWidth) * width/oldWidth
+		self.offset = (self.offset % oldWidth) * width/oldWidth - 1 # -1 to avoid black vertical lines on resize
+		self.offset = self.offset % width # to handle negative values
 		self.time_offset = (self.time_offset % oldWidth) * width/oldWidth
 		self.pixmap = self.pixmap.scaled(2*width, height, QtCore.Qt.IgnoreAspectRatio, QtCore.Qt.SmoothTransformation)
 
