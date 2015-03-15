@@ -23,8 +23,7 @@ from numpy import ndarray, floor, int16, fromstring, vstack, iinfo, float64
 
 # the sample rate below should be dynamic, taken from PyAudio/PortAudio
 SAMPLING_RATE = 48000
-FRAMES_PER_BUFFER = 1024 # FIXME this parameter seems to have no effect on the
-# actual frames_per_buffer used by PortAudio. Is it a bug in PyAudio ?
+FRAMES_PER_BUFFER = 512
 
 class AudioBackend(QtCore.QObject):
 
@@ -267,7 +266,8 @@ class AudioBackend(QtCore.QObject):
 		# (interleaved in the data buffer)
 		maxInputChannels = self.pa.get_device_info_by_index(device)['maxInputChannels']
 		stream = self.pa.open(format=paInt16, channels=maxInputChannels, rate=SAMPLING_RATE, input=True,
-				input_device_index=device, stream_callback=self.callback)
+				input_device_index=device, stream_callback=self.callback,
+				frames_per_buffer = FRAMES_PER_BUFFER)
 
 		lat_ms = 1000*stream.get_input_latency()
 		self.logger.push("Device claims %d ms latency" %(lat_ms))
