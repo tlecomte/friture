@@ -93,6 +93,8 @@ class Spectrogram_Widget(QtWidgets.QWidget):
 
         self.last_data_time = 0.
 
+        self.mustRestart = False
+
     # method
     def set_buffer(self, buffer):
         self.audiobuffer = buffer
@@ -144,6 +146,10 @@ class Spectrogram_Widget(QtWidgets.QWidget):
             norm_spectrogram = self.scale_spectrogram(self.log_spectrogram(spn) + w)
             self.PlotZoneImage.addData(self.freq, norm_spectrogram, self.last_data_time)
 
+            if self.mustRestart:
+                self.PlotZoneImage.restart()
+                self.mustRestart = False
+
         # thickness of a frequency column depends on FFT size and window overlap
         # hamming window with 75% overlap provides good quality (Perfect reconstruction,
         # aliasing from side lobes only, 42 dB channel isolation)
@@ -166,11 +172,12 @@ class Spectrogram_Widget(QtWidgets.QWidget):
         self.PlotZoneImage.plotImage.set_jitter(canvas_jitter)
 
     def pause(self):
-        self.PlotZoneImage.pause()        
+        self.PlotZoneImage.pause()
 
     def restart(self):
-        self.PlotZoneImage.restart()
-        
+        # defer the restart until we get data from the audio source (so that a fresh lastdatatime is passed to the spectrogram image)
+        self.mustRestart = True
+
     def setminfreq(self, freq):
         self.minfreq = freq
         self.PlotZoneImage.setfreqrange(self.minfreq, self.maxfreq)

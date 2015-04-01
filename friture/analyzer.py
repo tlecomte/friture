@@ -188,12 +188,14 @@ class Friture(QMainWindow, ):
 			self.logger.push("Timer stop")
 			self.display_timer.stop()
 			self.ui.actionStart.setText("Start")
+			self.audiobackend.pause()
 			self.centralwidget.pause()
 			self.dockmanager.pause()
 		else:
 			self.logger.push("Timer start")
 			self.display_timer.start()
 			self.ui.actionStart.setText("Stop")
+			self.audiobackend.restart()
 			self.centralwidget.restart()
 			self.dockmanager.restart()
 
