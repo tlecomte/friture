@@ -77,9 +77,6 @@ if py2exe_build:
 					 "API-MS-Win-Core-LocalRegistry-L1-1-0.dll",
 					 "SETUPAPI.dll",
 					 "PSAPI.dll",
-					 "libifcoremd.dll",
-					 "libiomp5md.dll",
-					 "libmmd.dll",
 					 "msvcp*.dll",
 					 "msvcr*.dll"]
 	#manually include python libraries that py2exe fails to detect
