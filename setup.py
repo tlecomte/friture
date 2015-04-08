@@ -53,7 +53,7 @@ if py2exe_build:
 	excludes += ["matplotlib","_ssl","Tkconstants","Tkinter","tcl","email","pyreadline","nose",\
 			"doctest", "pdb", "pydoc", "_hashlib", "bz2","httplib","cookielib","cookielib","urllib","urllib2","Image",\
 			"pywin","optparse","zipfile","calendar","compiler",\
-			"_imaging","_ssl"]
+			"_imaging","_ssl","sqlite3","PIL","IPython"]
 	#Note: unittest, inspect are needed by numpy
 	#exclude dlls that py2exe includes by error
 	#failure to exclude these dlls will prevent the executable to be run under XP for example
