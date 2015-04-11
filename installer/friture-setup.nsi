@@ -105,6 +105,7 @@ Section "SectionPrincipale" SEC01
   CreateShortCut "$DESKTOP\Friture.lnk" "$INSTDIR\friture.exe"
   SetOutPath "$INSTDIR\imageformats"
   File "${PROJECT_PATH}\dist\imageformats\*"
+  SetOutPath "$INSTDIR\platforms"
   File "${PROJECT_PATH}\dist\platforms\*"
   SetOutPath "$INSTDIR"
   File "${PROJECT_PATH}\dist\library.zip"
