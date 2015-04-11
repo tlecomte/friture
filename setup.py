@@ -32,6 +32,11 @@ except ImportError:
 #To decrease the py2exe distributions dramatically, these import lines can
 #be commented out !
 
+# icudt53.dll is also huge but needed for Qt
+# A stripped down version is available here:
+# https://forum.qt.io/topic/37891/minimal-icudt51-dll-icudt52-dll-and-icudt53-dll
+# http://qlcplus.sourceforge.net/icudt53.dll
+
 data_files = []
 excludes = []
 dll_excludes = []
@@ -53,7 +58,7 @@ if py2exe_build:
 	excludes += ["matplotlib","_ssl","Tkconstants","Tkinter","tcl","email","pyreadline","nose",\
 			"doctest", "pdb", "pydoc", "_hashlib", "bz2","httplib","cookielib","cookielib","urllib","urllib2","Image",\
 			"pywin","optparse","zipfile","calendar","compiler",\
-			"_imaging","_ssl","sqlite3","PIL","IPython"]
+			"_imaging","_ssl","sqlite3","PIL","IPython","tornado","zmq", "numpy.core._dotblas"]
 	#Note: unittest, inspect are needed by numpy
 	#exclude dlls that py2exe includes by error
 	#failure to exclude these dlls will prevent the executable to be run under XP for example
@@ -84,8 +89,8 @@ if py2exe_build:
 	# + OpenGL_accelerate.formathandler that is imported by the Python/C
 	# API so that py2exe does not detect it
 	includes += ["sip",
-              "PyQt4.QtSvg",
-              "PyQt4.QtXml",
+              "PyQt5.QtSvg",
+              "PyQt5.QtXml",
               "OpenGL.platform.win32",
               "OpenGL.arrays.ctypesarrays",
               "OpenGL.arrays.numpymodule",
