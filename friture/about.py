@@ -49,7 +49,7 @@ aboutText = """
 </ul>
 """ %(friture.__version__,
 	friture.__releasedate__,
-	sys.winver,
+	"%d.%d" %(sys.version_info.major, sys.version_info.minor),
 	QtCore.PYQT_VERSION_STR,
 	QtCore.qVersion(),
 	pyaudio.__version__,
