@@ -109,7 +109,9 @@ Section "SectionPrincipale" SEC01
   SetOutPath "$INSTDIR"
   File "${PROJECT_PATH}\dist\library.zip"
   File "${PROJECT_PATH}\dist\*.pyd"
-  File "${PROJECT_PATH}\dist\*.dll"
+  ; take all dlls except icudt*.dll which will be taken from the installer folder, where a stripped down version is stored
+  File /x icudt*.dll "${PROJECT_PATH}\dist\*.dll"
+  File "${PROJECT_PATH}\installer\icudt*.dll"
   File "${PROJECT_PATH}\dist\friture.exe"
   File "${PROJECT_PATH}\COPYING.txt"
   File "${PROJECT_PATH}\README.rst"
