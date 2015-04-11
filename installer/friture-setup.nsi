@@ -124,7 +124,7 @@ Section MSVC
   SetOutPath $PLUGINSDIR
   File "${PROJECT_PATH}\installer\vcredist_x86.exe"
   DetailPrint "Installing Visual C++ 2010 Libraries"
-  ExecWait '"$PLUGINSDIR\vcredist_x86.exe" /q!"'
+  ExecWait '"$PLUGINSDIR\vcredist_x86.exe" /passive /norestart"'
 SectionEnd
 
 Section -AdditionalIcons
