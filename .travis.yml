@@ -19,14 +19,14 @@ install:
   - pip3 install -U py2app
 # command to run tests
 script:
- - python3 -c "from PyQt5 import QtCore; print(\"Qt: \" + QtCore.qVersion())"
- - python3 -c "from PyQt5 import QtCore; print(\"PyQt: \" + PYQT_VERSION_STR)"
- - python3 -c "import pyaudio; print(\"PyAudio: \" + pyaudio.__version__)"
- - python3 -c "import pyaudio; print(\"PortAudio: \" + pyaudio.pa.get_version_text())"
- - python3 -c "import numpy; print(\"Numpy: \" + numpy.__version__)"
- - python3 -c "import scipy; print(\"Numpy: \" + scipy.__version__)"
- - python3 -c "import Cython; print(\"Numpy: \" + Cython.__version__)"
- - python3 -c "import OpenGL; print(\"Numpy: \" + OpenGL.__version__)"
+ - python3 -c "from PyQt5 import QtCore; print(\"Qt \" + QtCore.qVersion())"
+ - python3 -c "from PyQt5 import QtCore; print(\"PyQt \" + PYQT_VERSION_STR)"
+ - python3 -c "import pyaudio; print(\"PyAudio \" + pyaudio.__version__)"
+ - python3 -c "import pyaudio; print(\"PortAudio \" + pyaudio.pa.get_version_text())"
+ - python3 -c "import numpy; print(\"Numpy \" + numpy.__version__)"
+ - python3 -c "import scipy; print(\"Scipy \" + scipy.__version__)"
+ - python3 -c "import Cython; print(\"Cython\" + Cython.__version__)"
+ - python3 -c "import OpenGL; print(\"OpenGL \" + OpenGL.__version__)"
  - timout 60s python3 friture.py
  - python3 setup.py build
  - ls -R build
