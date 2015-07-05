@@ -6,5 +6,5 @@ docutils
 numpy
 psutil
 scipy
-PyQt
-# PyQwt is also required, but not described in the PyPI
+# PyQt # PyQt does not seem to be available in PyPI
+

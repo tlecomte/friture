@@ -10,6 +10,7 @@ before_install:
 # Upgrade pip
   - pip3 install --upgrade pip setuptools
   - brew install qt5
+  - brew install pyqt5
   - brew install portaudio
 # command to install dependencies
 install:
