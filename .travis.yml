@@ -1,12 +1,14 @@
-os: osx
 language: python
+os: osx
 python:
   - "3.4"
 before_install:
   - brew update
-  - brew install qt
+  - brew install qt5
   - brew install portaudio
 # command to install dependencies
-install: "pip install -r requirements.txt"
+install:
+  - pip install -r requirements.txt
+  - pip install -U py2app
 # command to run tests
 # script: nosetests
