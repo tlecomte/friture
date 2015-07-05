@@ -32,3 +32,5 @@ script:
  - ls -R build
  - python3 setup.py install
  - python3 setup.py py2app
+ - ls -R .
+
