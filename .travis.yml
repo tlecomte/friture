@@ -19,19 +19,19 @@ install:
   - pip3 install -U py2app
 # command to run tests
 script:
- - python3 -c "from PyQt5 import QtCore; print(\"Qt \" + QtCore.qVersion())"
- - python3 -c "from PyQt5 import QtCore; print(\"PyQt \" + QtCore.PYQT_VERSION_STR)"
- - python3 -c "import pyaudio; print(\"PyAudio \" + pyaudio.__version__)"
- - python3 -c "import pyaudio; print(\"PortAudio \" + pyaudio.pa.get_version_text())"
- - python3 -c "import numpy; print(\"Numpy \" + numpy.__version__)"
- - python3 -c "import scipy; print(\"Scipy \" + scipy.__version__)"
- - python3 -c "import Cython; print(\"Cython\" + Cython.__version__)"
- - python3 -c "import OpenGL; print(\"OpenGL \" + OpenGL.__version__)"
- - /usr/local/opt/coreutils/libexec/gnubin/timeout 20s python3 friture.py
- - python3 setup.py build
- - ls -R build
- - python3 setup.py install
+# - python3 -c "from PyQt5 import QtCore; print(\"Qt \" + QtCore.qVersion())"
+# - python3 -c "from PyQt5 import QtCore; print(\"PyQt \" + QtCore.PYQT_VERSION_STR)"
+# - python3 -c "import pyaudio; print(\"PyAudio \" + pyaudio.__version__)"
+# - python3 -c "import pyaudio; print(\"PortAudio \" + pyaudio.pa.get_version_text())"
+# - python3 -c "import numpy; print(\"Numpy \" + numpy.__version__)"
+# - python3 -c "import scipy; print(\"Scipy \" + scipy.__version__)"
+# - python3 -c "import Cython; print(\"Cython\" + Cython.__version__)"
+# - python3 -c "import OpenGL; print(\"OpenGL \" + OpenGL.__version__)"
+# - /usr/local/opt/coreutils/libexec/gnubin/timeout 20s python3 friture.py
+# - python3 setup.py build
+# - ls -R build
+# - python3 setup.py install
  - sed -i '.bak' -e 's/file(p/open(p/g' /usr/local/lib/python3.4/site-packages/py2app/recipes/pyopengl.py
- - usr /cat/local/lib/python3.4/site-packages/py2app/recipes/pyopengl.py
+# - cat /usr/local/lib/python3.4/site-packages/py2app/recipes/pyopengl.py
  - python3 setup.py py2app
  - ls -R .
