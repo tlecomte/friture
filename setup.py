@@ -118,11 +118,12 @@ if py2exe_build:
 	)
 
 elif py2app_build:
- if sys.platform == 'darwin':
-     extra_options = dict(
-         setup_requires=['py2app'],
-         app=['friture.py'],
-     )
+	extra_options = dict(
+		setup_requires=['py2app'],
+		app=['friture.py'],
+	)
+else:
+	extra_options = dict()
 
 ext_modules = [Extension("friture.exp_smoothing_conv", ["friture/extension/exp_smoothing_conv.pyx"],
                          include_dirs = [numpy.get_include()]),
