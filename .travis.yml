@@ -13,7 +13,7 @@ before_install:
   - brew install portaudio
 # command to install dependencies
 install:
-  - pip3 install -r requirements.txt
+  - pip3 install --allow-external -r requirements.txt
   - pip3 install -U py2app
 # command to run tests
 # script: nosetests
