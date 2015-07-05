@@ -12,7 +12,7 @@ before_install:
   - brew install qt5
   - brew install pyqt5
   - brew install portaudio
-  - brew info coreutils # for the timeout command below
+  - brew install coreutils # for the timeout command below
 # command to install dependencies
 install:
   - pip3 install --allow-external pyaudio --allow-unverified pyaudio -r requirements.txt
