@@ -1,9 +1,14 @@
-language: python
+language: objective-c
 os: osx
 python:
   - "3.4"
 before_install:
   - brew update
+  - brew install python
+# make brews python the system default
+  - brew link --overwrite python
+  - which python
+  - python --version
   - brew install qt5
   - brew install portaudio
 # command to install dependencies
