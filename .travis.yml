@@ -12,6 +12,7 @@ before_install:
   - brew install qt5
   - brew install pyqt5
   - brew install portaudio
+  - brew info coreutils # for the timeout command below
 # command to install dependencies
 install:
   - pip3 install --allow-external pyaudio --allow-unverified pyaudio -r requirements.txt
@@ -26,6 +27,7 @@ script:
  - python3 -c "import scipy; print(\"Numpy: \" + scipy.__version__)"
  - python3 -c "import Cython; print(\"Numpy: \" + Cython.__version__)"
  - python3 -c "import OpenGL; print(\"Numpy: \" + OpenGL.__version__)"
+ - timout 60s python3 friture.py
  - python3 setup.py build
  - ls -R build
  - python3 setup.py install
