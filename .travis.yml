@@ -4,11 +4,13 @@ python:
   - "3.4"
 before_install:
   - brew update
-  - brew install python
+  - brew install python3
 # make brews python the system default
-  - brew link --overwrite python
+  - brew link --overwrite python3
   - which python
   - python --version
+# Upgrade pip
+  - pip install --upgrade pip
   - brew install qt5
   - brew install portaudio
 # command to install dependencies
