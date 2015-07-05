@@ -159,6 +159,7 @@ setup(name = "friture",
 	scripts = ['scripts/friture'],
 	cmdclass = {"build_ext": build_ext},
 	ext_modules = ext_modules,
+	**extra_options
 	)
 
 # py2exe (0.9.2.2 at least on Python 3.4) does not seem to respect the dll_excludes option
