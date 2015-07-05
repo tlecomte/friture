@@ -27,7 +27,7 @@ script:
  - python3 -c "import scipy; print(\"Scipy \" + scipy.__version__)"
  - python3 -c "import Cython; print(\"Cython\" + Cython.__version__)"
  - python3 -c "import OpenGL; print(\"OpenGL \" + OpenGL.__version__)"
- - /usr/local/opt/coreutils/libexec/gnubin/timeout 60s python3 friture.py
+ - /usr/local/opt/coreutils/libexec/gnubin/timeout 20s python3 friture.py
  - python3 setup.py build
  - ls -R build
  - python3 setup.py install
