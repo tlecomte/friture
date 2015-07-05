@@ -27,4 +27,6 @@ script:
  - python3 -c "import Cython; print(\"Numpy: \" + Cython.__version__)"
  - python3 -c "import OpenGL; print(\"Numpy: \" + OpenGL.__version__)"
  - python3 setup.py build
+ - ls -R build
  - python3 setup.py install
+ - python3 setup.py py2app

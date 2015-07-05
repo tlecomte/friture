@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import sys
 from distutils.core import setup
 from distutils.extension import Extension
 from Cython.Distutils import build_ext
@@ -9,12 +10,17 @@ import os.path
 import numpy
 import friture # for the version number
 
-py2exe_build = True
-try:
-	import py2exe
-except ImportError:
-	print("Cannot find py2exe")
-	py2exe_build = False
+py2exe_build = False
+py2app_build = False
+
+if "py2exe" in sys.argv:
+	try:
+		import py2exe
+		py2exe_build = True
+	except ImportError:
+		print("Cannot find py2exe")
+elif "py2app" in sys.argv:
+	py2app_build = True
 
 # see INSTALL file for details
 # to create a source package
@@ -37,12 +43,12 @@ except ImportError:
 # https://forum.qt.io/topic/37891/minimal-icudt51-dll-icudt52-dll-and-icudt53-dll
 # http://qlcplus.sourceforge.net/icudt53.dll
 
-data_files = []
-excludes = []
-dll_excludes = []
-includes = []
-
 if py2exe_build:
+	data_files = []
+	excludes = []
+	dll_excludes = []
+	includes = []
+
 	# find path to PyQt5 module dir
 	import PyQt5
 	pyqt5_path = os.path.abspath(PyQt5.__file__)
@@ -105,6 +111,19 @@ if py2exe_build:
 		else:
 			os.environ['CPATH'] = numpy.get_include()
 
+	extra_options = dict(
+		windows = [{"script":'friture.py', "icon_resources":[(1, "resources/images/friture.ico")]}],
+		options = {"py2exe":{"includes":includes, "excludes":excludes, "dll_excludes":dll_excludes}},
+		data_files = data_files,
+	)
+
+elif py2app_build:
+ if sys.platform == 'darwin':
+     extra_options = dict(
+         setup_requires=['py2app'],
+         app=['friture.py'],
+     )
+
 ext_modules = [Extension("friture.exp_smoothing_conv", ["friture/extension/exp_smoothing_conv.pyx"],
                          include_dirs = [numpy.get_include()]),
                Extension("friture.linear_interp", ["friture/extension/linear_interp.pyx"],
@@ -138,9 +157,6 @@ setup(name = "friture",
 	],
 	packages = ['friture', 'friture.plotting'],
 	scripts = ['scripts/friture'],
-	windows = [{"script":'friture.py', "icon_resources":[(1, "resources/images/friture.ico")]}],
-	options = {"py2exe":{"includes":includes, "excludes":excludes, "dll_excludes":dll_excludes}},
-	data_files = data_files,
 	cmdclass = {"build_ext": build_ext},
 	ext_modules = ext_modules,
 	)
