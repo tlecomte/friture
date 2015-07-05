@@ -31,6 +31,7 @@ script:
  - python3 setup.py build
  - ls -R build
  - python3 setup.py install
+ - sed -i 's/file(p/open(p/g' /usr/local/lib/python3.4/site-packages/py2app/recipes/pyopengl.py
+ - cat /usr/local/lib/python3.4/site-packages/py2app/recipes/pyopengl.py
  - python3 setup.py py2app
  - ls -R .
-
