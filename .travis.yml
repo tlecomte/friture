@@ -38,9 +38,10 @@ script:
  - sed -i '.bak' -e 's/loader=loader.filename)/loader_path=loader.filename)/g' /usr/local/lib/python3.4/site-packages/macholib/MachOGraph.py
  - python3 setup.py py2app
  - ls -R dist
- - ls -R /usr/local/opt/qt5
- - timeout 15s open dist/friture.app
- - cp -R /Developer/Qt/5.3/clang_64/plugins/ dist/MyApplication.app/Contents/PlugIns
- - timeout 15s open dist/friture.app
- - macdeployqt dist/friture.app
- - timeout 15s open dist/friture.app
+ - /usr/local/opt/coreutils/libexec/gnubin/timeout 15s open dist/friture.app
+ - ls -R /usr/local/opt/qt5/plugins
+ - cp -R /usr/local/opt/qt5/plugins/imageformats/libqsvg.dylib dist/friture.app/Contents/PlugIns/imageformats/
+ - cp -R /usr/local/opt/qt5/plugins/platforms/libqcocoa.dylib dist/friture.app/Contents/PlugIns/platforms/
+ - /usr/local/opt/coreutils/libexec/gnubin/timeout 15s open dist/friture.app
+# - macdeployqt dist/friture.app
+# - /usr/local/opt/coreutils/libexec/gnubin/timeout 15s open dist/friture.app
