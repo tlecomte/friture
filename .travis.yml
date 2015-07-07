@@ -43,10 +43,10 @@ script:
  - mkdir dist/friture.app/Contents/PlugIns/platforms
  - cp -R /usr/local/opt/qt5/plugins/imageformats/libqsvg.dylib dist/friture.app/Contents/PlugIns/imageformats/
  - cp -R /usr/local/opt/qt5/plugins/platforms/libqcocoa.dylib dist/friture.app/Contents/PlugIns/platforms/
- - /usr/local/opt/qt5/bin/macdeployqt dist/friture.app
+ - /usr/local/opt/qt5/bin/macdeployqt dist/friture.app -dmg
  - /usr/local/opt/coreutils/libexec/gnubin/timeout 15s open dist/friture.app
  - ls -R dist
 # - /usr/local/opt/coreutils/libexec/gnubin/timeout 15s open dist/friture.app
  - du -hs dist/friture.app
- - /usr/local/opt/qt5/bin/macdeployqt dist/friture.app -dmg
+ - ls -l dist
  - ls -l
