@@ -33,15 +33,15 @@ script:
 # - python3 setup.py install
 # Fix an issue in PyOpenGL recipe for python3
  - sed -i '.bak' -e 's/file(p/open(p/g' /usr/local/lib/python3.4/site-packages/py2app/recipes/pyopengl.py
-# - cat /usr/local/lib/python3.4/site-packages/py2app/recipes/pyopengl.py
 # Fix a bug in MacOGraph.py
  - sed -i '.bak' -e 's/loader=loader.filename)/loader_path=loader.filename)/g' /usr/local/lib/python3.4/site-packages/macholib/MachOGraph.py
  - python3 setup.py py2app
- - ls -R dist
- - /usr/local/opt/coreutils/libexec/gnubin/timeout 15s open dist/friture.app
- - ls -R /usr/local/opt/qt5/plugins
- - cp -R /usr/local/opt/qt5/plugins/imageformats/libqsvg.dylib dist/friture.app/Contents/PlugIns/imageformats/
- - cp -R /usr/local/opt/qt5/plugins/platforms/libqcocoa.dylib dist/friture.app/Contents/PlugIns/platforms/
- - /usr/local/opt/coreutils/libexec/gnubin/timeout 15s open dist/friture.app
-# - macdeployqt dist/friture.app
 # - /usr/local/opt/coreutils/libexec/gnubin/timeout 15s open dist/friture.app
+# - ls -R /usr/local/opt/qt5/plugins
+# - cp -R /usr/local/opt/qt5/plugins/imageformats/libqsvg.dylib dist/friture.app/Contents/PlugIns/imageformats/
+# - cp -R /usr/local/opt/qt5/plugins/platforms/libqcocoa.dylib dist/friture.app/Contents/PlugIns/platforms/
+ - /usr/local/opt/qt5/bin/macdeployqt dist/friture.app
+ - /usr/local/opt/coreutils/libexec/gnubin/timeout 15s open dist/friture.app
+ - ls -R dist
+# - /usr/local/opt/coreutils/libexec/gnubin/timeout 15s open dist/friture.app
+ - du -hs dist/friture.app
