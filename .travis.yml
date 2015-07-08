@@ -1,52 +1,41 @@
 language: objective-c
 os: osx
 python:
-  - "3.4"
+  - '3.4'
 before_install:
   - brew update
   - brew install python3
   - which python3
   - python3 --version
-# Upgrade pip
   - pip3 install --upgrade pip setuptools
   - brew install qt5
   - brew install pyqt5
   - brew install portaudio
-  - brew install coreutils # for the timeout command below
-# command to install dependencies
+  - brew install coreutils
 install:
   - pip3 install --allow-external pyaudio --allow-unverified pyaudio -r requirements.txt
   - pip3 install -U py2app
-# command to run tests
 script:
-# - python3 -c "from PyQt5 import QtCore; print(\"Qt \" + QtCore.qVersion())"
-# - python3 -c "from PyQt5 import QtCore; print(\"PyQt \" + QtCore.PYQT_VERSION_STR)"
-# - python3 -c "import pyaudio; print(\"PyAudio \" + pyaudio.__version__)"
-# - python3 -c "import pyaudio; print(\"PortAudio \" + pyaudio.pa.get_version_text())"
-# - python3 -c "import numpy; print(\"Numpy \" + numpy.__version__)"
-# - python3 -c "import scipy; print(\"Scipy \" + scipy.__version__)"
-# - python3 -c "import Cython; print(\"Cython\" + Cython.__version__)"
-# - python3 -c "import OpenGL; print(\"OpenGL \" + OpenGL.__version__)"
-# - /usr/local/opt/coreutils/libexec/gnubin/timeout 20s python3 friture.py
-# - python3 setup.py build
-# - ls -R build
-# - python3 setup.py install
-# Fix an issue in PyOpenGL recipe for python3
- - sed -i '.bak' -e 's/file(p/open(p/g' /usr/local/lib/python3.4/site-packages/py2app/recipes/pyopengl.py
-# Fix a bug in MacOGraph.py
- - sed -i '.bak' -e 's/loader=loader.filename)/loader_path=loader.filename)/g' /usr/local/lib/python3.4/site-packages/macholib/MachOGraph.py
- - python3 setup.py py2app
-# - /usr/local/opt/coreutils/libexec/gnubin/timeout 15s open dist/friture.app
-# - ls -R /usr/local/opt/qt5/plugins
- - mkdir dist/friture.app/Contents/PlugIns
- - mkdir dist/friture.app/Contents/PlugIns/imageformats
- - mkdir dist/friture.app/Contents/PlugIns/platforms
- - cp -R /usr/local/opt/qt5/plugins/imageformats/libqsvg.dylib dist/friture.app/Contents/PlugIns/imageformats/
- - cp -R /usr/local/opt/qt5/plugins/platforms/libqcocoa.dylib dist/friture.app/Contents/PlugIns/platforms/
- - /usr/local/opt/qt5/bin/macdeployqt dist/friture.app -dmg
- - /usr/local/opt/coreutils/libexec/gnubin/timeout 15s open dist/friture.app
- - ls -R dist
-# - /usr/local/opt/coreutils/libexec/gnubin/timeout 15s open dist/friture.app
- - du -hs dist/friture.app
- - ls -l dist
- - ls -l
+  - sed -i '.bak' -e 's/file(p/open(p/g' /usr/local/lib/python3.4/site-packages/py2app/recipes/pyopengl.py
+  - sed -i '.bak' -e 's/loader=loader.filename)/loader_path=loader.filename)/g' /usr/local/lib/python3.4/site-packages/macholib/MachOGraph.py
+  - python3 setup.py py2app
+  - mkdir dist/friture.app/Contents/PlugIns
+  - mkdir dist/friture.app/Contents/PlugIns/imageformats
+  - mkdir dist/friture.app/Contents/PlugIns/platforms
+  - cp -R /usr/local/opt/qt5/plugins/imageformats/libqsvg.dylib dist/friture.app/Contents/PlugIns/imageformats/
+  - cp -R /usr/local/opt/qt5/plugins/platforms/libqcocoa.dylib dist/friture.app/Contents/PlugIns/platforms/
+  - "/usr/local/opt/qt5/bin/macdeployqt dist/friture.app -dmg"
+  - "/usr/local/opt/coreutils/libexec/gnubin/timeout 15s open dist/friture.app"
+  - ls -R dist
+  - du -hs dist/friture.app
+  - ls -l dist
+  - ls -l
+deploy:
+  provider: releases
+  api_key:
+    secure: N19tf9SJmo3KluUL3DjGMxTTGaa9/qu6UNxqPtOyRu/StSzU1yeh1D8oZr+qYl6tWeqogvSWKlDw78Dp1c4Ro0IQB7ebgxT4YJGF6DeuCo1gvi1uE84Xh+Hl+Y4urS52F3ABSAHejhYhJW7XxsrA3MCiz56S7OEsuDp1u4fG8LM=
+  file: dist/friture.dmg
+  skip_cleanup: true
+  on:
+    repo: tlecomte/friture
+    tags: true
