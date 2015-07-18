@@ -112,7 +112,7 @@ if py2exe_build:
 			os.environ['CPATH'] = numpy.get_include()
 
 	extra_options = dict(
-		windows = [{"script":'friture.py', "icon_resources":[(1, "resources/images/friture.ico")]}],
+		windows = [{"script":'main.py', "icon_resources":[(1, "resources/images/friture.ico")]}],
 		options = {"py2exe":{"includes":includes, "excludes":excludes, "dll_excludes":dll_excludes}},
 		data_files = data_files,
 	)
@@ -120,7 +120,7 @@ if py2exe_build:
 elif py2app_build:
 	extra_options = dict(
 		setup_requires=['py2app'],
-		app=['friture.py'],
+		app=['main.py'],
 	)
 else:
 	extra_options = dict()
