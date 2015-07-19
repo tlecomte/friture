@@ -219,7 +219,7 @@ def main():
 
 	app = QApplication(sys.argv)
 
-	if plaftorm.system() == "Darwin":
+	if platform.system() == "Darwin":
 		# help the py2app-packaged application find the Qt plugins (imageformats and platforms)
 		QApplication.addLibraryPaths(QApplication.applicationDirPath() + '../PlugIns')
 
