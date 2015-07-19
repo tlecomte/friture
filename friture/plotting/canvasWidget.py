@@ -33,7 +33,6 @@ class CanvasWidget(QtWidgets.QWidget):
 
         self.setAutoFillBackground(False)
         self.setAttribute(QtCore.Qt.WA_NoSystemBackground, True)
-        self.setAttribute(QtCore.Qt.WA_PaintOnScreen, True)
 
         self.horizontalScaleTransform = horizontalScaleTransform
         self.verticalScaleTransform = verticalScaleTransform
