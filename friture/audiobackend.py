@@ -93,9 +93,10 @@ class AudioBackend(QtCore.QObject):
 		self.new_data_available_from_callback.connect(self.handle_new_data)
 
 	def close(self):
-		self.stream.stop_stream()
-		self.stream.close()
-		self.stream = None
+		if self.stream != None:
+			self.stream.stop_stream()
+			self.stream.close()
+			self.stream = None
 
 	# method
 	def get_readable_devices_list(self):
