@@ -221,7 +221,7 @@ def main():
 
 	if platform.system() == "Darwin":
 		# help the py2app-packaged application find the Qt plugins (imageformats and platforms)
-		QApplication.addLibraryPaths(QApplication.applicationDirPath() + '../PlugIns')
+		QApplication.addLibraryPath(QApplication.applicationDirPath() + '../PlugIns')
 
 	# Splash screen
 	pixmap = QPixmap(":/images/splash.png")
