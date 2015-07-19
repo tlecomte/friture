@@ -16,6 +16,7 @@ install:
   - pip3 install --allow-external pyaudio --allow-unverified pyaudio -r requirements.txt
   - pip3 install -U py2app
 script:
+  - python3 setup.py build_ext --inplace
   - sed -i '.bak' -e 's/file(p/open(p/g' /usr/local/lib/python3.4/site-packages/py2app/recipes/pyopengl.py
   - sed -i '.bak' -e 's/loader=loader.filename)/loader_path=loader.filename)/g' /usr/local/lib/python3.4/site-packages/macholib/MachOGraph.py
   - python3 setup.py py2app
