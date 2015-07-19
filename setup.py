@@ -43,11 +43,25 @@ elif "py2app" in sys.argv:
 # https://forum.qt.io/topic/37891/minimal-icudt51-dll-icudt52-dll-and-icudt53-dll
 # http://qlcplus.sourceforge.net/icudt53.dll
 
+#manually include python libraries that py2exe/py2app fails to detect
+# for pyOpenGL : http://www.jstump.com/blog/archive/2009/06/30/py2exe-and-pyopengl-3x-with-no-manual-tinkering/
+# + OpenGL_accelerate.formathandler that is imported by the Python/C
+# API so that py2exe/py2app does not detect it
+includes = ["sip",
+          "PyQt5.QtSvg",
+          "PyQt5.QtXml",
+          "OpenGL.platform.win32",
+          "OpenGL.arrays.ctypesarrays",
+          "OpenGL.arrays.numpymodule",
+          "OpenGL.arrays.lists",
+          "OpenGL.arrays.numbers",
+          "OpenGL.arrays.strings",
+          "OpenGL_accelerate.formathandler"]
+
 if py2exe_build:
 	data_files = []
 	excludes = []
 	dll_excludes = []
-	includes = []
 
 	# find path to PyQt5 module dir
 	import PyQt5
@@ -90,20 +104,6 @@ if py2exe_build:
 					 "PSAPI.dll",
 					 "msvcp*.dll",
 					 "msvcr*.dll"]
-	#manually include python libraries that py2exe fails to detect
-	# for pyOpenGL : http://www.jstump.com/blog/archive/2009/06/30/py2exe-and-pyopengl-3x-with-no-manual-tinkering/
-	# + OpenGL_accelerate.formathandler that is imported by the Python/C
-	# API so that py2exe does not detect it
-	includes += ["sip",
-              "PyQt5.QtSvg",
-              "PyQt5.QtXml",
-              "OpenGL.platform.win32",
-              "OpenGL.arrays.ctypesarrays",
-              "OpenGL.arrays.numpymodule",
-              "OpenGL.arrays.lists",
-              "OpenGL.arrays.numbers",
-              "OpenGL.arrays.strings",
-              "OpenGL_accelerate.formathandler"]
 
 	if os.name == 'nt':
 		if 'CPATH' in os.environ:
@@ -121,7 +121,7 @@ elif py2app_build:
 	extra_options = dict(
 		setup_requires=['py2app'],
 		app=['main.py'],
-		options={'py2app':{'includes':['sip'], 'iconfile':'resources/images/friture.icns'}},
+		options={'py2app':{'includes':includes, 'iconfile':'resources/images/friture.icns'}},
 	)
 else:
 	extra_options = dict()
