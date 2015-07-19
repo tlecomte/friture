@@ -121,7 +121,7 @@ elif py2app_build:
 	extra_options = dict(
 		setup_requires=['py2app'],
 		app=['main.py'],
-		options={'py2app':{'includes':['sip']}},
+		options={'py2app':{'includes':['sip'], 'iconfile':'resources/images/friture.icns'}},
 	)
 else:
 	extra_options = dict()
