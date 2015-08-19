@@ -88,8 +88,10 @@ class Generator_Widget(QtWidgets.QWidget):
         self.stackedLayout.addWidget(sweepPageWidget)
         self.stackedLayout.addWidget(burstPageWidget)
 
-        self.spinBox_sine_frequency = QtWidgets.QSpinBox(sinePageWidget)
+        self.spinBox_sine_frequency = QtWidgets.QDoubleSpinBox(sinePageWidget)
         self.spinBox_sine_frequency.setKeyboardTracking(False)
+        self.spinBox_sine_frequency.setDecimals(2)
+        self.spinBox_sine_frequency.setSingleStep(1)
         self.spinBox_sine_frequency.setMinimum(20)
         self.spinBox_sine_frequency.setMaximum(22000)
         self.spinBox_sine_frequency.setProperty("value", DEFAULT_SINE_FREQUENCY)
