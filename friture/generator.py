@@ -29,16 +29,8 @@ from friture.generators.pink import PinkGenerator
 from friture.generators.white import WhiteGenerator
 
 SMOOTH_DISPLAY_TIMER_PERIOD_MS = 25
-
 FRAMES_PER_BUFFER = 2*1024
-
 DEFAULT_GENERATOR_KIND_INDEX = 0
-DEFAULT_SINE_FREQUENCY = 440.
-DEFAULT_SWEEP_STARTFREQUENCY = 20.
-DEFAULT_SWEEP_STOPFREQUENCY = 22000.
-DEFAULT_BURST_PERIOD_S = 1.
-DEFAULT_SWEEP_PERIOD_S = 1.
-
 RAMP_LENGTH = 10e-3 # 10 ms
 
 (stopped, starting, playing, stopping) = list(range(0, 4))
@@ -63,75 +55,24 @@ class Generator_Widget(QtWidgets.QWidget):
         self.comboBox_generator_kind.addItem("Burst")
         self.comboBox_generator_kind.setCurrentIndex(DEFAULT_GENERATOR_KIND_INDEX)
 
-        sinePageWidget = QtWidgets.QWidget(self)
-        whitePageWidget = QtWidgets.QWidget(self)
-        pinkPageWidget = QtWidgets.QWidget(self)
-        sweepPageWidget = QtWidgets.QWidget(self)
-        burstPageWidget = QtWidgets.QWidget(self)
+        self.sineGenerator = SineGenerator(self, logger)
+        self.sweepGenerator = SweepGenerator(self, logger)
+        self.whiteGenerator = WhiteGenerator(self, logger)
+        self.pinkGenerator = PinkGenerator(self, logger)
+        self.burstGenerator = BurstGenerator(self, logger)
+
+        self.sinePageWidget = self.sineGenerator.settingsWidget()
+        self.whitePageWidget = self.whiteGenerator.settingsWidget()
+        self.pinkPageWidget = self.pinkGenerator.settingsWidget()
+        self.sweepPageWidget = self.sweepGenerator.settingsWidget()
+        self.burstPageWidget = self.burstGenerator.settingsWidget()
 
         self.stackedLayout = QtWidgets.QStackedLayout()
-        self.stackedLayout.addWidget(sinePageWidget)
-        self.stackedLayout.addWidget(whitePageWidget)
-        self.stackedLayout.addWidget(pinkPageWidget)
-        self.stackedLayout.addWidget(sweepPageWidget)
-        self.stackedLayout.addWidget(burstPageWidget)
-
-        self.spinBox_sine_frequency = QtWidgets.QDoubleSpinBox(sinePageWidget)
-        self.spinBox_sine_frequency.setKeyboardTracking(False)
-        self.spinBox_sine_frequency.setDecimals(2)
-        self.spinBox_sine_frequency.setSingleStep(1)
-        self.spinBox_sine_frequency.setMinimum(20)
-        self.spinBox_sine_frequency.setMaximum(22000)
-        self.spinBox_sine_frequency.setProperty("value", DEFAULT_SINE_FREQUENCY)
-        self.spinBox_sine_frequency.setObjectName("spinBox_sine_frequency")
-        self.spinBox_sine_frequency.setSuffix(" Hz")
-
-        self.sineLayout = QtWidgets.QFormLayout(sinePageWidget)
-        self.sineLayout.addRow("Frequency:", self.spinBox_sine_frequency)
-
-        self.spinBox_sweep_startfrequency = QtWidgets.QSpinBox(sweepPageWidget)
-        self.spinBox_sweep_startfrequency.setKeyboardTracking(False)
-        self.spinBox_sweep_startfrequency.setMinimum(20)
-        self.spinBox_sweep_startfrequency.setMaximum(22000)
-        self.spinBox_sweep_startfrequency.setProperty("value", DEFAULT_SWEEP_STARTFREQUENCY)
-        self.spinBox_sweep_startfrequency.setObjectName("spinBox_sweep_startfrequency")
-        self.spinBox_sweep_startfrequency.setSuffix(" Hz")
-
-        self.spinBox_sweep_stopfrequency = QtWidgets.QSpinBox(sweepPageWidget)
-        self.spinBox_sweep_stopfrequency.setKeyboardTracking(False)
-        self.spinBox_sweep_stopfrequency.setMinimum(20)
-        self.spinBox_sweep_stopfrequency.setMaximum(22000)
-        self.spinBox_sweep_stopfrequency.setProperty("value", DEFAULT_SWEEP_STOPFREQUENCY)
-        self.spinBox_sweep_stopfrequency.setObjectName("spinBox_sweep_stopfrequency")
-        self.spinBox_sweep_stopfrequency.setSuffix(" Hz")
-
-        self.spinBox_sweep_period = QtWidgets.QDoubleSpinBox(sweepPageWidget)
-        self.spinBox_sweep_period.setKeyboardTracking(False)
-        self.spinBox_sweep_period.setDecimals(2)
-        self.spinBox_sweep_period.setSingleStep(1)
-        self.spinBox_sweep_period.setMinimum(0.01)
-        self.spinBox_sweep_period.setMaximum(60)
-        self.spinBox_sweep_period.setProperty("value", DEFAULT_SWEEP_PERIOD_S)
-        self.spinBox_sweep_period.setObjectName("spinBox_sweep_period")
-        self.spinBox_sweep_period.setSuffix(" s")
-
-        self.sweepLayout = QtWidgets.QFormLayout(sweepPageWidget)
-        self.sweepLayout.addRow("Start frequency:", self.spinBox_sweep_startfrequency)
-        self.sweepLayout.addRow("Stop frequency:", self.spinBox_sweep_stopfrequency)
-        self.sweepLayout.addRow("Period:", self.spinBox_sweep_period)
-
-        self.spinBox_burst_period = QtWidgets.QDoubleSpinBox(burstPageWidget)
-        self.spinBox_burst_period.setKeyboardTracking(False)
-        self.spinBox_burst_period.setDecimals(2)
-        self.spinBox_burst_period.setSingleStep(1)
-        self.spinBox_burst_period.setMinimum(0.01)
-        self.spinBox_burst_period.setMaximum(60)
-        self.spinBox_burst_period.setProperty("value", DEFAULT_BURST_PERIOD_S)
-        self.spinBox_burst_period.setObjectName("spinBox_burst_period")
-        self.spinBox_burst_period.setSuffix(" s")
-
-        self.burstLayout = QtWidgets.QFormLayout(burstPageWidget)
-        self.burstLayout.addRow("Period:", self.spinBox_burst_period)
+        self.stackedLayout.addWidget(self.sinePageWidget)
+        self.stackedLayout.addWidget(self.whitePageWidget)
+        self.stackedLayout.addWidget(self.pinkPageWidget)
+        self.stackedLayout.addWidget(self.sweepPageWidget)
+        self.stackedLayout.addWidget(self.burstPageWidget)
 
         self.t = 0.
         self.t_start = 0.
@@ -188,7 +129,7 @@ class Generator_Widget(QtWidgets.QWidget):
         #self.setStyleSheet(STYLESHEET)
 
         #self.response_time = DEFAULT_RESPONSE_TIME
-        
+
         # initialize the settings dialog
         self.settings_dialog = Generator_Settings_Dialog(self, self.logger)
 
@@ -200,21 +141,6 @@ class Generator_Widget(QtWidgets.QWidget):
             self.settings_dialog.comboBox_outputDevice.setCurrentIndex(self.audiobackend.output_devices.index(self.device))
 
         self.settings_dialog.comboBox_outputDevice.currentIndexChanged.connect(self.device_changed)
-
-        self.sineGenerator = SineGenerator()
-        self.spinBox_sine_frequency.valueChanged.connect(self.sineGenerator.setf)
-
-        self.sweepGenerator = SweepGenerator()
-        self.spinBox_sweep_startfrequency.valueChanged.connect(self.sweepGenerator.setf1)
-        self.spinBox_sweep_stopfrequency.valueChanged.connect(self.sweepGenerator.setf2)
-        self.spinBox_sweep_period.valueChanged.connect(self.sweepGenerator.setT)
-
-        self.whiteGenerator = WhiteGenerator()
-
-        self.pinkGenerator = PinkGenerator()
-
-        self.burstGenerator = BurstGenerator()
-        self.spinBox_burst_period.valueChanged.connect(self.burstGenerator.setT)
 
 #        channels = self.audiobackend.get_readable_current_output_channels()
 #        for channel in channels:
@@ -375,29 +301,24 @@ class Generator_Widget(QtWidgets.QWidget):
 
     def saveState(self, settings):
         settings.setValue("generator kind", self.comboBox_generator_kind.currentIndex())
-        settings.setValue("sine frequency", self.spinBox_sine_frequency.value())
-        settings.setValue("sweep start frequency", self.spinBox_sweep_startfrequency.value())
-        settings.setValue("sweep stop frequency", self.spinBox_sweep_stopfrequency.value())
-        settings.setValue("sweep period", self.spinBox_sweep_period.value())
-        settings.setValue("burst period", self.spinBox_burst_period.value())
-        
+
+        self.sinePageWidget.saveState(settings)
+        self.whitePageWidget.saveState(settings)
+        self.pinkPageWidget.saveState(settings)
+        self.sweepPageWidget.saveState(settings)
+        self.burstPageWidget.saveState(settings)
         self.settings_dialog.saveState(settings)
 
     def restoreState(self, settings):
         generator_kind = settings.value("generator kind", DEFAULT_GENERATOR_KIND_INDEX)
         self.comboBox_generator_kind.setCurrentIndex(generator_kind)
         self.stackedLayout.setCurrentIndex(generator_kind)
-        sine_freq = float(settings.value("sine frequency", DEFAULT_SINE_FREQUENCY))
-        self.spinBox_sine_frequency.setValue(sine_freq)
-        sweep_start_frequency = float(settings.value("sweep start frequency", DEFAULT_SWEEP_STARTFREQUENCY))
-        self.spinBox_sweep_startfrequency.setValue(sweep_start_frequency)
-        sweep_stop_frequency = float(settings.value("sweep stop frequency", DEFAULT_SWEEP_STOPFREQUENCY))
-        self.spinBox_sweep_stopfrequency.setValue(sweep_stop_frequency)
-        sweep_period = float(settings.value("sweep period", DEFAULT_BURST_PERIOD_S))
-        self.spinBox_sweep_period.setValue(sweep_period)
-        burst_period = float(settings.value("burst period", DEFAULT_SWEEP_PERIOD_S))
-        self.spinBox_burst_period.setValue(burst_period)
-        
+
+        self.sinePageWidget.restoreState(settings)
+        self.whitePageWidget.restoreState(settings)
+        self.pinkPageWidget.restoreState(settings)
+        self.sweepPageWidget.restoreState(settings)
+        self.burstPageWidget.restoreState(settings)
         self.settings_dialog.restoreState(settings)
 
 class Generator_Settings_Dialog(QtWidgets.QDialog):
@@ -406,7 +327,7 @@ class Generator_Settings_Dialog(QtWidgets.QDialog):
 
         self.logger = logger
 
-        self.setWindowTitle("Spectrum settings")
+        self.setWindowTitle("Generator settings")
 
         self.formLayout = QtWidgets.QFormLayout(self)
 

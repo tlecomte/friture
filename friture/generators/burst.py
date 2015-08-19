@@ -18,14 +18,23 @@
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
 import numpy as np
+from PyQt5 import QtWidgets
 from friture.audiobackend import SAMPLING_RATE
 
+DEFAULT_BURST_PERIOD_S = 1.
+
 class BurstGenerator:
-    def __init__(self):
+    def __init__(self, parent, logger):
         self.T = 1.
+
+        self.settings = SettingsWidget(parent, logger)
+        self.settings.spinBox_burst_period.valueChanged.connect(self.setT)
 
     def setT(self, T):
         self.T = T
+
+    def settingsWidget(self):
+        return self.settings
 
     def signal(self, t):
         floatdata = np.zeros(t.shape)
@@ -36,3 +45,32 @@ class BurstGenerator:
         floatdata[ind_plus] = 1.
         #floatdata[ind_minus] = -1.
         return floatdata
+
+class SettingsWidget(QtWidgets.QWidget):
+    def __init__(self, parent, logger):
+        super().__init__(parent)
+
+        self.logger = logger
+
+        self.spinBox_burst_period = QtWidgets.QDoubleSpinBox(self)
+        self.spinBox_burst_period.setKeyboardTracking(False)
+        self.spinBox_burst_period.setDecimals(2)
+        self.spinBox_burst_period.setSingleStep(1)
+        self.spinBox_burst_period.setMinimum(0.01)
+        self.spinBox_burst_period.setMaximum(60)
+        self.spinBox_burst_period.setProperty("value", DEFAULT_BURST_PERIOD_S)
+        self.spinBox_burst_period.setObjectName("spinBox_burst_period")
+        self.spinBox_burst_period.setSuffix(" s")
+
+        self.formLayout = QtWidgets.QFormLayout(self)
+
+        self.formLayout.addRow("Period:", self.spinBox_burst_period)
+
+        self.setLayout(self.formLayout)
+
+    def saveState(self, settings):
+        settings.setValue("burst period", self.spinBox_burst_period.value())
+
+    def restoreState(self, settings):
+        burst_period = float(settings.value("burst period", DEFAULT_BURST_PERIOD_S))
+        self.spinBox_burst_period.setValue(burst_period)

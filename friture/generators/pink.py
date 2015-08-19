@@ -19,6 +19,7 @@
 
 import numpy as np
 from numpy.random import standard_normal
+from PyQt5 import QtWidgets
 
 PINK_FIDELITY = 100.
 
@@ -37,10 +38,24 @@ def pinknoise(n, rvs=standard_normal):
     return pink/k
 
 class PinkGenerator:
-    def __init__(self):
-        return
+    def __init__(self, parent, logger):
+        self.settings = SettingsWidget(parent, logger)
+
+    def settingsWidget(self):
+        return self.settings
 
     def signal(self, t):
         n = len(t)
         return pinknoise(n)
 
+class SettingsWidget(QtWidgets.QWidget):
+    def __init__(self, parent, logger):
+        super().__init__(parent)
+
+        self.logger = logger
+
+    def saveState(self, settings):
+        return
+
+    def restoreState(self, settings):
+        return
