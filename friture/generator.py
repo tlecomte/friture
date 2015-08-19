@@ -20,9 +20,13 @@
 from PyQt5 import QtGui, QtCore, QtWidgets
 import numpy as np
 import pyaudio
-from numpy.random import standard_normal
 from friture.audiobackend import SAMPLING_RATE
 from friture.logger import PrintLogger
+from friture.generators.sweep import SweepGenerator
+from friture.generators.sine import SineGenerator
+from friture.generators.burst import BurstGenerator
+from friture.generators.pink import PinkGenerator
+from friture.generators.white import WhiteGenerator
 
 SMOOTH_DISPLAY_TIMER_PERIOD_MS = 25
 
@@ -35,25 +39,9 @@ DEFAULT_SWEEP_STOPFREQUENCY = 22000.
 DEFAULT_BURST_PERIOD_S = 1.
 DEFAULT_SWEEP_PERIOD_S = 1.
 
-PINK_FIDELITY = 100.
-
 RAMP_LENGTH = 10e-3 # 10 ms
 
 (stopped, starting, playing, stopping) = list(range(0, 4))
-
-def pinknoise(n, rvs=standard_normal):
-    if n==0:
-        return np.zeros((0,))
-    
-    #k = int(min(np.floor(np.log(n)/np.log(2)), PINK_FIDELITY))
-    k = 13 # dynamic k adds audible "clicks"
-    pink = np.zeros((n,), np.float)
-
-    for m in 2**np.arange(k):
-        p = int(np.ceil(float(n) / m))
-        pink += np.repeat(rvs(size=p), m, axis=0)[:n]
-
-    return pink/k
 
 class Generator_Widget(QtWidgets.QWidget):
     def __init__(self, parent, audiobackend, logger = PrintLogger()):
@@ -213,11 +201,21 @@ class Generator_Widget(QtWidgets.QWidget):
 
         self.settings_dialog.comboBox_outputDevice.currentIndexChanged.connect(self.device_changed)
 
+        self.sineGenerator = SineGenerator()
+        self.spinBox_sine_frequency.valueChanged.connect(self.sineGenerator.setf)
+
         self.sweepGenerator = SweepGenerator()
         self.spinBox_sweep_startfrequency.valueChanged.connect(self.sweepGenerator.setf1)
         self.spinBox_sweep_stopfrequency.valueChanged.connect(self.sweepGenerator.setf2)
         self.spinBox_sweep_period.valueChanged.connect(self.sweepGenerator.setT)
-        
+
+        self.whiteGenerator = WhiteGenerator()
+
+        self.pinkGenerator = PinkGenerator()
+
+        self.burstGenerator = BurstGenerator()
+        self.spinBox_burst_period.valueChanged.connect(self.burstGenerator.setT)
+
 #        channels = self.audiobackend.get_readable_current_output_channels()
 #        for channel in channels:
 #            self.settings_dialog.comboBox_firstChannel.addItem(channel)
@@ -325,33 +323,19 @@ class Generator_Widget(QtWidgets.QWidget):
 
         #t = self.t + np.arange(0, 5*SMOOTH_DISPLAY_TIMER_PERIOD_MS*1e-3, 1./float(SAMPLING_RATE))
         t = self.t + np.arange(0, N/float(SAMPLING_RATE), 1./float(SAMPLING_RATE))
-        n = len(t)
 
         kind = self.comboBox_generator_kind.currentIndex()
 
         if kind == 0:
-            # sinusoid
-            f = float(self.spinBox_sine_frequency.value())
-            floatdata = np.sin(2.*np.pi*t*f)                
+            floatdata = self.sineGenerator.signal(t)
         elif kind == 1:
-            # white noise
-            floatdata = standard_normal(n)
+            floatdata = self.whiteGenerator.signal(t)
         elif kind == 2:
-            #pink noise
-            floatdata = pinknoise(n)
+            floatdata = self.pinkGenerator.signal(t)
         elif kind == 3:
-            #sweep
-            floatdata = self.sweepGenerator.sweepSignal(t)
+            floatdata = self.sweepGenerator.signal(t)
         elif kind == 4:
-            #burst
-            floatdata = np.zeros(t.shape)
-            T = self.spinBox_burst_period.value() # period
-            i = (t*SAMPLING_RATE)%(T*SAMPLING_RATE)
-            n = 1
-            ind_plus = np.where(i < n)
-            #ind_minus = np.where((i >= n)*(i < 2*n))
-            floatdata[ind_plus] = 1.
-            #floatdata[ind_minus] = -1.
+            floatdata = self.burstGenerator.signal(t)
         else:
             print("generator error : index of signal type not found")
             return
@@ -444,36 +428,3 @@ class Generator_Settings_Dialog(QtWidgets.QDialog):
         # change the device only if it exists in the device list
         if id >= 0:
             self.comboBox_outputDevice.setCurrentIndex(id)
-
-class SweepGenerator:
-    def __init__(self):
-        self.f1 = 20.
-        self.f2 = 22000.
-        self.T = 1.
-        self.L, self.K = self.computeKL(self.f1, self.f2, self.T)
-    
-    def computeKL(self, f1, f2, T):
-        w1 = 2*np.pi*f1
-        w2 = 2*np.pi*f2
-        K = w1*T/np.log(w2/w1)
-        L = T/np.log(w2/w1)
-        return L, K
-
-    def setf1(self, f1):
-        self.f1 = f1
-        self.L, self.K = self.computeKL(self.f1, self.f2, self.T)
-        
-    def setf2(self, f2):
-        self.f2 = f2
-        self.L, self.K = self.computeKL(self.f1, self.f2, self.T)        
-
-    def setT(self, T):
-        self.T = T
-        self.L, self.K = self.computeKL(self.f1, self.f2, self.T)
-    
-    def sweepSignal(self, t):
-        # https://ccrma.stanford.edu/realsimple/imp_meas/Sine_Sweep_Measurement_Theory.html
-
-        #f = (self.f2 - self.f1)*(1. + np.sin(2*np.pi*t/self.T))/2. + self.f1
-        #return np.sin(2*np.pi*t*f)
-        return np.sin(self.K*(np.exp(t%self.T/self.L) - 1.))
