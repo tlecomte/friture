@@ -29,14 +29,25 @@ class SineGenerator:
         self.settings = SettingsWidget(parent, logger)
         self.settings.spinBox_sine_frequency.valueChanged.connect(self.setf)
 
+        self.offset = 0
+        self.lastt = 0
+
     def setf(self, f):
+        oldf = self.f
         self.f = f
+
+        # the offset is adapted to avoid phase break
+        lastphase = 2.*np.pi*self.lastt*oldf + self.offset
+        newphase = 2.*np.pi*self.lastt*self.f + self.offset
+        self.offset += (lastphase - newphase)
+        self.offset %= 2.*np.pi
 
     def settingsWidget(self):
         return self.settings
 
     def signal(self, t):
-        return np.sin(2.*np.pi*t*self.f)
+        self.lastt = t[-1]
+        return np.sin(2.*np.pi*t*self.f + self.offset)
 
 class SettingsWidget(QtWidgets.QWidget):
     def __init__(self, parent, logger):
