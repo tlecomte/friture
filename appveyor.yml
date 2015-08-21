@@ -16,4 +16,5 @@ init:
   - "%PYTHON%/python setup.py build_ext --inplace"
   - "%PYTHON%/python setup.py py2exe"
   - ps: "ls -R build"
+  - "makensis.exe installer/friture-setup.nsi"
 build: false
