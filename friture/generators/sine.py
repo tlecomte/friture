@@ -23,6 +23,9 @@ from PyQt5 import QtWidgets
 DEFAULT_SINE_FREQUENCY = 440.
 
 class SineGenerator:
+
+    name = "Sine"
+
     def __init__(self, parent, logger):
         self.f = 440.
 

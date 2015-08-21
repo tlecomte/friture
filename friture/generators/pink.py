@@ -38,6 +38,8 @@ def pinknoise(n, rvs=standard_normal):
     return pink/k
 
 class PinkGenerator:
+    name = "Pink noise"
+
     def __init__(self, parent, logger):
         self.settings = SettingsWidget(parent, logger)
 

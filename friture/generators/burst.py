@@ -24,6 +24,8 @@ from friture.audiobackend import SAMPLING_RATE
 DEFAULT_BURST_PERIOD_S = 1.
 
 class BurstGenerator:
+    name = "Burst"
+
     def __init__(self, parent, logger):
         self.T = 1.
 

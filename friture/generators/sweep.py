@@ -25,6 +25,8 @@ DEFAULT_SWEEP_STOPFREQUENCY = 22000.
 DEFAULT_SWEEP_PERIOD_S = 1.
 
 class SweepGenerator:
+    name = "Sweep"
+
     def __init__(self, parent, logger):
         self.f1 = 20.
         self.f2 = 22000.

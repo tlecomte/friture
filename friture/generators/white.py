@@ -22,6 +22,8 @@ from numpy.random import standard_normal
 from PyQt5 import QtWidgets
 
 class WhiteGenerator:
+    name = "White noise"
+
     def __init__(self, parent, logger):
         self.settings = SettingsWidget(parent, logger)
 

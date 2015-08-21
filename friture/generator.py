@@ -49,33 +49,23 @@ class Generator_Widget(QtWidgets.QWidget):
         self.gridLayout = QtWidgets.QGridLayout(self)
         self.gridLayout.setObjectName("gridLayout")
 
+        self.generators = []
+        self.generators.append(SineGenerator(self, logger))
+        self.generators.append(WhiteGenerator(self, logger))
+        self.generators.append(PinkGenerator(self, logger))
+        self.generators.append(SweepGenerator(self, logger))
+        self.generators.append(BurstGenerator(self, logger))
+
         self.comboBox_generator_kind = QtWidgets.QComboBox(self)
         self.comboBox_generator_kind.setObjectName("comboBox_generator_kind")
-        self.comboBox_generator_kind.addItem("Sine")
-        self.comboBox_generator_kind.addItem("White noise")
-        self.comboBox_generator_kind.addItem("Pink noise")
-        self.comboBox_generator_kind.addItem("Sweep")
-        self.comboBox_generator_kind.addItem("Burst")
-        self.comboBox_generator_kind.setCurrentIndex(DEFAULT_GENERATOR_KIND_INDEX)
-
-        self.sineGenerator = SineGenerator(self, logger)
-        self.sweepGenerator = SweepGenerator(self, logger)
-        self.whiteGenerator = WhiteGenerator(self, logger)
-        self.pinkGenerator = PinkGenerator(self, logger)
-        self.burstGenerator = BurstGenerator(self, logger)
-
-        self.sinePageWidget = self.sineGenerator.settingsWidget()
-        self.whitePageWidget = self.whiteGenerator.settingsWidget()
-        self.pinkPageWidget = self.pinkGenerator.settingsWidget()
-        self.sweepPageWidget = self.sweepGenerator.settingsWidget()
-        self.burstPageWidget = self.burstGenerator.settingsWidget()
 
         self.stackedLayout = QtWidgets.QStackedLayout()
-        self.stackedLayout.addWidget(self.sinePageWidget)
-        self.stackedLayout.addWidget(self.whitePageWidget)
-        self.stackedLayout.addWidget(self.pinkPageWidget)
-        self.stackedLayout.addWidget(self.sweepPageWidget)
-        self.stackedLayout.addWidget(self.burstPageWidget)
+
+        for generator in self.generators:
+            self.comboBox_generator_kind.addItem(generator.name)
+            self.stackedLayout.addWidget(generator.settingsWidget())
+
+        self.comboBox_generator_kind.setCurrentIndex(DEFAULT_GENERATOR_KIND_INDEX)
 
         self.t = 0.
         self.t_start = 0.
@@ -243,24 +233,22 @@ class Generator_Widget(QtWidgets.QWidget):
         if N==0:
             return ("", pyaudio.paContinue)
 
-        #t = self.t + np.arange(0, 5*SMOOTH_DISPLAY_TIMER_PERIOD_MS*1e-3, 1./float(SAMPLING_RATE))
         t = self.t + np.arange(0, N/float(SAMPLING_RATE), 1./float(SAMPLING_RATE))
 
-        kind = self.comboBox_generator_kind.currentIndex()
+        name = self.comboBox_generator_kind.currentText()
 
-        if kind == 0:
-            floatdata = self.sineGenerator.signal(t)
-        elif kind == 1:
-            floatdata = self.whiteGenerator.signal(t)
-        elif kind == 2:
-            floatdata = self.pinkGenerator.signal(t)
-        elif kind == 3:
-            floatdata = self.sweepGenerator.signal(t)
-        elif kind == 4:
-            floatdata = self.burstGenerator.signal(t)
-        else:
+        generators = [generator for generator in self.generators if generator.name == name]
+
+        if len(generators) == 0:
             print("generator error : index of signal type not found")
             return (None, pyaudio.paContinue)
+
+        if len(generators) > 1:
+            print("generator error : 2 (or more) generators have the same name")
+            return (None, pyaudio.paContinue)
+
+        generator = generators[0]
+        floatdata = generator.signal(t)
 
         # add smooth ramps at start/stop to avoid undesirable bursts
         if self.state == starting:
@@ -303,11 +291,9 @@ class Generator_Widget(QtWidgets.QWidget):
     def saveState(self, settings):
         settings.setValue("generator kind", self.comboBox_generator_kind.currentIndex())
 
-        self.sinePageWidget.saveState(settings)
-        self.whitePageWidget.saveState(settings)
-        self.pinkPageWidget.saveState(settings)
-        self.sweepPageWidget.saveState(settings)
-        self.burstPageWidget.saveState(settings)
+        for generator in self.generators:
+            generator.settingsWidget().saveState(settings)
+
         self.settings_dialog.saveState(settings)
 
     def restoreState(self, settings):
@@ -315,11 +301,9 @@ class Generator_Widget(QtWidgets.QWidget):
         self.comboBox_generator_kind.setCurrentIndex(generator_kind)
         self.stackedLayout.setCurrentIndex(generator_kind)
 
-        self.sinePageWidget.restoreState(settings)
-        self.whitePageWidget.restoreState(settings)
-        self.pinkPageWidget.restoreState(settings)
-        self.sweepPageWidget.restoreState(settings)
-        self.burstPageWidget.restoreState(settings)
+        for generator in self.generators:
+            generator.settingsWidget().restoreState(settings)
+
         self.settings_dialog.restoreState(settings)
 
 class Generator_Settings_Dialog(QtWidgets.QDialog):
