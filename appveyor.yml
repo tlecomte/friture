@@ -7,7 +7,7 @@ init:
   - ps: "ls C:/Python34/"
   - ps: "ls C:/Python34/Scripts/"
   - "%PYTHON%/python --version"
-  - "%PYTHON%/pip3 --version"
+  - "%PYTHON%/Scripts/pip3 --version"
   #- set QTDIR=C:\Qt\5.4\mingw491_32
   #- set PATH=%QTDIR%\bin;C:\MinGW\bin;%PATH%
   # chocolatey pyqt5 does not work
