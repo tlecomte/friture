@@ -38,6 +38,9 @@ class Logger(QtCore.QObject):
 		self.count += 1
 		self.logChanged.emit()
 
+		# also print to the console
+		print(text)
+
 	# return the current log
 	def text(self):
 		return self.log
