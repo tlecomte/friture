@@ -7,10 +7,10 @@ init:
   - ps: "ls C:/Python34/Scripts/"
   - choco install pyqt5
   - nuget install portaudio
-  - %PYTHON%/Scripts/pip3 install --upgrade pip setuptools
-  - %PYTHON%/Scripts/pip3 install --allow-external pyaudio --allow-unverified pyaudio -r requirements.txt
-  - %PYTHON%/Scripts/pip3 install -U py2exe
-  - %PYTHON%/python setup.py build_ext --inplace
-  - %PYTHON%/python setup.py py2exe
+  - "%PYTHON%/Scripts/pip3 install --upgrade pip setuptools"
+  - "%PYTHON%/Scripts/pip3 install --allow-external pyaudio --allow-unverified pyaudio -r requirements.txt"
+  - "%PYTHON%/Scripts/pip3 install -U py2exe"
+  - "%PYTHON%/python setup.py build_ext --inplace"
+  - "%PYTHON%/python setup.py py2exe"
   - ps: "ls -R build"
 build: false
