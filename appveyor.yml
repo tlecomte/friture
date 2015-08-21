@@ -5,7 +5,9 @@ init:
   - "ECHO %PYTHON% %PYTHON_VERSION% %PYTHON_ARCH%"
   - ps: "ls C:/Python34/"
   - ps: "ls C:/Python34/Scripts/"
-  - choco install pyqt5
+  - set QTDIR=C:\Qt\5.4\mingw491_32
+  - set PATH=%QTDIR%\bin;C:\MinGW\bin;%PATH%
+  - choco install pyqt5 -version 5.5.0
   - nuget install portaudio
   - "%PYTHON%/Scripts/pip3 install --upgrade pip setuptools"
   - "%PYTHON%/Scripts/pip3 install --allow-external pyaudio --allow-unverified pyaudio -r requirements.txt"
