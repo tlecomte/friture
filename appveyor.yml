@@ -14,7 +14,8 @@ init:
   #- choco install pyqt5 -version 5.5.0
   - choco install nsis -pre
   - nuget install portaudio
-  - "%PYTHON%/Scripts/pip3 install --upgrade pip setuptools"
+  # disable pip upgrade, seems to be broken (permission error)
+  #- "%PYTHON%/Scripts/pip3 install --upgrade pip setuptools"
   - "%PYTHON%/Scripts/pip3 install --allow-external pyaudio --allow-unverified pyaudio -r requirements.txt"
   - "%PYTHON%/Scripts/pip3 install -U py2exe"
   - ps: Start-FileDownload $env:PyQT -FileName $env:temp/pyqt5_install.exe
