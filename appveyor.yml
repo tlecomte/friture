@@ -1,20 +1,28 @@
 environment:
   matrix:
     - PYTHON: "C:/Python34"
+      PyQT: "http://downloads.sourceforge.net/pyqt/PyQt5/PyQt-5.5/PyQt5-5.5-gpl-Py3.4-Qt5.5.0-x32.exe"
 init:
   - "ECHO %PYTHON% %PYTHON_VERSION% %PYTHON_ARCH%"
   - ps: "ls C:/Python34/"
   - ps: "ls C:/Python34/Scripts/"
-  - set QTDIR=C:\Qt\5.4\mingw491_32
-  - set PATH=%QTDIR%\bin;C:\MinGW\bin;%PATH%
-  - choco install pyqt5 -version 5.5.0
+  - "%PYTHON%/python --version"
+  - "%PYTHON%/pip3 --version"
+  #- set QTDIR=C:\Qt\5.4\mingw491_32
+  #- set PATH=%QTDIR%\bin;C:\MinGW\bin;%PATH%
+  # chocolatey pyqt5 does not work
+  #- choco install pyqt5 -version 5.5.0
   - choco install nsis -pre
   - nuget install portaudio
   - "%PYTHON%/Scripts/pip3 install --upgrade pip setuptools"
   - "%PYTHON%/Scripts/pip3 install --allow-external pyaudio --allow-unverified pyaudio -r requirements.txt"
   - "%PYTHON%/Scripts/pip3 install -U py2exe"
+  - ps: Start-FileDownload $env:PyQT -FileName $env:temp/pyqt5_install.exe
+  - ps: "& $env:temp/pyqt5_install.exe /S"
+  - ps: "Wait-Process -Name pyqt5_install -Timeout 600"
+  - "%PYTHON%/python -c \"import PyQt5\""
+build:
   - "%PYTHON%/python setup.py build_ext --inplace"
   - "%PYTHON%/python setup.py py2exe"
   - ps: "ls -R build"
   - "makensis.exe installer/friture-setup.nsi"
-build: false
