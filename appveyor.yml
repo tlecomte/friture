@@ -1,0 +1,6 @@
+environment:
+  - PYTHON: "C:/Python34"
+init:
+  - "ECHO %PYTHON%"
+  - ps: "ls C:/Python*"
+build: false
