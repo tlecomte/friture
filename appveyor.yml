@@ -35,7 +35,8 @@ install:
   # PortAudio
   - ps: Start-FileDownload $env:Portaudio -FileName $env:temp/portaudio_install.zip
   - ps: c:\programdata\chocolatey\bin\7z.exe x $env:temp\portaudio_install.zip
-  - set PORTAUDIO_PATH=%CD%\portaudio-r1891-build
+  - set CFLAGS="-I %CD%/portaudio-r1891-build/include/ -L %CD%/portaudio-r1891-build/lib/Win32/Release"
+  - "ECHO %CFLAGS%"
   # Python libraries
   - "%PYTHON%/Scripts/pip3 install --allow-external pyaudio --allow-unverified pyaudio -r requirements.txt"
   - "%PYTHON%/Scripts/pip3 install -U py2exe"
