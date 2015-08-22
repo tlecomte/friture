@@ -20,18 +20,21 @@ init:
   #- choco install pyqt5 -version 5.5.0
   - choco install nsis -pre
   - ps: cinst 7zip.commandline
-  - ps: Start-FileDownload $env:Portaudio -FileName $env:temp/portaudio_install.zip
-  - ps: c:\programdata\chocolatey\bin\7z.exe x $env:temp\portaudio_install.zip
-  - set PORTAUDIO_PATH=%CD%\portaudio-r1891-build
   # disable pip upgrade, seems to be broken (permission error)
   #- "%PYTHON%/Scripts/pip3 install --upgrade pip setuptools"
 install:
-  - "%PYTHON%/Scripts/pip3 install --allow-external pyaudio --allow-unverified pyaudio -r requirements.txt"
-  - "%PYTHON%/Scripts/pip3 install -U py2exe"
+  # PyQt
   - ps: Start-FileDownload $env:PyQT -FileName $env:temp/pyqt5_install.exe
   - ps: "& $env:temp/pyqt5_install.exe /S"
   - ps: "Wait-Process -Name pyqt5_install -Timeout 600"
   - "%PYTHON%/python -c \"import PyQt5\""
+  # PortAudio
+  - ps: Start-FileDownload $env:Portaudio -FileName $env:temp/portaudio_install.zip
+  - ps: c:\programdata\chocolatey\bin\7z.exe x $env:temp\portaudio_install.zip
+  - set PORTAUDIO_PATH=%CD%\portaudio-r1891-build
+  # Python libraries
+  - "%PYTHON%/Scripts/pip3 install --allow-external pyaudio --allow-unverified pyaudio -r requirements.txt"
+  - "%PYTHON%/Scripts/pip3 install -U py2exe"
   - "%PYTHON%/python setup.py build_ext --inplace"
   - "%PYTHON%/python setup.py py2exe"
   - ps: "ls -R build"
