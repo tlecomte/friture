@@ -7,7 +7,7 @@ environment:
   matrix:
     - PYTHON: "C:/Python34"
       PyQT: "http://downloads.sourceforge.net/pyqt/PyQt5/PyQt-5.5/PyQt5-5.5-gpl-Py3.4-Qt5.5.0-x32.exe"
-      Portaudio: "https://github.com/adfernandes/precompiled-portaudio-windows/raw/master/portaudio-r1891-build.zip"
+      PyAudio: "http://www.lfd.uci.edu/~gohlke/pythonlibs/3i673h27/PyAudio-0.2.8-cp34-none-win32.whl"
 init:
   - "ECHO %PYTHON% %PYTHON_VERSION% %PYTHON_ARCH%"
   - ps: "ls C:/Python34/"
@@ -32,13 +32,12 @@ install:
   - ps: Set-Content -Path "C:\\Python34\\Lib\\site-packages\\PyQt5\\pyuic5.bat" -Value "C:\\Python34\\python.exe -m PyQt5.uic.pyuic %1 %2 %3 %4 %5 %6 %7 %8 %9"
   - ps: Get-Content "C:\\Python34\\Lib\\site-packages\\PyQt5\\pyuic5.bat"
   - "%PYTHON%/python -c \"import PyQt5\""
-  # PortAudio
-  - ps: Start-FileDownload $env:Portaudio -FileName $env:temp/portaudio_install.zip
-  - ps: c:\programdata\chocolatey\bin\7z.exe x $env:temp\portaudio_install.zip
-  - set CFLAGS="-I %CD%/portaudio-r1891-build/include/ -L %CD%/portaudio-r1891-build/lib/Win32/Release"
-  - "ECHO %CFLAGS%"
+  # PyAudio wheel
+  - ps: Start-FileDownload $env:PyAudio -FileName $env:temp/pyaudio.whl
+  - "%PYTHON%/Scripts/pip3 install %temp%/pyaudio.whl"
+  - "%PYTHON%/python -c \"import pyaudio\""
   # Python libraries
-  - "%PYTHON%/Scripts/pip3 install --allow-external pyaudio --allow-unverified pyaudio -r requirements.txt"
+  - "%PYTHON%/Scripts/pip3 install -r requirements.txt"
   - "%PYTHON%/Scripts/pip3 install -U py2exe"
   - "%PYTHON%/python setup.py build_ext --inplace"
   - "%PYTHON%/python setup.py py2exe"
