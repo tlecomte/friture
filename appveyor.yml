@@ -9,6 +9,8 @@ environment:
       PyQT: "http://downloads.sourceforge.net/pyqt/PyQt5/PyQt-5.5/PyQt5-5.5-gpl-Py3.4-Qt5.5.0-x32.exe"
       # copied from http://www.lfd.uci.edu/~gohlke/pythonlibs/3i673h27/PyAudio-0.2.8-cp34-none-win32.whl
       PyAudio: "https://www.dropbox.com/s/7um7fx768kn895v/PyAudio-0.2.8-cp34-none-win32.whl?dl=1"
+      Numpy: "https://www.dropbox.com/s/v5qppu080wz3ahp/numpy-1.9.2%2Bmkl-cp34-none-win32.whl?dl=1"
+      Scipy: "https://www.dropbox.com/s/mtymjhowyfogykk/scipy-0.16.0-cp34-none-win32.whl?dl=1"
 init:
   - "ECHO %PYTHON% %PYTHON_VERSION% %PYTHON_ARCH%"
   - ps: "ls C:/Python34/"
@@ -37,11 +39,19 @@ install:
   - ps: Start-FileDownload $env:PyAudio -FileName $env:temp/PyAudio-0.2.8-cp34-none-win32.whl
   - "%PYTHON%/Scripts/pip3 install %temp%/PyAudio-0.2.8-cp34-none-win32.whl"
   - "%PYTHON%/python -c \"import pyaudio\""
+  # Numpy wheel
+  - ps: Start-FileDownload $env:Numpy -FileName $env:temp/numpy-1.9.2-cp34-none-win32.whl
+  - "%PYTHON%/Scripts/pip3 install %temp%/numpy-1.9.2-cp34-none-win32.whl"
+  - "%PYTHON%/python -c \"import numpy\""
+  # Scipy wheel
+  - ps: Start-FileDownload $env:Scipy -FileName $env:temp/scipy-0.16.0-cp34-none-win32.whl
+  - "%PYTHON%/Scripts/pip3 install %temp%/scipy-0.16.0-cp34-none-win32.whl"
+  - "%PYTHON%/python -c \"import scipy\""
   # Python libraries
-  - "%PYTHON%/Scripts/pip3 install -r requirements.txt"
-  - "%PYTHON%/Scripts/pip3 install -U py2exe"
-  - "%PYTHON%/python setup.py build_ext --inplace"
-  - "%PYTHON%/python setup.py py2exe"
+  - "%CMD_IN_ENV% %PYTHON%/Scripts/pip3 install -r requirements.txt"
+  - "%CMD_IN_ENV% %PYTHON%/Scripts/pip3 install -U py2exe"
+  - "%CMD_IN_ENV% %PYTHON%/python setup.py build_ext --inplace"
+  - "%CMD_IN_ENV% %PYTHON%/python setup.py py2exe"
   - ps: "ls -R build"
   - "makensis.exe installer/friture-setup.nsi"
 build: false
