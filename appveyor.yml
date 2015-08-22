@@ -34,8 +34,8 @@ install:
   - ps: Get-Content "C:\\Python34\\Lib\\site-packages\\PyQt5\\pyuic5.bat"
   - "%PYTHON%/python -c \"import PyQt5\""
   # PyAudio wheel
-  - ps: Start-FileDownload $env:PyAudio -FileName $env:temp/pyaudio.whl
-  - "%PYTHON%/Scripts/pip3 install %temp%/pyaudio.whl"
+  - ps: Start-FileDownload $env:PyAudio -FileName $env:temp/PyAudio-0.2.8-cp34-none-win32.whl
+  - "%PYTHON%/Scripts/pip3 install %temp%/PyAudio-0.2.8-cp34-none-win32.whl"
   - "%PYTHON%/python -c \"import pyaudio\""
   # Python libraries
   - "%PYTHON%/Scripts/pip3 install -r requirements.txt"
