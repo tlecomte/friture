@@ -7,7 +7,8 @@ environment:
   matrix:
     - PYTHON: "C:/Python34"
       PyQT: "http://downloads.sourceforge.net/pyqt/PyQt5/PyQt-5.5/PyQt5-5.5-gpl-Py3.4-Qt5.5.0-x32.exe"
-      PyAudio: "http://www.lfd.uci.edu/~gohlke/pythonlibs/3i673h27/PyAudio-0.2.8-cp34-none-win32.whl"
+      # copied from http://www.lfd.uci.edu/~gohlke/pythonlibs/3i673h27/PyAudio-0.2.8-cp34-none-win32.whl
+      PyAudio: "https://www.dropbox.com/s/7um7fx768kn895v/PyAudio-0.2.8-cp34-none-win32.whl?dl=0"
 init:
   - "ECHO %PYTHON% %PYTHON_VERSION% %PYTHON_ARCH%"
   - ps: "ls C:/Python34/"
