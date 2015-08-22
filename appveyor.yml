@@ -1,7 +1,13 @@
 environment:
+  global:
+    # SDK v7.0 MSVC Express 2008's SetEnv.cmd script will fail if the
+    # /E:ON and /V:ON options are not enabled in the batch script intepreter
+    # See: http://stackoverflow.com/a/13751649/163740
+    CMD_IN_ENV: "cmd /E:ON /V:ON /C .\\appveyor\\run_with_env.cmd"
   matrix:
     - PYTHON: "C:/Python34"
       PyQT: "http://downloads.sourceforge.net/pyqt/PyQt5/PyQt-5.5/PyQt5-5.5-gpl-Py3.4-Qt5.5.0-x32.exe"
+      Portaudio: "https://github.com/adfernandes/precompiled-portaudio-windows/raw/master/portaudio-r1891-build.zip"
 init:
   - "ECHO %PYTHON% %PYTHON_VERSION% %PYTHON_ARCH%"
   - ps: "ls C:/Python34/"
@@ -13,10 +19,13 @@ init:
   # chocolatey pyqt5 does not work
   #- choco install pyqt5 -version 5.5.0
   - choco install nsis -pre
+  - ps: cinst 7zip.commandline
+  - ps: Start-FileDownload $env:Portaudio -FileName $env:temp/portaudio_install.zip
+  - ps: c:\programdata\chocolatey\bin\7z.exe x $env:temp\portaudio_install.zip
+  - set PORTAUDIO_PATH=%CD%\portaudio-r1891-build
   # disable pip upgrade, seems to be broken (permission error)
   #- "%PYTHON%/Scripts/pip3 install --upgrade pip setuptools"
 install:
-  - nuget install portaudio
   - "%PYTHON%/Scripts/pip3 install --allow-external pyaudio --allow-unverified pyaudio -r requirements.txt"
   - "%PYTHON%/Scripts/pip3 install -U py2exe"
   - ps: Start-FileDownload $env:PyQT -FileName $env:temp/pyqt5_install.exe
