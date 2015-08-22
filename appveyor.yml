@@ -25,8 +25,12 @@ init:
 install:
   # PyQt
   - ps: Start-FileDownload $env:PyQT -FileName $env:temp/pyqt5_install.exe
-  - ps: "& $env:temp/pyqt5_install.exe /S"
-  - ps: "Wait-Process -Name pyqt5_install -Timeout 600"
+
+  - ps: c:\programdata\chocolatey\bin\7z.exe x $env:temp\pyqt5_install.exe -oC:\\Python34 -r
+  - ps: ls -name "C:\\Python34\\Lib\\site-packages"
+  - ps: ls -name "C:\\Python34\\Lib\\site-packages\\PyQt5"
+  - ps: Set-Content -Path "C:\\Python34\\Lib\\site-packages\\PyQt5\\pyuic5.bat" -Value "C:\\Python34\\python.exe -m PyQt5.uic.pyuic %1 %2 %3 %4 %5 %6 %7 %8 %9"
+  - ps: Get-Content "C:\\Python34\\Lib\\site-packages\\PyQt5\\pyuic5.bat"
   - "%PYTHON%/python -c \"import PyQt5\""
   # PortAudio
   - ps: Start-FileDownload $env:Portaudio -FileName $env:temp/portaudio_install.zip
