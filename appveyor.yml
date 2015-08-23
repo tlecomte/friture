@@ -48,10 +48,10 @@ install:
   - "%PYTHON%/Scripts/pip3 install %temp%/scipy-0.16.0-cp34-none-win32.whl"
   - "%PYTHON%/python -c \"import scipy\""
   # Python libraries
-  - "%CMD_IN_ENV% %PYTHON%/Scripts/pip3 install -r requirements.txt"
-  - "%CMD_IN_ENV% %PYTHON%/Scripts/pip3 install -U py2exe"
-  - "%CMD_IN_ENV% %PYTHON%/python setup.py build_ext --inplace"
-  - "%CMD_IN_ENV% %PYTHON%/python setup.py py2exe"
+  - "%PYTHON%/Scripts/pip3 install -r requirements.txt"
+  - "%PYTHON%/Scripts/pip3 install -U py2exe"
+  - "%PYTHON%/python setup.py build_ext --inplace"
+  - "%PYTHON%/python setup.py py2exe"
   - ps: "ls -R build"
-  - "makensis.exe installer/friture-setup.nsi"
+  - "c:\programdata\chocolatey\bin\makensis.exe installer/friture-setup.nsi"
 build: false
