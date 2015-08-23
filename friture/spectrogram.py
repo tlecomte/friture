@@ -108,9 +108,9 @@ class Spectrogram_Widget(QtWidgets.QWidget):
         epsilon = 1e-30
         return 10.*log10(sp + epsilon)
 
-    # scale the db spectrum from [- spec_range db ... 0 db] > [0..1]
+    # scale the db spectrum from [- spec_range db ... 0 db] to [0..1] (do not clip, will be down after resampling)
     def scale_spectrogram(self, sp):
-        return (sp.clip(min = self.spec_min, max = self.spec_max) - self.spec_min)/(self.spec_max - self.spec_min)
+        return (sp - self.spec_min)/(self.spec_max - self.spec_min)
 
     def handle_new_data(self, floatdata):
         # we need to maintain an index of where we are in the buffer

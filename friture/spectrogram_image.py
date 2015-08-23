@@ -129,6 +129,7 @@ class CanvasScaledSpectrogram(QtCore.QObject):
 	def floats_to_bytes(self, data):
 		#dat1 = (255. * data).astype(numpy.uint8)
 		#dat4 = dat1.repeat(4)
+
 		dat4 = self.color_from_float(data)
 		return dat4.tostring()
 
@@ -151,7 +152,9 @@ class CanvasScaledSpectrogram(QtCore.QObject):
 			self.colors[i] = QtGui.QColor(cmap[i, 0]*255, cmap[i, 1]*255, cmap[i, 2]*255).rgb()
 
 	def color_from_float(self, v):
-		return pyx_color_from_float_2D(self.colors, v)
+		# clip in [0..1] before using the fast lookup function
+		v = numpy.clip(v, 0., 1.)
+		return  pyx_color_from_float_2D(self.colors, v)
 		#d = (v*255).astype(numpy.uint8)
 		#return self.colors[d]
 
