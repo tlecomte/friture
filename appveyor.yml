@@ -28,7 +28,6 @@ init:
 install:
   # PyQt
   - ps: Start-FileDownload $env:PyQT -FileName $env:temp/pyqt5_install.exe
-
   - ps: c:\programdata\chocolatey\bin\7z.exe x $env:temp\pyqt5_install.exe -oC:\\Python34 -r
   - ps: ls -name "C:\\Python34\\Lib\\site-packages"
   - ps: ls -name "C:\\Python34\\Lib\\site-packages\\PyQt5"
@@ -53,6 +52,6 @@ install:
   - "%PYTHON%/python setup.py build_ext --inplace"
   - "%PYTHON%/python setup.py py2exe"
   - ps: "ls -R dist"
-  - ps: "C:\Program Files (x86)\NSIS\makensis.exe installer\friture-setup.nsi"
+  - ps: C:\Program Files (x86)\NSIS\makensis.exe installer\friture-setup.nsi
   - ps: "ls -R installer"
 build: false
