@@ -74,8 +74,6 @@ class Generator_Widget(QtWidgets.QWidget):
 
         self.audiobackend = audiobackend
 
-        self.p = pyaudio.PyAudio()
-
         self.stream_stop_ramp_finished.connect(self.stop_stream_after_ramp)
 
         self.device = None
@@ -86,7 +84,7 @@ class Generator_Widget(QtWidgets.QWidget):
         for device in self.audiobackend.output_devices:
             self.logger.push("Opening the stream")
             try:
-                self.stream = self.open_output_stream(device)
+                self.stream = self.audiobackend.open_output_stream(device, self.audioCallback)
                 self.stream.start_stream()
                 self.stream.stop_stream()
                 self.device = device
@@ -147,16 +145,6 @@ class Generator_Widget(QtWidgets.QWidget):
 #        second_channel = self.audiobackend.get_current_second_channel()
 #        self.settings_dialog.comboBox_secondChannel.setCurrentIndex(second_channel)
 
-    # method
-    def open_output_stream(self, device):
-        # by default we open the device stream with all the channels
-        # (interleaved in the data buffer)
-        maxOutputChannels = self.p.get_device_info_by_index(device)['maxOutputChannels']
-        stream = self.p.open(format=pyaudio.paInt16, channels=maxOutputChannels, rate=SAMPLING_RATE, output=True,
-                frames_per_buffer=FRAMES_PER_BUFFER, output_device_index=device,
-                stream_callback=self.audioCallback)
-        return stream
-
     def device_changed(self, index):
         device = self.audiobackend.output_devices[index]
 
@@ -170,8 +158,7 @@ class Generator_Widget(QtWidgets.QWidget):
 
         # first see if the format is supported by PortAudio
         try:
-            maxOutputChannels = self.p.get_device_info_by_index(device)['maxOutputChannels']
-            success = self.p.is_format_supported(SAMPLING_RATE, output_device=device, output_channels=maxOutputChannels, output_format=pyaudio.paInt16)
+            success = self.audiobackend.is_output_format_supported(device, pyaudio.paInt16)
         except ValueError as error:
             errorMessage = error.args[0]
             self.logger.push("Format is not supported. " + errorMessage)
@@ -179,7 +166,7 @@ class Generator_Widget(QtWidgets.QWidget):
 
         if success:
             try:
-                self.stream = self.open_output_stream(device)
+                self.stream = self.audiobackend.open_output_stream(device, self.audioCallback)
                 self.device = device
                 self.stream.start_stream()
                 if self.state not in [starting, playing]:
@@ -286,7 +273,7 @@ class Generator_Widget(QtWidgets.QWidget):
 
         # output channels are interleaved
         # we output to all channels simultaneously with the same data
-        maxOutputChannels = self.p.get_device_info_by_index(self.device)['maxOutputChannels']
+        maxOutputChannels = self.audiobackend.get_device_outputchannels_count(self.device)
         floatdata = floatdata.repeat(maxOutputChannels)
 
         int16info = np.iinfo(np.int16)

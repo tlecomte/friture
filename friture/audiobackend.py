@@ -285,6 +285,21 @@ class AudioBackend(QtCore.QObject):
 		return stream
 
 	# method
+	def open_output_stream(self, device, callback):
+		# by default we open the device stream with all the channels
+		# (interleaved in the data buffer)
+		maxOutputChannels = self.pa.get_device_info_by_index(device)['maxOutputChannels']
+		stream = self.pa.open(format=paInt16, channels=maxOutputChannels, rate=SAMPLING_RATE, output=True,
+								frames_per_buffer=FRAMES_PER_BUFFER, output_device_index=device,
+								stream_callback=callback)
+		return stream
+
+	def is_output_format_supported(self, device, format):
+		maxOutputChannels = self.pa.get_device_info_by_index(device)['maxOutputChannels']
+		success = self.pa.is_format_supported(SAMPLING_RATE, output_device=device, output_channels=maxOutputChannels, output_format=format)
+		return success
+
+	# method
 	# return the index of the current input device in the input devices list
 	# (not the same as the PortAudio index, since the latter is the index
 	# in the list of *all* devices, not only input ones)
@@ -316,6 +331,9 @@ class AudioBackend(QtCore.QObject):
 	# method	
 	def get_current_device_nchannels(self):
 		return self.pa.get_device_info_by_index(self.device)['maxInputChannels']
+
+	def get_device_outputchannels_count(self, device):
+		return self.pa.get_device_info_by_index(device)['maxOutputChannels']
 
 	def handle_new_data(self, in_data, frame_count, input_time, status):
 		if self.terminated:
