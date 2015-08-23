@@ -52,6 +52,7 @@ class AudioBackend(QtCore.QObject):
 		self.logger = logger
 
 		self.duo_input = False
+		self.terminated = False
 
 		self.logger.push("Initializing PyAudio")
 		self.pa = PyAudio()
@@ -97,6 +98,14 @@ class AudioBackend(QtCore.QObject):
 			self.stream.stop_stream()
 			self.stream.close()
 			self.stream = None
+
+		# call terminate on PortAudio
+		self.logger.push("Terminating PortAudio")
+		self.pa.terminate()
+		self.logger.push("PortAudio terminated")
+
+		# avoid calling PortAudio methods in the callback/slots
+		self.terminated = True
 
 	# method
 	def get_readable_devices_list(self):
@@ -309,6 +318,9 @@ class AudioBackend(QtCore.QObject):
 		return self.pa.get_device_info_by_index(self.device)['maxInputChannels']
 
 	def handle_new_data(self, in_data, frame_count, input_time, status):
+		if self.terminated:
+			return
+
 		if (status & paInputOverflow):
 			print("Stream overflow!")
 			self.xruns += 1
