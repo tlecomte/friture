@@ -52,6 +52,6 @@ install:
   - "%PYTHON%/python setup.py build_ext --inplace"
   - "%PYTHON%/python setup.py py2exe"
   - ps: "ls -R dist"
-  - ps: C:\Program Files (x86)\NSIS\makensis.exe installer\friture-setup.nsi
+  - "C:\\Program\ Files\ \(x86\)\\NSIS\\makensis.exe installer\\friture-setup.nsi"
   - ps: "ls -R installer"
 build: false
