@@ -1,65 +1,139 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 
-	<title>Friture : Features</title>
-	
-	<link rel="stylesheet" type="text/css" href="css/style.css"> 
-	
-	<link rel="shortcut icon" type="image/x-icon" href="images/favicon.ico" />
+    <title>Friture: Features</title>
 
-	<script type="text/javascript">
-		var _gaq = _gaq || [];
-		_gaq.push(['_setAccount', 'UA-25716805-1']);
-		_gaq.push(['_trackPageview']);
-		(function() {
-		var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-		ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-		var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-		})();
-	</script>
+    <link rel="shortcut icon" type="image/x-icon" href="images/favicon.ico" />
+
+    <script type="text/javascript">
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-25716805-1']);
+        _gaq.push(['_trackPageview']);
+        (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+
+    <!--Bootstrap stuff-->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!--<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">-->
+    <!-- Bootstrap theme from https://bootswatch.com/darkly/ -->
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
 </head>
 
 <body>
-  <a href="http://github.com/tlecomte/friture"><img style="position: absolute; top: 0; right: 0; border: 0;" src="images/forkme_right_darkblue_121621.png" alt="Fork me on GitHub" /></a>
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="#">Friture.org</a>
+            </div>
+            <div>
+                <ul class="nav navbar-nav">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="download.html">Download</a></li>
+                    <li class="active"><a href="#">Features</a></li>
+                    <li><a href="frequency-analysis.html">Frequency analysis</a></li>
+                    <li><a href="programming.html">Contributing</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
 
-  <div id="container">
+    <a href="http://github.com/tlecomte/friture">
+        <img style="position: absolute; top: 0; right: 0; border: 0;" src="images/forkme_right_darkblue_121621.png" alt="Fork me on GitHub" />
+    </a>
 
-    <h1><img src="images/friture-logo.png" width="128" height="128" alt="Friture logo" style="vertical-align:middle"/>Features of Friture</h1>
-    <p>The purpose of Friture is to help analyze an audio signal to make adjustments in the preprocessing. This is achieved by providing a set of widgets to visualize audio data:</p>
+    <div class="container" id="container">
 
-        <h2>Level widget</h2>
-        <img src="images/friture_levels_20100318.png" width="179" height="167" alt="Friture levels widget"/>
-        <p>The level widget displays RMS power and peak power in dBFS (dB Full Scale). It is refreshed approximately every 20 ms.</p>
+        <h1>Features</h1>
 
-        <h2>Scope widget</h2>
-        <img src="images/friture_scope_20100318.png" width="352" height="161" alt="Friture scope widget"/>
-        <p>The scope widget displays audio data versus time, for chunks of approximately 20 ms. It is refreshed approximately every 20 ms.</p>
+        <p>The purpose of Friture is to help analyze an audio signal to understand the characteristics of this signal (fundamental, harmonics, feedback, etc.), to describe the source/room/receiver behaviour (reverberation, gain peaks, etc.), or to make adjustments in the preprocessing (room equalization). This is achieved by providing a set of widgets to visualize audio data:</p>
 
-        <h2>Spectrum widget</h2>
-        <img src="images/friture_spectrum_20100318.png" width="301" height="166" alt="Friture spectrum widget"/>
-        <p>The spectrum widget displays audio data versus frequency. The refresh time is fixed by the window length of the Fourier transform. For 1024 points at a sampling rate of 44100 Hz, the refresh time is 1024/44100 = 23.2 ms. When the refresh time to too long, two successive transform windows can be made to overlap (this is not currently implemented). Additionally, the widget draws peaks for each frequency component, which are increased by the spectrum and slowly decrease as for the peaks in the level widget.</p>
+        <div class="row">
+            <div class="col-sm-6">
+                <h2>2D Spectrogram widget</h2>
+                <p>
+                    <a href="images/friture_spectrogram_20150824_large.png" title="Click for the full size">
+                        <img class="img-responsive" src="images/friture_spectrogram_20150824.png" alt="Friture spectrogram widget"/>
+                    </a>
+                </p>
+                <p>The 2D spectrogram widget displays audio data versus both frequency and time, in a rolling-against-time fashion. The time-frequency resolution of the display is fixed by the window length of the Fourier transform (as for the minimum response time of the spectrum widget). It is also limited by the resolution of your display in pixels.</p>
+            </div>
 
-        <h2>Rolling spectrogram widget</h2>
-        <a href="images/friture_spectrogram_20100318.png" title="Click for the full size"><img src="images/friture_spectrogram_20100318_320.png" width="320" height="128" alt="Friture spectrogram widget"/></a>
-        <p>The rolling spectrogram widget displays audio data versus both frequency and time, in a rolling-against-time fashion. The refresh time is limited by the window length of the Fourier transform, as for the spectrum widget, and also by the time resolution of the widget, which is fixed by the width of the widget in pixels and the total time scale to be displayed. As for the spectrum widgets, when the refresh time to too long because of the window length of the Fourier transform, two successive transform windows can be made to overlap (this is not currently implemented).</p>
+            <div class="col-sm-6">
+                <h2>Spectrum widget</h2>
+                <p>
+                    <img class="img-responsive" src="images/friture_spectrum_20150824.png" alt="Friture spectrum widget"/>
+                </p>
+                <p>The spectrum widget displays audio data versus frequency. This is very appropriate to visualize the characteristics of tha signal: fundamental frequency, harmonics, feedback frequencies, etc.</p>
 
-        <h2>Upcoming features</h2>
-        <p>In addition to the above list of widgets that are already available in Friture, the following widgets are going to be implemented later:</p>
+                <p>The response time of the display is configurable. The minimum response time is linked to the window length of the Fourier transform. For a FFT of 1024 points, and given the sampling rate of 48000 Hz used by Friture, the minimum response time is 1024/48000 = 21.3 ms.</p>
 
-        <h3>Rolling waveform widget</h3>
-        <p>The rolling waveform widget is similar to the usual waveform display in audio edition software like audacity. It displays RMS and peak levels in dBFS against time. It is synchronized with the rolling spectrogram widget.</p>
+                <p>Additionally, the widget draws peaks for each frequency component. These peaks mark the recent maxima of the spectrum, and start to decrease shortly after the peak was reached. Finally, a label identifies the frequency of the global maximum of the spectrum.</p>
+            </div>
+        </div>
 
-        <h3>Long-time level widget</h3>
-        <p>The long-time level widget displays power versus time, for long time scales. The purpose of this widget is to determine if the average level has changed over time.</p>
+        <div class="row">
+            <div class="col-sm-6">
+                <h2>Octave Spectrum widget</h2>
+                <p>
+                    <img class="img-responsive" src="images/friture_octavespectrum_20150824.png" alt="Friture spectrogram widget"/>
+                </p>
+                <p>The octave spectrum widget displays audio data versus time, similarly to the Spectrum widget. Audio data is grouped in frequency bins with fraction-of-octave widths. Each frequency bin is the result of a fraction-of-octave filter.</p>
 
-    <hr>
-    <p align=center><a href="index.html">Friture Homepage</a> <a href="download.html">Download Friture</a></p>
+                <p>The following figure illustrates the frequency response of the filter bank used with the 3 bands-per-octave setting. The filters for each octave are applied after decimations of the signal. Both the band-pass filters and the low-pass decimation filters are implemented as elliptic IIR filters. The -3dB width of each filter is constant on a logarithmic frequency scale.</p>
 
-  </div>
-  
+                <p>
+                    <img class="img-responsive" src="images/friture_filters_3bandsperoctave.png" alt="Friture filters for the 3-bands per octave spectrum"/>
+                </p>
+            </div>
+
+            <div class="col-sm-6">
+                <h2>Delay estimator</h2>
+                <p>
+                    <img class="img-responsive" src="images/friture_delay_20150824.png" alt="Friture delay estimator widget"/>
+                </p>
+                <p>The delay estimator widget computes the time delay between the 2 input channels. This is usehul to align speakers in a room.</p>
+
+                <p>The delay estimation is achieved using a cross-correlation algorithm. It only works when the 2-channel mode is enabled.</p>
+
+                <p>References:</p>
+                <ul class="list-group">
+                    <li class="list-group-item">Knapp, C. H. and Carter, G. C.: 1976, The generalized correlation method for estimation of time delay, IEEE Transactions on Acoustics, Speech and Signal Processing ASSP-24(4), 320-327.</li>
+                    <li class="list-group-item">Brandstein, M. S. and Silverman, H. F.: 1997, A robust method for speech signal time-delay estimation in reverberant rooms, Proc. IEEE International Conference on Acoustics, Speech and Signal Processing, Munich, Germany.</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-6">
+
+                <h2>Level widget</h2>
+                <p>
+                    <img class="img-responsive" src="images/friture_levels_20150824.png" alt="Friture levels widget"/>
+                </p>
+                <p>The level widget displays peak power (25 ms response time, i.e. instantaneous) and RMS power (300 ms response time) in dBFS (dB Full Scale). When the 2-channels mode is enabled, it displays the levels of each channel on a separate scale.</p>
+            </div>
+
+            <div class="col-sm-6">
+                <h2>Scope widget</h2>
+                <p>
+                    <img class="img-responsive" src="images/friture_scope_20150824.png" alt="Friture scope widget"/>
+                </p>
+                <p>The scope widget displays audio data versus time. The time scale is configurable. The display is synchronized with regards to a leading-edge of the signal positioned in the center of the time axis, as a traditional scope would do.</p>
+            </div>
+        </div>
+    </div>
+
 </body>
+
 </html>
