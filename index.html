@@ -6,9 +6,7 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 
 	<title>Friture</title>
-	
-	<link rel="stylesheet" type="text/css" href="css/style.css"> 
-	
+
 	<link rel="shortcut icon" type="image/x-icon" href="images/favicon.ico" />
 
 	<script type="text/javascript">
@@ -21,46 +19,84 @@
 		var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
 		})();
 	</script>
+
+	<!--Bootstrap stuff-->
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<!--<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">-->
+	<!-- Bootstrap theme from https://bootswatch.com/darkly/ -->
+	<link rel="stylesheet" href="css/bootstrap.min.css">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+	<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+
+	<!-- Custom styles for this template -->
+	<style style="display:none">
+.jumbotron {
+  text-align: center;
+}
+	</style>
+
 </head>
 
 <body>
-	<a href="http://github.com/tlecomte/friture"><img style="position: absolute; top: 0; right: 0; border: 0;" src="images/forkme_right_darkblue_121621.png" alt="Fork me on GitHub" /></a>
+	<nav class="navbar navbar-default">
+		<div class="container-fluid">
+			<div class="navbar-header">
+				<a class="navbar-brand" href="#">Friture.org</a>
+			</div>
+			<div>
+				<ul class="nav navbar-nav">
+					<li class="active"><a href="#">Home</a></li>
+					<li><a href="download.html">Download</a></li>
+					<li><a href="features.html">Features</a></li>
+					<li><a href="frequency-analysis.html">Frequency analysis</a></li>
+					<li><a href="programming.html">Contributing</a></li>
+				</ul>
+			</div>
+		</div>
+	</nav>
 
-	<div id="container">
+	<a href="http://github.com/tlecomte/friture">
+		<img style="position: absolute; top: 0; right: 0; border: 0;" src="images/forkme_right_darkblue_121621.png" alt="Fork me on GitHub" />
+	</a>
 
-		<h1><img src="images/friture-logo.png" width="128" height="128" alt="Friture logo" style="vertical-align:middle"/> Friture</h1>
+	<div class="container" id="container">
+		<div class="jumbotron">
+				<h1><img src="images/friture-logo.png" width="128" height="128" alt="Friture logo" style="vertical-align:middle"/> Friture</h1>
+				<p>Friture is a real-time audio analyzer.</p><p>It works on Windows, Mac OS X and Linux. It is free and open source.</p>
+				<p><a href="download.html" class="btn btn-success btn-lg" role="button"> <i class="fa fa-download"></i>&nbsp;
+				<b>Download Friture</b><br>Windows, OS X, Linux</a></p>
+		</div>
 
-		<a href="images/friture_20100713.png" title="Click for the full size"><img src="images/friture_20100713_persp.png" width="400" height="405" class="align-right alt="Friture screen capture"/></a>
+		<div class="row">
+			<div class="col-sm-6">
+				<h2>Features</h2>
+				<p>Friture displays audio data in several widgets, such as a scope, a spectrum analyzer, or a rolling 2D spectrogram. Learn more about the <a href="features.html">features</a> of Friture.</p>
 
-		<div class="description">Real-time audio spectrogram</div>
+				<h2>Audio and programming notes</h2>
+				<p>Friture does frequency analysis on audio signals. Learn more about the <a href="frequency-analysis.html">time-frequency transforms</a> for audio data.</p>
+				<p>Friture is written in Python and uses various libraries. Learn more about the <a href="programming.html">design</a> of Friture.</p>
+				<p>Friture is free and open-source, licensed under the <a href="https://github.com/tlecomte/friture/blob/master/COPYING.txt">GPLv3+</a></p>
+			</div>
 
-		<p>Friture is a program designed to analyze audio input in real-time.</p>
+			<div class="col-sm-6">
+				<a href="images/friture_20150824.png" title="Click for the full size">
+					<img class="img-responsive" src="images/friture_20150824_small.png" alt="Friture screen capture"/>
+					<!--<img src="images/friture_20150824_small.png" width="500" height="266" class="align-right" alt="Friture screen capture"/>-->
+				</a>
+			</div>
+		</div>
 
-		<a href="download.html" class="downloadButton">Download Friture</a>
-
-		<h2>Features</h2>
-		<p>Friture displays audio data in several widgets, such as a scope, a spectrum analyzer, or a rolling 2D spectrogram. Learn more about the <a href="features.html">features</a> of Friture.</p>
-
-		<h2>Audio and programming notes</h2>
-		<p>Friture does frequency analysis on audio signals. Learn more about the <a href="frequency-analysis.html">time-frequency transforms</a> for audio data.</p>
-		<p>Friture is written in Python and uses various libraries. Learn more about the <a href="programming.html">design</a> of Friture.</p>
-		<p>Friture is free and open-source, licensed under the <a href="https://github.com/tlecomte/friture/blob/master/COPYING.txt">GPLv3+</a></p>
-		
 		<h2>Links</h2>
-		<p>Friture is registered in the <a href="http://pypi.python.org/pypi?:action=display&name=friture">Python Package Index</a>,
-                        and its codebase is analyzed by <a href="http://www.ohloh.net/p/friture">ohloh.net</a>. Friture also has a <a href="https://github.com/tlecomte/friture/wiki">wiki</a>.</p>
-		
+		<p>Friture is registered in the <a href="http://pypi.python.org/pypi?:action=display&name=friture">Python Package Index</a></p>
+		<p>Its codebase is analyzed by <a href="http://www.ohloh.net/p/friture">ohloh.net</a>.</p>
+		<p>Friture also has a <a href="https://github.com/tlecomte/friture/wiki">wiki</a>.</p>
+
 		<h2>Contact</h2>
-		<p><a href="mailto:contact@friture.org">contact@friture.org</a></p>
-
-		<h2>Survey</h2>
-		<p>Please email <a href="mailto:contact@friture.org">contact@friture.org</a> if you are interested in purchasing a professional version of Friture, for Windows, Mac OS, Linux, Android, iPhone or iPad.</p>
-
-		<p>Please email <a href="mailto:contact@friture.org">contact@friture.org</a> if you are interested in purchasing a professional version of Friture with additional features such as live impulse-response measurement, live estimation of room acoustics parameters, ability to analyze and store several traces, ability to go back in time.</p>
+		<p><i class="fa fa-envelope-o"></i> <a href="mailto:contact@friture.org">contact@friture.org</a></p>
 
 	</div>
 
-  
 </body>
 
 </html>
