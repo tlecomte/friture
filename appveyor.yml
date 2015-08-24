@@ -65,11 +65,12 @@ install:
 build: false
 artifacts:
   - path: installer/friture-setup-*.exe
+  - name: friture-setup
 deploy:
   provider: GitHub
   auth_token:
     secure: G+gWuedV/W/4omkXG1VVmu0AP8+E5jehFo8Hte5fZxeA1XKW29bnbxk0GJUOtnVz
-  artifact: friture-setup-*.exe
+  artifact: friture-setup
   draft: true
   prerelease: false
   on:
