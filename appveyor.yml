@@ -64,7 +64,7 @@ install:
   - cd ..
 build: false
 artifacts:
-  - path: installer/friture-setup-*.exe
+  - path: installer/friture-*.exe
     name: friture-setup
 deploy:
   provider: GitHub

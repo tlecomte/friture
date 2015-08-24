@@ -58,7 +58,7 @@ SetCompressor lzma
 ; MUI end ------
 
 Name "${PRODUCT_NAME} ${VERSION_SHORT}"
-OutFile "friture-setup-${VERSION_SHORT}-${TIMESTAMP}.exe"
+OutFile "friture-${VERSION_SHORT}-${TIMESTAMP}.exe"
 InstallDir "$PROGRAMFILES\Friture"
 InstallDirRegKey HKLM "${PRODUCT_DIR_REGKEY}" ""
 ShowInstDetails show
