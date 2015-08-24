@@ -5,10 +5,8 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 
-	<title>Friture : Download</title>
-	
-	<link rel="stylesheet" type="text/css" href="css/style.css"> 
-	
+	<title>Friture: Download</title>
+
 	<link rel="shortcut icon" type="image/x-icon" href="images/favicon.ico" />
 
 	<script type="text/javascript">
@@ -21,36 +19,71 @@
 		var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
 		})();
 	</script>
+
+	<!--Bootstrap stuff-->
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<!--<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">-->
+	<!-- Bootstrap theme from https://bootswatch.com/darkly/ -->
+	<link rel="stylesheet" href="css/bootstrap.min.css">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+	<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
 </head>
 
 <body>
-  <a href="http://github.com/tlecomte/friture"><img style="position: absolute; top: 0; right: 0; border: 0;" src="images/forkme_right_darkblue_121621.png" alt="Fork me on GitHub" /></a>
+	<nav class="navbar navbar-default">
+		<div class="container-fluid">
+			<div class="navbar-header">
+				<a class="navbar-brand" href="#">Friture.org</a>
+			</div>
+			<div>
+				<ul class="nav navbar-nav">
+					<li><a href="index.html">Home</a></li>
+					<li class="active"><a href="#">Download</a></li>
+					<li><a href="features.html">Features</a></li>
+					<li><a href="frequency-analysis.html">Frequency analysis</a></li>
+					<li><a href="programming.html">Contributing</a></li>
+				</ul>
+			</div>
+		</div>
+	</nav>
 
-  <div id="container">
+	<a href="http://github.com/tlecomte/friture">
+		<img style="position: absolute; top: 0; right: 0; border: 0;" src="images/forkme_right_darkblue_121621.png" alt="Fork me on GitHub" />
+	</a>
 
-    <h1>Download Friture</h1>
+	<div class="container" id="container">
 
-<p class="latest-version">Latest Version: 0.17 ‒ 20150411 ‒ April 11 2015</p>
+		<h1>Download Friture</h1>
 
-<h2>Windows</h2>
-<p>Download the latest Friture package for Windows:</p>
-<p><a href="https://s3-eu-west-1.amazonaws.com/friture-installers/friture-setup-0.17-20150411.exe" onclick="_gaq.push(['_trackEvent','Download','Download windows-installer','2015/04/11']);">friture-setup-0.17-20150411.exe</a></p>
-<h2>Other platforms</h2>
-<p>On other platforms (Mac OS, Linux), please use the <a href="http://pypi.python.org/pypi?:action=display&name=friture">PyPI package</a>.
-Some dependencies have to be manually installed in this case. They are documented for Linux
-<a href="https://github.com/tlecomte/friture/wiki/Linux">in the wiki</a> (notes contributed by Lee McKusick) when installing from source. The
-same dependencies are likely to have to be installed when using the PyPI package
-too.</p>
-<h2>Bugs</h2>
-<p>If you encounter any problems while installing or running Friture, please <a href="https://github.com/tlecomte/friture/issues">report them</a>.</p>
-<h2>Source</h2>
-<p>You can find the <a href="https://github.com/tlecomte/friture">source code</a> of Friture on <a href="http://github.com">GitHub</a>.</p>
+		<div class="alert alert-success">
+			<strong>Latest Version:</strong> 0.18 ‒ 20150824 ‒ August 24 2015
+		</div>
 
-<hr>
-<p align=center><a href="index.html">Friture Homepage</a></p>
+		<h2><i class="fa fa-windows"></i> Windows</h2>
+		<p>Download the latest Friture package for Windows:</p>
+		<p><a href="https://s3-eu-west-1.amazonaws.com/friture-installers/friture-0.18-20150824.exe" onclick="_gaq.push(['_trackEvent','Download','Download windows-installer','2015/08/24']);">friture-0.18-20150824.exe</a></p>
 
-  </div>
+		<h2><i class="fa fa-apple"></i> OS X</h2>
+		<p>Download the latest Friture package for OS X:</p>
+		<p><a href="https://s3-eu-west-1.amazonaws.com/friture-installers/friture-0.18-20150824.dmg" onclick="_gaq.push(['_trackEvent','Download','Download OS X-installer','2015/08/24']);">friture-0.18-20150824.dmg</a></p>
 
-  
+		<h2><i class="fa fa-linux"></i> Linux (and other platforms)</h2>
+		<p>On Linux and other platforms (FreeBSD, etc.), please check within the packages prepared by your distribution.</p>
+
+		<p> If there is none, please use the <a href="http://pypi.python.org/pypi?:action=display&name=friture">PyPI package</a>.
+		Some dependencies have to be manually installed in this case. They are documented for Linux
+		<a href="https://github.com/tlecomte/friture/wiki/Linux">in the wiki</a> (notes contributed by Lee McKusick) when installing from source. The
+		same dependencies are likely to have to be installed when using the PyPI package too.</p>
+
+		<h2>Bugs</h2>
+		<p>If you encounter any problems while installing or running Friture, please <a href="https://github.com/tlecomte/friture/issues">report them</a>.</p>
+
+		<h2>Source</h2>
+		<p>You can find the source code of Friture on <a href="https://github.com/tlecomte/friture">GitHub</a>.</p>
+
+	</div>
+
 </body>
+
 </html>
