@@ -27,11 +27,12 @@ script:
   - cp -R /usr/local/opt/qt5/plugins/imageformats/libqsvg.dylib dist/friture.app/Contents/PlugIns/imageformats/
   - cp -R /usr/local/opt/qt5/plugins/platforms/libqcocoa.dylib dist/friture.app/Contents/PlugIns/platforms/
   - "/usr/local/opt/qt5/bin/macdeployqt dist/friture.app -dmg"
-  - "/usr/local/opt/coreutils/libexec/gnubin/timeout 15s open dist/friture.app"
-  - ls -R dist
+  #- "/usr/local/opt/coreutils/libexec/gnubin/timeout 15s open dist/friture.app"
+  #- ls -R dist
   - du -hs dist/friture.app
-  - ls -l dist
-  - ls -l
+  - du -hs dist/friture.dmg
+  #- ls -l dist
+  #- ls -l
 deploy:
   provider: releases
   api_key:
