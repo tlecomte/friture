@@ -69,7 +69,7 @@ deploy:
   provider: GitHub
   auth_token:
     secure: G+gWuedV/W/4omkXG1VVmu0AP8+E5jehFo8Hte5fZxeA1XKW29bnbxk0GJUOtnVz
-  artifact: installer/friture-setup-*.exe
+  artifact: friture-setup-*.exe
   draft: true
   prerelease: false
   on:
