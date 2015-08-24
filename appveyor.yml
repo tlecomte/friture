@@ -56,4 +56,7 @@ install:
   - cd installer
   - "makensis.exe friture-setup.nsi"
   - ps: "ls -R ."
+  - cd ..
 build: false
+artifacts:
+  - path: installer/friture-setup-*.exe
