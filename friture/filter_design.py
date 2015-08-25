@@ -152,13 +152,14 @@ def octave_filters_oneoctave(Nbands, BandsPerOctave):
         # could be another IIR filter
         [b, a] = ellip(order, pbrip, sbrip, freq, btype='bandpass')
 
-        B += [b]
-        A += [a]
+        B += [b.tolist()]
+        A += [a.tolist()]
 
     return [B, A, fi, f_low, f_high]
 
 def generate_filters_params():
     import os
+    import json
 
     params = {}
 
@@ -174,27 +175,34 @@ def generate_filters_params():
     #bdec = firwin(30, fc)
     #adec = [1.]
 
-    set_printoptions(precision=24)
+    #set_printoptions(precision=24)
 
-    params['dec'] = [bdec, adec]
+    params['dec'] = [bdec.tolist(), adec.tolist()]
 
     #generate the octave filters
     for BandsPerOctave in [1,3,6,12,24]:
         Nbands = NOCTAVE*BandsPerOctave
         [boct, aoct, fi, flow, fhigh] = octave_filters_oneoctave(Nbands, BandsPerOctave)
-        params['%d' %BandsPerOctave] = [boct, aoct, fi, flow, fhigh]
+        params['%d' %BandsPerOctave] = [boct, aoct, fi.tolist(), flow.tolist(), fhigh.tolist()]
 
     out = """\
 # Filters parameters generated from filter_design.py
+
+import json
 from numpy import array
-params = %s
-""" %repr(params)
+
+jsonparams = \"\"\"
+%s
+\"\"\"
+
+params = json.loads(jsonparams)
+""" %json.dumps(params, indent=4, sort_keys=True) #repr(params)
 
     path = os.path.dirname(__file__)
     fname = os.path.join(path, 'generated_filters.py')
     output = open(fname,'w')
-    output.write(out)
-    output.close()
+    with open(fname,'w') as output:
+        output.write(out)
 
 # main() is a test function
 def main():
