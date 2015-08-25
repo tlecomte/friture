@@ -21,51 +21,51 @@ from PyQt5 import QtGui, QtCore, QtWidgets
 import psutil # for CPU usage monitoring
 
 class StatisticsWidget(QtWidgets.QWidget):
-	def __init__(self, parent, logger, timer, audiobackend):
-		super().__init__(parent)
+    def __init__(self, parent, logger, timer, audiobackend):
+        super().__init__(parent)
 
-		self.audiobackend = audiobackend
+        self.audiobackend = audiobackend
 
-		self.setObjectName("tab_stats")
+        self.setObjectName("tab_stats")
 
-		self.stats_scrollarea = QtWidgets.QScrollArea(self)
-		self.stats_scrollarea.setWidgetResizable(True)
-		self.stats_scrollarea.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
-		self.stats_scrollarea.setObjectName("stats_scrollArea")
+        self.stats_scrollarea = QtWidgets.QScrollArea(self)
+        self.stats_scrollarea.setWidgetResizable(True)
+        self.stats_scrollarea.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
+        self.stats_scrollarea.setObjectName("stats_scrollArea")
 
-		self.scrollAreaWidgetContents = QtWidgets.QWidget(self.stats_scrollarea)
-		self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 87, 220))
-		self.scrollAreaWidgetContents.setStyleSheet("""QWidget { background: white }""")
-		self.scrollAreaWidgetContents.setObjectName("stats_scrollAreaWidgetContents")
+        self.scrollAreaWidgetContents = QtWidgets.QWidget(self.stats_scrollarea)
+        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 87, 220))
+        self.scrollAreaWidgetContents.setStyleSheet("""QWidget { background: white }""")
+        self.scrollAreaWidgetContents.setObjectName("stats_scrollAreaWidgetContents")
 
-		self.LabelStats = QtWidgets.QLabel(self.scrollAreaWidgetContents)
-		self.LabelStats.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
-		self.LabelStats.setTextInteractionFlags(QtCore.Qt.LinksAccessibleByKeyboard|QtCore.Qt.LinksAccessibleByMouse|QtCore.Qt.TextBrowserInteraction|QtCore.Qt.TextSelectableByKeyboard|QtCore.Qt.TextSelectableByMouse)
-		self.LabelStats.setObjectName("LabelStats")
+        self.LabelStats = QtWidgets.QLabel(self.scrollAreaWidgetContents)
+        self.LabelStats.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
+        self.LabelStats.setTextInteractionFlags(QtCore.Qt.LinksAccessibleByKeyboard|QtCore.Qt.LinksAccessibleByMouse|QtCore.Qt.TextBrowserInteraction|QtCore.Qt.TextSelectableByKeyboard|QtCore.Qt.TextSelectableByMouse)
+        self.LabelStats.setObjectName("LabelStats")
 
-		self.stats_layout = QtWidgets.QVBoxLayout(self.scrollAreaWidgetContents)
-		self.stats_layout.setObjectName("stats_layout")
-		self.stats_layout.addWidget(self.LabelStats)
-		self.stats_scrollarea.setWidget(self.scrollAreaWidgetContents)
+        self.stats_layout = QtWidgets.QVBoxLayout(self.scrollAreaWidgetContents)
+        self.stats_layout.setObjectName("stats_layout")
+        self.stats_layout.addWidget(self.LabelStats)
+        self.stats_scrollarea.setWidget(self.scrollAreaWidgetContents)
 
-		self.tab_stats_layout = QtWidgets.QGridLayout(self)
-		self.tab_stats_layout.addWidget(self.stats_scrollarea)
+        self.tab_stats_layout = QtWidgets.QGridLayout(self)
+        self.tab_stats_layout.addWidget(self.stats_scrollarea)
 
-		timer.timeout.connect(self.stats_update)
+        timer.timeout.connect(self.stats_update)
 
 
-	# method
-	def stats_update(self):
-		if not self.LabelStats.isVisible():
-		    return
-		
-		cpu_percent = psutil.cpu_percent(0)
+    # method
+    def stats_update(self):
+        if not self.LabelStats.isVisible():
+            return
 
-		label = "Chunk #%d\n"\
-		"Global CPU usage: %d %%\n"\
-		"Number of overflowed inputs (XRUNs): %d"\
-		% (self.audiobackend.chunk_number,
-			cpu_percent,
-			self.audiobackend.xruns)
-		
-		self.LabelStats.setText(label)
+        cpu_percent = psutil.cpu_percent(0)
+
+        label = "Chunk #%d\n"\
+        "Global CPU usage: %d %%\n"\
+        "Number of overflowed inputs (XRUNs): %d"\
+        % (self.audiobackend.chunk_number,
+                cpu_percent,
+                self.audiobackend.xruns)
+
+        self.LabelStats.setText(label)

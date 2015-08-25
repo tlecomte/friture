@@ -25,32 +25,32 @@ from friture.audiobackend import SAMPLING_RATE
 FRAMES_PER_BUFFER = 1024
 
 class AudioBuffer(QtCore.QObject):
-	new_data_available = QtCore.pyqtSignal(np.ndarray)
+    new_data_available = QtCore.pyqtSignal(np.ndarray)
 
-	def __init__(self, logger):
-		super().__init__()
+    def __init__(self, logger):
+        super().__init__()
 
-		self.ringbuffer = RingBuffer(logger)
-		self.newpoints = 0
-		self.lastDataTime = 0.
+        self.ringbuffer = RingBuffer(logger)
+        self.newpoints = 0
+        self.lastDataTime = 0.
 
-	def data(self, length):
-		return self.ringbuffer.data(length)
+    def data(self, length):
+        return self.ringbuffer.data(length)
 
-	def data_older(self, length, delay_samples):
-		return self.ringbuffer.data_older(length, delay_samples)
+    def data_older(self, length, delay_samples):
+        return self.ringbuffer.data_older(length, delay_samples)
 
-	def newdata(self):
-		return self.data(self.newpoints)
+    def newdata(self):
+        return self.data(self.newpoints)
 
-	def set_newdata(self, newpoints):
-		self.newpoints = newpoints
+    def set_newdata(self, newpoints):
+        self.newpoints = newpoints
 
-	def data_indexed(self, start, length):
-		return self.ringbuffer.data_indexed(start, length)
+    def data_indexed(self, start, length):
+        return self.ringbuffer.data_indexed(start, length)
 
-	def handle_new_data(self, floatdata, input_time, status):
-		self.ringbuffer.push(floatdata)
-		self.set_newdata(floatdata.shape[1])
-		self.new_data_available.emit(floatdata)
-		self.lastDataTime = input_time
+    def handle_new_data(self, floatdata, input_time, status):
+        self.ringbuffer.push(floatdata)
+        self.set_newdata(floatdata.shape[1])
+        self.new_data_available.emit(floatdata)
+        self.lastDataTime = input_time

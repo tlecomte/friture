@@ -68,220 +68,220 @@ STYLESHEET = """
 #"""
 
 class Friture(QMainWindow, ):
-	def __init__(self, logger):
-		QMainWindow.__init__(self)
+    def __init__(self, logger):
+        QMainWindow.__init__(self)
 
-		# logger
-		self.logger = logger
+        # logger
+        self.logger = logger
 
-		# Setup the user interface
-		self.ui = Ui_MainWindow()
-		self.ui.setupUi(self)
+        # Setup the user interface
+        self.ui = Ui_MainWindow()
+        self.ui.setupUi(self)
 
-		# Initialize the audio data ring buffer
-		self.audiobuffer = AudioBuffer(self.logger)
+        # Initialize the audio data ring buffer
+        self.audiobuffer = AudioBuffer(self.logger)
 
-		# Initialize the audio backend
-		self.audiobackend = AudioBackend(self.logger)
+        # Initialize the audio backend
+        self.audiobackend = AudioBackend(self.logger)
 
-		# signal containing new data from the audio callback thread, processed as numpy array
-		self.audiobackend.new_data_available.connect(self.audiobuffer.handle_new_data)
+        # signal containing new data from the audio callback thread, processed as numpy array
+        self.audiobackend.new_data_available.connect(self.audiobuffer.handle_new_data)
 
-		# this timer is used to update widgets that just need to display as fast as they can
-		self.display_timer = QtCore.QTimer()
-		self.display_timer.setInterval(SMOOTH_DISPLAY_TIMER_PERIOD_MS) # constant timing
+        # this timer is used to update widgets that just need to display as fast as they can
+        self.display_timer = QtCore.QTimer()
+        self.display_timer.setInterval(SMOOTH_DISPLAY_TIMER_PERIOD_MS) # constant timing
 
-		# slow timer
-		self.slow_timer = QtCore.QTimer()
-		self.slow_timer.setInterval(SLOW_TIMER_PERIOD_MS) # constant timing
+        # slow timer
+        self.slow_timer = QtCore.QTimer()
+        self.slow_timer.setInterval(SLOW_TIMER_PERIOD_MS) # constant timing
 
-		self.about_dialog = About_Dialog(self, self.logger, self.audiobackend, self.slow_timer)
-		self.settings_dialog = Settings_Dialog(self, self.logger, self.audiobackend)
+        self.about_dialog = About_Dialog(self, self.logger, self.audiobackend, self.slow_timer)
+        self.settings_dialog = Settings_Dialog(self, self.logger, self.audiobackend)
 
-		self.centralwidget = CentralWidget(self.ui.centralwidget, self.logger, "central_widget", 0)
-		self.centralLayout = QVBoxLayout(self.ui.centralwidget)
-		self.centralLayout.setContentsMargins(0, 0, 0, 0)
-		self.centralLayout.addWidget(self.centralwidget)
+        self.centralwidget = CentralWidget(self.ui.centralwidget, self.logger, "central_widget", 0)
+        self.centralLayout = QVBoxLayout(self.ui.centralwidget)
+        self.centralLayout.setContentsMargins(0, 0, 0, 0)
+        self.centralLayout.addWidget(self.centralwidget)
 
-		self.dockmanager = DockManager(self, self.logger)
+        self.dockmanager = DockManager(self, self.logger)
 
-		# timer ticks
-		self.display_timer.timeout.connect(self.centralwidget.canvasUpdate)
-		self.display_timer.timeout.connect(self.dockmanager.canvasUpdate)
+        # timer ticks
+        self.display_timer.timeout.connect(self.centralwidget.canvasUpdate)
+        self.display_timer.timeout.connect(self.dockmanager.canvasUpdate)
 
-		# toolbar clicks
-		self.ui.actionStart.triggered.connect(self.timer_toggle)
-		self.ui.actionSettings.triggered.connect(self.settings_called)
-		self.ui.actionAbout.triggered.connect(self.about_called)
-		self.ui.actionNew_dock.triggered.connect(self.dockmanager.new_dock)
+        # toolbar clicks
+        self.ui.actionStart.triggered.connect(self.timer_toggle)
+        self.ui.actionSettings.triggered.connect(self.settings_called)
+        self.ui.actionAbout.triggered.connect(self.about_called)
+        self.ui.actionNew_dock.triggered.connect(self.dockmanager.new_dock)
 
-		# restore the settings and widgets geometries
-		self.restoreAppState()
+        # restore the settings and widgets geometries
+        self.restoreAppState()
 
-		# start timers
-		self.timer_toggle()
-		self.slow_timer.start()
-		
-		self.logger.push("Init finished, entering the main loop")
-	
-	# slot
-	def settings_called(self):
-		self.settings_dialog.show()
-	
-	# slot
-	def about_called(self):
-		self.about_dialog.show()
-	
-	# event handler
-	def closeEvent(self, event):
-		self.audiobackend.close()
-		self.saveAppState()
-		event.accept()
-	
-	# method
-	def saveAppState(self):
-		settings = QtCore.QSettings("Friture", "Friture")
-		
-		settings.beginGroup("Docks")
-		self.dockmanager.saveState(settings)
-		settings.endGroup()
-		
-		settings.beginGroup("CentralWidget")
-		self.centralwidget.saveState(settings)
-		settings.endGroup()
-		
-		settings.beginGroup("MainWindow")
-		windowGeometry = self.saveGeometry()
-		settings.setValue("windowGeometry", windowGeometry)
-		windowState = self.saveState()
-		settings.setValue("windowState", windowState)
-		settings.endGroup()
+        # start timers
+        self.timer_toggle()
+        self.slow_timer.start()
 
-		settings.beginGroup("AudioBackend")
-		self.settings_dialog.saveState(settings)
-		settings.endGroup()
-	
-	# method
-	def restoreAppState(self):
-		settings = QtCore.QSettings("Friture", "Friture")
+        self.logger.push("Init finished, entering the main loop")
 
-		settings.beginGroup("Docks")
-		self.dockmanager.restoreState(settings)
-		settings.endGroup()
+    # slot
+    def settings_called(self):
+        self.settings_dialog.show()
 
-		settings.beginGroup("CentralWidget")
-		self.centralwidget.restoreState(settings)
-		settings.endGroup()
+    # slot
+    def about_called(self):
+        self.about_dialog.show()
 
-		settings.beginGroup("MainWindow")
-		self.restoreGeometry(settings.value("windowGeometry", type=QtCore.QByteArray))
-		self.restoreState(settings.value("windowState", type=QtCore.QByteArray))
-		settings.endGroup()
+    # event handler
+    def closeEvent(self, event):
+        self.audiobackend.close()
+        self.saveAppState()
+        event.accept()
 
-		settings.beginGroup("AudioBackend")
-		self.settings_dialog.restoreState(settings)
-		settings.endGroup()
+    # method
+    def saveAppState(self):
+        settings = QtCore.QSettings("Friture", "Friture")
 
-	# slot
-	def timer_toggle(self):
-		if self.display_timer.isActive():
-			self.logger.push("Timer stop")
-			self.display_timer.stop()
-			self.ui.actionStart.setText("Start")
-			self.audiobackend.pause()
-			self.centralwidget.pause()
-			self.dockmanager.pause()
-		else:
-			self.logger.push("Timer start")
-			self.display_timer.start()
-			self.ui.actionStart.setText("Stop")
-			self.audiobackend.restart()
-			self.centralwidget.restart()
-			self.dockmanager.restart()
+        settings.beginGroup("Docks")
+        self.dockmanager.saveState(settings)
+        settings.endGroup()
+
+        settings.beginGroup("CentralWidget")
+        self.centralwidget.saveState(settings)
+        settings.endGroup()
+
+        settings.beginGroup("MainWindow")
+        windowGeometry = self.saveGeometry()
+        settings.setValue("windowGeometry", windowGeometry)
+        windowState = self.saveState()
+        settings.setValue("windowState", windowState)
+        settings.endGroup()
+
+        settings.beginGroup("AudioBackend")
+        self.settings_dialog.saveState(settings)
+        settings.endGroup()
+
+    # method
+    def restoreAppState(self):
+        settings = QtCore.QSettings("Friture", "Friture")
+
+        settings.beginGroup("Docks")
+        self.dockmanager.restoreState(settings)
+        settings.endGroup()
+
+        settings.beginGroup("CentralWidget")
+        self.centralwidget.restoreState(settings)
+        settings.endGroup()
+
+        settings.beginGroup("MainWindow")
+        self.restoreGeometry(settings.value("windowGeometry", type=QtCore.QByteArray))
+        self.restoreState(settings.value("windowState", type=QtCore.QByteArray))
+        settings.endGroup()
+
+        settings.beginGroup("AudioBackend")
+        self.settings_dialog.restoreState(settings)
+        settings.endGroup()
+
+    # slot
+    def timer_toggle(self):
+        if self.display_timer.isActive():
+            self.logger.push("Timer stop")
+            self.display_timer.stop()
+            self.ui.actionStart.setText("Start")
+            self.audiobackend.pause()
+            self.centralwidget.pause()
+            self.dockmanager.pause()
+        else:
+            self.logger.push("Timer start")
+            self.display_timer.start()
+            self.ui.actionStart.setText("Stop")
+            self.audiobackend.restart()
+            self.centralwidget.restart()
+            self.dockmanager.restart()
 
 
 def main():
-	if platform.system() == "Windows":
-		print("Running on Windows")
-		# On Windows, redirect stderr to a file
-		import imp, ctypes
-		if (hasattr(sys, "frozen") or # new py2exe
-			hasattr(sys, "importers") or # old py2exe
-			imp.is_frozen("__main__")): # tools/freeze
-				sys.stderr = open(os.path.expanduser("~/friture.exe.log"), "w")
-		# set the App ID for Windows 7 to properly display the icon in the
-		# taskbar.
-		myappid = 'Friture.Friture.Friture.current' # arbitrary string
-		try:
-			ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
-		except:
-			print("Could not set the app model ID. If the plaftorm is older than Windows 7, this is normal.")
+    if platform.system() == "Windows":
+        print("Running on Windows")
+        # On Windows, redirect stderr to a file
+        import imp, ctypes
+        if (hasattr(sys, "frozen") or # new py2exe
+                hasattr(sys, "importers") or # old py2exe
+                imp.is_frozen("__main__")): # tools/freeze
+            sys.stderr = open(os.path.expanduser("~/friture.exe.log"), "w")
+        # set the App ID for Windows 7 to properly display the icon in the
+        # taskbar.
+        myappid = 'Friture.Friture.Friture.current' # arbitrary string
+        try:
+            ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
+        except:
+            print("Could not set the app model ID. If the plaftorm is older than Windows 7, this is normal.")
 
-	app = QApplication(sys.argv)
+    app = QApplication(sys.argv)
 
-	if platform.system() == "Darwin":
-		# help the py2app-packaged application find the Qt plugins (imageformats and platforms)
-		QApplication.addLibraryPath(QApplication.applicationDirPath() + '../PlugIns')
+    if platform.system() == "Darwin":
+        # help the py2app-packaged application find the Qt plugins (imageformats and platforms)
+        QApplication.addLibraryPath(QApplication.applicationDirPath() + '../PlugIns')
 
-	# Splash screen
-	pixmap = QPixmap(":/images/splash.png")
-	splash = QSplashScreen(pixmap)
-	splash.show()
-	splash.showMessage("Initializing the audio subsystem")
-	app.processEvents()
-	
-	# Set the separator stylesheet here
-	# As of Qt 4.6, separator width is not handled correctly
-	# when the stylesheet is applied directly to the QMainWindow instance.
-	# QtCreator workarounds it with a "minisplitter" special class
-	app.setStyleSheet(STYLESHEET)
-	
-	# Logger class
-	logger = Logger()
-	
-	window = Friture(logger)
-	window.show()
-	splash.finish(window)
-	
-	profile = "no" # "python" or "kcachegrind" or anything else to disable
+    # Splash screen
+    pixmap = QPixmap(":/images/splash.png")
+    splash = QSplashScreen(pixmap)
+    splash.show()
+    splash.showMessage("Initializing the audio subsystem")
+    app.processEvents()
 
-	if len(sys.argv) > 1:
-		if sys.argv[1] == "--python":
-			profile = "python"
-		#elif sys.argv[1] == "--kcachegrind":
-			#profile = "kcachegrind"
-		elif sys.argv[1] == "--no":
-			profile = "no"
-		else:
-			print("command-line arguments (%s) not recognized" %sys.argv[1:])
+    # Set the separator stylesheet here
+    # As of Qt 4.6, separator width is not handled correctly
+    # when the stylesheet is applied directly to the QMainWindow instance.
+    # QtCreator workarounds it with a "minisplitter" special class
+    app.setStyleSheet(STYLESHEET)
 
-	if profile == "python":
-		import cProfile
-		import pstats
-		
-		cProfile.runctx('app.exec_()', globals(), locals(), filename="friture.cprof")
-		
-		stats = pstats.Stats("friture.cprof")
-		stats.strip_dirs().sort_stats('time').print_stats(20)
-		stats.strip_dirs().sort_stats('cumulative').print_stats(20)  
+    # Logger class
+    logger = Logger()
 
-		sys.exit(0)
-	#elif profile == "kcachegrind":
-		#import cProfile
-		#import lsprofcalltree
+    window = Friture(logger)
+    window.show()
+    splash.finish(window)
 
-		#p = cProfile.Profile()
-		#p.run('app.exec_()')
-		
-		#k = lsprofcalltree.KCacheGrind(p)
-		#data = open('cachegrind.out.00000', 'wb')
-		#k.output(data)
-		#data.close()
+    profile = "no" # "python" or "kcachegrind" or anything else to disable
 
-		## alternative code with pyprof2calltree instead of lsprofcalltree
-		##import pyprof2calltree
-		##pyprof2calltree.convert(p.getstats(), "cachegrind.out.00000") # save
-		
-		#sys.exit(0)
-	else:
-		sys.exit(app.exec_())
+    if len(sys.argv) > 1:
+        if sys.argv[1] == "--python":
+            profile = "python"
+        #elif sys.argv[1] == "--kcachegrind":
+            #profile = "kcachegrind"
+        elif sys.argv[1] == "--no":
+            profile = "no"
+        else:
+            print("command-line arguments (%s) not recognized" %sys.argv[1:])
+
+    if profile == "python":
+        import cProfile
+        import pstats
+
+        cProfile.runctx('app.exec_()', globals(), locals(), filename="friture.cprof")
+
+        stats = pstats.Stats("friture.cprof")
+        stats.strip_dirs().sort_stats('time').print_stats(20)
+        stats.strip_dirs().sort_stats('cumulative').print_stats(20)
+
+        sys.exit(0)
+    #elif profile == "kcachegrind":
+        #import cProfile
+        #import lsprofcalltree
+
+        #p = cProfile.Profile()
+        #p.run('app.exec_()')
+
+        #k = lsprofcalltree.KCacheGrind(p)
+        #data = open('cachegrind.out.00000', 'wb')
+        #k.output(data)
+        #data.close()
+
+        ## alternative code with pyprof2calltree instead of lsprofcalltree
+        ##import pyprof2calltree
+        ##pyprof2calltree.convert(p.getstats(), "cachegrind.out.00000") # save
+
+        #sys.exit(0)
+    else:
+        sys.exit(app.exec_())

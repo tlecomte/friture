@@ -139,7 +139,7 @@ class Scope_Widget(QtWidgets.QWidget):
     # method
     def saveState(self, settings):
         self.settings_dialog.saveState(settings)
-    
+
     # method
     def restoreState(self, settings):
         self.settings_dialog.restoreState(settings)
@@ -148,13 +148,13 @@ class Scope_Widget(QtWidgets.QWidget):
 class Scope_Settings_Dialog(QtWidgets.QDialog):
     def __init__(self, parent, logger):
         super().__init__(parent)
-        
+
         self.logger = logger
-        
+
         self.setWindowTitle("Scope settings")
-        
+
         self.formLayout = QtWidgets.QFormLayout(self)
-        
+
         self.doubleSpinBox_timerange = QtWidgets.QDoubleSpinBox(self)
         self.doubleSpinBox_timerange.setDecimals(1)
         self.doubleSpinBox_timerange.setMinimum(0.1)
@@ -164,7 +164,7 @@ class Scope_Settings_Dialog(QtWidgets.QDialog):
         self.doubleSpinBox_timerange.setSuffix(" ms")
 
         self.formLayout.addRow("Time range:", self.doubleSpinBox_timerange)
-        
+
         self.setLayout(self.formLayout)
 
         self.doubleSpinBox_timerange.valueChanged.connect(self.parent().set_timerange)

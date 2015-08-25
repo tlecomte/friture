@@ -39,79 +39,77 @@ aboutText = """
 <p>This instance of Friture runs thanks to the following external projects:</p>
 
 <ul>
-	<li>Python %s</li>
-	<li>PyQt %s (Qt %s)</li>
-	<li>PyAudio %s (%s)</li>
-	<li>Numpy %s</li>
-	<li>Scipy %s</li>
-	<li>Cython %s</li>
-	<li>PyOpenGL %s</li>
+        <li>Python %s</li>
+        <li>PyQt %s (Qt %s)</li>
+        <li>PyAudio %s (%s)</li>
+        <li>Numpy %s</li>
+        <li>Scipy %s</li>
+        <li>Cython %s</li>
+        <li>PyOpenGL %s</li>
 </ul>
 """ %(friture.__version__,
-	friture.__releasedate__,
-	"%d.%d" %(sys.version_info.major, sys.version_info.minor),
-	QtCore.PYQT_VERSION_STR,
-	QtCore.qVersion(),
-	pyaudio.__version__,
-	pyaudio.pa.get_version_text(),
-	numpy.__version__,
-	scipy.__version__,
-	Cython.__version__,
-	OpenGL.__version__)
+        friture.__releasedate__,
+        "%d.%d" %(sys.version_info.major, sys.version_info.minor),
+        QtCore.PYQT_VERSION_STR,
+        QtCore.qVersion(),
+        pyaudio.__version__,
+        pyaudio.pa.get_version_text(),
+        numpy.__version__,
+        scipy.__version__,
+        Cython.__version__,
+        OpenGL.__version__)
 
 class About_Dialog(QtWidgets.QDialog):
-	def __init__(self, parent, logger, audiobackend, timer):
-		super().__init__(parent)
+    def __init__(self, parent, logger, audiobackend, timer):
+        super().__init__(parent)
 
-		self.setObjectName("About_Dialog")
-		self.resize(400, 300)
-		self.setWindowTitle("About Friture")
-		
-		icon = QtGui.QIcon()
-		icon.addPixmap(QtGui.QPixmap(":/images-src/window-icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-		self.setWindowIcon(icon)
-		self.verticalLayout = QtWidgets.QVBoxLayout(self)
-		self.verticalLayout.setObjectName("verticalLayout")
-		
-		self.tabWidget = QtWidgets.QTabWidget(self)
-		self.tabWidget.setObjectName("tabWidget")
-		self.aboutTab = QtWidgets.QWidget()
-		self.aboutTab.setObjectName("aboutTab")
-		self.horizontalLayout = QtWidgets.QHBoxLayout(self.aboutTab)
-		self.horizontalLayout.setObjectName("horizontalLayout")
-		self.label_2 = QtWidgets.QLabel(self.aboutTab)
-		self.label_2.setMinimumSize(QtCore.QSize(128, 128))
-		self.label_2.setMaximumSize(QtCore.QSize(128, 128))
-		self.label_2.setPixmap(QtGui.QPixmap(":/images-src/window-icon.svg"))
-		self.label_2.setScaledContents(True)
-		self.label_2.setObjectName("label_2")
-		self.horizontalLayout.addWidget(self.label_2)
-		self.label = QtWidgets.QLabel(self.aboutTab)
-		self.label.setOpenExternalLinks( True ) 
-		self.label.setObjectName("label")
-		self.label.setText(aboutText)
-		
-		self.horizontalLayout.addWidget(self.label)
-		self.tabWidget.addTab(self.aboutTab, "About")
-		
-		self.tab_stats = StatisticsWidget(self, logger, timer, audiobackend)
-		self.tabWidget.addTab(self.tab_stats, "Statistics")
-		
-		self.tab_log = LogWidget(self, logger)
-		self.tabWidget.addTab(self.tab_log, "Log")
-		
-		self.tabWidget.setCurrentIndex(0)
-		
-		self.buttonBox = QtWidgets.QDialogButtonBox(self)
-		self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
-		self.buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.Close)
-		self.buttonBox.setObjectName("buttonBox")
-		
-		self.verticalLayout.addWidget(self.tabWidget)
-		self.verticalLayout.addWidget(self.buttonBox)
-		
-		self.buttonBox.accepted.connect(self.accept)
-		self.buttonBox.rejected.connect(self.reject)
-		QtCore.QMetaObject.connectSlotsByName(self)
+        self.setObjectName("About_Dialog")
+        self.resize(400, 300)
+        self.setWindowTitle("About Friture")
 
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap(":/images-src/window-icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.setWindowIcon(icon)
+        self.verticalLayout = QtWidgets.QVBoxLayout(self)
+        self.verticalLayout.setObjectName("verticalLayout")
 
+        self.tabWidget = QtWidgets.QTabWidget(self)
+        self.tabWidget.setObjectName("tabWidget")
+        self.aboutTab = QtWidgets.QWidget()
+        self.aboutTab.setObjectName("aboutTab")
+        self.horizontalLayout = QtWidgets.QHBoxLayout(self.aboutTab)
+        self.horizontalLayout.setObjectName("horizontalLayout")
+        self.label_2 = QtWidgets.QLabel(self.aboutTab)
+        self.label_2.setMinimumSize(QtCore.QSize(128, 128))
+        self.label_2.setMaximumSize(QtCore.QSize(128, 128))
+        self.label_2.setPixmap(QtGui.QPixmap(":/images-src/window-icon.svg"))
+        self.label_2.setScaledContents(True)
+        self.label_2.setObjectName("label_2")
+        self.horizontalLayout.addWidget(self.label_2)
+        self.label = QtWidgets.QLabel(self.aboutTab)
+        self.label.setOpenExternalLinks( True )
+        self.label.setObjectName("label")
+        self.label.setText(aboutText)
+
+        self.horizontalLayout.addWidget(self.label)
+        self.tabWidget.addTab(self.aboutTab, "About")
+
+        self.tab_stats = StatisticsWidget(self, logger, timer, audiobackend)
+        self.tabWidget.addTab(self.tab_stats, "Statistics")
+
+        self.tab_log = LogWidget(self, logger)
+        self.tabWidget.addTab(self.tab_log, "Log")
+
+        self.tabWidget.setCurrentIndex(0)
+
+        self.buttonBox = QtWidgets.QDialogButtonBox(self)
+        self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
+        self.buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.Close)
+        self.buttonBox.setObjectName("buttonBox")
+
+        self.verticalLayout.addWidget(self.tabWidget)
+        self.verticalLayout.addWidget(self.buttonBox)
+
+        self.buttonBox.accepted.connect(self.accept)
+        self.buttonBox.rejected.connect(self.reject)
+        QtCore.QMetaObject.connectSlotsByName(self)

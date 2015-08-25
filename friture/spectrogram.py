@@ -52,7 +52,7 @@ class Spectrogram_Widget(QtWidgets.QWidget):
 
         self.audiobuffer = None
         self.audiobackend = audiobackend
-        
+
         # initialize the class instance that will do the fft
         self.proc = audioproc(self.logger)
 
@@ -64,18 +64,18 @@ class Spectrogram_Widget(QtWidgets.QWidget):
         self.spec_min = DEFAULT_SPEC_MIN
         self.spec_max = DEFAULT_SPEC_MAX
         self.weighting = DEFAULT_WEIGHTING
-        
+
         self.update_weighting()
         self.freq = self.proc.get_freq_scale()
-              
+
         self.timerange_s = DEFAULT_TIMERANGE
         self.canvas_width = 100.
-        
-        self.old_index = 0        
+
+        self.old_index = 0
         self.overlap = 3./4.
         self.overlap_frac = Fraction(3, 4)
         self.dT_s = self.fft_size*(1. - self.overlap)/float(SAMPLING_RATE)
-        
+
         self.PlotZoneImage.setlog10freqscale() #DEFAULT_FREQ_SCALE = 1 #log10
         self.PlotZoneImage.setfreqrange(self.minfreq, self.maxfreq)
         self.PlotZoneImage.setspecrange(self.spec_min, self.spec_max)
@@ -85,7 +85,7 @@ class Spectrogram_Widget(QtWidgets.QWidget):
 
         sfft_rate_frac = Fraction(SAMPLING_RATE, self.fft_size)/(Fraction(1) - self.overlap_frac)/1000
         self.PlotZoneImage.set_sfft_rate(sfft_rate_frac)
-        
+
         # initialize the settings dialog
         self.settings_dialog = Spectrogram_Settings_Dialog(self, self.logger)
 
@@ -188,14 +188,14 @@ class Spectrogram_Widget(QtWidgets.QWidget):
         self.proc.set_maxfreq(freq)
         self.update_weighting()
         self.freq = self.proc.get_freq_scale()
-    
+
     def setfftsize(self, fft_size):
         self.fft_size = fft_size
-        
+
         self.proc.set_fftsize(fft_size)
         self.update_weighting()
         self.freq = self.proc.get_freq_scale()
-                    
+
         self.dT_s = self.fft_size*(1. - self.overlap)/float(SAMPLING_RATE)
         self.PlotZoneImage.settimerange(self.timerange_s, self.dT_s)
 
@@ -207,17 +207,17 @@ class Spectrogram_Widget(QtWidgets.QWidget):
     def setmin(self, value):
         self.spec_min = value
         self.PlotZoneImage.setspecrange(self.spec_min, self.spec_max)
-    
+
     def setmax(self, value):
         self.spec_max = value
         self.PlotZoneImage.setspecrange(self.spec_min, self.spec_max)
-    
+
     def setweighting(self, weighting):
         self.weighting = weighting
         self.PlotZoneImage.setweighting(weighting)
         self.update_weighting()
-    
-    def update_weighting(self):    
+
+    def update_weighting(self):
         A, B, C = self.proc.get_freq_weighting()
         if self.weighting is 0:
             self.w = array([0.])
@@ -231,7 +231,7 @@ class Spectrogram_Widget(QtWidgets.QWidget):
 
     def settings_called(self, checked):
         self.settings_dialog.show()
-    
+
     def saveState(self, settings):
         self.settings_dialog.saveState(settings)
 

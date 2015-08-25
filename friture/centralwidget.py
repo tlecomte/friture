@@ -29,89 +29,89 @@ from friture.controlbar import ControlBar
 from friture.defaults import DEFAULT_CENTRAL_WIDGET
 
 class CentralWidget(QtWidgets.QWidget):
-	def __init__(self, parent, logger, name, type = 0):
-		super().__init__(parent)
-		
-		self.setObjectName(name)
+    def __init__(self, parent, logger, name, type = 0):
+        super().__init__(parent)
 
-		self.logger = logger
-		
-		self.controlBar = ControlBar(self)
-				
-		self.controlBar.comboBox_select.activated.connect(self.widget_select)
-		self.controlBar.settingsButton.clicked.connect(self.settings_slot)
+        self.setObjectName(name)
 
-		self.label = QtWidgets.QLabel(self)
-		self.label.setText(" Central dock ") # spaces before and after for nicer alignment
-		self.controlBar.layout.insertWidget(0, self.label)
-		
-		self.layout = QtWidgets.QVBoxLayout(self)
-		self.layout.addWidget(self.controlBar)
-		self.layout.setContentsMargins(0, 0, 0, 0)
-		self.setLayout(self.layout)
-		
-		self.audiowidget = None
-		self.widget_select(type)
+        self.logger = logger
 
-	# slot
-	def widget_select(self, item):
-		if self.audiowidget is not None:
-		    self.audiowidget.close()
-		    self.audiowidget.deleteLater()
-		
-		self.type = item
-		
-		if item is 0:
-			self.audiowidget = Levels_Widget(self, self.logger)
-		elif item is 1:
-			self.audiowidget = Scope_Widget(self, self.logger)
-		elif item is 2:
-			self.audiowidget = Spectrum_Widget(self, self.logger)
-		elif item is 3:
-			self.audiowidget = Spectrogram_Widget(self, self.parent().parent().audiobackend, self.logger)
-		elif item is 4:
-			self.audiowidget = OctaveSpectrum_Widget(self, self.logger)
-		elif item is 5:
-			self.audiowidget = Generator_Widget(self, self.parent().parent().audiobackend, self.logger)
-		elif item is 6:
-			self.audiowidget = Delay_Estimator_Widget(self, self.logger)
+        self.controlBar = ControlBar(self)
 
-		self.audiowidget.set_buffer(self.parent().parent().audiobuffer)
-		self.parent().parent().audiobuffer.new_data_available.connect(self.audiowidget.handle_new_data)
+        self.controlBar.comboBox_select.activated.connect(self.widget_select)
+        self.controlBar.settingsButton.clicked.connect(self.settings_slot)
 
-		self.layout.addWidget(self.audiowidget)
-		
-		self.controlBar.comboBox_select.setCurrentIndex(item)
+        self.label = QtWidgets.QLabel(self)
+        self.label.setText(" Central dock ") # spaces before and after for nicer alignment
+        self.controlBar.layout.insertWidget(0, self.label)
 
-	def canvasUpdate(self):
-		if self.audiowidget is not None:
-			self.audiowidget.canvasUpdate()
+        self.layout = QtWidgets.QVBoxLayout(self)
+        self.layout.addWidget(self.controlBar)
+        self.layout.setContentsMargins(0, 0, 0, 0)
+        self.setLayout(self.layout)
 
-	def pause(self):
-		if self.audiowidget is not None:
-			try:
-				self.audiowidget.pause()
-			except AttributeError:
-				pass
+        self.audiowidget = None
+        self.widget_select(type)
 
-	def restart(self):
-		if self.audiowidget is not None:
-			try:
-				self.audiowidget.restart()
-			except AttributeError:
-				pass
+    # slot
+    def widget_select(self, item):
+        if self.audiowidget is not None:
+            self.audiowidget.close()
+            self.audiowidget.deleteLater()
 
-	# slot
-	def settings_slot(self, checked):
-		self.audiowidget.settings_called(checked)
+        self.type = item
 
-	# method
-	def saveState(self, settings):
-		settings.setValue("type", self.type)
-		self.audiowidget.saveState(settings)
-	
-	# method
-	def restoreState(self, settings):
-		widgetType = settings.value("type", DEFAULT_CENTRAL_WIDGET)
-		self.widget_select(widgetType)
-		self.audiowidget.restoreState(settings)
+        if item is 0:
+            self.audiowidget = Levels_Widget(self, self.logger)
+        elif item is 1:
+            self.audiowidget = Scope_Widget(self, self.logger)
+        elif item is 2:
+            self.audiowidget = Spectrum_Widget(self, self.logger)
+        elif item is 3:
+            self.audiowidget = Spectrogram_Widget(self, self.parent().parent().audiobackend, self.logger)
+        elif item is 4:
+            self.audiowidget = OctaveSpectrum_Widget(self, self.logger)
+        elif item is 5:
+            self.audiowidget = Generator_Widget(self, self.parent().parent().audiobackend, self.logger)
+        elif item is 6:
+            self.audiowidget = Delay_Estimator_Widget(self, self.logger)
+
+        self.audiowidget.set_buffer(self.parent().parent().audiobuffer)
+        self.parent().parent().audiobuffer.new_data_available.connect(self.audiowidget.handle_new_data)
+
+        self.layout.addWidget(self.audiowidget)
+
+        self.controlBar.comboBox_select.setCurrentIndex(item)
+
+    def canvasUpdate(self):
+        if self.audiowidget is not None:
+            self.audiowidget.canvasUpdate()
+
+    def pause(self):
+        if self.audiowidget is not None:
+            try:
+                self.audiowidget.pause()
+            except AttributeError:
+                pass
+
+    def restart(self):
+        if self.audiowidget is not None:
+            try:
+                self.audiowidget.restart()
+            except AttributeError:
+                pass
+
+    # slot
+    def settings_slot(self, checked):
+        self.audiowidget.settings_called(checked)
+
+    # method
+    def saveState(self, settings):
+        settings.setValue("type", self.type)
+        self.audiowidget.saveState(settings)
+
+    # method
+    def restoreState(self, settings):
+        widgetType = settings.value("type", DEFAULT_CENTRAL_WIDGET)
+        self.widget_select(widgetType)
+        self.audiowidget.restoreState(settings)

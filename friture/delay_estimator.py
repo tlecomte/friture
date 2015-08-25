@@ -30,7 +30,7 @@ from friture.audiobackend import SAMPLING_RATE
 
 DEFAULT_DELAYRANGE = 1 # default delay range is 1 second
 
-def subsampler(Ndec, bdec, adec, x, zis):      
+def subsampler(Ndec, bdec, adec, x, zis):
     x_dec = x
 
     # FIXME problems when x is smaller than filter coeff
@@ -38,7 +38,7 @@ def subsampler(Ndec, bdec, adec, x, zis):
     # do not run on empty arrays, otherwise bad artefacts on the output !!
     if x.size == 0:
         return x, zis
-    
+
     if zis is None:
         for i in range(Ndec):
             x_dec, zf = decimate(bdec, adec, x_dec)
@@ -57,7 +57,7 @@ def subsampler_filtic(Ndec, bdec, adec):
     for i in range(Ndec):
         l = max(len(bdec), len(adec)) - 1
         zfs += [numpy.zeros(l)]
-    return zfs    
+    return zfs
 
 def generalized_cross_correlation(d0, d1):
     # substract the means
@@ -94,32 +94,32 @@ class Delay_Estimator_Widget(QtWidgets.QWidget):
 
         self.audiobuffer = None
         self.logger = logger
-        
+
         self.previous_delay_message = ""
         self.previous_correlation_message = ""
         self.previous_polarity_message = ""
         self.previous_channelInfo_message = ""
-        
+
         self.setObjectName("Delay_Estimator_Widget")
         self.layout = QtWidgets.QFormLayout(self)
         self.layout.setObjectName("layout")
-        
+
         font = QtGui.QFont()
         font.setPointSize(14)
         font.setWeight(75)
         font.setBold(True)
-        
+
         self.delay_label = QtWidgets.QLabel(self)
         self.delay_label.setFont(font)
         self.delay_label.setObjectName("delay_label")
-        
+
         self.delayText_label = QtWidgets.QLabel(self)
         self.delayText_label.setObjectName("delayText_label")
         self.delayText_label.setText("Delay:")
 
         self.correlation_label = QtWidgets.QLabel(self)
         self.correlation_label.setObjectName("Correlation_label")
-        
+
         self.correlationText_label = QtWidgets.QLabel(self)
         self.correlationText_label.setObjectName("correlationText_label")
         self.correlationText_label.setText("Confidence:")
@@ -127,21 +127,21 @@ class Delay_Estimator_Widget(QtWidgets.QWidget):
         self.polarity_label = QtWidgets.QLabel(self)
         self.polarity_label.setFont(font)
         self.polarity_label.setObjectName("polarity_label")
-        
+
         self.polarityText_label = QtWidgets.QLabel(self)
         self.polarityText_label.setObjectName("polarityText_label")
         self.polarityText_label.setText("Polarity:")
-        
+
         self.channelInfo_label = QtWidgets.QLabel(self)
         self.channelInfo_label.setObjectName("channelInfo_label")
-        
+
         self.layout.addRow(self.delayText_label, self.delay_label)
         self.layout.addRow(self.correlationText_label, self.correlation_label)
         self.layout.addRow(self.polarityText_label, self.polarity_label)
         self.layout.addRow(None, self.channelInfo_label)
-        
+
         self.settings_dialog = Delay_Estimator_Settings_Dialog(self, self.logger)
-        
+
         # We will decimate several times
         # no decimation => 1/fs = 23 µs resolution
         # 1 ms resolution => fs = 1000 Hz is enough => can divide the sampling rate by 44 !
@@ -157,12 +157,12 @@ class Delay_Estimator_Widget(QtWidgets.QWidget):
         self.zfs0 = subsampler_filtic(self.Ndec, self.bdec, self.adec)
         self.zfs1 = subsampler_filtic(self.Ndec, self.bdec, self.adec)
 
-        # ringbuffers for the subsampled data        
+        # ringbuffers for the subsampled data
         self.ringbuffer0 = RingBuffer(self.logger)
         self.ringbuffer1 = RingBuffer(self.logger)
-        
+
         self.delayrange_s = DEFAULT_DELAYRANGE # confidence range
-        
+
         self.old_Xcorr = None
 
         self.old_index = 0
@@ -313,7 +313,7 @@ in the setup window."""
 
     def set_delayrange(self, delay_s):
         self.delayrange_s = delay_s
-    
+
     # slot
     def settings_called(self, checked):
         self.settings_dialog.show()
@@ -321,7 +321,7 @@ in the setup window."""
     # method
     def saveState(self, settings):
         self.settings_dialog.saveState(settings)
-    
+
     # method
     def restoreState(self, settings):
         self.settings_dialog.restoreState(settings)
@@ -329,13 +329,13 @@ in the setup window."""
 class Delay_Estimator_Settings_Dialog(QtWidgets.QDialog):
     def __init__(self, parent, logger):
         super().__init__(parent)
-        
+
         self.logger = logger
-        
+
         self.setWindowTitle("Delay estimator settings")
-        
+
         self.formLayout = QtWidgets.QFormLayout(self)
-        
+
         self.doubleSpinBox_delayrange = QtWidgets.QDoubleSpinBox(self)
         self.doubleSpinBox_delayrange.setDecimals(1)
         self.doubleSpinBox_delayrange.setMinimum(0.1)
@@ -345,9 +345,9 @@ class Delay_Estimator_Settings_Dialog(QtWidgets.QDialog):
         self.doubleSpinBox_delayrange.setSuffix(" s")
 
         self.formLayout.addRow("Delay range (maximum delay that is reliably estimated):", self.doubleSpinBox_delayrange)
-        
+
         self.setLayout(self.formLayout)
-        
+
         self.doubleSpinBox_delayrange.valueChanged.connect(self.parent().set_delayrange)
 
     # method

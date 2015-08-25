@@ -15,7 +15,7 @@ class Frequency_Resampler:
         self.maxfreq = maxfreq
         self.nsamples = nsamples
         self.update_xscale()
-    
+
     def setfreqrange(self, minfreq, maxfreq):
         print("freq range changed", minfreq, maxfreq)
         self.minfreq = minfreq

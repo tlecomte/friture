@@ -20,38 +20,38 @@
 from PyQt5 import QtCore
 
 class Logger(QtCore.QObject):
-	
-	logChanged = QtCore.pyqtSignal()
 
-	def __init__(self):
-		super().__init__()
-		
-		self.count = 0
-		self.log = ""
+    logChanged = QtCore.pyqtSignal()
 
-	# push some text to the log
-	def push(self, text):
-		if len(self.log)==0:
-			self.log = "[0] %s" %text
-		else:
-			self.log = "%s\n[%d] %s" %(self.log, self.count, text)
-		self.count += 1
-		self.logChanged.emit()
+    def __init__(self):
+        super().__init__()
 
-		# also print to the console
-		print(text)
+        self.count = 0
+        self.log = ""
 
-	# return the current log
-	def text(self):
-		return self.log
+    # push some text to the log
+    def push(self, text):
+        if len(self.log)==0:
+            self.log = "[0] %s" %text
+        else:
+            self.log = "%s\n[%d] %s" %(self.log, self.count, text)
+        self.count += 1
+        self.logChanged.emit()
+
+        # also print to the console
+        print(text)
+
+    # return the current log
+    def text(self):
+        return self.log
 
 
 # simple logger that prints to the console
 class PrintLogger:
-	# push some text to the log
-	def push(self, text):
-		print(text)
+    # push some text to the log
+    def push(self, text):
+        print(text)
 
-	# return the current log
-	def text(self):
-		return ""
+    # return the current log
+    def text(self):
+        return ""
