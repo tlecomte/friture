@@ -232,7 +232,7 @@ def main():
     subplot(211)
 
     for i in range(0, response.shape[0]):
-        semilogx(freqScale[0:N/2],response[i, 0:N/2])
+        semilogx(freqScale[0:int(N/2)],response[i, 0:int(N/2)])
 
     xlim(fs/2000, fs)
     ylim(-70, 10)
@@ -275,7 +275,7 @@ def main():
 
     ydec3 = y[::2]
     response = 20.*log10(abs(fft(ydec3)))
-    freqScale2 = fftfreq(N/2, 2./fs)
+    freqScale2 = fftfreq(int(N/2), 2./fs)
     plot(freqScale2,fftshift(response), label="lowpass + dec2")
 
     legend(loc="lower left")
@@ -300,8 +300,8 @@ def main():
 
     for yone, d in zip(y, dec):
         response = 20.*log10(abs(fft(yone))*d)
-        freqScale = fftfreq(N/d, 1./(fs/d))
-        semilogx(freqScale[0:N/(2*d)],response[0:N/(2*d)])
+        freqScale = fftfreq(int(N/d), 1./(fs/d))
+        semilogx(freqScale[0:int(N/(2*d))],response[0:int(N/(2*d))])
 
     xlim(fs/2000, fs)
     ylim(-70, 10)
@@ -327,8 +327,8 @@ def main():
 
     for yone, d in zip(y, dec):
         response = 20.*log10(abs(fft(yone))*d)
-        freqScale = fftfreq(N/d, 1./(fs/d))
-        semilogx(freqScale[0:N/(2*d)],response[0:N/(2*d)])
+        freqScale = fftfreq(int(N/d), 1./(fs/d))
+        semilogx(freqScale[0:int(N/(2*d))],response[0:int(N/(2*d))])
 
     xlim(fs/2000, fs)
     ylim(-70, 10)
