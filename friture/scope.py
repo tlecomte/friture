@@ -60,16 +60,6 @@ class Scope_Widget(QtWidgets.QWidget):
         # basic trigger capability on leading edge
         floatdata = self.audiobuffer.data(2 * width)
 
-        # number of data points received at the last audio buffer update
-        #newpoints = self.audiobuffer.newpoints
-        # print newpoints
-
-        # because of the buffering, sometimes we have not got any data
-        # if newpoints==0:
-        #    return
-
-        #floatdata = self.audiobuffer.data(newpoints + width)
-
         twoChannels = False
         if floatdata.shape[0] > 1:
             twoChannels = True
@@ -83,7 +73,6 @@ class Scope_Widget(QtWidgets.QWidget):
 
         max = floatdata.max()
         trigger_level = max * 2. / 3.
-        #trigger_level = 0.6
         trigger_pos = where((triggerdata[:-1] < trigger_level) * (triggerdata[1:] >= trigger_level))[0]
 
         if len(trigger_pos) == 0:
@@ -92,15 +81,14 @@ class Scope_Widget(QtWidgets.QWidget):
         if len(trigger_pos) > 0:
             shift = trigger_pos[0]
         else:
-            # return
             shift = 0
         shift += trig_search_start
         datarange = width
         floatdata = floatdata[:, shift - datarange / 2: shift + datarange / 2]
 
-        self.y = floatdata[0, :]  # - floatdata.mean()
+        self.y = floatdata[0, :]
         if twoChannels:
-            self.y2 = floatdata[1, :]  # - floatdata.mean()
+            self.y2 = floatdata[1, :]
         else:
             self.y2 = None
 

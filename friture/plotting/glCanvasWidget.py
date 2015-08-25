@@ -140,7 +140,7 @@ class GlCanvasWidget(QtWidgets.QOpenGLWidget):
             GL.glEnd()
 
         # given the usual aspect ratio of the canvas, the vertical minor ticks would make it look crowded
-        #GL.glColor3f(0.5, 0.5, 0.5)
+        # GL.glColor3f(0.5, 0.5, 0.5)
         # for y in self.yMinorTick:
         #    GL.glBegin(GL.GL_LINES)
         #    GL.glVertex2f(0, y)
@@ -318,7 +318,7 @@ class GlCanvasWidget(QtWidgets.QOpenGLWidget):
             self.gridList = GL.glGenLists(1)
 
             if self.gridList == 0 or self.gridList is None:
-                raise RuntimeError( """Unable to generate a new display-list, context may not support display lists""")
+                raise RuntimeError("""Unable to generate a new display-list, context may not support display lists""")
 
             self.updateGrid()
 

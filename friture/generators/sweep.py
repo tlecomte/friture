@@ -83,12 +83,12 @@ class SweepGenerator:
     def signal(self, t):
         # https://ccrma.stanford.edu/realsimple/imp_meas/Sine_Sweep_Measurement_Theory.html
 
-        #f = (self.f2 - self.f1)*(1. + np.sin(2*np.pi*t/self.T))/2. + self.f1
+        # f = (self.f2 - self.f1)*(1. + np.sin(2*np.pi*t/self.T))/2. + self.f1
         # return np.sin(2*np.pi*t*f)
 
         result = np.cos(self.K * (np.exp((t - self.timeoffset) % self.T / self.L) - 1.))
 
-        if self.nextParams != None:
+        if self.nextParams is not None:
             # we have new params to put in place
             # do it at the first max
 

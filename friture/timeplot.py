@@ -293,10 +293,10 @@ class TimePlot(QtWidgets.QWidget):
             self.needfullreplot = True
 
         if not self.paused:
-            #y_interp = interp(self.xscaled, x_ms, y)
-            #y_interp2 = interp(self.xscaled, x_ms, y2)
-            #ClassPlot.setdata(self, self.xscaled, y_interp)
-            #self.curve2.setData(self.xscaled, y_interp2)
+            # y_interp = interp(self.xscaled, x_ms, y)
+            # y_interp2 = interp(self.xscaled, x_ms, y2)
+            # ClassPlot.setdata(self, self.xscaled, y_interp)
+            # self.curve2.setData(self.xscaled, y_interp2)
             self.curve.setData(x_ms, y)
             self.curve2.setData(x_ms, y2)
 

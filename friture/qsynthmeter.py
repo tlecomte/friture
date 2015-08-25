@@ -31,7 +31,6 @@ PEAK_DECAY_RATE = 1.0 - 3E-6
 PEAK_FALLOFF = 32  # default : 16
 
 
-#----------------------------------------------------------------------------
 # MeterScale -- Meter bridge scale widget.
 
 class MeterScale(QtWidgets.QWidget):
@@ -97,7 +96,6 @@ class MeterScale(QtWidgets.QWidget):
             self.drawLineLabel(painter, self.meter.iec_scale(dB), str(abs(dB)))
 
 
-#----------------------------------------------------------------------------
 # BallisticPeak -- Peak with a value and a color, that holds then decays
 
 class BallisticPeak:
@@ -135,7 +133,7 @@ class BallisticPeak:
                 peakValue = value
             else:
                 # if peakValue < self.meter.iec_level(self.meter.Color10dB):
-                            #self.peakColor = self.meter.Color6dB
+                #    self.peakColor = self.meter.Color6dB
                 self.peakDecayFactor *= self.peakDecayFactor
         self.peakHoldCounter += 1
 
@@ -143,7 +141,6 @@ class BallisticPeak:
 
         return peakValue
 
-#----------------------------------------------------------------------------
 # MeterValue -- Meter bridge value widget.
 
 
@@ -230,7 +227,6 @@ class MeterValue(QtWidgets.QFrame):
         # QtWidgets.QWidget.repaint(True)
 
 
-#----------------------------------------------------------------------------
 # qsynthMeter -- Meter bridge slot widget.
 
 class qsynthMeter(QtWidgets.QFrame):

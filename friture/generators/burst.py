@@ -44,9 +44,11 @@ class BurstGenerator:
         i = (t * SAMPLING_RATE) % (self.T * SAMPLING_RATE)
         n = 1
         ind_plus = np.where(i < n)
-        #ind_minus = np.where((i >= n)*(i < 2*n))
         floatdata[ind_plus] = 1.
-        #floatdata[ind_minus] = -1.
+
+        # ind_minus = np.where((i >= n)*(i < 2*n))
+        # floatdata[ind_minus] = -1.
+
         return floatdata
 
 

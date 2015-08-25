@@ -84,8 +84,6 @@ class RingBuffer():
         delay = self.offset - start
         self.grow_if_needed(length + delay)
 
-        #start0 = start % self.buffer_length + self.buffer_length
-        #stop0 = start0 + length
         stop0 = start % self.buffer_length + self.buffer_length
         start0 = stop0 - length
 

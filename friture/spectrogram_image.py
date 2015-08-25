@@ -36,9 +36,8 @@ class CanvasScaledSpectrogram(QtCore.QObject):
         self.canvas_height = canvas_height
         self.canvas_width = canvas_width
 
-        #self.fullspectrogram = numpy.zeros((self.canvas_height, self.time_bin_number(), 4), dtype = numpy.uint8)
         self.pixmap = QtGui.QPixmap(2 * self.canvas_width,  self.canvas_height)
-        # print "pixmap info : hasAlpha =", self.pixmap.hasAlpha(), ", depth =", self.pixmap.depth(), ", default depth =", self.pixmap.defaultDepth()
+        # print("pixmap info : hasAlpha =", self.pixmap.hasAlpha(), ", depth =", self.pixmap.depth(), ", default depth =", self.pixmap.defaultDepth())
         self.pixmap.fill(QtGui.QColor("black"))
         self.painter = QtGui.QPainter()
         self.offset = 0
@@ -50,12 +49,11 @@ class CanvasScaledSpectrogram(QtCore.QObject):
         # performance timer
         self.time = QtCore.QTime()
         self.time.start()
-        #self.logfile = open("latency_log.txt",'w')
+        # self.logfile = open("latency_log.txt",'w')
 
         self.resetBound = 20
 
     def erase(self):
-        #self.fullspectrogram = numpy.zeros((self.canvas_height, self.time_bin_number(), 4), dtype = numpy.uint8)
         self.pixmap = QtGui.QPixmap(2 * self.canvas_width,  self.canvas_height)
         self.pixmap.fill(QtGui.QColor("black"))
         self.offset = 0
@@ -128,8 +126,8 @@ class CanvasScaledSpectrogram(QtCore.QObject):
         self.offset += width
 
     def floats_to_bytes(self, data):
-        #dat1 = (255. * data).astype(numpy.uint8)
-        #dat4 = dat1.repeat(4)
+        # dat1 = (255. * data).astype(numpy.uint8)
+        # dat4 = dat1.repeat(4)
 
         dat4 = self.color_from_float(data)
         return dat4.tostring()
@@ -156,36 +154,36 @@ class CanvasScaledSpectrogram(QtCore.QObject):
         # clip in [0..1] before using the fast lookup function
         v = numpy.clip(v, 0., 1.)
         return pyx_color_from_float_2D(self.colors, v)
-        #d = (v*255).astype(numpy.uint8)
+        # d = (v*255).astype(numpy.uint8)
         # return self.colors[d]
 
     # def interpolate_colors(colors, flat=False, num_colors=256):
         # colors =
-        #""" given a list of colors, create a larger list of colors interpolating
+        # """ given a list of colors, create a larger list of colors interpolating
         # the first one. If flatten is True a list of numers will be returned. If
         # False, a list of (r,g,b) tuples. num_colors is the number of colors wanted
         # in the final list """
 
-        #palette = []
+        # palette = []
 
         # for i in range(num_colors):
-        #index = (i * (len(colors) - 1))/(num_colors - 1.0)
-        #index_int = int(index)
-        #alpha = index - float(index_int)
+        # index = (i * (len(colors) - 1))/(num_colors - 1.0)
+        # index_int = int(index)
+        # alpha = index - float(index_int)
 
         # if alpha > 0:
-        #r = (1.0 - alpha) * colors[index_int][0] + alpha * colors[index_int + 1][0]
-        #g = (1.0 - alpha) * colors[index_int][1] + alpha * colors[index_int + 1][1]
-        #b = (1.0 - alpha) * colors[index_int][2] + alpha * colors[index_int + 1][2]
+        # r = (1.0 - alpha) * colors[index_int][0] + alpha * colors[index_int + 1][0]
+        # g = (1.0 - alpha) * colors[index_int][1] + alpha * colors[index_int + 1][1]
+        # b = (1.0 - alpha) * colors[index_int][2] + alpha * colors[index_int + 1][2]
         # else:
-        #r = (1.0 - alpha) * colors[index_int][0]
-        #g = (1.0 - alpha) * colors[index_int][1]
-        #b = (1.0 - alpha) * colors[index_int][2]
+        # r = (1.0 - alpha) * colors[index_int][0]
+        # g = (1.0 - alpha) * colors[index_int][1]
+        # b = (1.0 - alpha) * colors[index_int][2]
 
         # if flat:
-        #palette.extend((int(r), int(g), int(b)))
+        # palette.extend((int(r), int(g), int(b)))
         # else:
-        #palette.append((int(r), int(g), int(b)))
+        # palette.append((int(r), int(g), int(b)))
 
         # return palette
 

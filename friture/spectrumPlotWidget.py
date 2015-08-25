@@ -74,8 +74,8 @@ def tree_rebin(y, ns, N):
         # Note: the FFT spectrum is mostly used to identify frequency content
         # ans _peaks_ are particularly interesting (e.g. feedback frequencies)
         # so we display the _max_ instead of the mean of each bin
-        #y3 = mean(y3, axis=1)
-        #y3 = (y3[::2] + y3[1::2])*0.5
+        # y3 = mean(y3, axis=1)
+        # y3 = (y3[::2] + y3[1::2])*0.5
 
         y3 = np.max(y3, axis=1)
 
@@ -369,8 +369,8 @@ class QuadsItem:
         # FIXME : the following would give a satisfying result if the
         # bins were one pixel wide at minimum => Need to to a rounding
         # to pixels
-        #w = x2 - x1
-        #i = where(w<1.)[0]
+        # w = x2 - x1
+        # i = where(w<1.)[0]
         # if len(i)>0:
         #    Ones_shaded[:i[0]:2] = 1.2
 

@@ -95,7 +95,7 @@ class AudioBackend(QtCore.QObject):
         self.new_data_available_from_callback.connect(self.handle_new_data)
 
     def close(self):
-        if self.stream != None:
+        if self.stream is not None:
             self.stream.stop_stream()
             self.stream.close()
             self.stream = None

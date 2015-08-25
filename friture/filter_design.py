@@ -172,13 +172,13 @@ def generate_filters_params():
     Ndec = 3
     fc = 0.5
     # other possibilities
-    #(bdec, adec) = ellip(Ndec, 0.05, 30, fc)
-    # print bdec
-    #(bdec, adec) = cheby1(Ndec, 0.05, fc)
-    #(bdec, adec) = butter(Ndec, fc)
+    # (bdec, adec) = ellip(Ndec, 0.05, 30, fc)
+    # print(bdec)
+    # (bdec, adec) = cheby1(Ndec, 0.05, fc)
+    # (bdec, adec) = butter(Ndec, fc)
     (bdec, adec) = iirdesign(0.48, 0.50, 0.05, 70, analog=0, ftype='ellip', output='ba')
-    #bdec = firwin(30, fc)
-    #adec = [1.]
+    # bdec = firwin(30, fc)
+    # adec = [1.]
 
     # set_printoptions(precision=24)
 
@@ -225,10 +225,10 @@ def main():
     impulse = zeros(N)
     impulse[N / 2] = 1
     f = 1000.
-    #impulse = sin(2*pi*f*arange(0, N/fs, 1./fs))
+    # impulse = sin(2*pi*f*arange(0, N/fs, 1./fs))
 
-    #[ERBforward, ERBfeedback] = MakeERBFilters(fs, Nchannels, low_freq)
-    #y = ERBFilterBank(ERBforward, ERBfeedback, impulse)
+    # [ERBforward, ERBfeedback] = MakeERBFilters(fs, Nchannels, low_freq)
+    # y = ERBFilterBank(ERBforward, ERBfeedback, impulse)
 
     BandsPerOctave = 3
     Nbands = NOCTAVE * BandsPerOctave
@@ -261,13 +261,13 @@ def main():
     Ndec = 3
     fc = 0.5
     # other possibilities
-    #(bdec, adec) = ellip(Ndec, 0.05, 30, fc)
+    # (bdec, adec) = ellip(Ndec, 0.05, 30, fc)
     # print bdec
-    #(bdec, adec) = cheby1(Ndec, 0.05, fc)
-    #(bdec, adec) = butter(Ndec, fc)
+    # (bdec, adec) = cheby1(Ndec, 0.05, fc)
+    # (bdec, adec) = butter(Ndec, fc)
     (bdec, adec) = iirdesign(0.48, 0.50, 0.05, 70, analog=0, ftype='ellip', output='ba')
-    #bdec = firwin(30, fc)
-    #adec = [1.]
+    # bdec = firwin(30, fc)
+    # adec = [1.]
 
     figure()
     subplot(211)

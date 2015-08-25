@@ -2,13 +2,13 @@
 from numpy import arange, sqrt, zeros
 # the three following lines are a workaround for a bug with scipy and py2exe
 # together. See http://www.pyinstaller.org/ticket/83 for reference.
-#from scipy.misc import factorial
-#import scipy
-#scipy.factorial = factorial
+# from scipy.misc import factorial
+# import scipy
+# scipy.factorial = factorial
 
 # importing lfilter from scipy.signal.signaltools instead of scipy.signal decreases
 # dramatically the number of modules imported (and decreases the size of the NSIS package...)
-#from scipy.signal.signaltools import lfilter
+# from scipy.signal.signaltools import lfilter
 # importint _linear_filter itself from sigtools is even better
 from scipy.signal.sigtools import _linear_filter
 
@@ -35,7 +35,8 @@ def ERBFilterBank(forward, feedback, x):
 # 1600 2000 Hz, etc.
 #
 # http://zone.ni.com/devzone/cda/tut/p/id/2975
-# According to the IEC 1260:1995 and the ANSI S1.11:2004 standards, the midband frequency, or center, frequency of the bandpass filter is defined by the following equations:
+# According to the IEC 1260:1995 and the ANSI S1.11:2004 standards, the midband (or center) frequency of the bandpass filter
+# is defined by the following equations:
 #
 #     fi = 1000 * 2ib for 1/N octave filters when N is odd
 #
@@ -133,11 +134,9 @@ def octave_filter_bank_decimation(blow, alow, forward, feedback, x, zis=None):
         for j in range(0, NOCTAVE):
             for i in range(0, BandsPerOctave)[::-1]:
                 filt, zf = lfilter(forward[i], feedback[i], x_dec, zi=zis[m])
-                #filt = lfilter(forward[i], feedback[i], x_dec)
                 m += 1
                 # zf can be reused to restart the filter
                 zfs += [zf]
-                #zfs += [0.]
                 y[k] = filt
                 dec[k] = 2 ** j
                 k -= 1
@@ -145,7 +144,6 @@ def octave_filter_bank_decimation(blow, alow, forward, feedback, x, zis=None):
             m += 1
             # zf can be reused to restart the filter
             zfs += [zf]
-            #zfs += [0.]
 
         return y, dec, zfs
 
@@ -247,7 +245,7 @@ def lfilter(b, a, x, axis=-1, zi=None):
 
     """
     # if isscalar(a):
-    #a = [a]
+    #    a = [a]
     if zi is None:
         return _linear_filter(b, a, x, axis)
     else:

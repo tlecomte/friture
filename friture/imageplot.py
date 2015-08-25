@@ -44,8 +44,6 @@ class PlotImage:
         self.T = 0.
         self.dT = 1.
         self.audiobackend = audiobackend
-        #self.previous_time = self.audiobackend.get_stream_time()
-        self.offset = 0  # self.audiobackend.get_stream_time()/self.dT
 
         self.jitter_s = 0.
 
@@ -129,7 +127,7 @@ class PlotImage:
 
             draw_delay = time - self.last_time
             # delta_t and draw_delay are almost equal => the problem does not come from PortAudio !
-            #print(draw_delay, draw_delay*rect.width()/self.T, delta_t)
+            # print(draw_delay, draw_delay*rect.width()/self.T, delta_t)
             self.last_time = time
 
             offset += pixel_delay

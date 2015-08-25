@@ -31,15 +31,15 @@ class Levels_Settings_Dialog(QtWidgets.QDialog):
 
         self.formLayout = QtWidgets.QFormLayout(self)
 
-        #self.doubleSpinBox_timerange = QtWidgets.QDoubleSpinBox(self)
+        # self.doubleSpinBox_timerange = QtWidgets.QDoubleSpinBox(self)
         # self.doubleSpinBox_timerange.setDecimals(1)
         # self.doubleSpinBox_timerange.setMinimum(0.1)
         # self.doubleSpinBox_timerange.setMaximum(1000.0)
-        #self.doubleSpinBox_timerange.setProperty("value", DEFAULT_TIMERANGE)
+        # self.doubleSpinBox_timerange.setProperty("value", DEFAULT_TIMERANGE)
         # self.doubleSpinBox_timerange.setObjectName("doubleSpinBox_timerange")
-        #self.doubleSpinBox_timerange.setSuffix(" s")
+        # self.doubleSpinBox_timerange.setSuffix(" s")
 
-        #self.formLayout.addRow("Time range:", self.doubleSpinBox_timerange)
+        # self.formLayout.addRow("Time range:", self.doubleSpinBox_timerange)
         self.formLayout.addRow("No settings for the levels.", None)
 
         self.setLayout(self.formLayout)
@@ -48,11 +48,11 @@ class Levels_Settings_Dialog(QtWidgets.QDialog):
 
     # method
     def saveState(self, settings):
-        #settings.setValue("timeRange", self.doubleSpinBox_timerange.value())
+        # settings.setValue("timeRange", self.doubleSpinBox_timerange.value())
         return
 
     # method
     def restoreState(self, settings):
-        #timeRange = float(settings.value("timeRange", DEFAULT_TIMERANGE))
+        # timeRange = float(settings.value("timeRange", DEFAULT_TIMERANGE))
         # self.doubleSpinBox_timerange.setValue(timeRange)
         return

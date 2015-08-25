@@ -85,10 +85,10 @@ def generalized_cross_correlation(d0, d1):
     W = 1. / (1e-10 * m + absG)
     # D1r = D1.conjugate(); G0 = D0r*D0; G1 = D1r*D1; W = numpy.abs(G)/(G0*G1) # HB weighted
     Xcorr = irfft(W * G)
-    #Xcorr_unweighted = irfft(G)
-    #numpy.save("d0.npy", d0)
-    #numpy.save("d1.npy", d1)
-    #numpy.save("Xcorr.npy", Xcorr)
+    # Xcorr_unweighted = irfft(G)
+    # numpy.save("d0.npy", d0)
+    # numpy.save("d1.npy", d1)
+    # numpy.save("Xcorr.npy", Xcorr)
 
     return Xcorr
 
@@ -243,7 +243,7 @@ class Delay_Estimator_Widget(QtWidgets.QWidget):
                     i = argmax(absXcorr)
 
                     # normalize
-                    #Xcorr_max_norm = Xcorr_unweighted[i]/(d0.size*std0*std1)
+                    # Xcorr_max_norm = Xcorr_unweighted[i]/(d0.size*std0*std1)
                     self.Xcorr_extremum = smoothed_Xcorr[i]
                     Xcorr_max_norm = abs(smoothed_Xcorr[i]) / (3 * numpy.std(smoothed_Xcorr))
                     self.delay_ms = 1e3 * float(i) / self.subsampled_sampling_rate
@@ -252,8 +252,8 @@ class Delay_Estimator_Widget(QtWidgets.QWidget):
                     if self.delay_ms > 1e3 * time / 2.:
                         self.delay_ms -= 1e3 * time
 
-                    #numpy.save("Xcorr_%d_%.1f.npy" %(i,delay_ms), Xcorr)
-                    #numpy.save("smoothed_Xcorr%d_%.1f.npy" %(i,delay_ms), smoothed_Xcorr)
+                    # numpy.save("Xcorr_%d_%.1f.npy" %(i,delay_ms), Xcorr)
+                    # numpy.save("smoothed_Xcorr%d_%.1f.npy" %(i,delay_ms), smoothed_Xcorr)
 
                     # store for smoothing
                     self.old_Xcorr = smoothed_Xcorr

@@ -49,7 +49,7 @@ def ceilWithinInterval(x, interval):
 
 # 0.322
 # 0.3
-#0.1, 0.2, 0.5
+# 0.1, 0.2, 0.5
 def roundWithPrecision(x, prec):
     candidates = [1. * 10 ** prec, 2. * 10 ** prec, 5. * 10 ** prec]
 

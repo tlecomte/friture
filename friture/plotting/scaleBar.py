@@ -163,7 +163,6 @@ class HorizontalScaleBar(QtWidgets.QWidget):
 
         # label end
         le = yt + self.labelSpacing
-        #lh = fm.height()
 
         # label precision
         majorTicks = self.scaleDivision.majorTicks()

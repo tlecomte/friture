@@ -117,10 +117,6 @@ class Generator_Widget(QtWidgets.QWidget):
         self.comboBox_generator_kind.activated.connect(self.stackedLayout.setCurrentIndex)
         self.startStopButton.toggled.connect(self.startStopButton_toggle)
 
-        # self.setStyleSheet(STYLESHEET)
-
-        #self.response_time = DEFAULT_RESPONSE_TIME
-
         # initialize the settings dialog
         self.settings_dialog = Generator_Settings_Dialog(self, self.logger)
 

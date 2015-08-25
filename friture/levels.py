@@ -92,10 +92,10 @@ class Levels_Widget(QtWidgets.QWidget):
         self.label_peak_legend.setText("dB FS\n Peak")
         self.label_rms.setTextFormat(QtCore.Qt.PlainText)
         self.label_peak.setTextFormat(QtCore.Qt.PlainText)
-        #self.label_rms.setSizePolicy(QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding))
-        #self.label_rms_legend.setSizePolicy(QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding))
-        #self.label_peak.setSizePolicy(QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding))
-        #self.label_peak_legend.setSizePolicy(QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding))
+        # self.label_rms.setSizePolicy(QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding))
+        # self.label_rms_legend.setSizePolicy(QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding))
+        # self.label_peak.setSizePolicy(QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding))
+        # self.label_peak_legend.setSizePolicy(QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding))
 
         self.logger = logger
         self.audiobuffer = None
@@ -143,10 +143,10 @@ class Levels_Widget(QtWidgets.QWidget):
         self.audiobuffer = buffer
 
     def handle_new_data(self, floatdata):
-        if floatdata.shape[0] > 1 and self.two_channels == False:
+        if floatdata.shape[0] > 1 and not self.two_channels:
             self.meter.setPortCount(2)
             self.two_channels = True
-        elif floatdata.shape[0] == 1 and self.two_channels == True:
+        elif floatdata.shape[0] == 1 and self.two_channels:
             self.meter.setPortCount(1)
             self.two_channels = False
 
@@ -212,7 +212,7 @@ class Levels_Widget(QtWidgets.QWidget):
                 self.label_rms.setText(string_rms)
                 self.label_peak.setText(string_peak)
         else:
-            #self.meter.m_iPortCount = 3
+            # self.meter.m_iPortCount = 3
             self.meter.setValue(0, self.level_rms, self.level_max)
             self.meter.setValue(1, self.level_rms_2, self.level_max_2)
 

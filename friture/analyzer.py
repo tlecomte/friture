@@ -42,33 +42,6 @@ SMOOTH_DISPLAY_TIMER_PERIOD_MS = 10
 # (and text painting is costly)
 SLOW_TIMER_PERIOD_MS = 1000
 
-STYLESHEET = """
-"""
-# QMainWindow::separator {
-# background: black;
-# width: 1px;
-# height: 1px;
-#}
-#
-# QMainWindow::separator:hover {
-# background: black;
-# width: 1px;
-# height: 1px;
-#}
-#
-# QToolBar {
-# border: none;
-# background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-# stop: 0 #a6a6a6, stop: 0.08 #7f7f7f,
-# stop: 0.39999 #717171, stop: 0.4 #626262,
-# stop: 0.9 #4c4c4c, stop: 1 #333333);
-#}
-#
-# QToolButton {
-# color: white;
-#}
-#"""
-
 
 class Friture(QMainWindow, ):
 
@@ -235,12 +208,6 @@ def main():
     splash.showMessage("Initializing the audio subsystem")
     app.processEvents()
 
-    # Set the separator stylesheet here
-    # As of Qt 4.6, separator width is not handled correctly
-    # when the stylesheet is applied directly to the QMainWindow instance.
-    # QtCreator workarounds it with a "minisplitter" special class
-    app.setStyleSheet(STYLESHEET)
-
     # Logger class
     logger = Logger()
 
@@ -253,8 +220,8 @@ def main():
     if len(sys.argv) > 1:
         if sys.argv[1] == "--python":
             profile = "python"
-        # elif sys.argv[1] == "--kcachegrind":
-            #profile = "kcachegrind"
+        elif sys.argv[1] == "--kcachegrind":
+            profile = "kcachegrind"
         elif sys.argv[1] == "--no":
             profile = "no"
         else:
@@ -271,22 +238,17 @@ def main():
         stats.strip_dirs().sort_stats('cumulative').print_stats(20)
 
         sys.exit(0)
-    # elif profile == "kcachegrind":
-        #import cProfile
-        #import lsprofcalltree
+    elif profile == "kcachegrind":
+        import cProfile
+        import lsprofcalltree
 
-        #p = cProfile.Profile()
-        # p.run('app.exec_()')
+        p = cProfile.Profile()
+        p.run('app.exec_()')
 
-        #k = lsprofcalltree.KCacheGrind(p)
-        #data = open('cachegrind.out.00000', 'wb')
-        # k.output(data)
-        # data.close()
+        k = lsprofcalltree.KCacheGrind(p)
+        with open('cachegrind.out.00000', 'wb') as data:
+            k.output(data)
 
-        # alternative code with pyprof2calltree instead of lsprofcalltree
-        ##import pyprof2calltree
-        # pyprof2calltree.convert(p.getstats(), "cachegrind.out.00000") # save
-
-        # sys.exit(0)
+        sys.exit(0)
     else:
         sys.exit(app.exec_())

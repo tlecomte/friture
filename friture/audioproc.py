@@ -31,8 +31,6 @@ except ImportError as e:
                                    "Error when loading one of the Cython extensions. Please make sure they are built, or rebuild them. See INSTALL.txt for details.")
     raise(e)
 
-#from cochlear import MakeERBFilters, ERBFilterBank, frequencies
-
 
 class audioproc():
 
@@ -55,7 +53,7 @@ class audioproc():
         samples = self.decimate(samples)
 
         # uncomment the following to disable the decimation altogether
-        #decimation = 1
+        # decimation = 1
 
         # FFT for a linear transformation in frequency scale
         fft = rfft(samples * self.window)
@@ -75,7 +73,7 @@ class audioproc():
         if self.decimation > 1:
             samples.shape = len(samples) / self.decimation, self.decimation
             # the full way
-            #samples = samples.mean(axis=1)
+            # samples = samples.mean(axis=1)
             # the simplest way
             samples = samples[:, 0]
         return samples

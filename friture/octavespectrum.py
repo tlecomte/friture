@@ -68,7 +68,6 @@ class OctaveSpectrum_Widget(QtWidgets.QWidget):
         self.PlotZoneSpect.setweighting(self.weighting)
 
         self.filters = octave_filters(DEFAULT_BANDSPEROCTAVE)
-        #self.bankbuffers = [RingBuffer() for band in range(0, DEFAULT_BANDSPEROCTAVE*NOCTAVE)]
         self.dispbuffers = [0] * DEFAULT_BANDSPEROCTAVE * NOCTAVE
 
         # set kernel and parameters for the smoothing filter
@@ -113,50 +112,13 @@ class OctaveSpectrum_Widget(QtWidgets.QWidget):
         # compute the filters' output
         y, decs_unused = self.filters.filter(floatdata)
 
-        # push to the ring buffer
-        # for bankbuffer, bankdata in zip(self.bankbuffers, y):
-        #       bankbuffer.push(bankdata**2)
-
-        # for bankbuffer, bankdata, dec in zip(self.bankbuffers, y, decs):
-        # bankbuffer.push(bankdata**2)
-
-        # an exponential smoothing filter is a simple IIR filter
-        # s_i = alpha*x_i + (1-alpha)*s_{i-1}
-        # we compute alpha so that the N most recent samples represent 100*w percent of the output
-        #w = 0.65
-        #N = time*SAMPLING_RATE/dec
-        #alpha = 1. - (1.-w)**(1./(N+1))
-        # filter coefficient
-        #forward = [alpha]
-        #feedback = [1., -(1. - alpha)]
-        #filt, zf = lfilter(forward, feedback, bankdata**2, zi=bankbuffer.data(1))
-        # bankbuffer.push(filt)
-        #sp += [bankbuffer.data(1)[0]]
-
-        # bankbuffer.push(bankdata**2)
-        #sp += [self.exp_smoothed_value(time, dec, bankbuffer)]
-
         # compute the widget data
-        #sp = [self.exp_smoothed_value(kernel, alpha, bankdata**2, old) for bankdata, kernel, alpha, old in zip(y, self.kernels, self.alphas, self.dispbuffers)]
         sp = [pyx_exp_smoothed_value(kernel, alpha, bankdata ** 2, old) for bankdata, kernel, alpha, old in zip(y, self.kernels, self.alphas, self.dispbuffers)]
+
         # store result for next computation
         self.dispbuffers = sp
 
-        # un-weighted moving average
-        #sp = [bankbuffer.data(time*SAMPLING_RATE/dec).mean() for bankbuffer, dec in zip(self.bankbuffers, decs)]
-
         sp = array(sp)
-
-        # Note: the following is largely suboptimal since the filter outputs
-        # are computed several times on the same signal...
-        #floatdata = self.audiobuffer.data(time*SAMPLING_RATE)
-        #y, dec = self.filters.filter(floatdata)
-        #sp = [(bank**2).mean() for bank in y]
-        #sp = array(sp)[::-1]
-
-        # brute force without decimation
-        #y_nodec = octave_filter_bank(self.b, self.a, floatdata)
-        #sp_nodec = (y_nodec**2).mean(axis=1)
 
         if self.weighting is 0:
             w = 0.
@@ -205,13 +167,12 @@ class OctaveSpectrum_Widget(QtWidgets.QWidget):
         ns = [self.response_time * SAMPLING_RATE / dec for dec in decs]
         Ns = [2 * 4096 / dec for dec in decs]
         self.alphas = [1. - (1. - w) ** (1. / (n + 1)) for n in ns]
-        # print ns, Ns
+        # print(ns, Ns)
         self.kernels = self.compute_kernels(self.alphas, Ns)
 
     def setbandsperoctave(self, bandsperoctave):
         self.filters.setbandsperoctave(bandsperoctave)
         # recreate the ring buffers
-        #self.bankbuffers = [RingBuffer() for band in range(0, bandsperoctave*NOCTAVE)]
         self.dispbuffers = [0] * bandsperoctave * NOCTAVE
         # reset kernel and parameters for the smoothing filter
         self.setresponsetime(self.response_time)
@@ -234,19 +195,15 @@ class octave_filters():
         self.setbandsperoctave(bandsperoctave)
 
     def filter(self, floatdata):
-        #y, dec, zfs = octave_filter_bank_decimation(self.bdec, self.adec, self.boct, self.aoct, floatdata)
         y, dec, zfs = octave_filter_bank_decimation(self.bdec, self.adec,
                                                     self.boct, self.aoct,
                                                     floatdata, zis=self.zfs)
-        #y, zfs = octave_filter_bank(self.b_nodec, self.a_nodec, floatdata); dec = [1.]*len(y)
-        #y, zfs = octave_filter_bank(self.b_nodec, self.a_nodec, floatdata, zis=self.zfs); dec = [1.]*len(y)
 
         self.zfs = zfs
 
         return y, dec
 
     def get_decs(self):
-        #decs = [1.]*self.nbands
         decs = [2 ** j for j in range(0, NOCTAVE)[::-1] for i in range(0, self.bandsperoctave)]
 
         return decs
@@ -257,15 +214,7 @@ class octave_filters():
         self.fi, self.flow, self.fhigh = octave_frequencies(self.nbands, self.bandsperoctave)
         [self.boct, self.aoct, fi, flow, fhigh] = generated_filters.params['%d' % bandsperoctave]
 
-        #z, p, k = tf2zpk(self.bdec, self.adec)
-        # print "poles", p, abs(p)**2
-        # print "zeros", z, abs(z)**2
-        # for b, a in zip(self.boct, self.aoct):
-        #z, p, k = tf2zpk(b, a)
-        # print "poles", p, abs(p)**2
-        # print "zeros", z, abs(z)**2
-
-        #[self.b_nodec, self.a_nodec, fi, fl, fh] = octave_filters(self.nbands, self.bandsperoctave)
+        # [self.b_nodec, self.a_nodec, fi, fl, fh] = octave_filters(self.nbands, self.bandsperoctave)
 
         f = self.fi
         Rc = 12200. ** 2 * f ** 2 / ((f ** 2 + 20.6 ** 2) * (f ** 2 + 12200. ** 2))
@@ -274,7 +223,6 @@ class octave_filters():
         self.C = 0.06 + 20. * log10(Rc)
         self.B = 0.17 + 20. * log10(Rb)
         self.A = 2.0 + 20. * log10(Ra)
-        #self.zfs = None
         self.zfs = octave_filter_bank_decimation_filtic(self.bdec, self.adec, self.boct, self.aoct)
 
         if bandsperoctave == 1:

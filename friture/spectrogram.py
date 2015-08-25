@@ -33,7 +33,6 @@ from friture.spectrogram_settings import (Spectrogram_Settings_Dialog,  # settin
 
 from friture.audiobackend import SAMPLING_RATE, FRAMES_PER_BUFFER
 from friture.logger import PrintLogger
-#from glrollingcanvaswidget import GLRollingCanvasWidget
 from fractions import Fraction
 
 
@@ -48,7 +47,6 @@ class Spectrogram_Widget(QtWidgets.QWidget):
         self.gridLayout = QtWidgets.QGridLayout(self)
         self.gridLayout.setObjectName("gridLayout")
         self.PlotZoneImage = ImagePlot(self, self.logger, audiobackend)
-        #self.PlotZoneImage = GLRollingCanvasWidget(self, self.logger)
         self.PlotZoneImage.setObjectName("PlotZoneImage")
         self.gridLayout.addWidget(self.PlotZoneImage, 0, 1, 1, 1)
 
