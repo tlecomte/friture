@@ -28,21 +28,24 @@ from friture.plotting.scaleDivision import ScaleDivision
 from friture.plotting.coordinateTransform import CoordinateTransform
 from friture.plotting.canvasWidget import CanvasWidget
 
+
 def tickFormatter(value, digits):
     if value >= 1e3:
-        label = "%gk" %(value/1e3)
+        label = "%gk" % (value / 1e3)
     else:
-        label = "%d" %(value)
+        label = "%d" % (value)
     return label
 
+
 class PlotImage:
+
     def __init__(self, logger, audiobackend):
         self.canvasscaledspectrogram = CanvasScaledSpectrogram(logger)
         self.T = 0.
         self.dT = 1.
         self.audiobackend = audiobackend
         #self.previous_time = self.audiobackend.get_stream_time()
-        self.offset = 0 #self.audiobackend.get_stream_time()/self.dT
+        self.offset = 0  # self.audiobackend.get_stream_time()/self.dT
 
         self.jitter_s = 0.
 
@@ -76,7 +79,7 @@ class PlotImage:
         for j in range(xyzs.shape[1]):
             freq_resampled_data = self.frequency_resampler.process(freq, xyzs[:, j])
             data = self.resampler.process(freq_resampled_data)
-            resampled_data[:,i:i+data.shape[1]] = data
+            resampled_data[:, i:i + data.shape[1]] = data
             i += data.shape[1]
 
         self.canvasscaledspectrogram.addData(resampled_data)
@@ -96,11 +99,11 @@ class PlotImage:
         self.frequency_resampler.setnsamples(rect.height())
         self.resampler.set_height(rect.height())
         self.canvasscaledspectrogram.setcanvas_height(rect.height())
-        #print self.jitter_s, self.T, rect.width(), rect.width()*(1 + self.jitter_s/self.T)
-        jitter_pix = rect.width()*self.jitter_s/self.T
+        # print self.jitter_s, self.T, rect.width(), rect.width()*(1 + self.jitter_s/self.T)
+        jitter_pix = rect.width() * self.jitter_s / self.T
         self.canvasscaledspectrogram.setcanvas_width(rect.width() + jitter_pix)
 
-        screen_rate_frac = Fraction(rect.width(), int(self.T*1000))
+        screen_rate_frac = Fraction(rect.width(), int(self.T * 1000))
         self.resampler.set_ratio(self.sfft_rate_frac, screen_rate_frac)
 
         # time advance
@@ -112,17 +115,17 @@ class PlotImage:
         # and slightly delay the spectrogram by the same number of columns
 
         pixmap = self.canvasscaledspectrogram.getpixmap()
-        offset = self.canvasscaledspectrogram.getpixmapoffset(delay=jitter_pix/2)
+        offset = self.canvasscaledspectrogram.getpixmapoffset(delay=jitter_pix / 2)
 
         if self.isPlaying:
-            delta_t = self.timer.nsecsElapsed()*1e-9
+            delta_t = self.timer.nsecsElapsed() * 1e-9
             self.timer.restart()
-            pixel_advance = delta_t/(self.T + self.jitter_s)*rect.width()
+            pixel_advance = delta_t / (self.T + self.jitter_s) * rect.width()
             self.canvasscaledspectrogram.addPixelAdvance(pixel_advance)
 
             time = self.audiobackend.get_stream_time()
             time_delay = time - self.last_data_time
-            pixel_delay = rect.width()*time_delay/self.T
+            pixel_delay = rect.width() * time_delay / self.T
 
             draw_delay = time - self.last_time
             # delta_t and draw_delay are almost equal => the problem does not come from PortAudio !
@@ -137,8 +140,8 @@ class PlotImage:
 
             hints = painter.renderHints()
             # enable bilinear pixmap transformation
-            painter.setRenderHints(hints|QtGui.QPainter.SmoothPixmapTransform)
-            #FIXME instead of a generic bilinear transformation, I need a specialized one
+            painter.setRenderHints(hints | QtGui.QPainter.SmoothPixmapTransform)
+            # FIXME instead of a generic bilinear transformation, I need a specialized one
             # since no transformation is needed in y, and the sampling rate is already known to be ok in x
             sw = rect.width()
             sh = rect.height()
@@ -173,9 +176,11 @@ class PlotImage:
 
     def set_jitter(self, jitter_s):
         self.jitter_s = jitter_s
-        #print jitter_s
+        # print jitter_s
+
 
 class ImagePlot(QtWidgets.QWidget):
+
     def __init__(self, parent, logger, audiobackend):
         super(ImagePlot, self).__init__(parent)
 
@@ -199,7 +204,7 @@ class ImagePlot(QtWidgets.QWidget):
         self.colorScale.setTitle("PSD (dB A)")
 
         self.canvasWidget = CanvasWidget(self, self.verticalScaleTransform, self.horizontalScaleTransform)
-        self.canvasWidget.setTrackerFormatter(lambda x, y: "%.2f s, %d Hz" %(x, y))
+        self.canvasWidget.setTrackerFormatter(lambda x, y: "%.2f s, %d Hz" % (x, y))
 
         plotLayout = QtWidgets.QGridLayout()
         plotLayout.setSpacing(0)
@@ -221,7 +226,7 @@ class ImagePlot(QtWidgets.QWidget):
 
         self.setspecrange(-140., 0.)
 
-        #need to replot here for the size Hints to be computed correctly (depending on axis scales...)
+        # need to replot here for the size Hints to be computed correctly (depending on axis scales...)
         self.update()
 
     def addData(self, freq, xyzs, last_data_time):

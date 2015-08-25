@@ -21,6 +21,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 
 from .grid import Grid
 
+
 class CanvasWidget(QtWidgets.QWidget):
 
     resized = QtCore.pyqtSignal(int, int)
@@ -49,7 +50,7 @@ class CanvasWidget(QtWidgets.QWidget):
 
         self.grid = Grid()
 
-        self.trackerFormatter = lambda x, y: "x=%d, y=%d" %(x, y)
+        self.trackerFormatter = lambda x, y: "x=%d, y=%d" % (x, y)
 
         self.anyOpaqueItem = False
 
@@ -109,7 +110,7 @@ class CanvasWidget(QtWidgets.QWidget):
             rect = painter.boundingRect(QtCore.QRect(self.mousex, self.mousey, 0, 0), QtCore.Qt.AlignLeft, text)
 
             # small offset so that it does not touch the rulers
-            rect.translate(4, -( rect.height() + 4))
+            rect.translate(4, -(rect.height() + 4))
 
             # avoid crossing the top and right borders
             dx = - max(rect.x() + rect.width() - self.width(), 0)
@@ -140,9 +141,9 @@ class CanvasWidget(QtWidgets.QWidget):
         h = self.height()
         rectPath = QtGui.QPainterPath()
         rectPath.moveTo(0, 0)
-        rectPath.lineTo(0, h-1)
-        rectPath.lineTo(w-1, h-1)
-        rectPath.lineTo(w-1, 0)
+        rectPath.lineTo(0, h - 1)
+        rectPath.lineTo(w - 1, h - 1)
+        rectPath.lineTo(w - 1, 0)
         rectPath.closeSubpath()
 
         painter.setPen(QtGui.QPen(QtGui.QColor(QtCore.Qt.gray)))

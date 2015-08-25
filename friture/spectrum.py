@@ -19,25 +19,27 @@
 
 from PyQt5 import QtGui, QtWidgets
 from numpy import log10, argmax, max, array, zeros, arange, floor, float64
-from friture.audioproc import audioproc # audio processing class
-from friture.spectrum_settings import (Spectrum_Settings_Dialog, # settings dialog
-                                                                           DEFAULT_FFT_SIZE,
-                                                                           DEFAULT_FREQ_SCALE,
-                                                                           DEFAULT_MAXFREQ,
-                                                                           DEFAULT_MINFREQ,
-                                                                           DEFAULT_SPEC_MIN,
-                                                                           DEFAULT_SPEC_MAX,
-                                                                           DEFAULT_WEIGHTING,
-                                                                           DEFAULT_RESPONSE_TIME,
-                                                                           DEFAULT_SHOW_FREQ_LABELS)
+from friture.audioproc import audioproc  # audio processing class
+from friture.spectrum_settings import (Spectrum_Settings_Dialog,  # settings dialog
+                                       DEFAULT_FFT_SIZE,
+                                       DEFAULT_FREQ_SCALE,
+                                       DEFAULT_MAXFREQ,
+                                       DEFAULT_MINFREQ,
+                                       DEFAULT_SPEC_MIN,
+                                       DEFAULT_SPEC_MAX,
+                                       DEFAULT_WEIGHTING,
+                                       DEFAULT_RESPONSE_TIME,
+                                       DEFAULT_SHOW_FREQ_LABELS)
 
 from friture.logger import PrintLogger
 from friture.audiobackend import SAMPLING_RATE
 from friture.spectrumPlotWidget import SpectrumPlotWidget
 from friture.exp_smoothing_conv import pyx_exp_smoothed_value_numpy
 
+
 class Spectrum_Widget(QtWidgets.QWidget):
-    def __init__(self, parent, logger = PrintLogger()):
+
+    def __init__(self, parent, logger=PrintLogger()):
         super().__init__(parent)
 
         self.logger = logger
@@ -56,7 +58,7 @@ class Spectrum_Widget(QtWidgets.QWidget):
         self.maxfreq = DEFAULT_MAXFREQ
         self.proc.set_maxfreq(self.maxfreq)
         self.minfreq = DEFAULT_MINFREQ
-        self.fft_size = 2**DEFAULT_FFT_SIZE*32
+        self.fft_size = 2 ** DEFAULT_FFT_SIZE * 32
         self.proc.set_fftsize(self.fft_size)
         self.spec_min = DEFAULT_SPEC_MIN
         self.spec_max = DEFAULT_SPEC_MAX
@@ -68,14 +70,14 @@ class Spectrum_Widget(QtWidgets.QWidget):
         self.freq = self.proc.get_freq_scale()
 
         self.old_index = 0
-        self.overlap = 3./4.
+        self.overlap = 3. / 4.
 
         self.update_display_buffers()
 
         # set kernel and parameters for the smoothing filter
         self.setresponsetime(self.response_time)
 
-        self.PlotZoneSpect.setlogfreqscale() #DEFAULT_FREQ_SCALE = 1 #log10
+        self.PlotZoneSpect.setlogfreqscale()  # DEFAULT_FREQ_SCALE = 1 #log10
         self.PlotZoneSpect.setfreqrange(self.minfreq, self.maxfreq)
         self.PlotZoneSpect.setspecrange(self.spec_min, self.spec_max)
         self.PlotZoneSpect.setweighting(self.weighting)
@@ -97,7 +99,7 @@ class Spectrum_Widget(QtWidgets.QWidget):
         # Idea: Instead of computing the log of the data, I could pre-compute
         # a list of values associated with the colormap, and then do a search...
         epsilon = 1e-30
-        return 10.*log10(sp + epsilon)
+        return 10. * log10(sp + epsilon)
 
     def handle_new_data(self, floatdata):
         # we need to maintain an index of where we are in the buffer
@@ -106,13 +108,13 @@ class Spectrum_Widget(QtWidgets.QWidget):
         available = index - self.old_index
 
         if available < 0:
-            #ringbuffer must have grown or something...
+            # ringbuffer must have grown or something...
             available = 0
             self.old_index = index
 
         # if we have enough data to add a frequency column in the time-frequency plane, compute it
-        needed = self.fft_size*(1. - self.overlap)
-        realizable = int(floor(available/needed))
+        needed = self.fft_size * (1. - self.overlap)
+        realizable = int(floor(available / needed))
 
         if realizable > 0:
             sp1n = zeros((len(self.freq), realizable), dtype=float64)
@@ -123,19 +125,19 @@ class Spectrum_Widget(QtWidgets.QWidget):
 
                 # first channel
                 # FIXME We should allow here for more intelligent transforms, especially when the log freq scale is selected
-                sp1n[:,i] = self.proc.analyzelive(floatdata[0,:])
+                sp1n[:, i] = self.proc.analyzelive(floatdata[0, :])
 
                 if self.dual_channels and floatdata.shape[0] > 1:
                     # second channel for comparison
-                    sp2n[:,i] = self.proc.analyzelive(floatdata[1,:])
+                    sp2n[:, i] = self.proc.analyzelive(floatdata[1, :])
 
                 self.old_index += int(needed)
 
-            #compute the widget data
-            #FIXME magnitude square ?
+            # compute the widget data
+            # FIXME magnitude square ?
             sp1 = pyx_exp_smoothed_value_numpy(self.kernel, self.alpha, sp1n, self.dispbuffers1)
             sp2 = pyx_exp_smoothed_value_numpy(self.kernel, self.alpha, sp2n, self.dispbuffers2)
-            #store result for next computation
+            # store result for next computation
             self.dispbuffers1 = sp1
             self.dispbuffers2 = sp2
 
@@ -168,24 +170,24 @@ class Spectrum_Widget(QtWidgets.QWidget):
         self.PlotZoneSpect.restart()
 
     def setresponsetime(self, response_time):
-        #time = SMOOTH_DISPLAY_TIMER_PERIOD_MS/1000. #DISPLAY
-        #time = 0.025 #IMPULSE setting for a sound level meter
-        #time = 0.125 #FAST setting for a sound level meter
-        #time = 1. #SLOW setting for a sound level meter
+        # time = SMOOTH_DISPLAY_TIMER_PERIOD_MS/1000. #DISPLAY
+        # time = 0.025 #IMPULSE setting for a sound level meter
+        # time = 0.125 #FAST setting for a sound level meter
+        # time = 1. #SLOW setting for a sound level meter
         self.response_time = response_time
 
         # an exponential smoothing filter is a simple IIR filter
         # s_i = alpha*x_i + (1-alpha)*s_{i-1}
-        #we compute alpha so that the N most recent samples represent 100*w percent of the output
+        # we compute alpha so that the N most recent samples represent 100*w percent of the output
         w = 0.65
-        delta_n = self.fft_size*(1. - self.overlap)
-        n = self.response_time*SAMPLING_RATE/delta_n
-        N = 2*4096
-        self.alpha = 1. - (1.-w)**(1./(n+1))
+        delta_n = self.fft_size * (1. - self.overlap)
+        n = self.response_time * SAMPLING_RATE / delta_n
+        N = 2 * 4096
+        self.alpha = 1. - (1. - w) ** (1. / (n + 1))
         self.kernel = self.compute_kernel(self.alpha, N)
 
     def compute_kernel(self, alpha, N):
-        kernel = (1.-alpha)**arange(N-1, -1, -1)
+        kernel = (1. - alpha) ** arange(N - 1, -1, -1)
         return kernel
 
     def update_display_buffers(self):

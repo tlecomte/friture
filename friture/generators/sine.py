@@ -22,6 +22,7 @@ from PyQt5 import QtWidgets
 
 DEFAULT_SINE_FREQUENCY = 440.
 
+
 class SineGenerator:
 
     name = "Sine"
@@ -40,19 +41,21 @@ class SineGenerator:
         self.f = f
 
         # the offset is adapted to avoid phase break
-        lastphase = 2.*np.pi*self.lastt*oldf + self.offset
-        newphase = 2.*np.pi*self.lastt*self.f + self.offset
+        lastphase = 2. * np.pi * self.lastt * oldf + self.offset
+        newphase = 2. * np.pi * self.lastt * self.f + self.offset
         self.offset += (lastphase - newphase)
-        self.offset %= 2.*np.pi
+        self.offset %= 2. * np.pi
 
     def settingsWidget(self):
         return self.settings
 
     def signal(self, t):
         self.lastt = t[-1]
-        return np.sin(2.*np.pi*t*self.f + self.offset)
+        return np.sin(2. * np.pi * t * self.f + self.offset)
+
 
 class SettingsWidget(QtWidgets.QWidget):
+
     def __init__(self, parent, logger):
         super().__init__(parent)
 

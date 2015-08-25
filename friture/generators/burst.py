@@ -23,6 +23,7 @@ from friture.audiobackend import SAMPLING_RATE
 
 DEFAULT_BURST_PERIOD_S = 1.
 
+
 class BurstGenerator:
     name = "Burst"
 
@@ -40,7 +41,7 @@ class BurstGenerator:
 
     def signal(self, t):
         floatdata = np.zeros(t.shape)
-        i = (t*SAMPLING_RATE)%(self.T*SAMPLING_RATE)
+        i = (t * SAMPLING_RATE) % (self.T * SAMPLING_RATE)
         n = 1
         ind_plus = np.where(i < n)
         #ind_minus = np.where((i >= n)*(i < 2*n))
@@ -48,7 +49,9 @@ class BurstGenerator:
         #floatdata[ind_minus] = -1.
         return floatdata
 
+
 class SettingsWidget(QtWidgets.QWidget):
+
     def __init__(self, parent, logger):
         super().__init__(parent)
 

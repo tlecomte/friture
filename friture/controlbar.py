@@ -22,33 +22,33 @@ from PyQt5 import QtGui, QtCore, QtWidgets
 STYLESHEET = """
 """
 
-#QWidget#controlWidget, QWidget#floatingcontrolWidget {
-#border: none;
-#background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-#stop: 0 #a6a6a6, stop: 0.08 #7f7f7f,
-#stop: 0.39999 #717171, stop: 0.4 #626262,
-#stop: 0.9 #4c4c4c, stop: 1 #333333);
+# QWidget#controlWidget, QWidget#floatingcontrolWidget {
+# border: none;
+# background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+# stop: 0 #a6a6a6, stop: 0.08 #7f7f7f,
+# stop: 0.39999 #717171, stop: 0.4 #626262,
+# stop: 0.9 #4c4c4c, stop: 1 #333333);
 #/* padding: 0px; */
 
 #}
 
-#QComboBox {
-#color: white;
-#border-style: solid;
-#border-color: black;
-#border-top-width: 0px;
-#border-bottom-width: 0px;
-#border-left-width: 0px;
-#border-right-width: 1px;
-#background-color: rgba(255,255,255,10%);
-#min-height:20px;
-#padding: 1px 10px 1px 3px;
+# QComboBox {
+# color: white;
+# border-style: solid;
+# border-color: black;
+# border-top-width: 0px;
+# border-bottom-width: 0px;
+# border-left-width: 0px;
+# border-right-width: 1px;
+# background-color: rgba(255,255,255,10%);
+# min-height:20px;
+# padding: 1px 10px 1px 3px;
 #}
 
-#QComboBox::drop-down {
-#border: none;
-#subcontrol-position: center right;
-#subcontrol-origin: padding;
+# QComboBox::drop-down {
+# border: none;
+# subcontrol-position: center right;
+# subcontrol-origin: padding;
 #/* border-left-width: 1px;*/
 #/* border-left-color: darkgray;*/
 #/* border-left-style: solid;*/ /* just a single line */
@@ -56,57 +56,59 @@ STYLESHEET = """
 #/* border-bottom-right-radius: 3px;*/
 #}
 
-#QComboBox::down-arrow {
-#image: url(:/dock-close.svg);
-#width: 10px;
-#height: 10px;
+# QComboBox::down-arrow {
+# image: url(:/dock-close.svg);
+# width: 10px;
+# height: 10px;
 #}
 
-#QComboBox::down-arrow:on { /* shift the arrow when popup is open */
-#top: 1px;
-#left: 1px;
+# QComboBox::down-arrow:on { /* shift the arrow when popup is open */
+# top: 1px;
+# left: 1px;
 #}
 
-#QComboBox:hover {
-#background-color: rgba(255,255,255,20%);
+# QComboBox:hover {
+# background-color: rgba(255,255,255,20%);
 #}
 
-#QComboBox:open {
-#background-color: rgba(255,255,255,30%);
+# QComboBox:open {
+# background-color: rgba(255,255,255,30%);
 #}
 
-#QToolButton {
-#background-color: rgba(255,255,255,10%);
+# QToolButton {
+# background-color: rgba(255,255,255,10%);
 #/* qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-#stop: 0 #a6a6a6, stop: 0.08 #7f7f7f,
-#stop: 0.39999 #717171, stop: 0.4 #626262,
-#stop: 0.9 #4c4c4c, stop: 1 #333333); */
-#border-style: solid;
-#border-color: black;
-#border-top-width: 0px;
-#border-bottom-width: 0px;
-#border-left-width: 1px;
-#border-right-width: 0px;
+# stop: 0 #a6a6a6, stop: 0.08 #7f7f7f,
+# stop: 0.39999 #717171, stop: 0.4 #626262,
+# stop: 0.9 #4c4c4c, stop: 1 #333333); */
+# border-style: solid;
+# border-color: black;
+# border-top-width: 0px;
+# border-bottom-width: 0px;
+# border-left-width: 1px;
+# border-right-width: 0px;
 #/*border: none;*/
 #/*padding: 0px;*/
 #/*margin: 0px;*/
 #/*icon-size: 10px;*/
 #/*min-width:20px;*/
-#min-height:20px;
-#max-height:20px;
+# min-height:20px;
+# max-height:20px;
 #/*text-align: center right;*/
 #}
 
-#QToolButton:hover {
-#background-color: rgba(255,255,255,20%);
+# QToolButton:hover {
+# background-color: rgba(255,255,255,20%);
 #}
 
-#QToolButton:pressed {
-#background-color: rgba(255,255,255,30%);
+# QToolButton:pressed {
+# background-color: rgba(255,255,255,30%);
 #}
 #"""
 
+
 class ControlBar(QtWidgets.QWidget):
+
     def __init__(self, parent):
         super().__init__(parent)
 
@@ -125,7 +127,7 @@ class ControlBar(QtWidgets.QWidget):
         self.comboBox_select.setCurrentIndex(0)
         self.comboBox_select.setToolTip("Select the type of audio widget")
 
-        self.settingsButton = QtWidgets.QToolButton (self)
+        self.settingsButton = QtWidgets.QToolButton(self)
         self.settingsButton.setToolTip("Customize the audio widget")
 
         settings_icon = QtGui.QIcon()

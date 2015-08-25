@@ -22,13 +22,15 @@ from PyQt5 import QtGui, QtCore, QtWidgets
 # shared with octavespectrum.py
 DEFAULT_SPEC_MIN = -80
 DEFAULT_SPEC_MAX = -20
-DEFAULT_WEIGHTING = 0 #None
+DEFAULT_WEIGHTING = 0  # None
 DEFAULT_BANDSPEROCTAVE = 3
 DEFAULT_BANDSPEROCTAVE_INDEX = 1
 DEFAULT_RESPONSE_TIME = 1.
 DEFAULT_RESPONSE_TIME_INDEX = 3
 
+
 class OctaveSpectrum_Settings_Dialog(QtWidgets.QDialog):
+
     def __init__(self, parent, logger):
         super().__init__(parent)
 
@@ -95,8 +97,8 @@ class OctaveSpectrum_Settings_Dialog(QtWidgets.QDialog):
 
     # slot
     def bandsperoctavechanged(self, index):
-        bandsperoctave = 3*2**(index-1) if index >= 1 else 1
-        self.logger.push("bandsperoctavechanged slot %d %d" %(index, bandsperoctave))
+        bandsperoctave = 3 * 2 ** (index - 1) if index >= 1 else 1
+        self.logger.push("bandsperoctavechanged slot %d %d" % (index, bandsperoctave))
         self.parent().setbandsperoctave(bandsperoctave)
 
     # slot
@@ -109,7 +111,7 @@ class OctaveSpectrum_Settings_Dialog(QtWidgets.QDialog):
             response_time = 0.3
         elif index == 3:
             response_time = 1.
-        self.logger.push("responsetimechanged slot %d %d" %(index, response_time))
+        self.logger.push("responsetimechanged slot %d %d" % (index, response_time))
         self.parent().setresponsetime(response_time)
 
     # method

@@ -26,7 +26,10 @@ from friture.plotting.scaleBar import VerticalScaleBar, HorizontalScaleBar, Colo
 # - a title
 # - a scale bar with a baseline, ticks and tick labels
 # The logic of the placement of scale min/max and ticks belongs to another class
+
+
 class VerticalScaleWidget(QtWidgets.QWidget):
+
     def __init__(self, parent, transformation, scaleDivision, logger=None):
         super(VerticalScaleWidget, self).__init__()
 
@@ -52,6 +55,7 @@ class VerticalScaleWidget(QtWidgets.QWidget):
 
 
 class HorizontalScaleWidget(QtWidgets.QWidget):
+
     def __init__(self, parent, transformation, scaleDivision, logger=None):
         super(HorizontalScaleWidget, self).__init__()
 
@@ -77,6 +81,7 @@ class HorizontalScaleWidget(QtWidgets.QWidget):
 
 
 class ColorScaleWidget(QtWidgets.QWidget):
+
     def __init__(self, parent, transformation, scaleDivision, logger=None):
         super(ColorScaleWidget, self).__init__()
 

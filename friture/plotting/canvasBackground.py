@@ -19,7 +19,9 @@
 
 from PyQt5 import QtCore, QtGui
 
+
 class CanvasBackground:
+
     def __init__(self, *args):
         self.canvas_width = 2
         self.canvas_height = 2

@@ -15,7 +15,7 @@ try:
 except ImportError:
     app = QtWidgets.QApplication(sys.argv)
     QtWidgets.QMessageBox.critical(None, "OpenGL hellogl",
-            "PyOpenGL must be installed to run this example.")
+                                   "PyOpenGL must be installed to run this example.")
     sys.exit(1)
 
 from numpy import zeros, ones, log10, hstack, array, floor, mean, where, rint, inf
@@ -24,7 +24,8 @@ import numpy as np
 # The peak decay rates (magic goes here :).
 PEAK_DECAY_RATE = 1.0 - 3E-6
 # Number of cycles the peak stays on hold before fall-off.
-PEAK_FALLOFF_COUNT = 32 # default : 16
+PEAK_FALLOFF_COUNT = 32  # default : 16
+
 
 def pre_tree_rebin(x1, x2):
     if len(x2) == 0:
@@ -35,7 +36,7 @@ def pre_tree_rebin(x1, x2):
 
     # leave untouched the frequency bins that span more than half a pixel
     # and first make sure that what will be left can be decimated by two
-    rest = len(x2) - n0 - ((len(x2) - n0)//2)*2
+    rest = len(x2) - n0 - ((len(x2) - n0) // 2) * 2
 
     n0 += rest
 
@@ -52,21 +53,22 @@ def pre_tree_rebin(x1, x2):
     if n2 == 0.:
         n = [n0]
     else:
-        n = [n0] + [i*2 + n0 for i in n2]
+        n = [n0] + [i * 2 + n0 for i in n2]
 
     x1 = hstack((x1_0, x1_2))
     x2 = hstack((x2_0, x2_2))
 
     return x1, x2, n
 
+
 def tree_rebin(y, ns, N):
     y2 = zeros(N)
 
     n = 0
-    for i in range(len(ns)-1):
-        y3 = y[ns[i]:ns[i+1]]
-        d = 2**i
-        l = len(y3)/d
+    for i in range(len(ns) - 1):
+        y3 = y[ns[i]:ns[i + 1]]
+        d = 2 ** i
+        l = len(y3) / d
         y3.shape = (l, d)
 
         # Note: the FFT spectrum is mostly used to identify frequency content
@@ -77,12 +79,14 @@ def tree_rebin(y, ns, N):
 
         y3 = np.max(y3, axis=1)
 
-        y2[n:n+len(y3)] = y3
+        y2[n:n + len(y3)] = y3
         n += l
 
     return y2
 
+
 class SpectrumPlotWidget(QtWidgets.QWidget):
+
     def __init__(self, parent, logger=None):
         super(SpectrumPlotWidget, self).__init__()
 
@@ -106,7 +110,7 @@ class SpectrumPlotWidget(QtWidgets.QWidget):
         self.horizontalScale.setTitle("Frequency (Hz)")
 
         self.canvasWidget = GlCanvasWidget(self, self.verticalScaleTransform, self.horizontalScaleTransform)
-        self.canvasWidget.setTrackerFormatter(lambda x, y: "%d Hz, %.1f dB" %(x, y))
+        self.canvasWidget.setTrackerFormatter(lambda x, y: "%d Hz, %.1f dB" % (x, y))
 
         self.quadsItem = QuadsItem()
         self.canvasWidget.attach(self.quadsItem)
@@ -187,9 +191,9 @@ class SpectrumPlotWidget(QtWidgets.QWidget):
         x1 = zeros(x.shape)
         x2 = zeros(x.shape)
         x1[0] = 1e-10
-        x1[1:] = (x[1:] + x[:-1])/2.
+        x1[1:] = (x[1:] + x[:-1]) / 2.
         x2[:-1] = x1[1:]
-        x2[-1] = float(SAMPLING_RATE/2)
+        x2[-1] = float(SAMPLING_RATE / 2)
 
         if len(x1) != len(self.x1):
             self.needtransform = True
@@ -221,10 +225,10 @@ class SpectrumPlotWidget(QtWidgets.QWidget):
             self.horizontalScale.update()
 
             self.canvasWidget.setGrid(array(self.horizontalScaleDivision.majorTicks()),
-                                  array(self.horizontalScaleDivision.minorTicks()),
-                                  array(self.verticalScaleDivision.majorTicks()),
-                                  array(self.verticalScaleDivision.minorTicks())
-                                  )
+                                      array(self.horizontalScaleDivision.minorTicks()),
+                                      array(self.verticalScaleDivision.majorTicks()),
+                                      array(self.verticalScaleDivision.minorTicks())
+                                      )
 
             self.quadsItem.transformUpdate()
 
@@ -245,11 +249,12 @@ class SpectrumPlotWidget(QtWidgets.QWidget):
 
 
 class QuadsItem:
+
     def __init__(self, *args):
         self.peaks_enabled = True
         self.peak = zeros((3,))
         self.peak_int = zeros((3,))
-        self.peak_decay = ones((3,))*PEAK_DECAY_RATE
+        self.peak_decay = ones((3,)) * PEAK_DECAY_RATE
 
         self.x1 = array([0.1, 0.5, 1.])
         self.x2 = array([0.5, 1., 2.])
@@ -291,29 +296,29 @@ class QuadsItem:
 
         n = x.shape[0]
 
-        self.vertices = zeros((n,4,2))
-        self.vertices[:,0,0] = x
-        self.vertices[:,0,1] = y + h
-        self.vertices[:,1,0] = x + w
-        self.vertices[:,1,1] = y + h
-        self.vertices[:,2,0] = x + w
-        self.vertices[:,2,1] = y
-        self.vertices[:,3,0] = x
-        self.vertices[:,3,1] = y
+        self.vertices = zeros((n, 4, 2))
+        self.vertices[:, 0, 0] = x
+        self.vertices[:, 0, 1] = y + h
+        self.vertices[:, 1, 0] = x + w
+        self.vertices[:, 1, 1] = y + h
+        self.vertices[:, 2, 0] = x + w
+        self.vertices[:, 2, 1] = y
+        self.vertices[:, 3, 0] = x
+        self.vertices[:, 3, 1] = y
 
-        self.colors = zeros((n,4,3))
-        self.colors[:,0,0] = r
-        self.colors[:,1,0] = r
-        self.colors[:,2,0] = r
-        self.colors[:,3,0] = r
-        self.colors[:,0,1] = g
-        self.colors[:,1,1] = g
-        self.colors[:,2,1] = g
-        self.colors[:,3,1] = g
-        self.colors[:,0,2] = b
-        self.colors[:,1,2] = b
-        self.colors[:,2,2] = b
-        self.colors[:,3,2] = b
+        self.colors = zeros((n, 4, 3))
+        self.colors[:, 0, 0] = r
+        self.colors[:, 1, 0] = r
+        self.colors[:, 2, 0] = r
+        self.colors[:, 3, 0] = r
+        self.colors[:, 0, 1] = g
+        self.colors[:, 1, 1] = g
+        self.colors[:, 2, 1] = g
+        self.colors[:, 3, 1] = g
+        self.colors[:, 0, 2] = b
+        self.colors[:, 1, 2] = b
+        self.colors[:, 2, 2] = b
+        self.colors[:, 3, 2] = b
 
     def transformUpdate(self):
         self.need_transform = True
@@ -328,8 +333,8 @@ class QuadsItem:
                 self.transformed_x1, self.transformed_x2, n = pre_tree_rebin(self.transformed_x1, self.transformed_x2)
                 self.n = [0] + n
                 self.N = 0
-                for i in range(len(self.n)-1):
-                    self.N += (self.n[i+1] - self.n[i])/2**i
+                for i in range(len(self.n) - 1):
+                    self.N += (self.n[i + 1] - self.n[i]) / 2 ** i
 
             self.need_transform = False
 
@@ -340,14 +345,14 @@ class QuadsItem:
         if xMap.log:
             y = tree_rebin(self.y, self.n, self.N)
         else:
-            n = floor(1./(x2[2] - x1[1]))
-            if n>0:
-                new_len = len(self.y)//n
-                rest = len(self.y) - new_len*n
+            n = floor(1. / (x2[2] - x1[1]))
+            if n > 0:
+                new_len = len(self.y) // n
+                rest = len(self.y) - new_len * n
 
                 new_y = self.y[:-rest]
                 new_y.shape = (new_len, n)
-                y = mean(new_y, axis = 1)
+                y = mean(new_y, axis=1)
 
                 x1 = x1[:-rest:n]
                 x2 = x2[n::n]
@@ -360,13 +365,13 @@ class QuadsItem:
         transformed_y = yMap.toScreen(y)
 
         Ones = ones(x1.shape)
-        Ones_shaded = Ones #.copy()
+        Ones_shaded = Ones  # .copy()
         # FIXME : the following would give a satisfying result if the
         # bins were one pixel wide at minimum => Need to to a rounding
         # to pixels
         #w = x2 - x1
         #i = where(w<1.)[0]
-        #if len(i)>0:
+        # if len(i)>0:
         #    Ones_shaded[:i[0]:2] = 1.2
 
         if self.peaks_enabled:
@@ -375,12 +380,12 @@ class QuadsItem:
             n = x1.size
 
             # FIXME should be done conditionally to need_transform
-            x1_with_peaks = zeros((2*n))
-            x2_with_peaks = zeros((2*n))
-            y_with_peaks = zeros((2*n))
-            r_with_peaks = zeros((2*n))
-            g_with_peaks = zeros((2*n))
-            b_with_peaks = zeros((2*n))
+            x1_with_peaks = zeros((2 * n))
+            x2_with_peaks = zeros((2 * n))
+            y_with_peaks = zeros((2 * n))
+            r_with_peaks = zeros((2 * n))
+            g_with_peaks = zeros((2 * n))
+            b_with_peaks = zeros((2 * n))
 
             x1_with_peaks[:n] = x1
             x1_with_peaks[n:] = x1
@@ -391,21 +396,21 @@ class QuadsItem:
             y_with_peaks[:n] = transformed_peak
             y_with_peaks[n:] = transformed_y
 
-            r_with_peaks[:n] = 1.*Ones
-            r_with_peaks[n:] = 0.*Ones
+            r_with_peaks[:n] = 1. * Ones
+            r_with_peaks[n:] = 0. * Ones
 
             g_with_peaks[:n] = 1. - self.peak_int
-            g_with_peaks[n:] = 0.5*Ones_shaded
+            g_with_peaks[n:] = 0.5 * Ones_shaded
 
             b_with_peaks[:n] = 1. - self.peak_int
-            b_with_peaks[n:] = 0.*Ones
+            b_with_peaks[n:] = 0. * Ones
         else:
             x1_with_peaks = x1
             x2_with_peaks = x2
             y_with_peaks = transformed_y
-            r_with_peaks = 0.*Ones
-            g_with_peaks = 0.5*Ones_shaded
-            b_with_peaks = 0.*Ones
+            r_with_peaks = 0. * Ones
+            g_with_peaks = 0.5 * Ones_shaded
+            b_with_peaks = 0. * Ones
 
         if self.baseline_transformed:
             # used for dual channel response measurement
@@ -428,9 +433,9 @@ class QuadsItem:
         GL.glEnableClientState(GL.GL_VERTEX_ARRAY)
         GL.glEnableClientState(GL.GL_COLOR_ARRAY)
 
-        #GL.glDisable(GL.GL_LIGHTING)
-        GL.glDrawArrays(GL.GL_QUADS, 0, 4*self.vertices.shape[0])
-        #GL.glEnable(GL.GL_LIGHTING)
+        # GL.glDisable(GL.GL_LIGHTING)
+        GL.glDrawArrays(GL.GL_QUADS, 0, 4 * self.vertices.shape[0])
+        # GL.glEnable(GL.GL_LIGHTING)
 
         GL.glDisableClientState(GL.GL_COLOR_ARRAY)
         GL.glDisableClientState(GL.GL_VERTEX_ARRAY)
@@ -438,7 +443,7 @@ class QuadsItem:
     def compute_peaks(self, y):
         if len(self.peak) != len(y):
             y_ones = ones(y.shape)
-            self.peak = y_ones*(-500.)
+            self.peak = y_ones * (-500.)
             self.peak_int = zeros(y.shape)
             self.peak_decay = y_ones * 20. * log10(PEAK_DECAY_RATE) * 5000
 

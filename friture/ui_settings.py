@@ -9,7 +9,9 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
+
 class Ui_Settings_Dialog(object):
+
     def setupUi(self, Settings_Dialog):
         Settings_Dialog.setObjectName("Settings_Dialog")
         Settings_Dialog.resize(483, 275)

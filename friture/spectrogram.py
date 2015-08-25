@@ -20,8 +20,8 @@
 from PyQt5 import QtGui, QtWidgets
 from numpy import log10, floor, zeros, float64, tile, array
 from friture.imageplot import ImagePlot
-from friture.audioproc import audioproc # audio processing class
-from friture.spectrogram_settings import (Spectrogram_Settings_Dialog, # settings dialog
+from friture.audioproc import audioproc  # audio processing class
+from friture.spectrogram_settings import (Spectrogram_Settings_Dialog,  # settings dialog
                                           DEFAULT_FFT_SIZE,
                                           DEFAULT_FREQ_SCALE,
                                           DEFAULT_MAXFREQ,
@@ -36,8 +36,10 @@ from friture.logger import PrintLogger
 #from glrollingcanvaswidget import GLRollingCanvasWidget
 from fractions import Fraction
 
+
 class Spectrogram_Widget(QtWidgets.QWidget):
-    def __init__(self, parent, audiobackend, logger = PrintLogger()):
+
+    def __init__(self, parent, audiobackend, logger=PrintLogger()):
         super().__init__(parent)
 
         self.logger = logger
@@ -59,7 +61,7 @@ class Spectrogram_Widget(QtWidgets.QWidget):
         self.maxfreq = DEFAULT_MAXFREQ
         self.proc.set_maxfreq(self.maxfreq)
         self.minfreq = DEFAULT_MINFREQ
-        self.fft_size = 2**DEFAULT_FFT_SIZE*32
+        self.fft_size = 2 ** DEFAULT_FFT_SIZE * 32
         self.proc.set_fftsize(self.fft_size)
         self.spec_min = DEFAULT_SPEC_MIN
         self.spec_max = DEFAULT_SPEC_MAX
@@ -72,18 +74,18 @@ class Spectrogram_Widget(QtWidgets.QWidget):
         self.canvas_width = 100.
 
         self.old_index = 0
-        self.overlap = 3./4.
+        self.overlap = 3. / 4.
         self.overlap_frac = Fraction(3, 4)
-        self.dT_s = self.fft_size*(1. - self.overlap)/float(SAMPLING_RATE)
+        self.dT_s = self.fft_size * (1. - self.overlap) / float(SAMPLING_RATE)
 
-        self.PlotZoneImage.setlog10freqscale() #DEFAULT_FREQ_SCALE = 1 #log10
+        self.PlotZoneImage.setlog10freqscale()  # DEFAULT_FREQ_SCALE = 1 #log10
         self.PlotZoneImage.setfreqrange(self.minfreq, self.maxfreq)
         self.PlotZoneImage.setspecrange(self.spec_min, self.spec_max)
         self.PlotZoneImage.setweighting(self.weighting)
         self.PlotZoneImage.settimerange(self.timerange_s, self.dT_s)
         self.update_jitter()
 
-        sfft_rate_frac = Fraction(SAMPLING_RATE, self.fft_size)/(Fraction(1) - self.overlap_frac)/1000
+        sfft_rate_frac = Fraction(SAMPLING_RATE, self.fft_size) / (Fraction(1) - self.overlap_frac) / 1000
         self.PlotZoneImage.set_sfft_rate(sfft_rate_frac)
 
         # initialize the settings dialog
@@ -106,11 +108,11 @@ class Spectrogram_Widget(QtWidgets.QWidget):
         # Idea: Instead of computing the log of the data, I could pre-compute
         # a list of values associated with the colormap, and then do a search...
         epsilon = 1e-30
-        return 10.*log10(sp + epsilon)
+        return 10. * log10(sp + epsilon)
 
     # scale the db spectrum from [- spec_range db ... 0 db] to [0..1] (do not clip, will be down after resampling)
     def scale_spectrogram(self, sp):
-        return (sp - self.spec_min)/(self.spec_max - self.spec_min)
+        return (sp - self.spec_min) / (self.spec_max - self.spec_min)
 
     def handle_new_data(self, floatdata):
         # we need to maintain an index of where we are in the buffer
@@ -120,13 +122,13 @@ class Spectrogram_Widget(QtWidgets.QWidget):
         available = index - self.old_index
 
         if available < 0:
-            #ringbuffer must have grown or something...
+            # ringbuffer must have grown or something...
             available = 0
             self.old_index = index
 
         # if we have enough data to add a frequency column in the time-frequency plane, compute it
-        needed = self.fft_size*(1. - self.overlap)
-        realizable = int(floor(available/needed))
+        needed = self.fft_size * (1. - self.overlap)
+        realizable = int(floor(available / needed))
 
         if realizable > 0:
             spn = zeros((len(self.freq), realizable), dtype=float64)
@@ -135,7 +137,7 @@ class Spectrogram_Widget(QtWidgets.QWidget):
                 floatdata = self.audiobuffer.data_indexed(self.old_index, self.fft_size)
 
                 # for now, take the first channel only
-                floatdata = floatdata[0,:]
+                floatdata = floatdata[0, :]
 
                 # FIXME We should allow here for more intelligent transforms, especially when the log freq scale is selected
                 spn[:, i] = self.proc.analyzelive(floatdata)
@@ -165,10 +167,10 @@ class Spectrogram_Widget(QtWidgets.QWidget):
         self.PlotZoneImage.draw()
 
     def update_jitter(self):
-        audio_jitter = 2*float(FRAMES_PER_BUFFER)/SAMPLING_RATE
-        analysis_jitter = self.fft_size*(1. - self.overlap)/SAMPLING_RATE
+        audio_jitter = 2 * float(FRAMES_PER_BUFFER) / SAMPLING_RATE
+        analysis_jitter = self.fft_size * (1. - self.overlap) / SAMPLING_RATE
         canvas_jitter = audio_jitter + analysis_jitter
-        #print audio_jitter, analysis_jitter, canvas_jitter
+        # print audio_jitter, analysis_jitter, canvas_jitter
         self.PlotZoneImage.plotImage.set_jitter(canvas_jitter)
 
     def pause(self):
@@ -196,10 +198,10 @@ class Spectrogram_Widget(QtWidgets.QWidget):
         self.update_weighting()
         self.freq = self.proc.get_freq_scale()
 
-        self.dT_s = self.fft_size*(1. - self.overlap)/float(SAMPLING_RATE)
+        self.dT_s = self.fft_size * (1. - self.overlap) / float(SAMPLING_RATE)
         self.PlotZoneImage.settimerange(self.timerange_s, self.dT_s)
 
-        sfft_rate_frac = Fraction(SAMPLING_RATE, self.fft_size)/(Fraction(1) - self.overlap_frac)/1000
+        sfft_rate_frac = Fraction(SAMPLING_RATE, self.fft_size) / (Fraction(1) - self.overlap_frac) / 1000
         self.PlotZoneImage.set_sfft_rate(sfft_rate_frac)
 
         self.update_jitter()

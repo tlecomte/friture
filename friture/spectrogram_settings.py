@@ -21,16 +21,18 @@ from PyQt5 import QtGui, QtCore, QtWidgets
 from friture.audiobackend import SAMPLING_RATE
 
 # shared with spectrogram.py
-DEFAULT_FFT_SIZE = 7 #4096 points
-DEFAULT_FREQ_SCALE = 1 #log10
-DEFAULT_MAXFREQ = SAMPLING_RATE/2
+DEFAULT_FFT_SIZE = 7  # 4096 points
+DEFAULT_FREQ_SCALE = 1  # log10
+DEFAULT_MAXFREQ = SAMPLING_RATE / 2
 DEFAULT_MINFREQ = 20
 DEFAULT_SPEC_MIN = -140
 DEFAULT_SPEC_MAX = 0
 DEFAULT_TIMERANGE = 10.
-DEFAULT_WEIGHTING = 0 #None
+DEFAULT_WEIGHTING = 0  # None
+
 
 class Spectrogram_Settings_Dialog(QtWidgets.QDialog):
+
     def __init__(self, parent, logger):
         super().__init__(parent)
 
@@ -70,7 +72,7 @@ class Spectrogram_Settings_Dialog(QtWidgets.QDialog):
 
         self.spinBox_minfreq = QtWidgets.QSpinBox(self)
         self.spinBox_minfreq.setMinimum(20)
-        self.spinBox_minfreq.setMaximum(SAMPLING_RATE/2)
+        self.spinBox_minfreq.setMaximum(SAMPLING_RATE / 2)
         self.spinBox_minfreq.setSingleStep(10)
         self.spinBox_minfreq.setValue(DEFAULT_MINFREQ)
         self.spinBox_minfreq.setObjectName("spinBox_minfreq")
@@ -78,7 +80,7 @@ class Spectrogram_Settings_Dialog(QtWidgets.QDialog):
 
         self.spinBox_maxfreq = QtWidgets.QSpinBox(self)
         self.spinBox_maxfreq.setMinimum(20)
-        self.spinBox_maxfreq.setMaximum(SAMPLING_RATE/2)
+        self.spinBox_maxfreq.setMaximum(SAMPLING_RATE / 2)
         self.spinBox_maxfreq.setSingleStep(1000)
         self.spinBox_maxfreq.setProperty("value", DEFAULT_MAXFREQ)
         self.spinBox_maxfreq.setObjectName("spinBox_maxfreq")
@@ -130,13 +132,13 @@ class Spectrogram_Settings_Dialog(QtWidgets.QDialog):
 
     # slot
     def fftsizechanged(self, index):
-        self.logger.push("fft_size_changed slot %d %d %f" %(index, 2**index*32, 150000/2**index*32))
-        fft_size = 2**index*32
+        self.logger.push("fft_size_changed slot %d %d %f" % (index, 2 ** index * 32, 150000 / 2 ** index * 32))
+        fft_size = 2 ** index * 32
         self.parent().setfftsize(fft_size)
 
     # slot
     def freqscalechanged(self, index):
-        self.logger.push("freq_scale slot %d" %index)
+        self.logger.push("freq_scale slot %d" % index)
         if index == 1:
             self.parent().PlotZoneImage.setlog10freqscale()
         else:
@@ -157,7 +159,7 @@ class Spectrogram_Settings_Dialog(QtWidgets.QDialog):
     def restoreState(self, settings):
         timeRange = float(settings.value("timeRange", DEFAULT_TIMERANGE))
         self.doubleSpinBox_timerange.setValue(timeRange)
-        fft_size = settings.value("fftSize", DEFAULT_FFT_SIZE) # 7th index is 1024 points
+        fft_size = settings.value("fftSize", DEFAULT_FFT_SIZE)  # 7th index is 1024 points
         self.comboBox_fftsize.setCurrentIndex(fft_size)
         freqscale = settings.value("freqScale", DEFAULT_FREQ_SCALE)
         self.comboBox_freqscale.setCurrentIndex(freqscale)

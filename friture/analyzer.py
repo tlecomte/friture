@@ -17,17 +17,19 @@
 # You should have received a copy of the GNU General Public License
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
-import sys, os, platform
+import sys
+import os
+import platform
 from PyQt5 import QtCore, QtOpenGL
 # specifically import from PyQt5.QtGui and QWidgets for startup time improvement :
 from PyQt5.QtWidgets import QMainWindow, QVBoxLayout, QErrorMessage, QApplication, QSplashScreen
 from PyQt5.QtGui import QPixmap
 from friture.ui_friture import Ui_MainWindow
-from friture.about import About_Dialog # About dialog
-from friture.settings import Settings_Dialog # Setting dialog
-from friture.logger import Logger # Logging class
-from friture.audiobuffer import AudioBuffer # audio ring buffer class
-from friture.audiobackend import AudioBackend# audio backend class
+from friture.about import About_Dialog  # About dialog
+from friture.settings import Settings_Dialog  # Setting dialog
+from friture.logger import Logger  # Logging class
+from friture.audiobuffer import AudioBuffer  # audio ring buffer class
+from friture.audiobackend import AudioBackend  # audio backend class
 from friture.centralwidget import CentralWidget
 from friture.dockmanager import DockManager
 
@@ -42,32 +44,34 @@ SLOW_TIMER_PERIOD_MS = 1000
 
 STYLESHEET = """
 """
-#QMainWindow::separator {
-#background: black;
-#width: 1px;
-#height: 1px;
+# QMainWindow::separator {
+# background: black;
+# width: 1px;
+# height: 1px;
 #}
 #
-#QMainWindow::separator:hover {
-#background: black;
-#width: 1px;
-#height: 1px;
+# QMainWindow::separator:hover {
+# background: black;
+# width: 1px;
+# height: 1px;
 #}
 #
-#QToolBar {
-#border: none;
-#background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-#stop: 0 #a6a6a6, stop: 0.08 #7f7f7f,
-#stop: 0.39999 #717171, stop: 0.4 #626262,
-#stop: 0.9 #4c4c4c, stop: 1 #333333);
+# QToolBar {
+# border: none;
+# background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+# stop: 0 #a6a6a6, stop: 0.08 #7f7f7f,
+# stop: 0.39999 #717171, stop: 0.4 #626262,
+# stop: 0.9 #4c4c4c, stop: 1 #333333);
 #}
 #
-#QToolButton {
-#color: white;
+# QToolButton {
+# color: white;
 #}
 #"""
 
+
 class Friture(QMainWindow, ):
+
     def __init__(self, logger):
         QMainWindow.__init__(self)
 
@@ -89,11 +93,11 @@ class Friture(QMainWindow, ):
 
         # this timer is used to update widgets that just need to display as fast as they can
         self.display_timer = QtCore.QTimer()
-        self.display_timer.setInterval(SMOOTH_DISPLAY_TIMER_PERIOD_MS) # constant timing
+        self.display_timer.setInterval(SMOOTH_DISPLAY_TIMER_PERIOD_MS)  # constant timing
 
         # slow timer
         self.slow_timer = QtCore.QTimer()
-        self.slow_timer.setInterval(SLOW_TIMER_PERIOD_MS) # constant timing
+        self.slow_timer.setInterval(SLOW_TIMER_PERIOD_MS)  # constant timing
 
         self.about_dialog = About_Dialog(self, self.logger, self.audiobackend, self.slow_timer)
         self.settings_dialog = Settings_Dialog(self, self.logger, self.audiobackend)
@@ -204,14 +208,15 @@ def main():
     if platform.system() == "Windows":
         print("Running on Windows")
         # On Windows, redirect stderr to a file
-        import imp, ctypes
-        if (hasattr(sys, "frozen") or # new py2exe
-                hasattr(sys, "importers") or # old py2exe
-                imp.is_frozen("__main__")): # tools/freeze
+        import imp
+        import ctypes
+        if (hasattr(sys, "frozen") or  # new py2exe
+                hasattr(sys, "importers") or  # old py2exe
+                imp.is_frozen("__main__")):  # tools/freeze
             sys.stderr = open(os.path.expanduser("~/friture.exe.log"), "w")
         # set the App ID for Windows 7 to properly display the icon in the
         # taskbar.
-        myappid = 'Friture.Friture.Friture.current' # arbitrary string
+        myappid = 'Friture.Friture.Friture.current'  # arbitrary string
         try:
             ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
         except:
@@ -243,17 +248,17 @@ def main():
     window.show()
     splash.finish(window)
 
-    profile = "no" # "python" or "kcachegrind" or anything else to disable
+    profile = "no"  # "python" or "kcachegrind" or anything else to disable
 
     if len(sys.argv) > 1:
         if sys.argv[1] == "--python":
             profile = "python"
-        #elif sys.argv[1] == "--kcachegrind":
+        # elif sys.argv[1] == "--kcachegrind":
             #profile = "kcachegrind"
         elif sys.argv[1] == "--no":
             profile = "no"
         else:
-            print("command-line arguments (%s) not recognized" %sys.argv[1:])
+            print("command-line arguments (%s) not recognized" % sys.argv[1:])
 
     if profile == "python":
         import cProfile
@@ -266,22 +271,22 @@ def main():
         stats.strip_dirs().sort_stats('cumulative').print_stats(20)
 
         sys.exit(0)
-    #elif profile == "kcachegrind":
+    # elif profile == "kcachegrind":
         #import cProfile
         #import lsprofcalltree
 
         #p = cProfile.Profile()
-        #p.run('app.exec_()')
+        # p.run('app.exec_()')
 
         #k = lsprofcalltree.KCacheGrind(p)
         #data = open('cachegrind.out.00000', 'wb')
-        #k.output(data)
-        #data.close()
+        # k.output(data)
+        # data.close()
 
-        ## alternative code with pyprof2calltree instead of lsprofcalltree
+        # alternative code with pyprof2calltree instead of lsprofcalltree
         ##import pyprof2calltree
-        ##pyprof2calltree.convert(p.getstats(), "cachegrind.out.00000") # save
+        # pyprof2calltree.convert(p.getstats(), "cachegrind.out.00000") # save
 
-        #sys.exit(0)
+        # sys.exit(0)
     else:
         sys.exit(app.exec_())

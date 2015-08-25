@@ -19,7 +19,7 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from numpy import log10, abs, arange
-from friture.levels_settings import Levels_Settings_Dialog # settings dialog
+from friture.levels_settings import Levels_Settings_Dialog  # settings dialog
 from friture.qsynthmeter import qsynthMeter
 from friture.audioproc import audioproc
 from friture.logger import PrintLogger
@@ -39,10 +39,12 @@ padding: 1px;
 SMOOTH_DISPLAY_TIMER_PERIOD_MS = 25
 LEVEL_TEXT_LABEL_PERIOD_MS = 250
 
-LEVEL_TEXT_LABEL_STEPS = LEVEL_TEXT_LABEL_PERIOD_MS/SMOOTH_DISPLAY_TIMER_PERIOD_MS
+LEVEL_TEXT_LABEL_STEPS = LEVEL_TEXT_LABEL_PERIOD_MS / SMOOTH_DISPLAY_TIMER_PERIOD_MS
+
 
 class Levels_Widget(QtWidgets.QWidget):
-    def __init__(self, parent = None, logger = PrintLogger()):
+
+    def __init__(self, parent=None, logger=PrintLogger()):
         super().__init__(parent)
         self.setObjectName("Levels_Widget")
 
@@ -56,21 +58,21 @@ class Levels_Widget(QtWidgets.QWidget):
 
         self.label_peak = QtWidgets.QLabel(self)
         self.label_peak.setFont(font)
-        #QtCore.Qt.AlignBottom|QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft
-        self.label_peak.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignRight)
+        # QtCore.Qt.AlignBottom|QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft
+        self.label_peak.setAlignment(QtCore.Qt.AlignBottom | QtCore.Qt.AlignRight)
         self.label_peak.setObjectName("label_peak")
 
         self.label_peak_legend = QtWidgets.QLabel(self)
-        self.label_peak_legend.setAlignment(QtCore.Qt.AlignTop|QtCore.Qt.AlignRight)
+        self.label_peak_legend.setAlignment(QtCore.Qt.AlignTop | QtCore.Qt.AlignRight)
         self.label_peak_legend.setObjectName("label_peak_legend")
 
         self.label_rms = QtWidgets.QLabel(self)
         self.label_rms.setFont(font)
-        self.label_rms.setAlignment(QtCore.Qt.AlignBottom|QtCore.Qt.AlignRight)
+        self.label_rms.setAlignment(QtCore.Qt.AlignBottom | QtCore.Qt.AlignRight)
         self.label_rms.setObjectName("label_rms")
 
         self.label_rms_legend = QtWidgets.QLabel(self)
-        self.label_rms_legend.setAlignment(QtCore.Qt.AlignTop|QtCore.Qt.AlignRight)
+        self.label_rms_legend.setAlignment(QtCore.Qt.AlignTop | QtCore.Qt.AlignRight)
         self.label_rms_legend.setObjectName("label_rms_legend")
 
         self.meter = qsynthMeter(self)
@@ -104,19 +106,19 @@ class Levels_Widget(QtWidgets.QWidget):
         # initialize the class instance that will do the fft
         self.proc = audioproc(self.logger)
 
-        #time = SMOOTH_DISPLAY_TIMER_PERIOD_MS/1000. #DISPLAY
-        #time = 0.025 #IMPULSE setting for a sound level meter
-        #time = 0.125 #FAST setting for a sound level meter
-        #time = 1. #SLOW setting for a sound level meter
-        self.response_time = 0.300 #300ms is a common value for VU meters
+        # time = SMOOTH_DISPLAY_TIMER_PERIOD_MS/1000. #DISPLAY
+        # time = 0.025 #IMPULSE setting for a sound level meter
+        # time = 0.125 #FAST setting for a sound level meter
+        # time = 1. #SLOW setting for a sound level meter
+        self.response_time = 0.300  # 300ms is a common value for VU meters
         # an exponential smoothing filter is a simple IIR filter
         # s_i = alpha*x_i + (1-alpha)*s_{i-1}
-        #we compute alpha so that the n most recent samples represent 100*w percent of the output
+        # we compute alpha so that the n most recent samples represent 100*w percent of the output
         w = 0.65
-        n = self.response_time*SAMPLING_RATE
+        n = self.response_time * SAMPLING_RATE
         N = 4096
-        self.alpha = 1. - (1.-w)**(1./(n+1))
-        self.kernel = (1. - self.alpha)**(arange(0, N)[::-1])
+        self.alpha = 1. - (1. - w) ** (1. / (n + 1))
+        self.kernel = (1. - self.alpha) ** (arange(0, N)[::-1])
         # first channel
         self.level_rms = -30.
         self.level_max = -30.
@@ -128,9 +130,9 @@ class Levels_Widget(QtWidgets.QWidget):
         self.old_rms_2 = 1e-30
         self.old_max_2 = 1e-30
 
-        response_time_peaks = 0.025 # 25ms for instantaneous peaks
-        n2 = response_time_peaks/(SMOOTH_DISPLAY_TIMER_PERIOD_MS/1000.)
-        self.alpha2 = 1. - (1.-w)**(1./(n2+1))
+        response_time_peaks = 0.025  # 25ms for instantaneous peaks
+        n2 = response_time_peaks / (SMOOTH_DISPLAY_TIMER_PERIOD_MS / 1000.)
+        self.alpha2 = 1. - (1. - w) ** (1. / (n2 + 1))
 
         self.two_channels = False
 
@@ -149,43 +151,43 @@ class Levels_Widget(QtWidgets.QWidget):
             self.two_channels = False
 
         # first channel
-        y1 = floatdata[0,:]
+        y1 = floatdata[0, :]
 
         # exponential smoothing for max
         if len(y1) > 0:
             value_max = abs(y1).max()
-            if value_max > self.old_max*(1.-self.alpha2):
+            if value_max > self.old_max * (1. - self.alpha2):
                 self.old_max = value_max
             else:
                 # exponential decrease
-                self.old_max *= (1.-self.alpha2)
+                self.old_max *= (1. - self.alpha2)
 
         # exponential smoothing for RMS
-        value_rms = pyx_exp_smoothed_value(self.kernel, self.alpha, y1**2, self.old_rms)
+        value_rms = pyx_exp_smoothed_value(self.kernel, self.alpha, y1 ** 2, self.old_rms)
         self.old_rms = value_rms
 
-        self.level_rms = 10.*log10(value_rms + 0.*1e-80)
-        self.level_max = 20.*log10(self.old_max + 0.*1e-80)
+        self.level_rms = 10. * log10(value_rms + 0. * 1e-80)
+        self.level_max = 20. * log10(self.old_max + 0. * 1e-80)
 
         if self.two_channels:
             # second channel
-            y2 = floatdata[1,:]
+            y2 = floatdata[1, :]
 
             # exponential smoothing for max
             if len(y2) > 0:
                 value_max = abs(y2).max()
-                if value_max > self.old_max_2*(1.-self.alpha2):
+                if value_max > self.old_max_2 * (1. - self.alpha2):
                     self.old_max_2 = value_max
                 else:
                     # exponential decrease
-                    self.old_max_2 *= (1.-self.alpha2)
+                    self.old_max_2 *= (1. - self.alpha2)
 
             # exponential smoothing for RMS
-            value_rms = pyx_exp_smoothed_value(self.kernel, self.alpha, y2**2, self.old_rms_2)
+            value_rms = pyx_exp_smoothed_value(self.kernel, self.alpha, y2 ** 2, self.old_rms_2)
             self.old_rms_2 = value_rms
 
-            self.level_rms_2 = 10.*log10(value_rms + 0.*1e-80)
-            self.level_max_2 = 20.*log10(self.old_max_2 + 0.*1e-80)
+            self.level_rms_2 = 10. * log10(value_rms + 0. * 1e-80)
+            self.level_max_2 = 20. * log10(self.old_max_2 + 0. * 1e-80)
 
     # method
     def canvasUpdate(self):
@@ -224,17 +226,17 @@ class Levels_Widget(QtWidgets.QWidget):
                 else:
                     string_peak_2 = "-Inf"
 
-                self.label_rms.setText("1: %s\n2: %s" %(string_rms, string_rms_2))
-                self.label_peak.setText("1: %s\n2: %s" %(string_peak, string_peak_2))
+                self.label_rms.setText("1: %s\n2: %s" % (string_rms, string_rms_2))
+                self.label_peak.setText("1: %s\n2: %s" % (string_peak, string_peak_2))
 
         if self.i == LEVEL_TEXT_LABEL_STEPS:
             self.i = 0
 
         if 0:
-            fft_size = time*SAMPLING_RATE #1024
-            maxfreq = SAMPLING_RATE/2
+            fft_size = time * SAMPLING_RATE  # 1024
+            maxfreq = SAMPLING_RATE / 2
             sp, freq, A, B, C = self.proc.analyzelive(floatdata, fft_size, maxfreq)
-            print(level_rms, 10*log10((sp**2).sum()*2.), freq.max())
+            print(level_rms, 10 * log10((sp ** 2).sum() * 2.), freq.max())
 
     # slot
     def settings_called(self, checked):

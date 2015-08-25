@@ -10,11 +10,13 @@ import numpy as np
 from friture.scipy_resample import resample
 from friture.linear_interp import pyx_linear_interp_2D
 
+
 class Online_Linear_2D_resampler:
+
     def __init__(self, interp_factor_L=1, decim_factor_M=1, height=1):
         self.interp_factor_L = interp_factor_L
-        self.decim_factor_M  = decim_factor_M
-        self.resampling_ratio = float(interp_factor_L)/decim_factor_M
+        self.decim_factor_M = decim_factor_M
+        self.resampling_ratio = float(interp_factor_L) / decim_factor_M
 
         self.height = height
 
@@ -28,8 +30,8 @@ class Online_Linear_2D_resampler:
     def set_ratio(self, interp_factor_L, decim_factor_M):
         if self.interp_factor_L != interp_factor_L or self.decim_factor_M != decim_factor_M:
             self.interp_factor_L = interp_factor_L
-            self.decim_factor_M  = decim_factor_M
-            self.resampling_ratio = float(interp_factor_L)/decim_factor_M
+            self.decim_factor_M = decim_factor_M
+            self.resampling_ratio = float(interp_factor_L) / decim_factor_M
 
             self.orig_index = 0.
             self.resampled_index = 0.
@@ -44,15 +46,15 @@ class Online_Linear_2D_resampler:
             # we resample here instead of just restarting with zeros to avoid black vertical lines
             # in the spectrogram
             self.old_data = resample(self.old_data, self.height)
-            self.resampled_data = resample(self.resampled_data, self.height) # resample on the first axis
+            self.resampled_data = resample(self.resampled_data, self.height)  # resample on the first axis
 
     def processable(self, m):
-        return int(np.ceil((self.orig_index + m - (self.resampled_index + self.resampling_ratio))/self.resampling_ratio))
+        return int(np.ceil((self.orig_index + m - (self.resampled_index + self.resampling_ratio)) / self.resampling_ratio))
 
     # will return as much resampled data as possible
     def process(self, data):
         self.orig_index += 1.
-        n = int(np.ceil((self.orig_index - (self.resampled_index + self.resampling_ratio))/self.resampling_ratio))
+        n = int(np.ceil((self.orig_index - (self.resampled_index + self.resampling_ratio)) / self.resampling_ratio))
 
         if self.resampled_data.shape[1] < n:
             self.resampled_data = np.zeros((self.height, n))

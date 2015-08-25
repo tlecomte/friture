@@ -21,7 +21,7 @@ from PyQt5 import QtGui, QtWidgets
 from numpy import log10, array, arange, where
 from friture.logger import PrintLogger
 from friture.histplot import HistPlot
-from friture.octavespectrum_settings import (OctaveSpectrum_Settings_Dialog, # settings dialog
+from friture.octavespectrum_settings import (OctaveSpectrum_Settings_Dialog,  # settings dialog
                                              DEFAULT_SPEC_MIN,
                                              DEFAULT_SPEC_MAX,
                                              DEFAULT_WEIGHTING,
@@ -43,8 +43,10 @@ import friture.renard as renard
 
 SMOOTH_DISPLAY_TIMER_PERIOD_MS = 25
 
+
 class OctaveSpectrum_Widget(QtWidgets.QWidget):
-    def __init__(self, parent, logger = PrintLogger()):
+
+    def __init__(self, parent, logger=PrintLogger()):
         super().__init__(parent)
 
         self.logger = logger
@@ -67,7 +69,7 @@ class OctaveSpectrum_Widget(QtWidgets.QWidget):
 
         self.filters = octave_filters(DEFAULT_BANDSPEROCTAVE)
         #self.bankbuffers = [RingBuffer() for band in range(0, DEFAULT_BANDSPEROCTAVE*NOCTAVE)]
-        self.dispbuffers = [0]*DEFAULT_BANDSPEROCTAVE*NOCTAVE
+        self.dispbuffers = [0] * DEFAULT_BANDSPEROCTAVE * NOCTAVE
 
         # set kernel and parameters for the smoothing filter
         self.setresponsetime(self.response_time)
@@ -82,65 +84,65 @@ class OctaveSpectrum_Widget(QtWidgets.QWidget):
     def compute_kernels(self, alphas, Ns):
         kernels = []
         for alpha, N in zip(alphas, Ns):
-            kernels += [(1.-alpha)**arange(N-1, -1, -1)]
+            kernels += [(1. - alpha) ** arange(N - 1, -1, -1)]
         return kernels
 
     def get_kernel(self, kernel, N):
         return
 
     def get_conv(self, kernel, data):
-        return kernel*data
+        return kernel * data
 
     def exp_smoothed_value(self, kernel, alpha, data, previous):
         N = len(data)
         if N == 0:
             return previous
         else:
-            value = alpha * (kernel[-N:]*data).sum() + previous*(1.-alpha)**N
+            value = alpha * (kernel[-N:] * data).sum() + previous * (1. - alpha) ** N
             return value
 
     def handle_new_data(self, floatdata):
-        #the behaviour of the filters functions is sometimes
-        #unexpected when they are called on empty arrays
+        # the behaviour of the filters functions is sometimes
+        # unexpected when they are called on empty arrays
         if floatdata.shape[1] == 0:
             return
 
         # for now, take the first channel only
-        floatdata = floatdata[0,:]
+        floatdata = floatdata[0, :]
 
-        #compute the filters' output
+        # compute the filters' output
         y, decs_unused = self.filters.filter(floatdata)
 
-        #push to the ring buffer
-        #for bankbuffer, bankdata in zip(self.bankbuffers, y):
+        # push to the ring buffer
+        # for bankbuffer, bankdata in zip(self.bankbuffers, y):
         #       bankbuffer.push(bankdata**2)
 
-        #for bankbuffer, bankdata, dec in zip(self.bankbuffers, y, decs):
-            #bankbuffer.push(bankdata**2)
+        # for bankbuffer, bankdata, dec in zip(self.bankbuffers, y, decs):
+        # bankbuffer.push(bankdata**2)
 
-            ##an exponential smoothing filter is a simple IIR filter
-            ##s_i = alpha*x_i + (1-alpha)*s_{i-1}
-            ##we compute alpha so that the N most recent samples represent 100*w percent of the output
-            #w = 0.65
-            #N = time*SAMPLING_RATE/dec
-            #alpha = 1. - (1.-w)**(1./(N+1))
-            ##filter coefficient
-            #forward = [alpha]
-            #feedback = [1., -(1. - alpha)]
-            #filt, zf = lfilter(forward, feedback, bankdata**2, zi=bankbuffer.data(1))
-            #bankbuffer.push(filt)
-            #sp += [bankbuffer.data(1)[0]]
+        # an exponential smoothing filter is a simple IIR filter
+        # s_i = alpha*x_i + (1-alpha)*s_{i-1}
+        # we compute alpha so that the N most recent samples represent 100*w percent of the output
+        #w = 0.65
+        #N = time*SAMPLING_RATE/dec
+        #alpha = 1. - (1.-w)**(1./(N+1))
+        # filter coefficient
+        #forward = [alpha]
+        #feedback = [1., -(1. - alpha)]
+        #filt, zf = lfilter(forward, feedback, bankdata**2, zi=bankbuffer.data(1))
+        # bankbuffer.push(filt)
+        #sp += [bankbuffer.data(1)[0]]
 
-            #bankbuffer.push(bankdata**2)
-            #sp += [self.exp_smoothed_value(time, dec, bankbuffer)]
+        # bankbuffer.push(bankdata**2)
+        #sp += [self.exp_smoothed_value(time, dec, bankbuffer)]
 
-        #compute the widget data
+        # compute the widget data
         #sp = [self.exp_smoothed_value(kernel, alpha, bankdata**2, old) for bankdata, kernel, alpha, old in zip(y, self.kernels, self.alphas, self.dispbuffers)]
-        sp = [pyx_exp_smoothed_value(kernel, alpha, bankdata**2, old) for bankdata, kernel, alpha, old in zip(y, self.kernels, self.alphas, self.dispbuffers)]
-        #store result for next computation
+        sp = [pyx_exp_smoothed_value(kernel, alpha, bankdata ** 2, old) for bankdata, kernel, alpha, old in zip(y, self.kernels, self.alphas, self.dispbuffers)]
+        # store result for next computation
         self.dispbuffers = sp
 
-        #un-weighted moving average
+        # un-weighted moving average
         #sp = [bankbuffer.data(time*SAMPLING_RATE/dec).mean() for bankbuffer, dec in zip(self.bankbuffers, decs)]
 
         sp = array(sp)
@@ -152,7 +154,7 @@ class OctaveSpectrum_Widget(QtWidgets.QWidget):
         #sp = [(bank**2).mean() for bank in y]
         #sp = array(sp)[::-1]
 
-        #brute force without decimation
+        # brute force without decimation
         #y_nodec = octave_filter_bank(self.b, self.a, floatdata)
         #sp_nodec = (y_nodec**2).mean(axis=1)
 
@@ -166,7 +168,7 @@ class OctaveSpectrum_Widget(QtWidgets.QWidget):
             w = self.filters.C
 
         epsilon = 1e-30
-        db_spectrogram = 10*log10(sp + epsilon) + w
+        db_spectrogram = 10 * log10(sp + epsilon) + w
         self.PlotZoneSpect.setdata(self.filters.flow, self.filters.fhigh, self.filters.f_nominal, db_spectrogram)
 
     # method
@@ -189,28 +191,28 @@ class OctaveSpectrum_Widget(QtWidgets.QWidget):
         self.PlotZoneSpect.setweighting(weighting)
 
     def setresponsetime(self, response_time):
-        #time = SMOOTH_DISPLAY_TIMER_PERIOD_MS/1000. #DISPLAY
-        #time = 0.025 #IMPULSE setting for a sound level meter
-        #time = 0.125 #FAST setting for a sound level meter
-        #time = 1. #SLOW setting for a sound level meter
+        # time = SMOOTH_DISPLAY_TIMER_PERIOD_MS/1000. #DISPLAY
+        # time = 0.025 #IMPULSE setting for a sound level meter
+        # time = 0.125 #FAST setting for a sound level meter
+        # time = 1. #SLOW setting for a sound level meter
         self.response_time = response_time
 
         # an exponential smoothing filter is a simple IIR filter
         # s_i = alpha*x_i + (1-alpha)*s_{i-1}
-        #we compute alpha so that the N most recent samples represent 100*w percent of the output
+        # we compute alpha so that the N most recent samples represent 100*w percent of the output
         w = 0.65
         decs = self.filters.get_decs()
-        ns = [self.response_time*SAMPLING_RATE/dec for dec in decs]
-        Ns = [2*4096/dec for dec in decs]
-        self.alphas = [1. - (1.-w)**(1./(n+1)) for n in ns]
-        #print ns, Ns
+        ns = [self.response_time * SAMPLING_RATE / dec for dec in decs]
+        Ns = [2 * 4096 / dec for dec in decs]
+        self.alphas = [1. - (1. - w) ** (1. / (n + 1)) for n in ns]
+        # print ns, Ns
         self.kernels = self.compute_kernels(self.alphas, Ns)
 
     def setbandsperoctave(self, bandsperoctave):
         self.filters.setbandsperoctave(bandsperoctave)
-        #recreate the ring buffers
+        # recreate the ring buffers
         #self.bankbuffers = [RingBuffer() for band in range(0, bandsperoctave*NOCTAVE)]
-        self.dispbuffers = [0]*bandsperoctave*NOCTAVE
+        self.dispbuffers = [0] * bandsperoctave * NOCTAVE
         # reset kernel and parameters for the smoothing filter
         self.setresponsetime(self.response_time)
 
@@ -223,7 +225,9 @@ class OctaveSpectrum_Widget(QtWidgets.QWidget):
     def restoreState(self, settings):
         self.settings_dialog.restoreState(settings)
 
+
 class octave_filters():
+
     def __init__(self, bandsperoctave):
         [self.bdec, self.adec] = generated_filters.params['dec']
 
@@ -232,8 +236,8 @@ class octave_filters():
     def filter(self, floatdata):
         #y, dec, zfs = octave_filter_bank_decimation(self.bdec, self.adec, self.boct, self.aoct, floatdata)
         y, dec, zfs = octave_filter_bank_decimation(self.bdec, self.adec,
-                                                                                                self.boct, self.aoct,
-                                                                                                floatdata, zis=self.zfs)
+                                                    self.boct, self.aoct,
+                                                    floatdata, zis=self.zfs)
         #y, zfs = octave_filter_bank(self.b_nodec, self.a_nodec, floatdata); dec = [1.]*len(y)
         #y, zfs = octave_filter_bank(self.b_nodec, self.a_nodec, floatdata, zis=self.zfs); dec = [1.]*len(y)
 
@@ -243,33 +247,33 @@ class octave_filters():
 
     def get_decs(self):
         #decs = [1.]*self.nbands
-        decs = [2**j for j in range(0, NOCTAVE)[::-1] for i in range(0, self.bandsperoctave)]
+        decs = [2 ** j for j in range(0, NOCTAVE)[::-1] for i in range(0, self.bandsperoctave)]
 
         return decs
 
     def setbandsperoctave(self, bandsperoctave):
         self.bandsperoctave = bandsperoctave
-        self.nbands = NOCTAVE*self.bandsperoctave
+        self.nbands = NOCTAVE * self.bandsperoctave
         self.fi, self.flow, self.fhigh = octave_frequencies(self.nbands, self.bandsperoctave)
-        [self.boct, self.aoct, fi, flow, fhigh] = generated_filters.params['%d' %bandsperoctave]
+        [self.boct, self.aoct, fi, flow, fhigh] = generated_filters.params['%d' % bandsperoctave]
 
         #z, p, k = tf2zpk(self.bdec, self.adec)
-        #print "poles", p, abs(p)**2
-        #print "zeros", z, abs(z)**2
-        #for b, a in zip(self.boct, self.aoct):
-            #z, p, k = tf2zpk(b, a)
-            #print "poles", p, abs(p)**2
-            #print "zeros", z, abs(z)**2
+        # print "poles", p, abs(p)**2
+        # print "zeros", z, abs(z)**2
+        # for b, a in zip(self.boct, self.aoct):
+        #z, p, k = tf2zpk(b, a)
+        # print "poles", p, abs(p)**2
+        # print "zeros", z, abs(z)**2
 
         #[self.b_nodec, self.a_nodec, fi, fl, fh] = octave_filters(self.nbands, self.bandsperoctave)
 
         f = self.fi
-        Rc = 12200.**2*f**2 / ((f**2 + 20.6**2)*(f**2 + 12200.**2))
-        Rb = 12200.**2*f**3 / ((f**2 + 20.6**2)*(f**2 + 12200.**2)*((f**2 + 158.5**2)**0.5))
-        Ra = 12200.**2*f**4 / ((f**2 + 20.6**2)*(f**2 + 12200.**2)*((f**2 + 107.7**2)**0.5) * ((f**2 + 737.9**2)**0.5))
-        self.C = 0.06 + 20.*log10(Rc)
-        self.B = 0.17 + 20.*log10(Rb)
-        self.A = 2.0  + 20.*log10(Ra)
+        Rc = 12200. ** 2 * f ** 2 / ((f ** 2 + 20.6 ** 2) * (f ** 2 + 12200. ** 2))
+        Rb = 12200. ** 2 * f ** 3 / ((f ** 2 + 20.6 ** 2) * (f ** 2 + 12200. ** 2) * ((f ** 2 + 158.5 ** 2) ** 0.5))
+        Ra = 12200. ** 2 * f ** 4 / ((f ** 2 + 20.6 ** 2) * (f ** 2 + 12200. ** 2) * ((f ** 2 + 107.7 ** 2) ** 0.5) * ((f ** 2 + 737.9 ** 2) ** 0.5))
+        self.C = 0.06 + 20. * log10(Rc)
+        self.B = 0.17 + 20. * log10(Rb)
+        self.A = 2.0 + 20. * log10(Ra)
         #self.zfs = None
         self.zfs = octave_filter_bank_decimation_filtic(self.bdec, self.adec, self.boct, self.aoct)
 
@@ -284,7 +288,7 @@ class octave_filters():
         elif bandsperoctave == 24:
             basis = renard.R80
         else:
-            raise Exception("Unknown bandsperoctave: %d" %(bandsperoctave))
+            raise Exception("Unknown bandsperoctave: %d" % (bandsperoctave))
 
         # search the index of 1 kHz, the reference
         i = where(self.fi == 1000.)[0][0]
@@ -294,12 +298,12 @@ class octave_filters():
 
         k = 0
         while len(self.f_nominal) < len(self.fi) - i:
-            self.f_nominal += ["{0:.{width}f}k".format(10**k*f, width=2-k) for f in basis]
+            self.f_nominal += ["{0:.{width}f}k".format(10 ** k * f, width=2 - k) for f in basis]
             k += 1
         self.f_nominal = self.f_nominal[:len(self.fi) - i]
 
         k = 0
         while len(self.f_nominal) < len(self.fi):
-            self.f_nominal = ["%d" %(10**(2-k)*f) for f in basis] + self.f_nominal
+            self.f_nominal = ["%d" % (10 ** (2 - k) * f) for f in basis] + self.f_nominal
             k += 1
         self.f_nominal = self.f_nominal[-len(self.fi):]

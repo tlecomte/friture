@@ -19,7 +19,9 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
+
 class LogWidget(QtWidgets.QWidget):
+
     def __init__(self, parent, logger):
         super().__init__(parent)
 
@@ -29,7 +31,7 @@ class LogWidget(QtWidgets.QWidget):
 
         self.log_scrollarea = QtWidgets.QScrollArea(self)
         self.log_scrollarea.setWidgetResizable(True)
-        self.log_scrollarea.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
+        self.log_scrollarea.setAlignment(QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
         self.log_scrollarea.setObjectName("log_scrollArea")
 
         self.log_scrollAreaWidgetContents = QtWidgets.QWidget(self.log_scrollarea)
@@ -39,8 +41,9 @@ class LogWidget(QtWidgets.QWidget):
         self.log_scrollarea.setWidget(self.log_scrollAreaWidgetContents)
 
         self.LabelLog = QtWidgets.QLabel(self.log_scrollAreaWidgetContents)
-        self.LabelLog.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
-        self.LabelLog.setTextInteractionFlags(QtCore.Qt.LinksAccessibleByKeyboard|QtCore.Qt.LinksAccessibleByMouse|QtCore.Qt.TextBrowserInteraction|QtCore.Qt.TextSelectableByKeyboard|QtCore.Qt.TextSelectableByMouse)
+        self.LabelLog.setAlignment(QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
+        self.LabelLog.setTextInteractionFlags(QtCore.Qt.LinksAccessibleByKeyboard | QtCore.Qt.LinksAccessibleByMouse |
+                                              QtCore.Qt.TextBrowserInteraction | QtCore.Qt.TextSelectableByKeyboard | QtCore.Qt.TextSelectableByMouse)
         self.LabelLog.setObjectName("LabelLog")
 
         self.log_layout = QtWidgets.QVBoxLayout(self.log_scrollAreaWidgetContents)
@@ -52,7 +55,6 @@ class LogWidget(QtWidgets.QWidget):
 
         self.logger.logChanged.connect(self.log_changed)
         self.log_scrollarea.verticalScrollBar().rangeChanged.connect(self.log_scroll_range_changed)
-
 
     # slot
     # update the log widget with the new log content

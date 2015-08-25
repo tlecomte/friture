@@ -28,8 +28,10 @@ from friture.delay_estimator import Delay_Estimator_Widget
 from friture.controlbar import ControlBar
 from friture.defaults import DEFAULT_CENTRAL_WIDGET
 
+
 class CentralWidget(QtWidgets.QWidget):
-    def __init__(self, parent, logger, name, type = 0):
+
+    def __init__(self, parent, logger, name, type=0):
         super().__init__(parent)
 
         self.setObjectName(name)
@@ -42,7 +44,7 @@ class CentralWidget(QtWidgets.QWidget):
         self.controlBar.settingsButton.clicked.connect(self.settings_slot)
 
         self.label = QtWidgets.QLabel(self)
-        self.label.setText(" Central dock ") # spaces before and after for nicer alignment
+        self.label.setText(" Central dock ")  # spaces before and after for nicer alignment
         self.controlBar.layout.insertWidget(0, self.label)
 
         self.layout = QtWidgets.QVBoxLayout(self)

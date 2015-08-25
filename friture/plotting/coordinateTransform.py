@@ -19,8 +19,11 @@
 
 import numpy as np
 
-#transforms between screen coordinates and plot coordinates
+# transforms between screen coordinates and plot coordinates
+
+
 class CoordinateTransform(object):
+
     def __init__(self, min, max, length, startBorder, endBorder):
         super(CoordinateTransform, self).__init__()
 
@@ -50,21 +53,21 @@ class CoordinateTransform(object):
 
     def toScreen(self, x):
         if self.max == self.min:
-            return self.startBorder + 0.*x # keep x type (this can produce a RunTimeWarning if x contains inf)
+            return self.startBorder + 0. * x  # keep x type (this can produce a RunTimeWarning if x contains inf)
 
         if self.log:
             logMin = max(1e-20, self.min)
             logMax = max(logMin, self.max)
-            x = (x<1e-20)*1e-20 + (x>=1e-20)*x
-            return (np.log10(x/logMin))*(self.length - self.startBorder - self.endBorder)/np.log10(logMax/logMin) + self.startBorder
+            x = (x < 1e-20) * 1e-20 + (x >= 1e-20) * x
+            return (np.log10(x / logMin)) * (self.length - self.startBorder - self.endBorder) / np.log10(logMax / logMin) + self.startBorder
         else:
-            return (x - self.min)*(self.length - self.startBorder - self.endBorder)/(self.max - self.min) + self.startBorder
+            return (x - self.min) * (self.length - self.startBorder - self.endBorder) / (self.max - self.min) + self.startBorder
 
     def toPlot(self, x):
         if self.length == self.startBorder + self.endBorder:
-            return self.min + 0.*x # keep x type (this can produce a RunTimeWarning if x contains inf)
+            return self.min + 0. * x  # keep x type (this can produce a RunTimeWarning if x contains inf)
 
         if self.log:
-            return 10**((x - self.startBorder)*np.log10(self.max/self.min)/(self.length - self.startBorder - self.endBorder))*self.min
+            return 10 ** ((x - self.startBorder) * np.log10(self.max / self.min) / (self.length - self.startBorder - self.endBorder)) * self.min
         else:
-            return (x - self.startBorder)*(self.max - self.min)/(self.length - self.startBorder - self.endBorder) + self.min
+            return (x - self.startBorder) * (self.max - self.min) / (self.length - self.startBorder - self.endBorder) + self.min

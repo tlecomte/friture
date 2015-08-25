@@ -24,10 +24,12 @@ from friture.audiobackend import SAMPLING_RATE
 from friture.logger import PrintLogger
 
 SMOOTH_DISPLAY_TIMER_PERIOD_MS = 25
-DEFAULT_TIMERANGE = 2*SMOOTH_DISPLAY_TIMER_PERIOD_MS
+DEFAULT_TIMERANGE = 2 * SMOOTH_DISPLAY_TIMER_PERIOD_MS
+
 
 class Scope_Widget(QtWidgets.QWidget):
-    def __init__(self, parent, logger = PrintLogger()):
+
+    def __init__(self, parent, logger=PrintLogger()):
         super().__init__(parent)
 
         self.audiobuffer = None
@@ -53,17 +55,17 @@ class Scope_Widget(QtWidgets.QWidget):
         self.audiobuffer = buffer
 
     def handle_new_data(self, floatdata):
-        time = self.timerange*1e-3
-        width = int(time*SAMPLING_RATE)
-        #basic trigger capability on leading edge
-        floatdata = self.audiobuffer.data(2*width)
+        time = self.timerange * 1e-3
+        width = int(time * SAMPLING_RATE)
+        # basic trigger capability on leading edge
+        floatdata = self.audiobuffer.data(2 * width)
 
-        #number of data points received at the last audio buffer update
+        # number of data points received at the last audio buffer update
         #newpoints = self.audiobuffer.newpoints
-        #print newpoints
+        # print newpoints
 
         # because of the buffering, sometimes we have not got any data
-        #if newpoints==0:
+        # if newpoints==0:
         #    return
 
         #floatdata = self.audiobuffer.data(newpoints + width)
@@ -73,45 +75,45 @@ class Scope_Widget(QtWidgets.QWidget):
             twoChannels = True
 
         # trigger on the first channel only
-        triggerdata = floatdata[0,:]
+        triggerdata = floatdata[0, :]
         # trigger on half of the waveform
-        trig_search_start = width/2
-        trig_search_stop = -width/2
-        triggerdata = triggerdata[trig_search_start : trig_search_stop]
+        trig_search_start = width / 2
+        trig_search_stop = -width / 2
+        triggerdata = triggerdata[trig_search_start: trig_search_stop]
 
         max = floatdata.max()
-        trigger_level = max*2./3.
+        trigger_level = max * 2. / 3.
         #trigger_level = 0.6
-        trigger_pos = where((triggerdata[:-1] < trigger_level)*(triggerdata[1:] >= trigger_level))[0]
+        trigger_pos = where((triggerdata[:-1] < trigger_level) * (triggerdata[1:] >= trigger_level))[0]
 
-        if len(trigger_pos)==0:
+        if len(trigger_pos) == 0:
             return
 
         if len(trigger_pos) > 0:
             shift = trigger_pos[0]
         else:
-            #return
+            # return
             shift = 0
         shift += trig_search_start
         datarange = width
-        floatdata = floatdata[:, shift -  datarange/2: shift +  datarange/2]
+        floatdata = floatdata[:, shift - datarange / 2: shift + datarange / 2]
 
-        self.y = floatdata[0,:] #- floatdata.mean()
+        self.y = floatdata[0, :]  # - floatdata.mean()
         if twoChannels:
-            self.y2 = floatdata[1,:] #- floatdata.mean()
+            self.y2 = floatdata[1, :]  # - floatdata.mean()
         else:
             self.y2 = None
 
         dBscope = False
         if dBscope:
             dBmin = -50.
-            self.y = sign(self.y)*(20*log10(abs(self.y))).clip(dBmin, 0.)/(-dBmin) + sign(self.y)*1.
+            self.y = sign(self.y) * (20 * log10(abs(self.y))).clip(dBmin, 0.) / (-dBmin) + sign(self.y) * 1.
             if twoChannels:
-                self.y2 = sign(self.y2)*(20*log10(abs(self.y2))).clip(dBmin, 0.)/(-dBmin) + sign(self.y2)*1.
+                self.y2 = sign(self.y2) * (20 * log10(abs(self.y2))).clip(dBmin, 0.) / (-dBmin) + sign(self.y2) * 1.
             else:
                 self.y2 = None
 
-        self.time = (arange(len(self.y)) - datarange/2)/float(SAMPLING_RATE)
+        self.time = (arange(len(self.y)) - datarange / 2) / float(SAMPLING_RATE)
 
         if self.y2 is not None:
             self.PlotZoneUp.setdataTwoChannels(self.time, self.y, self.y2)
@@ -146,6 +148,7 @@ class Scope_Widget(QtWidgets.QWidget):
 
 
 class Scope_Settings_Dialog(QtWidgets.QDialog):
+
     def __init__(self, parent, logger):
         super().__init__(parent)
 

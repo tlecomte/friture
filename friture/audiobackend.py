@@ -25,6 +25,7 @@ from numpy import ndarray, floor, int16, fromstring, vstack, iinfo, float64
 SAMPLING_RATE = 48000
 FRAMES_PER_BUFFER = 512
 
+
 class AudioBackend(QtCore.QObject):
 
     underflow = QtCore.pyqtSignal()
@@ -32,7 +33,7 @@ class AudioBackend(QtCore.QObject):
     new_data_available = QtCore.pyqtSignal(ndarray, float, int)
 
     def callback(self, in_data, frame_count, time_info, status):
-        #do the minimum from here to prevent overflows, just pass the data to the main thread
+        # do the minimum from here to prevent overflows, just pass the data to the main thread
 
         input_time = time_info['input_buffer_adc_time']
 
@@ -124,7 +125,7 @@ class AudioBackend(QtCore.QObject):
 
             nchannels = self.pa.get_device_info_by_index(device)['maxInputChannels']
 
-            desc = "%s (%d channels) (%s) %s" %(dev_info['name'], nchannels, api, extra_info)
+            desc = "%s (%d channels) (%s) %s" % (dev_info['name'], nchannels, api, extra_info)
 
             devices_list += [desc]
 
@@ -147,7 +148,7 @@ class AudioBackend(QtCore.QObject):
 
             nchannels = self.pa.get_device_info_by_index(device)['maxOutputChannels']
 
-            desc = "%s (%d channels) (%s) %s" %(dev_info['name'], nchannels, api, extra_info)
+            desc = "%s (%d channels) (%s) %s" % (dev_info['name'], nchannels, api, extra_info)
 
             devices_list += [desc]
 
@@ -276,11 +277,11 @@ class AudioBackend(QtCore.QObject):
         # (interleaved in the data buffer)
         maxInputChannels = self.pa.get_device_info_by_index(device)['maxInputChannels']
         stream = self.pa.open(format=paInt16, channels=maxInputChannels, rate=SAMPLING_RATE, input=True,
-                        input_device_index=device, stream_callback=self.callback,
-                        frames_per_buffer = FRAMES_PER_BUFFER)
+                              input_device_index=device, stream_callback=self.callback,
+                              frames_per_buffer=FRAMES_PER_BUFFER)
 
-        lat_ms = 1000*stream.get_input_latency()
-        self.logger.push("Device claims %d ms latency" %(lat_ms))
+        lat_ms = 1000 * stream.get_input_latency()
+        self.logger.push("Device claims %d ms latency" % (lat_ms))
 
         return stream
 
@@ -290,8 +291,8 @@ class AudioBackend(QtCore.QObject):
         # (interleaved in the data buffer)
         maxOutputChannels = self.pa.get_device_info_by_index(device)['maxOutputChannels']
         stream = self.pa.open(format=paInt16, channels=maxOutputChannels, rate=SAMPLING_RATE, output=True,
-                                                        frames_per_buffer=FRAMES_PER_BUFFER, output_device_index=device,
-                                                        stream_callback=callback)
+                              frames_per_buffer=FRAMES_PER_BUFFER, output_device_index=device,
+                              stream_callback=callback)
         return stream
 
     def is_output_format_supported(self, device, format):
@@ -316,7 +317,7 @@ class AudioBackend(QtCore.QObject):
         else:
             channels = []
             for channel in range(0, dev_info['maxInputChannels']):
-                channels += ["%d" %channel]
+                channels += ["%d" % channel]
 
         return channels
 
@@ -348,7 +349,7 @@ class AudioBackend(QtCore.QObject):
 
         int16info = iinfo(int16)
         norm_coeff = max(abs(int16info.min), int16info.max)
-        floatdata_all_channels = intdata_all_channels.astype(float64)/float(norm_coeff)
+        floatdata_all_channels = intdata_all_channels.astype(float64) / float(norm_coeff)
 
         channel = self.get_current_first_channel()
         nchannels = self.get_current_device_nchannels()

@@ -6,17 +6,18 @@ from numpy import arange, sqrt, zeros
 #import scipy
 #scipy.factorial = factorial
 
-#importing lfilter from scipy.signal.signaltools instead of scipy.signal decreases
-#dramatically the number of modules imported (and decreases the size of the NSIS package...)
+# importing lfilter from scipy.signal.signaltools instead of scipy.signal decreases
+# dramatically the number of modules imported (and decreases the size of the NSIS package...)
 #from scipy.signal.signaltools import lfilter
-#importint _linear_filter itself from sigtools is even better
+# importint _linear_filter itself from sigtools is even better
 from scipy.signal.sigtools import _linear_filter
 
-#NOTE: by default scipy.signal.__init__.py imports all of its submodules
-#To decrease the py2exe distributions dramatically, these import lines can
-#be commented out !
+# NOTE: by default scipy.signal.__init__.py imports all of its submodules
+# To decrease the py2exe distributions dramatically, these import lines can
+# be commented out !
 
 NOCTAVE = 9
+
 
 def ERBFilterBank(forward, feedback, x):
     # y=ERBFilterBank(forward, feedback, x)
@@ -27,7 +28,7 @@ def ERBFilterBank(forward, feedback, x):
     (rows, cols) = feedback.shape
     y = zeros((rows, len(x)))
     for i in range(0, rows):
-        y[i,:] = lfilter(forward[i,:], feedback[i,:], x)
+        y[i, :] = lfilter(forward[i, :], feedback[i, :], x)
     return y
 
 # Nominal frequencies: 31.5 40 50 63 80 100 125 160 200 250 315 400 500 630 800 1000 1250
@@ -44,28 +45,30 @@ def ERBFilterBank(forward, feedback, x):
 #     fi is the center frequency of the ith band-pass filter expressed in hertz.
 #     i is an integer when i = 0, f0 = 1 kHz, which is the reference frequency for the audio range.
 #     b is the bandwidth designator and equals 1 for octave, 1/3 for 1/3 octave, 1/6 for 1/6 octave, 1/12 for 1/12 octave, and 1/24 for 1/24 octave.
+
+
 def octave_frequencies(Nbands, BandsPerOctave):
-    f0 = 1000. # audio reference frequency is 1 kHz
+    f0 = 1000.  # audio reference frequency is 1 kHz
 
-    b = 1./BandsPerOctave
+    b = 1. / BandsPerOctave
 
-    imax = Nbands//2
-    if Nbands%2 == 0:
+    imax = Nbands // 2
+    if Nbands % 2 == 0:
         i = arange(-imax, imax)
     else:
         i = arange(-imax, imax + 1)
 
-
-    if BandsPerOctave%2 == 1:
-        fi = f0 * 2**(i*b)
+    if BandsPerOctave % 2 == 1:
+        fi = f0 * 2 ** (i * b)
     else:
         # FIXME the official formula does not seem to work !
-        fi = f0 * 2**(i*b) #fi = f0 * 2**((2*i+1)*b/2.)
+        fi = f0 * 2 ** (i * b)  # fi = f0 * 2**((2*i+1)*b/2.)
 
-    f_low = fi * sqrt(2**(-b))
-    f_high = fi * sqrt(2**b)
+    f_low = fi * sqrt(2 ** (-b))
+    f_high = fi * sqrt(2 ** b)
 
     return fi, f_low, f_high
+
 
 def octave_filter_bank(forward, feedback, x, zis=None):
     # This function filters the waveform x with the array of filters
@@ -81,7 +84,7 @@ def octave_filter_bank(forward, feedback, x, zis=None):
     if zis is None:
         zis = []
         for i in range(0, Nbank):
-            zis += [zeros(max(len(forward[i]), len(feedback[i]))-1)]
+            zis += [zeros(max(len(forward[i]), len(feedback[i])) - 1)]
 
     for i in range(0, Nbank):
         filt, zf = lfilter(forward[i], feedback[i], x, zi=zis[i])
@@ -94,16 +97,18 @@ def octave_filter_bank(forward, feedback, x, zis=None):
 # Note: we may have one filter in excess here : the low-pass filter for decimation
 # does approximately the same thing as the low-pass component of the highest band-pass
 # filter for the octave
+
+
 def octave_filter_bank_decimation(blow, alow, forward, feedback, x, zis=None):
     # This function filters the waveform x with the array of filters
     # specified by the forward and feedback parameters. Each row
     # of the forward and feedback parameters are the parameters
     # to the Matlab builtin function "filter".
     BandsPerOctave = len(forward)
-    Nbank = NOCTAVE*BandsPerOctave
+    Nbank = NOCTAVE * BandsPerOctave
 
-    y = [0.]*Nbank
-    dec = [0.]*Nbank
+    y = [0.] * Nbank
+    dec = [0.] * Nbank
 
     x_dec = x
 
@@ -116,7 +121,7 @@ def octave_filter_bank_decimation(blow, alow, forward, feedback, x, zis=None):
             for i in range(0, BandsPerOctave)[::-1]:
                 filt = lfilter(forward[i], feedback[i], x_dec)
                 y[k] = filt
-                dec[k] = 2**j
+                dec[k] = 2 ** j
                 k -= 1
             x_dec, zf = decimate(blow, alow, x_dec)
 
@@ -134,7 +139,7 @@ def octave_filter_bank_decimation(blow, alow, forward, feedback, x, zis=None):
                 zfs += [zf]
                 #zfs += [0.]
                 y[k] = filt
-                dec[k] = 2**j
+                dec[k] = 2 ** j
                 k -= 1
             x_dec, zf = decimate(blow, alow, x_dec, zi=zis[m])
             m += 1
@@ -143,6 +148,7 @@ def octave_filter_bank_decimation(blow, alow, forward, feedback, x, zis=None):
             #zfs += [0.]
 
         return y, dec, zfs
+
 
 def decimate(bdec, adec, x, zi=None):
     if zi is None:
@@ -157,6 +163,8 @@ def decimate(bdec, adec, x, zi=None):
     return x_dec, zf
 
 # build a proper array of zero initial conditions to start the filters
+
+
 def octave_filter_bank_decimation_filtic(blow, alow, forward, feedback):
     BandsPerOctave = len(forward)
     zfs = []
@@ -169,6 +177,7 @@ def octave_filter_bank_decimation_filtic(blow, alow, forward, feedback):
         zfs += [zeros(l)]
 
     return zfs
+
 
 def lfilter(b, a, x, axis=-1, zi=None):
     """
@@ -237,7 +246,7 @@ def lfilter(b, a, x, axis=-1, zi=None):
                  a[0] + a[1]z  + ... + a[na] z
 
     """
-    #if isscalar(a):
+    # if isscalar(a):
     #a = [a]
     if zi is None:
         return _linear_filter(b, a, x, axis)

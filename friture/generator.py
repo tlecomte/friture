@@ -29,17 +29,18 @@ from friture.generators.pink import PinkGenerator
 from friture.generators.white import WhiteGenerator
 
 SMOOTH_DISPLAY_TIMER_PERIOD_MS = 25
-FRAMES_PER_BUFFER = 2*1024
+FRAMES_PER_BUFFER = 2 * 1024
 DEFAULT_GENERATOR_KIND_INDEX = 0
-RAMP_LENGTH = 3e-3 # 10 ms
+RAMP_LENGTH = 3e-3  # 10 ms
 
 (stopped, starting, playing, stopping) = list(range(0, 4))
+
 
 class Generator_Widget(QtWidgets.QWidget):
 
     stream_stop_ramp_finished = QtCore.pyqtSignal()
 
-    def __init__(self, parent, audiobackend, logger = PrintLogger()):
+    def __init__(self, parent, audiobackend, logger=PrintLogger()):
         super().__init__(parent)
 
         self.logger = logger
@@ -116,7 +117,7 @@ class Generator_Widget(QtWidgets.QWidget):
         self.comboBox_generator_kind.activated.connect(self.stackedLayout.setCurrentIndex)
         self.startStopButton.toggled.connect(self.startStopButton_toggle)
 
-        #self.setStyleSheet(STYLESHEET)
+        # self.setStyleSheet(STYLESHEET)
 
         #self.response_time = DEFAULT_RESPONSE_TIME
 
@@ -231,10 +232,10 @@ class Generator_Widget(QtWidgets.QWidget):
             return ("", pyaudio.paContinue)
 
         # if we cannot write any sample, return now
-        if N==0:
+        if N == 0:
             return ("", pyaudio.paContinue)
 
-        t = self.t + np.arange(0, N/float(SAMPLING_RATE), 1./float(SAMPLING_RATE))
+        t = self.t + np.arange(0, N / float(SAMPLING_RATE), 1. / float(SAMPLING_RATE))
 
         name = self.comboBox_generator_kind.currentText()
 
@@ -254,20 +255,20 @@ class Generator_Widget(QtWidgets.QWidget):
         # add smooth ramps at start/stop to avoid undesirable bursts
         if self.state == starting:
             # add a ramp at the start
-            t_ramp = self.t_start + np.arange(0, N/float(SAMPLING_RATE), 1./float(SAMPLING_RATE))
+            t_ramp = self.t_start + np.arange(0, N / float(SAMPLING_RATE), 1. / float(SAMPLING_RATE))
             t_ramp = np.clip(t_ramp, 0., RAMP_LENGTH)
-            floatdata *= t_ramp/RAMP_LENGTH
-            self.t_start += N/float(SAMPLING_RATE)
+            floatdata *= t_ramp / RAMP_LENGTH
+            self.t_start += N / float(SAMPLING_RATE)
             if self.t_start > RAMP_LENGTH:
                 self.state = playing
 
         if self.state == stopping:
             print("stopping", self.t_stop, N)
             # add a ramp at the end
-            t_ramp = self.t_stop - np.arange(0, N/float(SAMPLING_RATE), 1./float(SAMPLING_RATE))
+            t_ramp = self.t_stop - np.arange(0, N / float(SAMPLING_RATE), 1. / float(SAMPLING_RATE))
             t_ramp = np.clip(t_ramp, 0., RAMP_LENGTH)
-            floatdata *= t_ramp/RAMP_LENGTH
-            self.t_stop -= N/float(SAMPLING_RATE)
+            floatdata *= t_ramp / RAMP_LENGTH
+            self.t_stop -= N / float(SAMPLING_RATE)
 
             if self.t_stop < 0.:
                 self.state = stopped
@@ -280,11 +281,11 @@ class Generator_Widget(QtWidgets.QWidget):
 
         int16info = np.iinfo(np.int16)
         norm_coeff = min(abs(int16info.min), int16info.max)
-        intdata = (np.clip(floatdata, int16info.min, int16info.max)*norm_coeff).astype(np.int16)
+        intdata = (np.clip(floatdata, int16info.min, int16info.max) * norm_coeff).astype(np.int16)
         chardata = intdata.tostring()
 
         # update the time counter
-        self.t += N/float(SAMPLING_RATE)
+        self.t += N / float(SAMPLING_RATE)
 
         return (chardata, pyaudio.paContinue)
 
@@ -309,7 +310,9 @@ class Generator_Widget(QtWidgets.QWidget):
 
         self.settings_dialog.restoreState(settings)
 
+
 class Generator_Settings_Dialog(QtWidgets.QDialog):
+
     def __init__(self, parent, logger):
         super().__init__(parent)
 

@@ -47,19 +47,21 @@ aboutText = """
         <li>Cython %s</li>
         <li>PyOpenGL %s</li>
 </ul>
-""" %(friture.__version__,
-        friture.__releasedate__,
-        "%d.%d" %(sys.version_info.major, sys.version_info.minor),
-        QtCore.PYQT_VERSION_STR,
-        QtCore.qVersion(),
-        pyaudio.__version__,
-        pyaudio.pa.get_version_text(),
-        numpy.__version__,
-        scipy.__version__,
-        Cython.__version__,
-        OpenGL.__version__)
+""" % (friture.__version__,
+       friture.__releasedate__,
+       "%d.%d" % (sys.version_info.major, sys.version_info.minor),
+       QtCore.PYQT_VERSION_STR,
+       QtCore.qVersion(),
+       pyaudio.__version__,
+       pyaudio.pa.get_version_text(),
+       numpy.__version__,
+       scipy.__version__,
+       Cython.__version__,
+       OpenGL.__version__)
+
 
 class About_Dialog(QtWidgets.QDialog):
+
     def __init__(self, parent, logger, audiobackend, timer):
         super().__init__(parent)
 
@@ -87,7 +89,7 @@ class About_Dialog(QtWidgets.QDialog):
         self.label_2.setObjectName("label_2")
         self.horizontalLayout.addWidget(self.label_2)
         self.label = QtWidgets.QLabel(self.aboutTab)
-        self.label.setOpenExternalLinks( True )
+        self.label.setOpenExternalLinks(True)
         self.label.setObjectName("label")
         self.label.setText(aboutText)
 

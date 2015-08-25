@@ -29,7 +29,9 @@ Please check your audio configuration.
 Friture will now exit.
 """
 
+
 class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
+
     def __init__(self, parent, logger, audiobackend):
         QtWidgets.QDialog.__init__(self, parent)
         Ui_Settings_Dialog.__init__(self)

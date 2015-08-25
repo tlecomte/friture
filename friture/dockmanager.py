@@ -22,7 +22,9 @@ from PyQt5.QtWidgets import QMainWindow
 from friture.defaults import DEFAULT_DOCKS
 from friture.dock import Dock
 
+
 class DockManager(QtCore.QObject):
+
     def __init__(self, parent, logger):
         super().__init__(parent)
 
@@ -40,17 +42,16 @@ class DockManager(QtCore.QObject):
         if len(dockindexes) == 0:
             index = 1
         else:
-            index = max(dockindexes)+1
-        name = "Dock %d" %index
+            index = max(dockindexes) + 1
+        name = "Dock %d" % index
         new_dock = Dock(self.parent(), self.logger, name)
         self.parent().addDockWidget(QtCore.Qt.TopDockWidgetArea, new_dock)
 
         self.docks += [new_dock]
 
-    #slot
+    # slot
     def close_dock(self, dock):
         self.docks.remove(dock)
-
 
     def saveState(self, settings):
         docknames = [dock.objectName() for dock in self.docks]
@@ -59,7 +60,6 @@ class DockManager(QtCore.QObject):
             settings.beginGroup(dock.objectName())
             dock.saveState(settings)
             settings.endGroup()
-
 
     def restoreState(self, settings):
         if settings.contains("dockNames"):
@@ -72,10 +72,9 @@ class DockManager(QtCore.QObject):
                 settings.endGroup()
         else:
             self.logger.push("First launch, display a default set of docks")
-            self.docks = [Dock(self.parent(), self.logger, "Dock %d" %(i), type = type) for i, type in enumerate(DEFAULT_DOCKS)]
+            self.docks = [Dock(self.parent(), self.logger, "Dock %d" % (i), type=type) for i, type in enumerate(DEFAULT_DOCKS)]
             for dock in self.docks:
                 self.parent().addDockWidget(QtCore.Qt.TopDockWidgetArea, dock)
-
 
     def canvasUpdate(self):
         for dock in self.docks:

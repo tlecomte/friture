@@ -1,7 +1,10 @@
 from PyQt5 import QtGui, QtCore, QtWidgets
 
-#a widget for the items' legends
+# a widget for the items' legends
+
+
 class LegendWidget(QtWidgets.QWidget):
+
     def __init__(self, parent, canvasWidget):
         super(LegendWidget, self).__init__(parent)
 
@@ -19,11 +22,11 @@ class LegendWidget(QtWidgets.QWidget):
         m = max([fm.width(item.title()) for item in self.canvasWidget.attachedItems])
 
         # for vertical title
-        return QtCore.QSize(m + 2*self.margin + self.spacing + self.lineLength, 2*self.margin + len(self.canvasWidget.attachedItems)*fm.height()*2)
+        return QtCore.QSize(m + 2 * self.margin + self.spacing + self.lineLength, 2 * self.margin + len(self.canvasWidget.attachedItems) * fm.height() * 2)
 
     def paintEvent(self, paintEvent):
         painter = QtGui.QPainter(self)
-        #painter.setRenderHint(QtGui.QPainter.Antialiasing)
+        # painter.setRenderHint(QtGui.QPainter.Antialiasing)
 
         fm = painter.fontMetrics()
 
@@ -31,8 +34,8 @@ class LegendWidget(QtWidgets.QWidget):
         y = self.margin + fm.height()
         for item in self.canvasWidget.attachedItems:
             painter.setPen(item.color())
-            yl = y - fm.height()/3
+            yl = y - fm.height() / 3
             painter.drawLine(self.margin, yl, self.margin + self.lineLength, yl)
             painter.setPen(QtCore.Qt.black)
             painter.drawText(x0, y, item.title())
-            y += fm.height()*2
+            y += fm.height() * 2

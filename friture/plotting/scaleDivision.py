@@ -21,16 +21,17 @@ import math
 from decimal import Decimal
 import numpy
 
+
 def numberPrecision(x):
     return Decimal(x).adjusted()
 
 
 def ceilWithPrecision(x, prec):
-    return math.ceil(x*10**-(prec))*10**(prec)
+    return math.ceil(x * 10 ** -(prec)) * 10 ** (prec)
 
 
 def floorWithPrecision(x, prec):
-    return math.floor(x*10**-(prec))*10**(prec)
+    return math.floor(x * 10 ** -(prec)) * 10 ** (prec)
 
 
 # 1.1 0.2
@@ -46,11 +47,11 @@ def ceilWithinInterval(x, interval):
     return candidate
 
 
-#0.322
-#0.3
+# 0.322
+# 0.3
 #0.1, 0.2, 0.5
 def roundWithPrecision(x, prec):
-    candidates = [1.*10**prec, 2.*10**prec, 5.*10**prec]
+    candidates = [1. * 10 ** prec, 2. * 10 ** prec, 5. * 10 ** prec]
 
     # find closest
     distances = [abs(x - candidate) for candidate in candidates]
@@ -60,8 +61,9 @@ def roundWithPrecision(x, prec):
     return candidates[i]
 
 
-#takes min/max of the scale, and returns appropriate ticks (selected for proper number, rounding)
+# takes min/max of the scale, and returns appropriate ticks (selected for proper number, rounding)
 class ScaleDivision(object):
+
     def __init__(self, min, max, length):
         self.min = min
         self.max = max
@@ -108,9 +110,9 @@ class ScaleDivision(object):
             trueMinLog10Ceil = int(numpy.ceil(trueMinLog10))
             trueMaxLog10Floor = int(numpy.floor(trueMaxLog10))
 
-            ticks = [10**i for i in range(trueMinLog10Ceil, trueMaxLog10Floor+1)]
+            ticks = [10 ** i for i in range(trueMinLog10Ceil, trueMaxLog10Floor + 1)]
         else:
-            base_interval = rang/6.
+            base_interval = rang / 6.
 
             approx_interval_prec = numberPrecision(base_interval)
 
@@ -122,8 +124,8 @@ class ScaleDivision(object):
                 return []
 
             # add ticks up to the max
-            N = int(math.floor((trueMax - rmin)/approx_interval))
-            ticks = [rmin + approx_interval*i for i in range(N+1)]
+            N = int(math.floor((trueMax - rmin) / approx_interval))
+            ticks = [rmin + approx_interval * i for i in range(N + 1)]
 
             self.majorTickInterval = approx_interval
 
@@ -145,14 +147,14 @@ class ScaleDivision(object):
             standardLogTicks = [2, 4, 6, 8]
 
             for a in standardLogTicks:
-                if a*majorTicks[0]/10. >= trueMin:
-                    ticks.append(a*majorTicks[0]/10.)
+                if a * majorTicks[0] / 10. >= trueMin:
+                    ticks.append(a * majorTicks[0] / 10.)
 
-            ticks += [a*x for a in standardLogTicks for x in majorTicks]
+            ticks += [a * x for a in standardLogTicks for x in majorTicks]
 
             for a in standardLogTicks:
-                if a*majorTicks[-1] <= trueMax:
-                    ticks.append(a*majorTicks[-1])
+                if a * majorTicks[-1] <= trueMax:
+                    ticks.append(a * majorTicks[-1])
         else:
             majorTickInterval = self.majorTickInterval
 
@@ -163,13 +165,13 @@ class ScaleDivision(object):
             if mainDigit == 1:
                 minorTickDiv = 5
             elif mainDigit == 2:
-                minorTickDiv = 4 # could be 2 with another tick subdivision
+                minorTickDiv = 4  # could be 2 with another tick subdivision
             elif mainDigit == 5:
                 minorTickDiv = 5
             else:
                 minorTickDiv = 5
 
-            minorTickInterval = abs(majorTickInterval/minorTickDiv)
+            minorTickInterval = abs(majorTickInterval / minorTickDiv)
 
             # find lowest bound
             x = majorTicks[0]

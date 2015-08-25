@@ -27,9 +27,10 @@ from friture.generator import Generator_Widget
 from friture.delay_estimator import Delay_Estimator_Widget
 from friture.controlbar import ControlBar
 
+
 class Dock(QtWidgets.QDockWidget):
 
-    def __init__(self, parent, logger, name, type = 0):
+    def __init__(self, parent, logger, name, type=0):
         super().__init__(name, parent)
 
         self.setObjectName(name)

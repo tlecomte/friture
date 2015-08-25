@@ -28,7 +28,7 @@ MINDB = -70.
 PEAK_DECAY_RATE = 1.0 - 3E-6
 
 # Number of cycles the peak stays on hold before fall-off.
-PEAK_FALLOFF = 32 # default : 16
+PEAK_FALLOFF = 32  # default : 16
 
 
 #----------------------------------------------------------------------------
@@ -36,9 +36,9 @@ PEAK_FALLOFF = 32 # default : 16
 
 class MeterScale(QtWidgets.QWidget):
     SEGMENTS_LEFT = 0
-    SEGMENTS_BOTH  = 1
+    SEGMENTS_BOTH = 1
 
-    def __init__(self, meter, segmentsConf = SEGMENTS_LEFT):
+    def __init__(self, meter, segmentsConf=SEGMENTS_LEFT):
         super().__init__(meter)
         self.meter = meter
         self.lastY = 0
@@ -46,7 +46,7 @@ class MeterScale(QtWidgets.QWidget):
         self.segmentsConf = segmentsConf
 
         self.setMinimumWidth(16)
-        #self.setBackgroundRole(QPalette.Mid)
+        # self.setBackgroundRole(QPalette.Mid)
 
         self.setFont(QtGui.QFont(self.font().family(), 6))
 
@@ -57,7 +57,7 @@ class MeterScale(QtWidgets.QWidget):
         scaleWidth = self.width()
 
         fontmetrics = painter.fontMetrics()
-        labelMidHeight = fontmetrics.height()/2
+        labelMidHeight = fontmetrics.height() / 2
 
         # only draw the dB label if we are not too close to the top,
         # or too close to the previous label
@@ -67,8 +67,8 @@ class MeterScale(QtWidgets.QWidget):
                 self.drawSegments(painter, currentY, scaleWidth)
 
             # draw the text label (## dB)
-            painter.drawText(0, currentY - labelMidHeight, scaleWidth-1, fontmetrics.height(),
-                    QtCore.Qt.AlignHCenter | QtCore.Qt.AlignVCenter, label)
+            painter.drawText(0, currentY - labelMidHeight, scaleWidth - 1, fontmetrics.height(),
+                             QtCore.Qt.AlignHCenter | QtCore.Qt.AlignVCenter, label)
 
             self.lastY = currentY + 1
 
@@ -86,7 +86,7 @@ class MeterScale(QtWidgets.QWidget):
     def setSegments(self, conf):
         self.segmentsConf = conf
 
-    def paintEvent (self, event):
+    def paintEvent(self, event):
         painter = QtGui.QPainter(self)
 
         self.lastY = 0
@@ -101,12 +101,13 @@ class MeterScale(QtWidgets.QWidget):
 # BallisticPeak -- Peak with a value and a color, that holds then decays
 
 class BallisticPeak:
+
     def __init__(self, meter):
-        self.meter = meter # used to reach IEC colors and levels
-        self.peakValue = 0 # in pixels
+        self.meter = meter  # used to reach IEC colors and levels
+        self.peakValue = 0  # in pixels
         self.peakHoldCounter = 0
         self.peakDecayFactor = PEAK_DECAY_RATE
-        self.peakColor       = self.meter.Color6dB
+        self.peakColor = self.meter.Color6dB
 
     def value(self):
         return self.peakValue
@@ -123,9 +124,9 @@ class BallisticPeak:
         if peakValue < value:
             # the value is higher than the peak, the peak must follow the value
             peakValue = value
-            self.peakHoldCounter = 0 # reset the hold
+            self.peakHoldCounter = 0  # reset the hold
             self.peakDecayFactor = PEAK_DECAY_RATE
-            self.peakColor = self.meter.Color10dB #iLevel
+            self.peakColor = self.meter.Color10dB  # iLevel
             while self.peakColor > self.meter.ColorOver and peakValue >= self.meter.iec_level(self.peakColor):
                 self.peakColor -= 1
         elif self.peakHoldCounter + 1 > self.meter.peakFalloff():
@@ -133,24 +134,26 @@ class BallisticPeak:
             if self.peakValue < value:
                 peakValue = value
             else:
-                #if peakValue < self.meter.iec_level(self.meter.Color10dB):
+                # if peakValue < self.meter.iec_level(self.meter.Color10dB):
                             #self.peakColor = self.meter.Color6dB
                 self.peakDecayFactor *= self.peakDecayFactor
         self.peakHoldCounter += 1
 
-        self.peakValue  = peakValue
+        self.peakValue = peakValue
 
         return peakValue
 
 #----------------------------------------------------------------------------
 # MeterValue -- Meter bridge value widget.
+
+
 class MeterValue(QtWidgets.QFrame):
 
     def __init__(self, meter):
         super().__init__(meter)
 
-        self.meter      = meter
-        self.dBValue    = 0.0
+        self.meter = meter
+        self.dBValue = 0.0
         self.pixelValue = 0
         self.peak = BallisticPeak(self.meter)
 
@@ -168,7 +171,7 @@ class MeterValue(QtWidgets.QFrame):
     def peakReset(self):
         self.peak.reset()
 
-    def setValue(self, value, secondaryValue = None):
+    def setValue(self, value, secondaryValue=None):
         self.dBValue = value
         self.dBValue = max(self.dBValue, MINDB)
         self.dBValue = min(self.dBValue, MAXDB)
@@ -200,7 +203,7 @@ class MeterValue(QtWidgets.QFrame):
 
         if self.isEnabled():
             painter.fillRect(0, 0, w, h,
-                    self.meter.color(self.meter.ColorBack))
+                             self.meter.color(self.meter.ColorBack))
             y = self.meter.iec_level(self.meter.Color0dB)
             painter.setPen(self.meter.color(self.meter.ColorFore))
             painter.drawLine(0, h - y, w, h - y)
@@ -209,22 +212,22 @@ class MeterValue(QtWidgets.QFrame):
 
         if self.pixelValue2 is not None:
             painter.drawPixmap(0, h - self.pixelValue2,
-                    self.meter.darkPixmap(), 0, h - self.pixelValue2, w, self.pixelValue2 + 1)
+                               self.meter.darkPixmap(), 0, h - self.pixelValue2, w, self.pixelValue2 + 1)
 
         painter.drawPixmap(0, h - self.pixelValue,
-                self.meter.pixmap(), 0, h - self.pixelValue, w, self.pixelValue + 1)
+                           self.meter.pixmap(), 0, h - self.pixelValue, w, self.pixelValue + 1)
 
         # draw the peak line
         painter.setPen(self.meter.color(self.peak.color()))
         painter.drawLine(0, h - self.peak.value(), w, h - self.peak.value())
 
-        self.paint_time = (95.*self.paint_time + 5.*t.elapsed())/100.
+        self.paint_time = (95. * self.paint_time + 5. * t.elapsed()) / 100.
 
     def resizeEvent(self, resizeEvent):
         self.peak.reset()
 
         QtWidgets.QWidget.resizeEvent(self, resizeEvent)
-        #QtWidgets.QWidget.repaint(True)
+        # QtWidgets.QWidget.repaint(True)
 
 
 #----------------------------------------------------------------------------
@@ -235,7 +238,7 @@ class qsynthMeter(QtWidgets.QFrame):
     def __init__(self, parent):
         super().__init__(parent)
 
-        self.portCount  = 1
+        self.portCount = 1
 
         self.IECScale = IECScale()
 
@@ -245,26 +248,26 @@ class qsynthMeter(QtWidgets.QFrame):
         # Peak falloff mode setting (0=no peak falloff).
         self.peakFalloffCycleCount = PEAK_FALLOFF
 
-        self.ColorOver  = 0
-        self.Color0dB   = 1
-        self.Color3dB   = 2
-        self.Color6dB   = 3
-        self.Color10dB  = 4
+        self.ColorOver = 0
+        self.Color0dB = 1
+        self.Color3dB = 2
+        self.Color6dB = 3
+        self.Color10dB = 4
         self.LevelCount = 5
-        self.ColorBack  = 5
-        self.ColorFore  = 6
+        self.ColorBack = 5
+        self.ColorFore = 6
         self.ColorCount = 7
 
-        self.iecLevels = [0]*self.LevelCount
+        self.iecLevels = [0] * self.LevelCount
 
-        self.colors = [QtGui.QColor(0, 0, 0)]*self.ColorCount
+        self.colors = [QtGui.QColor(0, 0, 0)] * self.ColorCount
         self.colors[self.ColorOver] = QtGui.QColor(240,   0, 20)
-        self.colors[self.Color0dB]  = QtGui.QColor(240, 160, 20)
-        self.colors[self.Color3dB]  = QtGui.QColor(220, 220, 20)
-        self.colors[self.Color6dB]  = QtGui.QColor(160, 220, 20)
-        self.colors[self.Color10dB] = QtGui.QColor( 40, 160, 40)
-        self.colors[self.ColorBack] = QtGui.QColor( 20,  40, 20)
-        self.colors[self.ColorFore] = QtGui.QColor( 80,  80, 80)
+        self.colors[self.Color0dB] = QtGui.QColor(240, 160, 20)
+        self.colors[self.Color3dB] = QtGui.QColor(220, 220, 20)
+        self.colors[self.Color6dB] = QtGui.QColor(160, 220, 20)
+        self.colors[self.Color10dB] = QtGui.QColor(40, 160, 40)
+        self.colors[self.ColorBack] = QtGui.QColor(20,  40, 20)
+        self.colors[self.ColorFore] = QtGui.QColor(80,  80, 80)
 
         self.setBackgroundRole(QtGui.QPalette.NoRole)
 
@@ -276,7 +279,7 @@ class qsynthMeter(QtWidgets.QFrame):
         self.build()
 
         self.setSizePolicy(
-                QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding))
+            QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding))
 
     # build the widget layout depending on the port count.
     def build(self):
@@ -321,42 +324,42 @@ class qsynthMeter(QtWidgets.QFrame):
 
             self.setMinimumSize(16 * self.portCount + 16 * len(self.singleScales), 120)
             self.setMaximumWidth(16 * self.portCount + 16 * len(self.singleScales))
-        else: # zero meters
+        else:  # zero meters
             self.setMinimumSize(2, 120)
             self.setMaximumWidth(4)
 
     # used by child widgets
-    def iec_scale (self, dB ):
+    def iec_scale(self, dB):
         return self.IECScale.iec_scale(dB)
 
-    def iec_level (self, index):
+    def iec_level(self, index):
         return self.iecLevels[index]
 
-    def getPortCount (self):
+    def getPortCount(self):
         return self.portCount
 
-    def setPortCount (self, count):
+    def setPortCount(self, count):
         self.portCount = count
         self.build()
 
-    def setPeakFalloff ( self, peakFalloffCount ):
+    def setPeakFalloff(self, peakFalloffCount):
         self.peakFalloffCycleCount = peakFalloffCount
 
-    def peakFalloff ( self ):
+    def peakFalloff(self):
         return self.peakFalloffCycleCount
 
     # Reset peak holder.
-    def peakReset (self):
-        for port in range (0, self.portCount):
+    def peakReset(self):
+        for port in range(0, self.portCount):
             self.singleMeters[port].peakReset()
 
-    def pixmap (self):
+    def pixmap(self):
         return self.levelPixmap
 
-    def darkPixmap (self):
+    def darkPixmap(self):
         return self.darkLevelPixmap
 
-    def updatePixmap (self):
+    def updatePixmap(self):
         w = self.width()
         h = self.height()
 
@@ -367,14 +370,14 @@ class qsynthMeter(QtWidgets.QFrame):
         grad.setColorAt(0.6, self.color(self.Color6dB))
         grad.setColorAt(0.8, self.color(self.Color10dB))
         grad = QtGui.QLinearGradient(0, 0, 0, h)
-        grad.setColorAt(0.0, QtGui.QColor(230,230,255))
-        grad.setColorAt(0.7, QtGui.QColor(0,0,255))
-        grad.setColorAt(1.0, QtGui.QColor(0,0,150))
+        grad.setColorAt(0.0, QtGui.QColor(230, 230, 255))
+        grad.setColorAt(0.7, QtGui.QColor(0, 0, 255))
+        grad.setColorAt(1.0, QtGui.QColor(0, 0, 150))
 
         self.levelPixmap = QtGui.QPixmap(w, h)
-        QtGui.QPainter(self.levelPixmap).fillRect(0, 0, w, h, grad);
+        QtGui.QPainter(self.levelPixmap).fillRect(0, 0, w, h, grad)
 
-        factor = 0#150
+        factor = 0  # 150
         darkGrad = QtGui.QLinearGradient(0, 0, 0, h)
         darkGrad.setColorAt(0.2, self.color(self.ColorOver).darker(factor))
         darkGrad.setColorAt(0.3, self.color(self.Color0dB).darker(factor))
@@ -383,39 +386,39 @@ class qsynthMeter(QtWidgets.QFrame):
         darkGrad.setColorAt(0.8, self.color(self.Color10dB).darker(factor))
 
         self.darkLevelPixmap = QtGui.QPixmap(w, h)
-        QtGui.QPainter(self.darkLevelPixmap).fillRect(0, 0, w, h, darkGrad);
+        QtGui.QPainter(self.darkLevelPixmap).fillRect(0, 0, w, h, darkGrad)
 
-
-    def refresh (self):
-        for iPort in range (0, self.portCount):
+    def refresh(self):
+        for iPort in range(0, self.portCount):
             self.singleMeters[iPort].refresh()
 
-    def resizeEvent ( self, event ):
+    def resizeEvent(self, event):
         self.IECScale.setHeight(0.95 * float(self.height()))
 
-        self.iecLevels[self.Color0dB]  = self.iec_scale(  0.0)
-        self.iecLevels[self.Color3dB]  = self.iec_scale( -3.0)
-        self.iecLevels[self.Color6dB]  = self.iec_scale( -6.0)
+        self.iecLevels[self.Color0dB] = self.iec_scale(0.0)
+        self.iecLevels[self.Color3dB] = self.iec_scale(-3.0)
+        self.iecLevels[self.Color6dB] = self.iec_scale(-6.0)
         self.iecLevels[self.Color10dB] = self.iec_scale(-10.0)
 
         self.updatePixmap()
 
-    def setValue ( self, port, value, secondaryValue = None):
+    def setValue(self, port, value, secondaryValue=None):
         self.singleMeters[port].setValue(value, secondaryValue)
 
-    def color ( self, index ):
+    def color(self, index):
         return self.colors[index]
 
 
 # class to translate from dB to pixels with an IEC scaling
 class IECScale:
+
     def __init__(self):
         self.height = 1.
 
     def setHeight(self, height):
         self.height = height
 
-    def iec_scale (self, dB ):
+    def iec_scale(self, dB):
         fDef = 1.
 
         if (dB < -70.0):
@@ -430,7 +433,7 @@ class IECScale:
             fDef = (dB + 40.0) * 0.015 + 0.15
         elif (dB < -20.0):
             fDef = (dB + 30.0) * 0.02 + 0.3
-        else: # if (dB < 0.0)
+        else:  # if (dB < 0.0)
             fDef = (dB + 20.0) * 0.025 + 0.5
 
         return fDef * self.height

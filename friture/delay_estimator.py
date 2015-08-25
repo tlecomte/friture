@@ -28,7 +28,8 @@ from friture.logger import PrintLogger
 
 from friture.audiobackend import SAMPLING_RATE
 
-DEFAULT_DELAYRANGE = 1 # default delay range is 1 second
+DEFAULT_DELAYRANGE = 1  # default delay range is 1 second
+
 
 def subsampler(Ndec, bdec, adec, x, zis):
     x_dec = x
@@ -52,12 +53,15 @@ def subsampler(Ndec, bdec, adec, x, zis):
         return x_dec, zfs
 
 # build a proper array of zero initial conditions to start the subsampler
+
+
 def subsampler_filtic(Ndec, bdec, adec):
     zfs = []
     for i in range(Ndec):
         l = max(len(bdec), len(adec)) - 1
         zfs += [numpy.zeros(l)]
     return zfs
+
 
 def generalized_cross_correlation(d0, d1):
     # substract the means
@@ -69,18 +73,18 @@ def generalized_cross_correlation(d0, d1):
     window = numpy.hanning(len(d0))
 
     # compute the cross-correlation
-    D0 = rfft(d0*window)
-    D1 = rfft(d1*window)
+    D0 = rfft(d0 * window)
+    D1 = rfft(d1 * window)
     D0r = D0.conjugate()
-    G = D0r*D1
-    #G = (G==0.)*1e-30 + (G<>0.)*G
-    #W = 1. # frequency unweighted
-    #W = 1./numpy.abs(G) # "PHAT"
+    G = D0r * D1
+    # G = (G==0.)*1e-30 + (G<>0.)*G
+    # W = 1. # frequency unweighted
+    # W = 1./numpy.abs(G) # "PHAT"
     absG = numpy.abs(G)
     m = max(absG)
-    W = 1./(1e-10*m + absG)
-    #D1r = D1.conjugate(); G0 = D0r*D0; G1 = D1r*D1; W = numpy.abs(G)/(G0*G1) # HB weighted
-    Xcorr = irfft(W*G)
+    W = 1. / (1e-10 * m + absG)
+    # D1r = D1.conjugate(); G0 = D0r*D0; G1 = D1r*D1; W = numpy.abs(G)/(G0*G1) # HB weighted
+    Xcorr = irfft(W * G)
     #Xcorr_unweighted = irfft(G)
     #numpy.save("d0.npy", d0)
     #numpy.save("d1.npy", d1)
@@ -88,8 +92,10 @@ def generalized_cross_correlation(d0, d1):
 
     return Xcorr
 
+
 class Delay_Estimator_Widget(QtWidgets.QWidget):
-    def __init__(self, parent = None, logger = PrintLogger()):
+
+    def __init__(self, parent=None, logger=PrintLogger()):
         super().__init__(parent)
 
         self.audiobuffer = None
@@ -152,7 +158,7 @@ class Delay_Estimator_Widget(QtWidgets.QWidget):
         # (actually, I could fit a gaussian on the cross-correlation peak to get
         # higher resolution even at low sample rates)
         self.Ndec = 2
-        self.subsampled_sampling_rate = SAMPLING_RATE/2**(self.Ndec)
+        self.subsampled_sampling_rate = SAMPLING_RATE / 2 ** (self.Ndec)
         [self.bdec, self.adec] = generated_filters.params['dec']
         self.zfs0 = subsampler_filtic(self.Ndec, self.bdec, self.adec)
         self.zfs1 = subsampler_filtic(self.Ndec, self.bdec, self.adec)
@@ -161,7 +167,7 @@ class Delay_Estimator_Widget(QtWidgets.QWidget):
         self.ringbuffer0 = RingBuffer(self.logger)
         self.ringbuffer1 = RingBuffer(self.logger)
 
-        self.delayrange_s = DEFAULT_DELAYRANGE # confidence range
+        self.delayrange_s = DEFAULT_DELAYRANGE  # confidence range
 
         self.old_Xcorr = None
 
@@ -184,9 +190,9 @@ class Delay_Estimator_Widget(QtWidgets.QWidget):
             self.two_channels = True
 
             # separate the channels
-            x0 = floatdata[0,:]
-            x1 = floatdata[1,:]
-            #subsample them
+            x0 = floatdata[0, :]
+            x1 = floatdata[1, :]
+            # subsample them
             x0_dec, self.zfs0 = subsampler(self.Ndec, self.bdec, self.adec, x0, self.zfs0)
             x1_dec, self.zfs1 = subsampler(self.Ndec, self.bdec, self.adec, x1, self.zfs1)
             # push to a 1-second ring buffer
@@ -200,18 +206,18 @@ class Delay_Estimator_Widget(QtWidgets.QWidget):
             available = index - self.old_index
 
             if available < 0:
-                #ringbuffer must have grown or something...
+                # ringbuffer must have grown or something...
                 available = 0
                 self.old_index = index
 
-            time = 2*self.delayrange_s
-            length = time*self.subsampled_sampling_rate
+            time = 2 * self.delayrange_s
+            length = time * self.subsampled_sampling_rate
             overlap = 0.5
-            needed = int(overlap*length)
+            needed = int(overlap * length)
 
-            realizable = int(available/needed)
+            realizable = int(available / needed)
 
-            #print available, needed, realizable
+            # print available, needed, realizable
 
             for i in range(realizable):
                 self.old_index += int(needed)
@@ -223,13 +229,13 @@ class Delay_Estimator_Widget(QtWidgets.QWidget):
                 d1.shape = (d1.size)
                 std0 = numpy.std(d0)
                 std1 = numpy.std(d1)
-                if std0>0. and std1>0.:
+                if std0 > 0. and std1 > 0.:
                     Xcorr = generalized_cross_correlation(d0, d1)
 
                     if self.old_Xcorr is not None and self.old_Xcorr.shape == Xcorr.shape:
                         # smoothing
                         alpha = 0.3
-                        smoothed_Xcorr = alpha*Xcorr + (1. - alpha)*self.old_Xcorr
+                        smoothed_Xcorr = alpha * Xcorr + (1. - alpha) * self.old_Xcorr
                     else:
                         smoothed_Xcorr = Xcorr
 
@@ -239,12 +245,12 @@ class Delay_Estimator_Widget(QtWidgets.QWidget):
                     # normalize
                     #Xcorr_max_norm = Xcorr_unweighted[i]/(d0.size*std0*std1)
                     self.Xcorr_extremum = smoothed_Xcorr[i]
-                    Xcorr_max_norm = abs(smoothed_Xcorr[i])/(3*numpy.std(smoothed_Xcorr))
-                    self.delay_ms = 1e3*float(i)/self.subsampled_sampling_rate
+                    Xcorr_max_norm = abs(smoothed_Xcorr[i]) / (3 * numpy.std(smoothed_Xcorr))
+                    self.delay_ms = 1e3 * float(i) / self.subsampled_sampling_rate
 
                     # delays larger than the half of the window most likely are actually negative
-                    if self.delay_ms > 1e3*time/2.:
-                        self.delay_ms -= 1e3*time
+                    if self.delay_ms > 1e3 * time / 2.:
+                        self.delay_ms -= 1e3 * time
 
                     #numpy.save("Xcorr_%d_%.1f.npy" %(i,delay_ms), Xcorr)
                     #numpy.save("smoothed_Xcorr%d_%.1f.npy" %(i,delay_ms), smoothed_Xcorr)
@@ -257,18 +263,18 @@ class Delay_Estimator_Widget(QtWidgets.QWidget):
                     self.Xcorr_extremum = 0.
 
                 # debug wrong phase detection
-                #if Xcorr[i] < 0.:
+                # if Xcorr[i] < 0.:
                 #    numpy.save("Xcorr.npy", Xcorr)
 
-                c = 340. # speed of sound, in meters per second (approximate)
-                self.distance_m = self.delay_ms*1e-3*c
+                c = 340.  # speed of sound, in meters per second (approximate)
+                self.distance_m = self.delay_ms * 1e-3 * c
 
                 # home-made measure of the significance
                 slope = 0.12
                 p = 3
-                x = (Xcorr_max_norm>1.)*(Xcorr_max_norm-1.)
-                x = (slope*x)**p
-                self.correlation = int((x/(1. + x))*100)
+                x = (Xcorr_max_norm > 1.) * (Xcorr_max_norm - 1.)
+                x = (slope * x) ** p
+                self.correlation = int((x / (1. + x)) * 100)
 
     # method
     def canvasUpdate(self):
@@ -276,8 +282,8 @@ class Delay_Estimator_Widget(QtWidgets.QWidget):
             return
 
         if self.two_channels:
-            delay_message = "%.1f ms\n= %.2f m" %(self.delay_ms, self.distance_m)
-            correlation_message = "%d%%" %(self.correlation)
+            delay_message = "%.1f ms\n= %.2f m" % (self.delay_ms, self.distance_m)
+            correlation_message = "%d%%" % (self.correlation)
             if self.Xcorr_extremum >= 0:
                 polarity_message = "In-phase"
             else:
@@ -326,7 +332,9 @@ in the setup window."""
     def restoreState(self, settings):
         self.settings_dialog.restoreState(settings)
 
+
 class Delay_Estimator_Settings_Dialog(QtWidgets.QDialog):
+
     def __init__(self, parent, logger):
         super().__init__(parent)
 

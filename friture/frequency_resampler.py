@@ -8,9 +8,11 @@ Created on Sat Apr 21 20:29:18 2012
 import numpy as np
 #from scipy.interpolate import interp1d, UnivariateSpline
 
+
 class Frequency_Resampler:
+
     def __init__(self, logfreqscale=0, minfreq=20., maxfreq=20000., nsamples=1):
-        self.logfreqscale = logfreqscale # 0: linear
+        self.logfreqscale = logfreqscale  # 0: linear
         self.minfreq = minfreq
         self.maxfreq = maxfreq
         self.nsamples = nsamples
@@ -34,7 +36,7 @@ class Frequency_Resampler:
         if self.nsamples != nsamples:
             self.nsamples = nsamples
             self.update_xscale()
-            print("nsamples changed, now: %d" %(nsamples))
+            print("nsamples changed, now: %d" % (nsamples))
 
     def setlogfreqscale(self, logfreqscale):
         if logfreqscale != self.logfreqscale:
@@ -43,11 +45,11 @@ class Frequency_Resampler:
             self.update_xscale()
 
     def process(self, freq, data):
-        #f = interp1d(freq, data) # construct an interpolant
-        #return f(self.xscaled)
-        #s = UnivariateSpline(freq, data, s=0, k=1) # construct the spline
-        #return s(self.xscaled)
-        #Note : interp1d and UnivariateSpline are both slower than interp
+        # f = interp1d(freq, data) # construct an interpolant
+        # return f(self.xscaled)
+        # s = UnivariateSpline(freq, data, s=0, k=1) # construct the spline
+        # return s(self.xscaled)
+        # Note : interp1d and UnivariateSpline are both slower than interp
         # interp is still not optimal because it involved a search whereas
         # the data is already completely sorted so an running interpolation
         # could be done faster

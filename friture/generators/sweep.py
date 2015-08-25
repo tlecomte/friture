@@ -24,6 +24,7 @@ DEFAULT_SWEEP_STARTFREQUENCY = 20.
 DEFAULT_SWEEP_STOPFREQUENCY = 22000.
 DEFAULT_SWEEP_PERIOD_S = 1.
 
+
 class SweepGenerator:
     name = "Sweep"
 
@@ -49,16 +50,16 @@ class SweepGenerator:
         # phase_max = 2*np.pi*f1*T/np.log(f2/f1)*(f2/f1 - 1.)
         # phase_max = N*2*np.pi
         # N = f1*T/np.log(f2/f1)*(f2/f1 - 1.)
-        Tmult = np.log(f2/f1)/(f1*(f2/f1 - 1.))
+        Tmult = np.log(f2 / f1) / (f1 * (f2 / f1 - 1.))
         if T >= Tmult:
-            T = np.round(T/Tmult)*Tmult
+            T = np.round(T / Tmult) * Tmult
         else:
-            T = np.ceil(T/Tmult)*Tmult
+            T = np.ceil(T / Tmult) * Tmult
 
-        w1 = 2*np.pi*f1
-        w2 = 2*np.pi*f2
-        K = w1*T/np.log(w2/w1)
-        L = T/np.log(w2/w1)
+        w1 = 2 * np.pi * f1
+        w2 = 2 * np.pi * f2
+        K = w1 * T / np.log(w2 / w1)
+        L = T / np.log(w2 / w1)
         return L, K, T
 
     def setf1(self, f1):
@@ -83,16 +84,16 @@ class SweepGenerator:
         # https://ccrma.stanford.edu/realsimple/imp_meas/Sine_Sweep_Measurement_Theory.html
 
         #f = (self.f2 - self.f1)*(1. + np.sin(2*np.pi*t/self.T))/2. + self.f1
-        #return np.sin(2*np.pi*t*f)
+        # return np.sin(2*np.pi*t*f)
 
-        result = np.cos(self.K*(np.exp((t - self.timeoffset)%self.T/self.L) - 1.))
+        result = np.cos(self.K * (np.exp((t - self.timeoffset) % self.T / self.L) - 1.))
 
         if self.nextParams != None:
             # we have new params to put in place
             # do it at the first max
 
             diff = result[1:] - result[:-1]
-            maxdetection = 0.*diff[:-1] + (diff[1:] < 0.)*(diff[:-1] > 0.)*1.
+            maxdetection = 0. * diff[:-1] + (diff[1:] < 0.) * (diff[:-1] > 0.) * 1.
 
             maxdetections = np.argwhere(maxdetection != 0.)
 
@@ -104,11 +105,13 @@ class SweepGenerator:
                 [self.L, self.K, self.T] = self.nextParams
                 self.nextParams = None
                 self.timeoffset = t[firstmaxpos]
-                result[firstmaxpos:] = np.cos(self.K*(np.exp((t[firstmaxpos:] - self.timeoffset)%self.T/self.L) - 1.))
+                result[firstmaxpos:] = np.cos(self.K * (np.exp((t[firstmaxpos:] - self.timeoffset) % self.T / self.L) - 1.))
 
         return result
 
+
 class SettingsWidget(QtWidgets.QWidget):
+
     def __init__(self, parent, logger):
         super().__init__(parent)
 

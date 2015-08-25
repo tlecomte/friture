@@ -24,6 +24,7 @@ from friture.audiobackend import SAMPLING_RATE
 
 FRAMES_PER_BUFFER = 1024
 
+
 class AudioBuffer(QtCore.QObject):
     new_data_available = QtCore.pyqtSignal(np.ndarray)
 

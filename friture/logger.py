@@ -19,6 +19,7 @@
 
 from PyQt5 import QtCore
 
+
 class Logger(QtCore.QObject):
 
     logChanged = QtCore.pyqtSignal()
@@ -31,10 +32,10 @@ class Logger(QtCore.QObject):
 
     # push some text to the log
     def push(self, text):
-        if len(self.log)==0:
-            self.log = "[0] %s" %text
+        if len(self.log) == 0:
+            self.log = "[0] %s" % text
         else:
-            self.log = "%s\n[%d] %s" %(self.log, self.count, text)
+            self.log = "%s\n[%d] %s" % (self.log, self.count, text)
         self.count += 1
         self.logChanged.emit()
 
@@ -49,6 +50,7 @@ class Logger(QtCore.QObject):
 # simple logger that prints to the console
 class PrintLogger:
     # push some text to the log
+
     def push(self, text):
         print(text)
 

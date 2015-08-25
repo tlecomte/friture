@@ -23,19 +23,21 @@ from PyQt5 import QtWidgets
 
 PINK_FIDELITY = 100.
 
+
 def pinknoise(n, rvs=standard_normal):
-    if n==0:
+    if n == 0:
         return np.zeros((0,))
 
     #k = int(min(np.floor(np.log(n)/np.log(2)), PINK_FIDELITY))
-    k = 13 # dynamic k adds audible "clicks"
+    k = 13  # dynamic k adds audible "clicks"
     pink = np.zeros((n,), np.float)
 
-    for m in 2**np.arange(k):
+    for m in 2 ** np.arange(k):
         p = int(np.ceil(float(n) / m))
         pink += np.repeat(rvs(size=p), m, axis=0)[:n]
 
-    return pink/k
+    return pink / k
+
 
 class PinkGenerator:
     name = "Pink noise"
@@ -50,7 +52,9 @@ class PinkGenerator:
         n = len(t)
         return pinknoise(n)
 
+
 class SettingsWidget(QtWidgets.QWidget):
+
     def __init__(self, parent, logger):
         super().__init__(parent)
 

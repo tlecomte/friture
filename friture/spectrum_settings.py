@@ -21,18 +21,20 @@ from PyQt5 import QtGui, QtCore, QtWidgets
 from friture.audiobackend import SAMPLING_RATE
 
 # shared with spectrum_settings.py
-DEFAULT_FFT_SIZE = 8 #8192 points
-DEFAULT_FREQ_SCALE = 1 #log10
+DEFAULT_FFT_SIZE = 8  # 8192 points
+DEFAULT_FREQ_SCALE = 1  # log10
 DEFAULT_MAXFREQ = 20000
 DEFAULT_MINFREQ = 20
 DEFAULT_SPEC_MIN = -100
 DEFAULT_SPEC_MAX = -20
-DEFAULT_WEIGHTING = 1 #A
+DEFAULT_WEIGHTING = 1  # A
 DEFAULT_SHOW_FREQ_LABELS = True
 DEFAULT_RESPONSE_TIME = 0.025
 DEFAULT_RESPONSE_TIME_INDEX = 0
 
+
 class Spectrum_Settings_Dialog(QtWidgets.QDialog):
+
     def __init__(self, parent, logger):
         super().__init__(parent)
 
@@ -70,7 +72,7 @@ class Spectrum_Settings_Dialog(QtWidgets.QDialog):
 
         self.spinBox_minfreq = QtWidgets.QSpinBox(self)
         self.spinBox_minfreq.setMinimum(20)
-        self.spinBox_minfreq.setMaximum(SAMPLING_RATE/2)
+        self.spinBox_minfreq.setMaximum(SAMPLING_RATE / 2)
         self.spinBox_minfreq.setSingleStep(10)
         self.spinBox_minfreq.setValue(DEFAULT_MINFREQ)
         self.spinBox_minfreq.setObjectName("spinBox_minfreq")
@@ -78,7 +80,7 @@ class Spectrum_Settings_Dialog(QtWidgets.QDialog):
 
         self.spinBox_maxfreq = QtWidgets.QSpinBox(self)
         self.spinBox_maxfreq.setMinimum(20)
-        self.spinBox_maxfreq.setMaximum(SAMPLING_RATE/2)
+        self.spinBox_maxfreq.setMaximum(SAMPLING_RATE / 2)
         self.spinBox_maxfreq.setSingleStep(1000)
         self.spinBox_maxfreq.setProperty("value", DEFAULT_MAXFREQ)
         self.spinBox_maxfreq.setObjectName("spinBox_maxfreq")
@@ -155,15 +157,15 @@ class Spectrum_Settings_Dialog(QtWidgets.QDialog):
     def fftsizechanged(self, index):
         # FIXME
         if self.logger is not None:
-            self.logger.push("fft_size_changed slot %d %d %f" %(index, 2**index*32, 150000/2**index*32))
-        fft_size = 2**index*32
+            self.logger.push("fft_size_changed slot %d %d %f" % (index, 2 ** index * 32, 150000 / 2 ** index * 32))
+        fft_size = 2 ** index * 32
         self.parent().setfftsize(fft_size)
 
     # slot
     def freqscalechanged(self, index):
         # FIXME
         if self.logger is not None:
-            self.logger.push("freq_scale slot %d" %index)
+            self.logger.push("freq_scale slot %d" % index)
         if index == 1:
             self.parent().PlotZoneSpect.setlogfreqscale()
         else:
@@ -179,7 +181,7 @@ class Spectrum_Settings_Dialog(QtWidgets.QDialog):
             response_time = 0.3
         elif index == 3:
             response_time = 1.
-        self.logger.push("responsetimechanged slot %d %d" %(index, response_time))
+        self.logger.push("responsetimechanged slot %d %d" % (index, response_time))
         self.parent().setresponsetime(response_time)
 
     # method
@@ -196,7 +198,7 @@ class Spectrum_Settings_Dialog(QtWidgets.QDialog):
 
     # method
     def restoreState(self, settings):
-        fft_size = settings.value("fftSize", DEFAULT_FFT_SIZE) # 7th index is 1024 points
+        fft_size = settings.value("fftSize", DEFAULT_FFT_SIZE)  # 7th index is 1024 points
         self.comboBox_fftsize.setCurrentIndex(fft_size)
         freqscale = settings.value("freqScale", DEFAULT_FREQ_SCALE)
         self.comboBox_freqscale.setCurrentIndex(freqscale)

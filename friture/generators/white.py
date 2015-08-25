@@ -21,6 +21,7 @@ import numpy as np
 from numpy.random import standard_normal
 from PyQt5 import QtWidgets
 
+
 class WhiteGenerator:
     name = "White noise"
 
@@ -34,7 +35,9 @@ class WhiteGenerator:
         n = len(t)
         return standard_normal(n)
 
+
 class SettingsWidget(QtWidgets.QWidget):
+
     def __init__(self, parent, logger):
         super().__init__(parent)
 

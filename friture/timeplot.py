@@ -31,18 +31,20 @@ try:
 except ImportError:
     app = QtWidgets.QApplication(sys.argv)
     QtWidgets.QMessageBox.critical(None, "OpenGL hellogl",
-            "PyOpenGL must be installed to run this example.")
+                                   "PyOpenGL must be installed to run this example.")
     sys.exit(1)
 
+
 class CurveItem:
+
     def __init__(self, *args):
         self.n = 0
         self.xMap = None
         self.yMap = None
         self.__color = Qt.QColor()
         self.__title = ""
-        self.vertices = zeros((1,2,2))
-        self.colors = zeros((1,2,3))
+        self.vertices = zeros((1, 2, 2))
+        self.colors = zeros((1, 2, 3))
         self.x = array([0., 1.])
         self.y = array([0., 0.])
 
@@ -52,16 +54,16 @@ class CurveItem:
 
             if self.n > 0:
                 Ones = ones(self.n)
-                r = self.color().red()/255.*Ones
-                g = self.color().green()/255.*Ones
-                b = self.color().blue()/255.*Ones
+                r = self.color().red() / 255. * Ones
+                g = self.color().green() / 255. * Ones
+                b = self.color().blue() / 255. * Ones
 
-                self.colors[:,0,0] = r
-                self.colors[:,1,0] = r
-                self.colors[:,0,1] = g
-                self.colors[:,1,1] = g
-                self.colors[:,0,2] = b
-                self.colors[:,1,2] = b
+                self.colors[:, 0, 0] = r
+                self.colors[:, 1, 0] = r
+                self.colors[:, 0, 1] = g
+                self.colors[:, 1, 1] = g
+                self.colors[:, 0, 2] = b
+                self.colors[:, 1, 2] = b
 
     def color(self):
         return self.__color
@@ -76,19 +78,19 @@ class CurveItem:
             self.n = n
 
             Ones = ones(n)
-            r = self.color().red()/255.*Ones
-            g = self.color().green()/255.*Ones
-            b = self.color().blue()/255.*Ones
+            r = self.color().red() / 255. * Ones
+            g = self.color().green() / 255. * Ones
+            b = self.color().blue() / 255. * Ones
 
-            self.colors = zeros((n,2,3))
-            self.colors[:,0,0] = r
-            self.colors[:,1,0] = r
-            self.colors[:,0,1] = g
-            self.colors[:,1,1] = g
-            self.colors[:,0,2] = b
-            self.colors[:,1,2] = b
+            self.colors = zeros((n, 2, 3))
+            self.colors[:, 0, 0] = r
+            self.colors[:, 1, 0] = r
+            self.colors[:, 0, 1] = g
+            self.colors[:, 1, 1] = g
+            self.colors[:, 0, 2] = b
+            self.colors[:, 1, 2] = b
 
-            self.vertices = zeros((n,2,2))
+            self.vertices = zeros((n, 2, 2))
 
     def setTitle(self, title):
         self.__title = title
@@ -100,11 +102,10 @@ class CurveItem:
         x = xMap.toScreen(self.x)
         y = yMap.toScreen(self.y)
 
-        self.vertices[:,0,0] = x[:-1]
-        self.vertices[:,0,1] = y[:-1]
-        self.vertices[:,1,0] = x[1:]
-        self.vertices[:,1,1] = y[1:]
-
+        self.vertices[:, 0, 0] = x[:-1]
+        self.vertices[:, 0, 1] = y[:-1]
+        self.vertices[:, 1, 0] = x[1:]
+        self.vertices[:, 1, 1] = y[1:]
 
         if self.vertices.size == 0 or self.colors.size == 0:
             return
@@ -121,15 +122,16 @@ class CurveItem:
         GL.glEnableClientState(GL.GL_VERTEX_ARRAY)
         GL.glEnableClientState(GL.GL_COLOR_ARRAY)
 
-        #GL.glDisable(GL.GL_LIGHTING)
-        GL.glDrawArrays(GL.GL_LINES, 0, 2*self.vertices.shape[0])
-        #GL.glEnable(GL.GL_LIGHTING)
+        # GL.glDisable(GL.GL_LIGHTING)
+        GL.glDrawArrays(GL.GL_LINES, 0, 2 * self.vertices.shape[0])
+        # GL.glEnable(GL.GL_LIGHTING)
 
         GL.glDisableClientState(GL.GL_COLOR_ARRAY)
         GL.glDisableClientState(GL.GL_VERTEX_ARRAY)
 
 
 class TimePlot(QtWidgets.QWidget):
+
     def __init__(self, parent, logger):
         super(TimePlot, self).__init__()
 
@@ -149,7 +151,7 @@ class TimePlot(QtWidgets.QWidget):
         self.horizontalScale.setTitle("Time (ms)")
 
         self.canvasWidget = GlCanvasWidget(self, self.verticalScaleTransform, self.horizontalScaleTransform)
-        self.canvasWidget.setTrackerFormatter(lambda x, y: "%.3g ms, %.3g" %(x, y))
+        self.canvasWidget.setTrackerFormatter(lambda x, y: "%.3g ms, %.3g" % (x, y))
 
         self.legendWidget = LegendWidget(self, self.canvasWidget)
 
@@ -178,7 +180,7 @@ class TimePlot(QtWidgets.QWidget):
         self.curve2.setTitle("Ch2")
         # self.curve2 will be attached when needed
 
-        #need to replot here for the size Hints to be computed correctly (depending on axis scales...)
+        # need to replot here for the size Hints to be computed correctly (depending on axis scales...)
         self.update()
 
         self.xmin = 0.
@@ -205,7 +207,7 @@ class TimePlot(QtWidgets.QWidget):
             self.legendWidget.hide()
             # the canvas reisze event will trigger a full replot
 
-        x_ms =  1e3*x
+        x_ms = 1e3 * x
         if self.xmax != x_ms[-1]:
             self.logger.push("timeplot : changing x max")
             self.xmax = x_ms[-1]
@@ -244,10 +246,10 @@ class TimePlot(QtWidgets.QWidget):
             self.horizontalScale.update()
 
             self.canvasWidget.setGrid(array(self.horizontalScaleDivision.majorTicks()),
-                                                                    array(self.horizontalScaleDivision.minorTicks()),
-                                                                    array(self.verticalScaleDivision.majorTicks()),
-                                                                    array(self.verticalScaleDivision.minorTicks())
-                                                                    )
+                                      array(self.horizontalScaleDivision.minorTicks()),
+                                      array(self.verticalScaleDivision.majorTicks()),
+                                      array(self.verticalScaleDivision.minorTicks())
+                                      )
 
     def pause(self):
         self.paused = True
@@ -276,7 +278,7 @@ class TimePlot(QtWidgets.QWidget):
             self.legendWidget.show()
             # the canvas reisze event will trigger a full replot
 
-        x_ms =  1e3*x
+        x_ms = 1e3 * x
         if self.xmax != x_ms[-1]:
             self.logger.push("timeplot : changing x max")
             self.xmax = x_ms[-1]

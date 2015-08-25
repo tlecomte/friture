@@ -21,7 +21,9 @@ from PyQt5 import QtCore, QtGui
 import numpy as np
 from friture.plotting.canvasBackground import CanvasBackground
 
+
 class Grid:
+
     def __init__(self, *args):
         self.canvas_width = 2
         self.canvas_height = 2
@@ -74,8 +76,8 @@ class Grid:
             painter.drawLine(0, y, w, y)
 
         # given the usual aspect ratio of the canvas, the vertical minor ticks would make it look crowded
-        #painter.setPen(QtGui.QPen(QtGui.QColor(QtCore.Qt.lightGray)))
-        #for y in yMinorTick:
+        # painter.setPen(QtGui.QPen(QtGui.QColor(QtCore.Qt.lightGray)))
+        # for y in yMinorTick:
         #    painter.drawLine(0, y, w, y)
 
     def draw(self, painter, xMap, yMap, rect):

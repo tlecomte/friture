@@ -18,9 +18,11 @@
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
 from PyQt5 import QtGui, QtCore, QtWidgets
-import psutil # for CPU usage monitoring
+import psutil  # for CPU usage monitoring
+
 
 class StatisticsWidget(QtWidgets.QWidget):
+
     def __init__(self, parent, logger, timer, audiobackend):
         super().__init__(parent)
 
@@ -30,7 +32,7 @@ class StatisticsWidget(QtWidgets.QWidget):
 
         self.stats_scrollarea = QtWidgets.QScrollArea(self)
         self.stats_scrollarea.setWidgetResizable(True)
-        self.stats_scrollarea.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
+        self.stats_scrollarea.setAlignment(QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
         self.stats_scrollarea.setObjectName("stats_scrollArea")
 
         self.scrollAreaWidgetContents = QtWidgets.QWidget(self.stats_scrollarea)
@@ -39,8 +41,9 @@ class StatisticsWidget(QtWidgets.QWidget):
         self.scrollAreaWidgetContents.setObjectName("stats_scrollAreaWidgetContents")
 
         self.LabelStats = QtWidgets.QLabel(self.scrollAreaWidgetContents)
-        self.LabelStats.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
-        self.LabelStats.setTextInteractionFlags(QtCore.Qt.LinksAccessibleByKeyboard|QtCore.Qt.LinksAccessibleByMouse|QtCore.Qt.TextBrowserInteraction|QtCore.Qt.TextSelectableByKeyboard|QtCore.Qt.TextSelectableByMouse)
+        self.LabelStats.setAlignment(QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
+        self.LabelStats.setTextInteractionFlags(QtCore.Qt.LinksAccessibleByKeyboard | QtCore.Qt.LinksAccessibleByMouse |
+                                                QtCore.Qt.TextBrowserInteraction | QtCore.Qt.TextSelectableByKeyboard | QtCore.Qt.TextSelectableByMouse)
         self.LabelStats.setObjectName("LabelStats")
 
         self.stats_layout = QtWidgets.QVBoxLayout(self.scrollAreaWidgetContents)
@@ -53,7 +56,6 @@ class StatisticsWidget(QtWidgets.QWidget):
 
         timer.timeout.connect(self.stats_update)
 
-
     # method
     def stats_update(self):
         if not self.LabelStats.isVisible():
@@ -62,9 +64,9 @@ class StatisticsWidget(QtWidgets.QWidget):
         cpu_percent = psutil.cpu_percent(0)
 
         label = "Chunk #%d\n"\
-        "Global CPU usage: %d %%\n"\
-        "Number of overflowed inputs (XRUNs): %d"\
-        % (self.audiobackend.chunk_number,
+            "Global CPU usage: %d %%\n"\
+            "Number of overflowed inputs (XRUNs): %d"\
+            % (self.audiobackend.chunk_number,
                 cpu_percent,
                 self.audiobackend.xruns)
 

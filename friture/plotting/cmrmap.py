@@ -33,9 +33,9 @@ import numpy as np
 # import directly from fitpack to avoid extra module imports that make the py2exe package grow
 from scipy.interpolate.fitpack import splrep, splev
 
-#NOTE: by default scipy.interpolate.__init__.py imports all of its submodules
-#To decrease the py2exe distributions dramatically, these import lines can
-#be commented out !
+# NOTE: by default scipy.interpolate.__init__.py imports all of its submodules
+# To decrease the py2exe distributions dramatically, these import lines can
+# be commented out !
 
 #   Returns a colour map CMAP (varying black -
 #   purple - red - yellow - white) that is monochrome-
@@ -58,15 +58,16 @@ from scipy.interpolate.fitpack import splrep, splev
 
 # reference colour map
 # adapted from article to produce more linear luminance
-CMRref = np.array([  [0, 0, 0],
-            [0.1, 0.1, 0.35],
-            [0.3, 0.15, 0.65],
-            [0.6, 0.2, 0.50],
-            [1, 0.25, 0.15],
-            [0.9, 0.55, 0],
-            [0.9, 0.75, 0.1],
-            [0.9, 0.9, 0.5],
-            [1, 1, 1]])
+CMRref = np.array([[0, 0, 0],
+                   [0.1, 0.1, 0.35],
+                   [0.3, 0.15, 0.65],
+                   [0.6, 0.2, 0.50],
+                   [1, 0.25, 0.15],
+                   [0.9, 0.55, 0],
+                   [0.9, 0.75, 0.1],
+                   [0.9, 0.9, 0.5],
+                   [1, 1, 1]])
+
 
 def compute_colors(N):
     xref = np.linspace(0, 1, CMRref.shape[0])
@@ -74,8 +75,8 @@ def compute_colors(N):
     cmap = np.zeros((N, 3))
 
     for i in range(3):
-        tck = splrep(xref, CMRref[:,i], s=0) # cubic spline (default) without smoothing
-        cmap[:,i] = splev(x, tck)
+        tck = splrep(xref, CMRref[:, i], s=0)  # cubic spline (default) without smoothing
+        cmap[:, i] = splev(x, tck)
 
     # Limit to range [0,1]
     cmap -= np.min(cmap)
@@ -94,8 +95,8 @@ if __name__ == "__main__":
     x = np.linspace(0, 1, N)
 
     plt.figure()
-    plt.plot(xref, CMRref[:,0], 'xr', x, cmap[:,0], 'r')
-    plt.plot(xref, CMRref[:,1], 'xg', x, cmap[:,1], 'g')
-    plt.plot(xref, CMRref[:,2], 'xb', x, cmap[:,2], 'b')
+    plt.plot(xref, CMRref[:, 0], 'xr', x, cmap[:, 0], 'r')
+    plt.plot(xref, CMRref[:, 1], 'xg', x, cmap[:, 1], 'g')
+    plt.plot(xref, CMRref[:, 2], 'xb', x, cmap[:, 2], 'b')
     plt.legend(['Linear', 'Cubic Spline'])
     plt.show()

@@ -8,8 +8,9 @@ try:
 except ImportError:
     app = QtWidgets.QApplication(sys.argv)
     QtWidgets.QMessageBox.critical(None, "OpenGL hellogl",
-            "PyOpenGL must be installed to run this example.")
+                                   "PyOpenGL must be installed to run this example.")
     sys.exit(1)
+
 
 class GlCanvasWidget(QtWidgets.QOpenGLWidget):
 
@@ -46,7 +47,7 @@ class GlCanvasWidget(QtWidgets.QOpenGLWidget):
         self.horizontalScaleTransform = horizontalScaleTransform
         self.verticalScaleTransform = verticalScaleTransform
 
-        self.trackerFormatter = lambda x, y: "x=%d, y=%d" %(x, y)
+        self.trackerFormatter = lambda x, y: "x=%d, y=%d" % (x, y)
 
         self.anyOpaqueItem = False
 
@@ -140,7 +141,7 @@ class GlCanvasWidget(QtWidgets.QOpenGLWidget):
 
         # given the usual aspect ratio of the canvas, the vertical minor ticks would make it look crowded
         #GL.glColor3f(0.5, 0.5, 0.5)
-        #for y in self.yMinorTick:
+        # for y in self.yMinorTick:
         #    GL.glBegin(GL.GL_LINES)
         #    GL.glVertex2f(0, y)
         #    GL.glVertex2f(w, y)
@@ -152,15 +153,15 @@ class GlCanvasWidget(QtWidgets.QOpenGLWidget):
         GL.glMatrixMode(GL.GL_PROJECTION)
         GL.glPushMatrix()
 
-        GL.glShadeModel(GL.GL_SMOOTH) # for gradient rendering
-        #GL.glDepthFunc(GL.GL_LESS) # The Type Of Depth Test To Do
-        GL.glDisable(GL.GL_DEPTH_TEST) # we do 2D, we need no depth test !
+        GL.glShadeModel(GL.GL_SMOOTH)  # for gradient rendering
+        # GL.glDepthFunc(GL.GL_LESS) # The Type Of Depth Test To Do
+        GL.glDisable(GL.GL_DEPTH_TEST)  # we do 2D, we need no depth test !
         GL.glMatrixMode(GL.GL_PROJECTION)
-        #GL.glEnable(GL.GL_CULL_FACE)
+        # GL.glEnable(GL.GL_CULL_FACE)
 
         # Clear The Screen And The Depth Buffer
         GL.glClearColor(1, 1, 1, 0)
-        GL.glClear(GL.GL_COLOR_BUFFER_BIT) # | GL.GL_DEPTH_BUFFER_BIT)
+        GL.glClear(GL.GL_COLOR_BUFFER_BIT)  # | GL.GL_DEPTH_BUFFER_BIT)
 
         # Reset The View
         self.setupViewport(self.width(), self.height())
@@ -194,12 +195,12 @@ class GlCanvasWidget(QtWidgets.QOpenGLWidget):
 
         painter.setRenderHint(QtGui.QPainter.Antialiasing)
         if self.fmax < 2e2:
-            text = "%.1f Hz" %(self.fmax)
+            text = "%.1f Hz" % (self.fmax)
         else:
-            text = "%d Hz" %(np.rint(self.fmax))
+            text = "%d Hz" % (np.rint(self.fmax))
 
         xmax = self.horizontalScaleTransform.toScreen(self.fmax)
-        if xmax==np.inf or xmax==-np.inf:
+        if xmax == np.inf or xmax == -np.inf:
             xmax = 0
         else:
             xmax = int(xmax)
@@ -209,8 +210,8 @@ class GlCanvasWidget(QtWidgets.QOpenGLWidget):
         rect = painter.boundingRect(QtCore.QRect(xmax, 0, 0, 0), Qt.Qt.AlignHCenter, text)
 
         # avoid crossing the left and top borders
-        dx = - min(rect.x()-2, 0)
-        dy = - min(rect.y()-1, 0)
+        dx = - min(rect.x() - 2, 0)
+        dy = - min(rect.y() - 1, 0)
         rect.translate(dx, dy)
 
         # avoid crossing the right and bottom borders
@@ -218,7 +219,7 @@ class GlCanvasWidget(QtWidgets.QOpenGLWidget):
         dy = - max(rect.bottom() - self.height() + 1, 0)
         rect.translate(dx, dy)
 
-        Hmiddle = (rect.left()+rect.right())/2
+        Hmiddle = (rect.left() + rect.right()) / 2
         triangleSize = 4
 
         # draw a white background
@@ -229,17 +230,17 @@ class GlCanvasWidget(QtWidgets.QOpenGLWidget):
         # draw a little downward-pointing triangle to indicate the frequency
         # triangle fill
         polygon = QtGui.QPolygon()
-        polygon << QtCore.QPoint(Hmiddle-triangleSize, rect.bottom()+1)
-        polygon << QtCore.QPoint(Hmiddle, rect.bottom()+1+triangleSize)
-        polygon << QtCore.QPoint(Hmiddle+triangleSize, rect.bottom()+1)
+        polygon << QtCore.QPoint(Hmiddle - triangleSize, rect.bottom() + 1)
+        polygon << QtCore.QPoint(Hmiddle, rect.bottom() + 1 + triangleSize)
+        polygon << QtCore.QPoint(Hmiddle + triangleSize, rect.bottom() + 1)
         painter.drawPolygon(polygon)
 
         # triangle outline
         painter.setPen(Qt.Qt.black)
-        painter.drawLine(rect.left(), rect.bottom()+1, Hmiddle-triangleSize, rect.bottom()+1)
-        painter.drawLine(Hmiddle-triangleSize, rect.bottom()+1, Hmiddle, rect.bottom()+1+triangleSize)
-        painter.drawLine(Hmiddle, rect.bottom()+1+triangleSize, Hmiddle+triangleSize, rect.bottom()+1)
-        painter.drawLine(Hmiddle+triangleSize, rect.bottom()+1, rect.right(), rect.bottom()+1)
+        painter.drawLine(rect.left(), rect.bottom() + 1, Hmiddle - triangleSize, rect.bottom() + 1)
+        painter.drawLine(Hmiddle - triangleSize, rect.bottom() + 1, Hmiddle, rect.bottom() + 1 + triangleSize)
+        painter.drawLine(Hmiddle, rect.bottom() + 1 + triangleSize, Hmiddle + triangleSize, rect.bottom() + 1)
+        painter.drawLine(Hmiddle + triangleSize, rect.bottom() + 1, rect.right(), rect.bottom() + 1)
 
         # frequency label
         painter.setPen(Qt.Qt.black)
@@ -258,7 +259,7 @@ class GlCanvasWidget(QtWidgets.QOpenGLWidget):
             rect = painter.boundingRect(QtCore.QRect(self.mousex, self.mousey, 0, 0), Qt.Qt.AlignLeft, text)
 
             # small offset so that it does not touch the rulers
-            rect.translate(4, -( rect.height() + 4))
+            rect.translate(4, -(rect.height() + 4))
 
             # avoid crossing the top and right borders
             dx = - max(rect.x() + rect.width() - self.width(), 0)
@@ -304,8 +305,8 @@ class GlCanvasWidget(QtWidgets.QOpenGLWidget):
         GL.glVertex2d(0, h)
         GL.glVertex2d(w, h)
         GL.glColor3f(1, 1, 1)
-        GL.glVertex2d(w, h/2)
-        GL.glVertex2d(0, h/2)
+        GL.glVertex2d(w, h / 2)
+        GL.glVertex2d(0, h / 2)
         GL.glEnd()
 
     def drawGrid(self):
@@ -330,9 +331,9 @@ class GlCanvasWidget(QtWidgets.QOpenGLWidget):
         GL.glColor3f(color.redF(), color.greenF(), color.blueF())
         GL.glBegin(GL.GL_LINE_LOOP)
         GL.glVertex2f(0, 0)
-        GL.glVertex2f(0, h-1)
-        GL.glVertex2f(w-1, h-1)
-        GL.glVertex2f(w-1, 0)
+        GL.glVertex2f(0, h - 1)
+        GL.glVertex2f(w - 1, h - 1)
+        GL.glVertex2f(w - 1, 0)
         GL.glEnd()
 
     def drawRuler(self):
