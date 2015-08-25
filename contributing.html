@@ -41,7 +41,6 @@
                     <li><a href="index.html">Home</a></li>
                     <li><a href="download.html">Download</a></li>
                     <li><a href="features.html">Features</a></li>
-                    <li><a href="frequency-analysis.html">Frequency analysis</a></li>
                     <li class="active"><a href="#">Contributing</a></li>
                 </ul>
             </div>
@@ -61,6 +60,13 @@
 
         <p>Feature requests and other comments can be posted on Github too, or by mail at <a href="mailto:contact@friture.org">contact@friture.org</a>.
 
+        <h2>Documentation</h2>
+        <p>There is not much documentation about Friture right now. You can contribute in 2 ways:</p>
+        <ul>
+            <li>Improve the Sphinx user manual that you can find in the <a href="https://github.com/tlecomte/friture/tree/master/doc">Github</a> repository.</li>
+            <li>Contribute to the <a href="https://github.com/tlecomte/friture/wiki">wiki</a>.</li>
+        </ul></p>
+
         <h2>Source</h2>
         <p>You can find the source code of Friture on <a href="https://github.com/tlecomte/friture">GitHub</a>. Feel free to fork the repository and try your ideas.</p>
 
@@ -68,6 +74,10 @@
 
         <h2>Continous integration and deployment</h2>
         <p>Friture Github repository is linked with the <a href="https://travis-ci.org/tlecomte/friture">Travis-CI</a> and <a href="https://ci.appveyor.com/project/tlecomte/friture">Appveyor</a> continuous integration services, which respectively package Friture for OS X and Windows. Packages are automatically pushed to <a href="https://github.com/tlecomte/friture/releases">GitHub releases</a> each time a tag is added on the repository.</p>
+
+        <h2>Links</h2>
+        <p>Friture is registered in the <a href="http://pypi.python.org/pypi?:action=display&name=friture">Python Package Index</a></p>
+        <p>Its codebase is analyzed by <a href="http://www.ohloh.net/p/friture">ohloh.net</a>.</p>
 
         <h2>Design</h2>
         <p>Friture is mostly written in the <a href="http://www.python.org">Python</a> programming language.
@@ -85,7 +95,7 @@
 
         <p>Most graphical operations (apart from simple widgets and general application design) are performed with <a href="http://www.opengl.org">OpenGL</a> (using the <a href="http://pyopengl.sourceforge.net">PyOpenGL</a> Python bindings).</p>
 
-        <p>Internally, Friture is designed around a 25-ms timer that periocally allows the various widgets to update their contents for a smooth visual result. Meanwhile, the PortAudio system invokes a callback that pushes the fresh audio data to a ringbuffer that can be accessed by the widgets.</p>
+        <p>Internally, Friture is designed around a 25-ms timer that periodically allows the various widgets to update their contents for a smooth visual result. Meanwhile, the PortAudio system invokes a callback that pushes the fresh audio data to a ringbuffer that can be accessed by the widgets.</p>
     </div>
 
 </body>
