@@ -33,6 +33,12 @@ elif "py2app" in sys.argv:
 # to create a bundled windows executable
 #       python setup.py py2exe
 
+# to test for pep8 issues:
+# pep8 --show-source --show-pep8 --max-line-length=170 friture
+
+# to fix pep8 issues automatically (replace -d by -i if the changes are fine):
+# autopep8 --max-line-length=170 -d -r friture
+
 #NOTE: by default scipy.interpolate.__init__.py and scipy.signal.__init__.py
 #import all of their submodules
 #To decrease the py2exe distributions dramatically, these import lines can
