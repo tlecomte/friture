@@ -5,22 +5,22 @@ from setuptools.extension import Extension
 from Cython.Distutils import build_ext
 from glob import glob
 import os
-from os.path import join, dirname # for README content reading and py2exe fix
+from os.path import join, dirname  # for README content reading and py2exe fix
 import os.path
 import numpy
-import friture # for the version number
+import friture  # for the version number
 
 py2exe_build = False
 py2app_build = False
 
 if "py2exe" in sys.argv:
-	try:
-		import py2exe
-		py2exe_build = True
-	except ImportError:
-		print("Cannot find py2exe")
+    try:
+        import py2exe
+        py2exe_build = True
+    except ImportError:
+        print("Cannot find py2exe")
 elif "py2app" in sys.argv:
-	py2app_build = True
+    py2app_build = True
 
 # see INSTALL file for details
 # to create a source package
@@ -39,146 +39,146 @@ elif "py2app" in sys.argv:
 # to fix pep8 issues automatically (replace -d by -i if the changes are fine):
 # autopep8 --max-line-length=170 -d -r friture
 
-#NOTE: by default scipy.interpolate.__init__.py and scipy.signal.__init__.py
-#import all of their submodules
-#To decrease the py2exe distributions dramatically, these import lines can
-#be commented out !
+# NOTE: by default scipy.interpolate.__init__.py and scipy.signal.__init__.py
+# import all of their submodules
+# To decrease the py2exe distributions dramatically, these import lines can
+# be commented out !
 
 # icudt53.dll is also huge but needed for Qt
 # A stripped down version is available here:
 # https://forum.qt.io/topic/37891/minimal-icudt51-dll-icudt52-dll-and-icudt53-dll
 # http://qlcplus.sourceforge.net/icudt53.dll
 
-#manually include python libraries that py2exe/py2app fails to detect
+# manually include python libraries that py2exe/py2app fails to detect
 # for pyOpenGL : http://www.jstump.com/blog/archive/2009/06/30/py2exe-and-pyopengl-3x-with-no-manual-tinkering/
 # + OpenGL_accelerate.formathandler that is imported by the Python/C
 # API so that py2exe/py2app does not detect it
 includes = ["sip",
-          "PyQt5.QtSvg",
-          "PyQt5.QtXml",
-          "OpenGL.platform.win32",
-          "OpenGL.arrays.ctypesarrays",
-          "OpenGL.arrays.numpymodule",
-          "OpenGL.arrays.lists",
-          "OpenGL.arrays.numbers",
-          "OpenGL.arrays.strings",
-          "OpenGL_accelerate.formathandler"]
+            "PyQt5.QtSvg",
+            "PyQt5.QtXml",
+            "OpenGL.platform.win32",
+            "OpenGL.arrays.ctypesarrays",
+            "OpenGL.arrays.numpymodule",
+            "OpenGL.arrays.lists",
+            "OpenGL.arrays.numbers",
+            "OpenGL.arrays.strings",
+            "OpenGL_accelerate.formathandler"]
 
 if py2exe_build:
-	data_files = []
-	excludes = []
-	dll_excludes = []
+    data_files = []
+    excludes = []
+    dll_excludes = []
 
-	# find path to PyQt5 module dir
-	import PyQt5
-	pyqt5_path = os.path.abspath(PyQt5.__file__)
-	pyqt5_dir = os.path.dirname(pyqt5_path)
+    # find path to PyQt5 module dir
+    import PyQt5
+    pyqt5_path = os.path.abspath(PyQt5.__file__)
+    pyqt5_dir = os.path.dirname(pyqt5_path)
 
-	#include the Qt SVG plugin to render the icons, and the Qt Windows platform plugin
-	svg_plugin = os.path.join(pyqt5_dir, "plugins", "imageformats", "qsvg.dll")
-	windows_plugin = os.path.join(pyqt5_dir, "plugins", "platforms", "qwindows.dll")
-	data_files += [("imageformats", [svg_plugin]),
-					("platforms", [windows_plugin])]
+    # include the Qt SVG plugin to render the icons, and the Qt Windows platform plugin
+    svg_plugin = os.path.join(pyqt5_dir, "plugins", "imageformats", "qsvg.dll")
+    windows_plugin = os.path.join(pyqt5_dir, "plugins", "platforms", "qwindows.dll")
+    data_files += [("imageformats", [svg_plugin]),
+                   ("platforms", [windows_plugin])]
 
-	#exclude some python libraries that py2exe includes by error
-	excludes += ["matplotlib","_ssl","Tkconstants","Tkinter","tcl","email","pyreadline","nose",\
-			"doctest", "pdb", "pydoc", "_hashlib", "bz2","httplib","cookielib","cookielib","urllib","urllib2","Image",\
-			"pywin","optparse","zipfile","calendar","compiler",\
-			"_imaging","_ssl","sqlite3","PIL","IPython","tornado","zmq", "numpy.core._dotblas"]
-	#Note: unittest, inspect are needed by numpy
-	#exclude dlls that py2exe includes by error
-	#failure to exclude these dlls will prevent the executable to be run under XP for example
-	dll_excludes += ["powrprof.dll",
-					 "msvcp90.dll",
-					 "winnsi.dll",
-					 "nsi.dll",
-					 "iphlpapi.dll",
-					 "WTSAPI32.dll",
-					 "API-MS-Win-Core-ErrorHandling-L1-1-0.dll",
-					 "API-MS-Win-Core-Misc-L1-1-0.dll",
-					 "API-MS-Win-Core-ProcessThreads-L1-1-0.dll",
-					 "API-MS-Win-Core-File-L1-1-0.dll",
-					 "API-MS-Win-Core-Handle-L1-1-0.dll",
-					 "API-MS-Win-Core-Profile-L1-1-0.dll",
-					 "API-MS-Win-Core-IO-L1-1-0.dll",
-					 "API-MS-Win-Core-String-L1-1-0.dll",
-					 "API-MS-Win-Core-Interlocked-L1-1-0.dll",
-					 "API-MS-Win-Core-SysInfo-L1-1-0.dll",
-					 "API-MS-Win-Security-Base-L1-1-0.dll",
-					 "API-MS-Win-Core-LocalRegistry-L1-1-0.dll",
-					 "SETUPAPI.dll",
-					 "PSAPI.dll",
-					 "msvcp*.dll",
-					 "msvcr*.dll"]
+    # exclude some python libraries that py2exe includes by error
+    excludes += ["matplotlib", "_ssl", "Tkconstants", "Tkinter", "tcl", "email", "pyreadline", "nose",
+                 "doctest", "pdb", "pydoc", "_hashlib", "bz2", "httplib", "cookielib", "cookielib", "urllib", "urllib2", "Image",
+                 "pywin", "optparse", "zipfile", "calendar", "compiler",
+                 "_imaging", "_ssl", "sqlite3", "PIL", "IPython", "tornado", "zmq", "numpy.core._dotblas"]
+    # Note: unittest, inspect are needed by numpy
+    # exclude dlls that py2exe includes by error
+    # failure to exclude these dlls will prevent the executable to be run under XP for example
+    dll_excludes += ["powrprof.dll",
+                     "msvcp90.dll",
+                     "winnsi.dll",
+                     "nsi.dll",
+                     "iphlpapi.dll",
+                     "WTSAPI32.dll",
+                     "API-MS-Win-Core-ErrorHandling-L1-1-0.dll",
+                     "API-MS-Win-Core-Misc-L1-1-0.dll",
+                     "API-MS-Win-Core-ProcessThreads-L1-1-0.dll",
+                     "API-MS-Win-Core-File-L1-1-0.dll",
+                     "API-MS-Win-Core-Handle-L1-1-0.dll",
+                     "API-MS-Win-Core-Profile-L1-1-0.dll",
+                     "API-MS-Win-Core-IO-L1-1-0.dll",
+                     "API-MS-Win-Core-String-L1-1-0.dll",
+                     "API-MS-Win-Core-Interlocked-L1-1-0.dll",
+                     "API-MS-Win-Core-SysInfo-L1-1-0.dll",
+                     "API-MS-Win-Security-Base-L1-1-0.dll",
+                     "API-MS-Win-Core-LocalRegistry-L1-1-0.dll",
+                     "SETUPAPI.dll",
+                     "PSAPI.dll",
+                     "msvcp*.dll",
+                     "msvcr*.dll"]
 
-	if os.name == 'nt':
-		if 'CPATH' in os.environ:
-			os.environ['CPATH'] = os.environ['CPATH'] + numpy.get_include()
-		else:
-			os.environ['CPATH'] = numpy.get_include()
+    if os.name == 'nt':
+        if 'CPATH' in os.environ:
+            os.environ['CPATH'] = os.environ['CPATH'] + numpy.get_include()
+        else:
+            os.environ['CPATH'] = numpy.get_include()
 
-	extra_options = dict(
-		windows = [{"script":'main.py',
-					"icon_resources":[(1, "resources/images/friture.ico")],
-					"dest_base": "friture"}],
-		options = {"py2exe":{"includes":includes, "excludes":excludes, "dll_excludes":dll_excludes}},
-		data_files = data_files,
-	)
+    extra_options = dict(
+        windows=[{"script": 'main.py',
+                  "icon_resources": [(1, "resources/images/friture.ico")],
+                  "dest_base": "friture"}],
+        options={"py2exe": {"includes": includes, "excludes": excludes, "dll_excludes": dll_excludes}},
+        data_files=data_files,
+    )
 
 elif py2app_build:
-	extra_options = dict(
-		setup_requires=['py2app'],
-		app=['main.py'],
-		options={'py2app':{'includes':includes, 'iconfile':'resources/images/friture.icns'}},
-	)
+    extra_options = dict(
+        setup_requires=['py2app'],
+        app=['main.py'],
+        options={'py2app': {'includes': includes, 'iconfile': 'resources/images/friture.icns'}},
+    )
 else:
-	extra_options = dict()
+    extra_options = dict()
 
 ext_modules = [Extension("friture.exp_smoothing_conv", ["friture/extension/exp_smoothing_conv.pyx"],
-                         include_dirs = [numpy.get_include()]),
+                         include_dirs=[numpy.get_include()]),
                Extension("friture.linear_interp", ["friture/extension/linear_interp.pyx"],
-                         include_dirs = [numpy.get_include()]),
+                         include_dirs=[numpy.get_include()]),
                Extension("friture.lookup_table", ["friture/extension/lookup_table.pyx"],
-                         include_dirs = [numpy.get_include()]),
+                         include_dirs=[numpy.get_include()]),
                Extension("friture.norm_square", ["friture/extension/norm_square.pyx"],
-                         include_dirs = [numpy.get_include()])]
+                         include_dirs=[numpy.get_include()])]
 
-setup(name = "friture",
-	version = friture.__version__,
-	description = 'Real-time visualization of live audio data',
-	long_description = open(join(dirname(__file__), 'README.rst')).read(),
-	license = "GNU GENERAL PUBLIC LICENSE",
-	author = 'Timothée Lecomte',
-	author_email = 'contact@friture.org',
-	url='http://www.friture.org',
-	keywords = ["audio", "spectrum", "spectrogram"],
-	classifiers = [
-	"Programming Language :: Python",
-	"Programming Language :: Cython",
-	"Development Status :: 4 - Beta",
-	"Environment :: MacOS X",
-	"Environment :: Win32 (MS Windows)",
-	"Environment :: X11 Applications :: Qt",
-	"Intended Audience :: End Users/Desktop",
-	"License :: OSI Approved :: GNU General Public License (GPL)",
-	"Operating System :: OS Independent",
-	"Topic :: Multimedia :: Sound/Audio :: Analysis",
-	"Topic :: Multimedia :: Sound/Audio :: Speech"
-	],
-	packages = ['friture',
-				'friture.plotting',
-				'friture.generators'],
-	scripts = ['scripts/friture'],
-	cmdclass = {"build_ext": build_ext},
-	ext_modules = ext_modules,
-	**extra_options
-	)
+setup(name="friture",
+      version=friture.__version__,
+      description='Real-time visualization of live audio data',
+      long_description=open(join(dirname(__file__), 'README.rst')).read(),
+      license="GNU GENERAL PUBLIC LICENSE",
+      author='Timothée Lecomte',
+      author_email='contact@friture.org',
+      url='http://www.friture.org',
+      keywords=["audio", "spectrum", "spectrogram"],
+      classifiers=[
+          "Programming Language :: Python",
+          "Programming Language :: Cython",
+          "Development Status :: 4 - Beta",
+          "Environment :: MacOS X",
+          "Environment :: Win32 (MS Windows)",
+          "Environment :: X11 Applications :: Qt",
+          "Intended Audience :: End Users/Desktop",
+          "License :: OSI Approved :: GNU General Public License (GPL)",
+          "Operating System :: OS Independent",
+          "Topic :: Multimedia :: Sound/Audio :: Analysis",
+          "Topic :: Multimedia :: Sound/Audio :: Speech"
+      ],
+      packages=['friture',
+                'friture.plotting',
+                'friture.generators'],
+      scripts=['scripts/friture'],
+      cmdclass={"build_ext": build_ext},
+      ext_modules=ext_modules,
+      **extra_options
+      )
 
 # py2exe (0.9.2.2 at least on Python 3.4) does not seem to respect the dll_excludes option
 # so we manually remove them from the dist directory
 if py2exe_build:
-	for filenamePattern in dll_excludes:
-		path = join("dist", filenamePattern)
-		for filename in glob(path):
-			print("Remove %s that py2exe should have excluded." %(filename))
-			os.remove(filename)
+    for filenamePattern in dll_excludes:
+        path = join("dist", filenamePattern)
+        for filename in glob(path):
+            print("Remove %s that py2exe should have excluded." % (filename))
+            os.remove(filename)
