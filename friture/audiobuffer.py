@@ -20,7 +20,6 @@
 from PyQt5 import QtCore
 import numpy as np
 from friture.ringbuffer import RingBuffer
-from friture.audiobackend import SAMPLING_RATE
 
 FRAMES_PER_BUFFER = 1024
 

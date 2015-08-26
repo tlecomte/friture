@@ -3,7 +3,7 @@
 
 import sys
 
-from PyQt5 import QtCore, QtGui, QtOpenGL, Qt, QtWidgets
+from PyQt5 import QtWidgets
 from friture.audiobackend import SAMPLING_RATE
 from friture.plotting.scaleWidget import VerticalScaleWidget, HorizontalScaleWidget
 from friture.plotting.scaleDivision import ScaleDivision
@@ -18,7 +18,7 @@ except ImportError:
                                    "PyOpenGL must be installed to run this example.")
     sys.exit(1)
 
-from numpy import zeros, ones, log10, hstack, array, floor, mean, where, rint, inf
+from numpy import zeros, ones, log10, hstack, array, floor, mean, where
 import numpy as np
 
 # The peak decay rates (magic goes here :).
@@ -88,7 +88,7 @@ def tree_rebin(y, ns, N):
 class SpectrumPlotWidget(QtWidgets.QWidget):
 
     def __init__(self, parent, logger=None):
-        super(SpectrumPlotWidget, self).__init__()
+        super(SpectrumPlotWidget, self).__init__(parent)
 
         self.x1 = array([0.1, 0.5, 1.])
         self.x2 = array([0.5, 1., 2.])
@@ -204,10 +204,6 @@ class SpectrumPlotWidget(QtWidgets.QWidget):
             self.canvasWidget.setfmax(fmax)
             self.quadsItem.setData(x1, x2, y)
 
-        # TODO :
-        # - Fix peaks loss when resizing
-        # - optimize if further needed
-
     def draw(self):
         if self.needtransform:
             self.verticalScaleDivision.setLength(self.canvasWidget.height())
@@ -227,8 +223,7 @@ class SpectrumPlotWidget(QtWidgets.QWidget):
             self.canvasWidget.setGrid(array(self.horizontalScaleDivision.majorTicks()),
                                       array(self.horizontalScaleDivision.minorTicks()),
                                       array(self.verticalScaleDivision.majorTicks()),
-                                      array(self.verticalScaleDivision.minorTicks())
-                                      )
+                                      array(self.verticalScaleDivision.minorTicks()))
 
             self.quadsItem.transformUpdate()
 
@@ -365,21 +360,13 @@ class QuadsItem:
         transformed_y = yMap.toScreen(y)
 
         Ones = ones(x1.shape)
-        Ones_shaded = Ones  # .copy()
-        # FIXME : the following would give a satisfying result if the
-        # bins were one pixel wide at minimum => Need to to a rounding
-        # to pixels
-        # w = x2 - x1
-        # i = where(w<1.)[0]
-        # if len(i)>0:
-        #    Ones_shaded[:i[0]:2] = 1.2
 
         if self.peaks_enabled:
             transformed_peak = yMap.toScreen(self.peak)
 
             n = x1.size
 
-            # FIXME should be done conditionally to need_transform
+            # TODO: should be done conditionally to need_transform
             x1_with_peaks = zeros((2 * n))
             x2_with_peaks = zeros((2 * n))
             y_with_peaks = zeros((2 * n))
@@ -400,7 +387,7 @@ class QuadsItem:
             r_with_peaks[n:] = 0. * Ones
 
             g_with_peaks[:n] = 1. - self.peak_int
-            g_with_peaks[n:] = 0.5 * Ones_shaded
+            g_with_peaks[n:] = 0.5 * Ones
 
             b_with_peaks[:n] = 1. - self.peak_int
             b_with_peaks[n:] = 0. * Ones
@@ -409,7 +396,7 @@ class QuadsItem:
             x2_with_peaks = x2
             y_with_peaks = transformed_y
             r_with_peaks = 0. * Ones
-            g_with_peaks = 0.5 * Ones_shaded
+            g_with_peaks = 0.5 * Ones
             b_with_peaks = 0. * Ones
 
         if self.baseline_transformed:

@@ -17,7 +17,9 @@
 # You should have received a copy of the GNU General Public License
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt5 import QtGui, QtWidgets
+"""Spectrogram widget, that displays a rolling 2D image of the time-frequency spectrum."""
+
+from PyQt5 import QtWidgets
 from numpy import log10, floor, zeros, float64, tile, array
 from friture.imageplot import ImagePlot
 from friture.audioproc import audioproc  # audio processing class
@@ -137,7 +139,7 @@ class Spectrogram_Widget(QtWidgets.QWidget):
                 # for now, take the first channel only
                 floatdata = floatdata[0, :]
 
-                # FIXME We should allow here for more intelligent transforms, especially when the log freq scale is selected
+                # FFT transform
                 spn[:, i] = self.proc.analyzelive(floatdata)
 
                 self.old_index += int(needed)

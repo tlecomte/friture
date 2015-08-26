@@ -18,8 +18,7 @@
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
 import numpy
-from PyQt5 import Qt, QtCore, QtGui
-from friture.audiobackend import SAMPLING_RATE
+from PyQt5 import QtCore, QtGui
 from friture.plotting import cmrmap
 from friture.lookup_table import pyx_color_from_float_2D
 
@@ -27,7 +26,7 @@ from friture.lookup_table import pyx_color_from_float_2D
 class CanvasScaledSpectrogram(QtCore.QObject):
     canvasWidthChanged = QtCore.pyqtSignal(int)
 
-    def __init__(self, logger, canvas_height=2,  canvas_width=2):
+    def __init__(self, logger, canvas_height=2, canvas_width=2):
         super().__init__()
 
         # store the logger instance
@@ -36,7 +35,7 @@ class CanvasScaledSpectrogram(QtCore.QObject):
         self.canvas_height = canvas_height
         self.canvas_width = canvas_width
 
-        self.pixmap = QtGui.QPixmap(2 * self.canvas_width,  self.canvas_height)
+        self.pixmap = QtGui.QPixmap(2 * self.canvas_width, self.canvas_height)
         # print("pixmap info : hasAlpha =", self.pixmap.hasAlpha(), ", depth =", self.pixmap.depth(), ", default depth =", self.pixmap.defaultDepth())
         self.pixmap.fill(QtGui.QColor("black"))
         self.painter = QtGui.QPainter()
@@ -54,7 +53,7 @@ class CanvasScaledSpectrogram(QtCore.QObject):
         self.resetBound = 20
 
     def erase(self):
-        self.pixmap = QtGui.QPixmap(2 * self.canvas_width,  self.canvas_height)
+        self.pixmap = QtGui.QPixmap(2 * self.canvas_width, self.canvas_height)
         self.pixmap.fill(QtGui.QColor("black"))
         self.offset = 0
         self.time_offset = 0
@@ -191,17 +190,7 @@ class CanvasScaledSpectrogram(QtCore.QObject):
         return self.pixmap
 
     def getpixmapoffset(self, delay=0):
-        # return self.offset % self.canvas_width
-        # FIXME this should be always negative, but it is not !! Why ?? Because of the filter ?
-        # print self.offset - self.time_offset
-
-        # if abs(self.time_offset - self.offset) > self.resetBound:
-        #       print "resetting"
-        #       self.syncOffsets()
-
         return self.offset % self.canvas_width
-
-        # return (self.time_offset + delay) % self.canvas_width
 
     # this is used when there is an underflow in the audio input
     def syncOffsets(self):

@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5 import QtCore, QtWidgets
 
 
 class LogWidget(QtWidgets.QWidget):
@@ -63,6 +63,6 @@ class LogWidget(QtWidgets.QWidget):
 
     # slot
     # scroll the log widget so that the last line is visible
-    def log_scroll_range_changed(self, min, max):
+    def log_scroll_range_changed(self, scroll_min, scroll_max):
         scrollbar = self.log_scrollarea.verticalScrollBar()
-        scrollbar.setValue(max)
+        scrollbar.setValue(scroll_max)

@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt5 import QtGui, QtCore, QtWidgets
+from PyQt5 import QtWidgets
 from friture.levels import Levels_Widget
 from friture.spectrum import Spectrum_Widget
 from friture.spectrogram import Spectrogram_Widget
@@ -31,29 +31,29 @@ from friture.defaults import DEFAULT_CENTRAL_WIDGET
 
 class CentralWidget(QtWidgets.QWidget):
 
-    def __init__(self, parent, logger, name, type=0):
+    def __init__(self, parent, logger, name, widget_type=0):
         super().__init__(parent)
 
         self.setObjectName(name)
 
         self.logger = logger
 
-        self.controlBar = ControlBar(self)
+        self.control_bar = ControlBar(self)
 
-        self.controlBar.comboBox_select.activated.connect(self.widget_select)
-        self.controlBar.settingsButton.clicked.connect(self.settings_slot)
+        self.control_bar.combobox_select.activated.connect(self.widget_select)
+        self.control_bar.settings_button.clicked.connect(self.settings_slot)
 
         self.label = QtWidgets.QLabel(self)
         self.label.setText(" Central dock ")  # spaces before and after for nicer alignment
-        self.controlBar.layout.insertWidget(0, self.label)
+        self.control_bar.layout.insertWidget(0, self.label)
 
         self.layout = QtWidgets.QVBoxLayout(self)
-        self.layout.addWidget(self.controlBar)
+        self.layout.addWidget(self.control_bar)
         self.layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(self.layout)
 
         self.audiowidget = None
-        self.widget_select(type)
+        self.widget_select(widget_type)
 
     # slot
     def widget_select(self, item):
@@ -83,7 +83,7 @@ class CentralWidget(QtWidgets.QWidget):
 
         self.layout.addWidget(self.audiowidget)
 
-        self.controlBar.comboBox_select.setCurrentIndex(item)
+        self.control_bar.combobox_select.setCurrentIndex(item)
 
     def canvasUpdate(self):
         if self.audiowidget is not None:
@@ -114,6 +114,6 @@ class CentralWidget(QtWidgets.QWidget):
 
     # method
     def restoreState(self, settings):
-        widgetType = settings.value("type", DEFAULT_CENTRAL_WIDGET)
-        self.widget_select(widgetType)
+        widget_type = settings.value("type", DEFAULT_CENTRAL_WIDGET)
+        self.widget_select(widget_type)
         self.audiowidget.restoreState(settings)

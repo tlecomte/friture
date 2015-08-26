@@ -1,9 +1,8 @@
 # Filters parameters generated from filter_design.py
 
 import json
-from numpy import array
 
-jsonparams = """
+JSON_PARAMS = """
 {
     "1": [
         [
@@ -882,4 +881,4 @@ jsonparams = """
 }
 """
 
-params = json.loads(jsonparams)
+PARAMS = json.loads(JSON_PARAMS)

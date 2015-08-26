@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt5 import QtGui, QtCore, QtWidgets
+from PyQt5 import QtWidgets
 from friture.audiobackend import SAMPLING_RATE
 
 # shared with spectrum_settings.py
@@ -155,15 +155,16 @@ class Spectrum_Settings_Dialog(QtWidgets.QDialog):
 
     # slot
     def fftsizechanged(self, index):
-        # FIXME
+        # FIXME default logger
         if self.logger is not None:
             self.logger.push("fft_size_changed slot %d %d %f" % (index, 2 ** index * 32, 150000 / 2 ** index * 32))
+        # FIXME the size should not be found from the index, but attached as item data
         fft_size = 2 ** index * 32
         self.parent().setfftsize(fft_size)
 
     # slot
     def freqscalechanged(self, index):
-        # FIXME
+        # FIXME default logger
         if self.logger is not None:
             self.logger.push("freq_scale slot %d" % index)
         if index == 1:

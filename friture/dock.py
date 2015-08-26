@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt5 import QtGui, QtCore, QtWidgets
+from PyQt5 import QtWidgets
 from friture.levels import Levels_Widget
 from friture.spectrum import Spectrum_Widget
 from friture.spectrogram import Spectrogram_Widget
@@ -30,28 +30,28 @@ from friture.controlbar import ControlBar
 
 class Dock(QtWidgets.QDockWidget):
 
-    def __init__(self, parent, logger, name, type=0):
+    def __init__(self, parent, logger, name, widget_type=0):
         super().__init__(name, parent)
 
         self.setObjectName(name)
 
         self.logger = logger
 
-        self.controlBar = ControlBar(self)
+        self.control_bar = ControlBar(self)
 
-        self.controlBar.comboBox_select.activated.connect(self.widget_select)
-        self.controlBar.settingsButton.clicked.connect(self.settings_slot)
+        self.control_bar.combobox_select.activated.connect(self.widget_select)
+        self.control_bar.settings_button.clicked.connect(self.settings_slot)
 
         self.dockwidget = QtWidgets.QWidget(self)
         self.layout = QtWidgets.QVBoxLayout(self.dockwidget)
-        self.layout.addWidget(self.controlBar)
+        self.layout.addWidget(self.control_bar)
         self.layout.setContentsMargins(0, 0, 0, 0)
         self.dockwidget.setLayout(self.layout)
 
         self.setWidget(self.dockwidget)
 
         self.audiowidget = None
-        self.widget_select(type)
+        self.widget_select(widget_type)
 
     # note that by default the closeEvent is accepted, no need to do it explicitely
     def closeEvent(self, event):
@@ -85,7 +85,7 @@ class Dock(QtWidgets.QDockWidget):
 
         self.layout.addWidget(self.audiowidget)
 
-        self.controlBar.comboBox_select.setCurrentIndex(item)
+        self.control_bar.combobox_select.setCurrentIndex(item)
 
     def canvasUpdate(self):
         if self.audiowidget is not None:
@@ -110,6 +110,6 @@ class Dock(QtWidgets.QDockWidget):
 
     # method
     def restoreState(self, settings):
-        widgetType = settings.value("type", 0)
-        self.widget_select(widgetType)
+        widget_type = settings.value("type", 0)
+        self.widget_select(widget_type)
         self.audiowidget.restoreState(settings)

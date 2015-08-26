@@ -105,7 +105,7 @@ def main():
     # higher resolution even at low sample rates)
     Ndec = 2
     subsampled_sampling_rate = SAMPLING_RATE/2**(Ndec)
-    [bdec, adec] = generated_filters.params['dec']
+    [bdec, adec] = generated_filters.PARAMS['dec']
     zfs0 = subsampler_filtic(Ndec, bdec, adec)
     zfs1 = subsampler_filtic(Ndec, bdec, adec)
     

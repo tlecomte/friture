@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt5 import QtGui, QtCore, QtWidgets
+from PyQt5 import QtCore, QtWidgets
 from friture.ui_settings import Ui_Settings_Dialog
 
 no_input_device_title = "No audio input device found"
@@ -161,10 +161,10 @@ class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
     # method
     def restoreState(self, settings):
         device_name = settings.value("deviceName", "")
-        id = self.comboBox_inputDevice.findText(device_name)
+        device_index = self.comboBox_inputDevice.findText(device_name)
         # change the device only if it exists in the device list
-        if id >= 0:
-            self.comboBox_inputDevice.setCurrentIndex(id)
+        if device_index >= 0:
+            self.comboBox_inputDevice.setCurrentIndex(device_index)
             channel = settings.value("firstChannel", 0)
             self.comboBox_firstChannel.setCurrentIndex(channel)
             channel = settings.value("secondChannel", 0)

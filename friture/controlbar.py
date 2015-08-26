@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt5 import QtGui, QtCore, QtWidgets
+from PyQt5 import QtGui, QtWidgets
 
 
 class ControlBar(QtWidgets.QWidget):
@@ -29,26 +29,26 @@ class ControlBar(QtWidgets.QWidget):
 
         self.layout = QtWidgets.QHBoxLayout(self)
 
-        self.comboBox_select = QtWidgets.QComboBox(self)
-        self.comboBox_select.addItem("Levels")
-        self.comboBox_select.addItem("Scope")
-        self.comboBox_select.addItem("FFT Spectrum")
-        self.comboBox_select.addItem("2D Spectrogram")
-        self.comboBox_select.addItem("Octave Spectrum")
-        self.comboBox_select.addItem("Generator")
-        self.comboBox_select.addItem("Delay Estimator")
-        self.comboBox_select.setCurrentIndex(0)
-        self.comboBox_select.setToolTip("Select the type of audio widget")
+        self.combobox_select = QtWidgets.QComboBox(self)
+        self.combobox_select.addItem("Levels")
+        self.combobox_select.addItem("Scope")
+        self.combobox_select.addItem("FFT Spectrum")
+        self.combobox_select.addItem("2D Spectrogram")
+        self.combobox_select.addItem("Octave Spectrum")
+        self.combobox_select.addItem("Generator")
+        self.combobox_select.addItem("Delay Estimator")
+        self.combobox_select.setCurrentIndex(0)
+        self.combobox_select.setToolTip("Select the type of audio widget")
 
-        self.settingsButton = QtWidgets.QToolButton(self)
-        self.settingsButton.setToolTip("Customize the audio widget")
+        self.settings_button = QtWidgets.QToolButton(self)
+        self.settings_button.setToolTip("Customize the audio widget")
 
         settings_icon = QtGui.QIcon()
         settings_icon.addPixmap(QtGui.QPixmap(":/images-src/dock-settings.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.settingsButton.setIcon(settings_icon)
+        self.settings_button.setIcon(settings_icon)
 
-        self.layout.addWidget(self.comboBox_select)
-        self.layout.addWidget(self.settingsButton)
+        self.layout.addWidget(self.combobox_select)
+        self.layout.addWidget(self.settings_button)
         self.layout.addStretch()
 
         self.setLayout(self.layout)

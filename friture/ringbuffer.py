@@ -18,8 +18,6 @@
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
 # FIXME problem when self.offset overflows the MAXINT limit !
-# FIXME grow the buffer by increment of power of 2
-# FIXME the growing code could be factorized
 
 from numpy import zeros
 

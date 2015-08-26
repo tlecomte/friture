@@ -19,7 +19,7 @@
 
 from PyQt5 import QtCore
 from pyaudio import PyAudio, paInt16, paInputOverflow
-from numpy import ndarray, floor, int16, fromstring, vstack, iinfo, float64
+from numpy import ndarray, int16, fromstring, vstack, iinfo, float64
 
 # the sample rate below should be dynamic, taken from PyAudio/PortAudio
 SAMPLING_RATE = 48000
@@ -169,11 +169,10 @@ class AudioBackend(QtCore.QObject):
             index = self.pa.get_default_output_device_info()['index']
         except IOError:
             index = None
-        return
+        return index
 
     # method
     def get_device_count(self):
-        # FIXME only input devices should be chosen, not all of them !
         return self.pa.get_device_count()
 
     # method
@@ -275,8 +274,8 @@ class AudioBackend(QtCore.QObject):
     def open_stream(self, device):
         # by default we open the device stream with all the channels
         # (interleaved in the data buffer)
-        maxInputChannels = self.pa.get_device_info_by_index(device)['maxInputChannels']
-        stream = self.pa.open(format=paInt16, channels=maxInputChannels, rate=SAMPLING_RATE, input=True,
+        max_input_channels = self.pa.get_device_info_by_index(device)['maxInputChannels']
+        stream = self.pa.open(format=paInt16, channels=max_input_channels, rate=SAMPLING_RATE, input=True,
                               input_device_index=device, stream_callback=self.callback,
                               frames_per_buffer=FRAMES_PER_BUFFER)
 
@@ -289,15 +288,15 @@ class AudioBackend(QtCore.QObject):
     def open_output_stream(self, device, callback):
         # by default we open the device stream with all the channels
         # (interleaved in the data buffer)
-        maxOutputChannels = self.pa.get_device_info_by_index(device)['maxOutputChannels']
-        stream = self.pa.open(format=paInt16, channels=maxOutputChannels, rate=SAMPLING_RATE, output=True,
+        max_output_channels = self.pa.get_device_info_by_index(device)['maxOutputChannels']
+        stream = self.pa.open(format=paInt16, channels=max_output_channels, rate=SAMPLING_RATE, output=True,
                               frames_per_buffer=FRAMES_PER_BUFFER, output_device_index=device,
                               stream_callback=callback)
         return stream
 
-    def is_output_format_supported(self, device, format):
-        maxOutputChannels = self.pa.get_device_info_by_index(device)['maxOutputChannels']
-        success = self.pa.is_format_supported(SAMPLING_RATE, output_device=device, output_channels=maxOutputChannels, output_format=format)
+    def is_output_format_supported(self, device, output_format):
+        max_output_channels = self.pa.get_device_info_by_index(device)['maxOutputChannels']
+        success = self.pa.is_format_supported(SAMPLING_RATE, output_device=device, output_channels=max_output_channels, output_format=output_format)
         return success
 
     # method
@@ -340,7 +339,7 @@ class AudioBackend(QtCore.QObject):
         if self.terminated:
             return
 
-        if (status & paInputOverflow):
+        if status & paInputOverflow:
             print("Stream overflow!")
             self.xruns += 1
             self.underflow.emit()

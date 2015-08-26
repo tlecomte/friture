@@ -63,8 +63,8 @@ class VerticalScaleBar(QtWidgets.QWidget):
 
         # base line
         xb = self.width() - self.borderOffset
-        y0 = self.coordinateTransform.toScreen(self.coordinateTransform.min)
-        y1 = self.coordinateTransform.toScreen(self.coordinateTransform.max)
+        y0 = self.coordinateTransform.toScreen(self.coordinateTransform.coord_min)
+        y1 = self.coordinateTransform.toScreen(self.coordinateTransform.coord_max)
         painter.drawLine(xb, y0, xb, y1)
 
         # tick start
@@ -153,8 +153,8 @@ class HorizontalScaleBar(QtWidgets.QWidget):
 
         # base line
         yb = self.borderOffset
-        x0 = self.coordinateTransform.toScreen(self.coordinateTransform.min)
-        x1 = self.coordinateTransform.toScreen(self.coordinateTransform.max)
+        x0 = self.coordinateTransform.toScreen(self.coordinateTransform.coord_min)
+        x1 = self.coordinateTransform.toScreen(self.coordinateTransform.coord_max)
         painter.drawLine(x0, yb, x1, yb)
 
         # tick start
@@ -257,8 +257,8 @@ class ColorScaleBar(QtWidgets.QWidget):
 
         # base line
         xb = self.borderOffset + self.colorBarWidth + self.barSpacing
-        y0 = self.coordinateTransform.toScreen(self.coordinateTransform.min)
-        y1 = self.coordinateTransform.toScreen(self.coordinateTransform.max)
+        y0 = self.coordinateTransform.toScreen(self.coordinateTransform.coord_min)
+        y1 = self.coordinateTransform.toScreen(self.coordinateTransform.coord_max)
         painter.drawLine(xb, y0, xb, y1)
 
         # tick start

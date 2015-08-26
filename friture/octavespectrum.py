@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt5 import QtGui, QtWidgets
+from PyQt5 import QtWidgets
 from numpy import log10, array, arange, where
 from friture.logger import PrintLogger
 from friture.histplot import HistPlot
@@ -26,9 +26,7 @@ from friture.octavespectrum_settings import (OctaveSpectrum_Settings_Dialog,  # 
                                              DEFAULT_SPEC_MAX,
                                              DEFAULT_WEIGHTING,
                                              DEFAULT_BANDSPEROCTAVE,
-                                             DEFAULT_BANDSPEROCTAVE_INDEX,
-                                             DEFAULT_RESPONSE_TIME,
-                                             DEFAULT_RESPONSE_TIME_INDEX)
+                                             DEFAULT_RESPONSE_TIME)
 
 from friture.filter import (octave_filter_bank_decimation, octave_frequencies,
                             octave_filter_bank_decimation_filtic, NOCTAVE)
@@ -190,7 +188,7 @@ class OctaveSpectrum_Widget(QtWidgets.QWidget):
 class octave_filters():
 
     def __init__(self, bandsperoctave):
-        [self.bdec, self.adec] = generated_filters.params['dec']
+        [self.bdec, self.adec] = generated_filters.PARAMS['dec']
 
         self.setbandsperoctave(bandsperoctave)
 
@@ -212,7 +210,7 @@ class octave_filters():
         self.bandsperoctave = bandsperoctave
         self.nbands = NOCTAVE * self.bandsperoctave
         self.fi, self.flow, self.fhigh = octave_frequencies(self.nbands, self.bandsperoctave)
-        [self.boct, self.aoct, fi, flow, fhigh] = generated_filters.params['%d' % bandsperoctave]
+        [self.boct, self.aoct, fi, flow, fhigh] = generated_filters.PARAMS['%d' % bandsperoctave]
 
         # [self.b_nodec, self.a_nodec, fi, fl, fh] = octave_filters(self.nbands, self.bandsperoctave)
 

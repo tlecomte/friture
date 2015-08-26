@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt5 import QtGui, QtWidgets
-from numpy import log10, argmax, max, array, zeros, arange, floor, float64
+from PyQt5 import QtWidgets
+from numpy import log10, argmax, zeros, arange, floor, float64
 from friture.audioproc import audioproc  # audio processing class
 from friture.spectrum_settings import (Spectrum_Settings_Dialog,  # settings dialog
                                        DEFAULT_FFT_SIZE,
@@ -124,7 +124,7 @@ class Spectrum_Widget(QtWidgets.QWidget):
                 floatdata = self.audiobuffer.data_indexed(self.old_index, self.fft_size)
 
                 # first channel
-                # FIXME We should allow here for more intelligent transforms, especially when the log freq scale is selected
+                # FFT transform
                 sp1n[:, i] = self.proc.analyzelive(floatdata[0, :])
 
                 if self.dual_channels and floatdata.shape[0] > 1:
@@ -134,7 +134,6 @@ class Spectrum_Widget(QtWidgets.QWidget):
                 self.old_index += int(needed)
 
             # compute the widget data
-            # FIXME magnitude square ?
             sp1 = pyx_exp_smoothed_value_numpy(self.kernel, self.alpha, sp1n, self.dispbuffers1)
             sp2 = pyx_exp_smoothed_value_numpy(self.kernel, self.alpha, sp2n, self.dispbuffers2)
             # store result for next computation

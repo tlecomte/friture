@@ -33,7 +33,7 @@ FRAMES_PER_BUFFER = 2 * 1024
 DEFAULT_GENERATOR_KIND_INDEX = 0
 RAMP_LENGTH = 3e-3  # 10 ms
 
-(stopped, starting, playing, stopping) = list(range(0, 4))
+(STOPPED, STARTING, PLAYING, STOPPING) = list(range(0, 4))
 
 
 class Generator_Widget(QtWidgets.QWidget):
@@ -47,8 +47,8 @@ class Generator_Widget(QtWidgets.QWidget):
         self.audiobuffer = None
 
         self.setObjectName("Generator_Widget")
-        self.gridLayout = QtWidgets.QGridLayout(self)
-        self.gridLayout.setObjectName("gridLayout")
+        self.grid_layout = QtWidgets.QGridLayout(self)
+        self.grid_layout.setObjectName("grid_layout")
 
         self.generators = []
         self.generators.append(SineGenerator(self, logger))
@@ -57,21 +57,21 @@ class Generator_Widget(QtWidgets.QWidget):
         self.generators.append(SweepGenerator(self, logger))
         self.generators.append(BurstGenerator(self, logger))
 
-        self.comboBox_generator_kind = QtWidgets.QComboBox(self)
-        self.comboBox_generator_kind.setObjectName("comboBox_generator_kind")
+        self.combobox_generator_kind = QtWidgets.QComboBox(self)
+        self.combobox_generator_kind.setObjectName("combobox_generator_kind")
 
-        self.stackedLayout = QtWidgets.QStackedLayout()
+        self.stacked_settings_layout = QtWidgets.QStackedLayout()
 
         for generator in self.generators:
-            self.comboBox_generator_kind.addItem(generator.name)
-            self.stackedLayout.addWidget(generator.settingsWidget())
+            self.combobox_generator_kind.addItem(generator.name)
+            self.stacked_settings_layout.addWidget(generator.settingsWidget())
 
-        self.comboBox_generator_kind.setCurrentIndex(DEFAULT_GENERATOR_KIND_INDEX)
+        self.combobox_generator_kind.setCurrentIndex(DEFAULT_GENERATOR_KIND_INDEX)
 
         self.t = 0.
         self.t_start = 0.
         self.t_stop = RAMP_LENGTH
-        self.state = stopped
+        self.state = STOPPED
 
         self.audiobackend = audiobackend
 
@@ -85,7 +85,7 @@ class Generator_Widget(QtWidgets.QWidget):
         for device in self.audiobackend.output_devices:
             self.logger.push("Opening the stream")
             try:
-                self.stream = self.audiobackend.open_output_stream(device, self.audioCallback)
+                self.stream = self.audiobackend.open_output_stream(device, self.audio_callback)
                 self.stream.start_stream()
                 self.stream.stop_stream()
                 self.device = device
@@ -94,7 +94,7 @@ class Generator_Widget(QtWidgets.QWidget):
             except:
                 self.logger.push("Fail")
 
-        self.startStopButton = QtWidgets.QPushButton(self)
+        self.start_stop_button = QtWidgets.QPushButton(self)
 
         startStopIcon = QtGui.QIcon()
         startStopIcon.addPixmap(QtGui.QPixmap(":/images-src/start.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
@@ -102,32 +102,30 @@ class Generator_Widget(QtWidgets.QWidget):
         startStopIcon.addPixmap(QtGui.QPixmap(":/images-src/stop.svg"), QtGui.QIcon.Active, QtGui.QIcon.On)
         startStopIcon.addPixmap(QtGui.QPixmap(":/images-src/stop.svg"), QtGui.QIcon.Selected, QtGui.QIcon.On)
         startStopIcon.addPixmap(QtGui.QPixmap(":/images-src/stop.svg"), QtGui.QIcon.Disabled, QtGui.QIcon.On)
-        self.startStopButton.setIcon(startStopIcon)
+        self.start_stop_button.setIcon(startStopIcon)
 
-        self.startStopButton.setObjectName("generatorStartStop")
-        self.startStopButton.setText("Start")
-        self.startStopButton.setToolTip("Start/Stop generator")
-        self.startStopButton.setCheckable(True)
-        self.startStopButton.setChecked(False)
+        self.start_stop_button.setObjectName("generatorStartStop")
+        self.start_stop_button.setText("Start")
+        self.start_stop_button.setToolTip("Start/Stop generator")
+        self.start_stop_button.setCheckable(True)
+        self.start_stop_button.setChecked(False)
 
-        self.gridLayout.addWidget(self.startStopButton, 0, 0, 1, 1)
-        self.gridLayout.addWidget(self.comboBox_generator_kind, 1, 0, 1, 1)
-        self.gridLayout.addLayout(self.stackedLayout, 2, 0, 1, 1)
+        self.grid_layout.addWidget(self.start_stop_button, 0, 0, 1, 1)
+        self.grid_layout.addWidget(self.combobox_generator_kind, 1, 0, 1, 1)
+        self.grid_layout.addLayout(self.stacked_settings_layout, 2, 0, 1, 1)
 
-        self.comboBox_generator_kind.activated.connect(self.stackedLayout.setCurrentIndex)
-        self.startStopButton.toggled.connect(self.startStopButton_toggle)
+        self.combobox_generator_kind.activated.connect(self.stacked_settings_layout.setCurrentIndex)
+        self.start_stop_button.toggled.connect(self.start_stop_button_toggle)
 
         # initialize the settings dialog
-        self.settings_dialog = Generator_Settings_Dialog(self, self.logger)
-
         devices = self.audiobackend.get_readable_output_devices_list()
-        for device in devices:
-            self.settings_dialog.comboBox_outputDevice.addItem(device)
-
         if self.device is not None:
-            self.settings_dialog.comboBox_outputDevice.setCurrentIndex(self.audiobackend.output_devices.index(self.device))
+            device_index = self.audiobackend.output_devices.index(self.device)
+        else:
+            device_index = None
+        self.settings_dialog = Generator_Settings_Dialog(self, self.logger, devices, device_index)
 
-        self.settings_dialog.comboBox_outputDevice.currentIndexChanged.connect(self.device_changed)
+        self.settings_dialog.combobox_output_device.currentIndexChanged.connect(self.device_changed)
 
 #        channels = self.audiobackend.get_readable_current_output_channels()
 #        for channel in channels:
@@ -135,7 +133,7 @@ class Generator_Widget(QtWidgets.QWidget):
 #            self.settings_dialog.comboBox_secondChannel.addItem(channel)
 
 #        current_device = self.audiobackend.get_readable_current_output_device()
-#        self.settings_dialog.comboBox_outputDevice.setCurrentIndex(current_device)
+#        self.settings_dialog.combobox_output_device.setCurrentIndex(current_device)
 
 #        first_channel = self.audiobackend.get_current_first_channel()
 #        self.settings_dialog.comboBox_firstChannel.setCurrentIndex(first_channel)
@@ -149,7 +147,7 @@ class Generator_Widget(QtWidgets.QWidget):
         previous_stream = self.stream
         previous_device = self.device
 
-        errorMessage = ""
+        error_message = ""
 
         self.logger.push("Trying to write to output device #%d" % (device))
 
@@ -157,21 +155,21 @@ class Generator_Widget(QtWidgets.QWidget):
         try:
             success = self.audiobackend.is_output_format_supported(device, pyaudio.paInt16)
         except ValueError as error:
-            errorMessage = error.args[0]
-            self.logger.push("Format is not supported. " + errorMessage)
+            error_message = error.args[0]
+            self.logger.push("Format is not supported. " + error_message)
             success = False
 
         if success:
             try:
-                self.stream = self.audiobackend.open_output_stream(device, self.audioCallback)
+                self.stream = self.audiobackend.open_output_stream(device, self.audio_callback)
                 self.device = device
                 self.stream.start_stream()
-                if self.state not in [starting, playing]:
+                if self.state not in [STARTING, PLAYING]:
                     self.stream.stop_stream()
                 success = True
             except OSError as error:
-                errorMessage = str(error)
-                self.logger.push("Fail. " + errorMessage)
+                error_message = str(error)
+                self.logger.push("Fail. " + error_message)
                 success = False
 
         if success:
@@ -188,9 +186,9 @@ class Generator_Widget(QtWidgets.QWidget):
             # that dialog remains on top when the error message is closed
             error_message = QtWidgets.QErrorMessage(self.settings_dialog)
             error_message.setWindowTitle("Output device error")
-            error_message.showMessage("Impossible to use the selected output device, reverting to the previous one. Reason is: " + errorMessage)
+            error_message.showMessage("Impossible to use the selected output device, reverting to the previous one. Reason is: " + error_message)
 
-        self.settings_dialog.comboBox_outputDevice.setCurrentIndex(self.audiobackend.output_devices.index(self.device))
+        self.settings_dialog.combobox_output_device.setCurrentIndex(self.audiobackend.output_devices.index(self.device))
 
     def settings_called(self, checked):
         self.settings_dialog.show()
@@ -200,17 +198,17 @@ class Generator_Widget(QtWidgets.QWidget):
         self.audiobuffer = buffer
 
     # slot
-    def startStopButton_toggle(self, checked):
+    def start_stop_button_toggle(self, checked):
         if checked:
-            self.startStopButton.setText("Stop")
-            if self.state == stopped or self.state == stopping:
-                self.state = starting
+            self.start_stop_button.setText("Stop")
+            if self.state == STOPPED or self.state == STOPPING:
+                self.state = STARTING
                 self.t_start = 0.
                 self.stream.start_stream()
         else:
-            self.startStopButton.setText("Start")
-            if self.state == playing or self.state == starting:
-                self.state = stopping
+            self.start_stop_button.setText("Start")
+            if self.state == PLAYING or self.state == STARTING:
+                self.state = STOPPING
                 self.t_stop = RAMP_LENGTH
                 # will stop at the end of the ramp
 
@@ -221,10 +219,10 @@ class Generator_Widget(QtWidgets.QWidget):
         # we do not make anything of the input data in the generator...
         return
 
-    def audioCallback(self, in_data, frame_count, time_info, status):
+    def audio_callback(self, in_data, frame_count, time_info, status):
         N = frame_count
 
-        if self.state == stopped:
+        if self.state == STOPPED:
             return ("", pyaudio.paContinue)
 
         # if we cannot write any sample, return now
@@ -233,7 +231,7 @@ class Generator_Widget(QtWidgets.QWidget):
 
         t = self.t + np.arange(0, N / float(SAMPLING_RATE), 1. / float(SAMPLING_RATE))
 
-        name = self.comboBox_generator_kind.currentText()
+        name = self.combobox_generator_kind.currentText()
 
         generators = [generator for generator in self.generators if generator.name == name]
 
@@ -249,16 +247,16 @@ class Generator_Widget(QtWidgets.QWidget):
         floatdata = generator.signal(t)
 
         # add smooth ramps at start/stop to avoid undesirable bursts
-        if self.state == starting:
+        if self.state == STARTING:
             # add a ramp at the start
             t_ramp = self.t_start + np.arange(0, N / float(SAMPLING_RATE), 1. / float(SAMPLING_RATE))
             t_ramp = np.clip(t_ramp, 0., RAMP_LENGTH)
             floatdata *= t_ramp / RAMP_LENGTH
             self.t_start += N / float(SAMPLING_RATE)
             if self.t_start > RAMP_LENGTH:
-                self.state = playing
+                self.state = PLAYING
 
-        if self.state == stopping:
+        if self.state == STOPPING:
             print("stopping", self.t_stop, N)
             # add a ramp at the end
             t_ramp = self.t_stop - np.arange(0, N / float(SAMPLING_RATE), 1. / float(SAMPLING_RATE))
@@ -267,7 +265,7 @@ class Generator_Widget(QtWidgets.QWidget):
             self.t_stop -= N / float(SAMPLING_RATE)
 
             if self.t_stop < 0.:
-                self.state = stopped
+                self.state = STOPPED
                 self.stream_stop_ramp_finished.emit()
 
         # output channels are interleaved
@@ -289,7 +287,7 @@ class Generator_Widget(QtWidgets.QWidget):
         return
 
     def saveState(self, settings):
-        settings.setValue("generator kind", self.comboBox_generator_kind.currentIndex())
+        settings.setValue("generator kind", self.combobox_generator_kind.currentIndex())
 
         for generator in self.generators:
             generator.settingsWidget().saveState(settings)
@@ -298,8 +296,8 @@ class Generator_Widget(QtWidgets.QWidget):
 
     def restoreState(self, settings):
         generator_kind = settings.value("generator kind", DEFAULT_GENERATOR_KIND_INDEX)
-        self.comboBox_generator_kind.setCurrentIndex(generator_kind)
-        self.stackedLayout.setCurrentIndex(generator_kind)
+        self.combobox_generator_kind.setCurrentIndex(generator_kind)
+        self.stacked_settings_layout.setCurrentIndex(generator_kind)
 
         for generator in self.generators:
             generator.settingsWidget().restoreState(settings)
@@ -309,30 +307,36 @@ class Generator_Widget(QtWidgets.QWidget):
 
 class Generator_Settings_Dialog(QtWidgets.QDialog):
 
-    def __init__(self, parent, logger):
+    def __init__(self, parent, logger, devices, device_index):
         super().__init__(parent)
 
         self.logger = logger
 
         self.setWindowTitle("Generator settings")
 
-        self.formLayout = QtWidgets.QFormLayout(self)
+        self.form_layout = QtWidgets.QFormLayout(self)
 
-        self.comboBox_outputDevice = QtWidgets.QComboBox(self)
-        self.comboBox_outputDevice.setObjectName("comboBox_outputDevice")
+        self.combobox_output_device = QtWidgets.QComboBox(self)
+        self.combobox_output_device.setObjectName("comboBox_outputDevice")
 
-        self.formLayout.addRow("Select the output device:", self.comboBox_outputDevice)
+        self.form_layout.addRow("Select the output device:", self.combobox_output_device)
 
-        self.setLayout(self.formLayout)
+        self.setLayout(self.form_layout)
+
+        for device in devices:
+            self.combobox_output_device.addItem(device)
+
+        if device_index is not None:
+            self.combobox_output_device.setCurrentIndex(device_index)
 
     def saveState(self, settings):
         # for the output device, we search by name instead of index, since
         # we do not know if the device order stays the same between sessions
-        settings.setValue("deviceName", self.comboBox_outputDevice.currentText())
+        settings.setValue("deviceName", self.combobox_output_device.currentText())
 
     def restoreState(self, settings):
         device_name = settings.value("deviceName", "")
-        id = self.comboBox_outputDevice.findText(device_name)
+        device_index = self.combobox_output_device.findText(device_name)
         # change the device only if it exists in the device list
-        if id >= 0:
-            self.comboBox_outputDevice.setCurrentIndex(id)
+        if device_index >= 0:
+            self.combobox_output_device.setCurrentIndex(device_index)

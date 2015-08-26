@@ -41,7 +41,7 @@ def ceilWithinInterval(x, interval):
 
     candidate = floorWithPrecision(x, prec + 1)
 
-    while (candidate < x):
+    while candidate < x:
         candidate += interval
 
     return candidate
@@ -64,9 +64,9 @@ def roundWithPrecision(x, prec):
 # takes min/max of the scale, and returns appropriate ticks (selected for proper number, rounding)
 class ScaleDivision(object):
 
-    def __init__(self, min, max, length):
-        self.min = min
-        self.max = max
+    def __init__(self, scale_min, scale_max, length):
+        self.scale_min = scale_min
+        self.scale_max = scale_max
         self.length = length
 
         self.majorTickInterval = 0
@@ -75,14 +75,14 @@ class ScaleDivision(object):
 
         self.log = False
 
-    def set_properties(self, min, max, length):
-        self.min = min
-        self.max = max
+    def set_properties(self, scale_min, scale_max, length):
+        self.scale_min = scale_min
+        self.scale_max = scale_max
         self.length = length
 
-    def setRange(self, min, max):
-        self.min = min
-        self.max = max
+    def setRange(self, scale_min, scale_max):
+        self.scale_min = scale_min
+        self.scale_max = scale_max
 
     def setLength(self, length):
         self.length = length
@@ -95,9 +95,9 @@ class ScaleDivision(object):
 
     def majorTicks(self):
 
-        rang = abs(self.max - self.min)
-        trueMin = min(self.min, self.max)
-        trueMax = max(self.min, self.max)
+        rang = abs(self.scale_max - self.scale_min)
+        trueMin = min(self.scale_min, self.scale_max)
+        trueMax = max(self.scale_min, self.scale_max)
 
         if self.log:
             if trueMin <= 0.:
@@ -138,8 +138,8 @@ class ScaleDivision(object):
         if len(majorTicks) < 2:
             return []
 
-        trueMin = min(self.min, self.max)
-        trueMax = max(self.min, self.max)
+        trueMin = min(self.scale_min, self.scale_max)
+        trueMax = max(self.scale_min, self.scale_max)
 
         if self.log:
             ticks = []
@@ -175,13 +175,13 @@ class ScaleDivision(object):
 
             # find lowest bound
             x = majorTicks[0]
-            while (x >= trueMin):
+            while x >= trueMin:
                 x -= minorTickInterval
             x += minorTickInterval
 
             # fill up to the max
             ticks = []
-            while (x <= trueMax):
+            while x <= trueMax:
                 ticks.append(x)
                 x += minorTickInterval
 

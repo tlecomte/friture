@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt5 import QtGui, QtCore, QtWidgets
+from PyQt5 import QtCore, QtWidgets
 import psutil  # for CPU usage monitoring
 
 
@@ -67,7 +67,7 @@ class StatisticsWidget(QtWidgets.QWidget):
             "Global CPU usage: %d %%\n"\
             "Number of overflowed inputs (XRUNs): %d"\
             % (self.audiobackend.chunk_number,
-                cpu_percent,
-                self.audiobackend.xruns)
+               cpu_percent,
+               self.audiobackend.xruns)
 
         self.LabelStats.setText(label)

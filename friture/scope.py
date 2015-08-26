@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt5 import QtGui, QtCore, QtWidgets
-from numpy import log10, where, linspace, sign, arange, zeros
+from PyQt5 import QtWidgets
+from numpy import log10, where, sign, arange, zeros
 from friture.timeplot import TimePlot
 from friture.audiobackend import SAMPLING_RATE
 from friture.logger import PrintLogger
@@ -71,8 +71,7 @@ class Scope_Widget(QtWidgets.QWidget):
         trig_search_stop = -width / 2
         triggerdata = triggerdata[trig_search_start: trig_search_stop]
 
-        max = floatdata.max()
-        trigger_level = max * 2. / 3.
+        trigger_level = floatdata.max() * 2. / 3.
         trigger_pos = where((triggerdata[:-1] < trigger_level) * (triggerdata[1:] >= trigger_level))[0]
 
         if len(trigger_pos) == 0:

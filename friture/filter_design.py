@@ -26,21 +26,21 @@ from friture.audiobackend import SAMPLING_RATE
 
 # Change the following parameters if you wish to use a different
 # ERB scale.
-EarQ = 9.26449  # Glasberg and Moore Parameters
-minBW = 24.7
-order = 1.
+EAR_Q = 9.26449  # Glasberg and Moore Parameters
+MIN_BW = 24.7
+ORDER = 1.
 
 
-def frequencies(fs, numChannels, lowFreq):
-    channels = arange(0, numChannels)
-    cf = -(EarQ * minBW) + exp(channels * (-log(fs / 2 + EarQ * minBW) +
-                                           log(lowFreq + EarQ * minBW)) / numChannels) \
-        * (fs / 2 + EarQ * minBW)
+def frequencies(fs, num_channels, low_freq):
+    channels = arange(0, num_channels)
+    cf = -(EAR_Q * MIN_BW) + exp(channels * (-log(fs / 2 + EAR_Q * MIN_BW) +
+                                             log(low_freq + EAR_Q * MIN_BW)) / num_channels) \
+        * (fs / 2 + EAR_Q * MIN_BW)
     return cf
 
 
-def MakeERBFilters(fs, numChannels, lowFreq):
-    # [forward, feedback] = MakeERBFilters(fs, numChannels) computes the
+def MakeERBFilters(fs, num_channels, low_freq):
+    # [forward, feedback] = MakeERBFilters(fs, num_channels) computes the
     # filter coefficients for a bank of Gammatone filters. These
     # filters were defined by Patterson and Holdworth for simulating
     # the cochlea. The results are returned as arrays of filter
@@ -48,14 +48,14 @@ def MakeERBFilters(fs, numChannels, lowFreq):
     # can be passed to the MatLab "filter" function, or you can do all
     # the filtering at once with the ERBFilterBank() function.
     #
-    # The filter bank contains "numChannels" channels that extend from
-    # half the sampling rate (fs) to "lowFreq".
+    # The filter bank contains "num_channels" channels that extend from
+    # half the sampling rate (fs) to "low_freq".
     T = 1. / fs
     # All of the following expressions are derived in Apple TR #35, "An
     # Efficient Implementation of the Patterson-Holdsworth Cochlear
     # Filter Bank."
-    cf = frequencies(fs, numChannels, lowFreq)
-    ERB = ((cf / EarQ) ** order + minBW ** order) ** (1. / order)
+    cf = frequencies(fs, num_channels, low_freq)
+    ERB = ((cf / EAR_Q) ** ORDER + MIN_BW ** ORDER) ** (1. / ORDER)
     B = 1.019 * 2 * pi * ERB
     gain = abs((-2 * exp(4 * 1j * cf * pi * T) * T +
                 2 * exp(-(B * T) + 2 * 1j * cf * pi * T) * T *
@@ -94,14 +94,14 @@ def MakeERBFilters(fs, numChannels, lowFreq):
     return [forward, feedback]
 
 
-def octave_filters(Nbands, BandsPerOctave):
+def octave_filters(total_band_count, bands_per_octave):
     # Bandpass Filter Generation
     pbrip = .5      # Pass band ripple
     sbrip = 50      # Stop band rejection
     # Filter order
     order = 2
 
-    fi, f_low, f_high = octave_frequencies(Nbands, BandsPerOctave)
+    fi, f_low, f_high = octave_frequencies(total_band_count, bands_per_octave)
 
     fs = SAMPLING_RATE
     wi = fi / (fs / 2.)  # normalized frequencies
@@ -126,18 +126,18 @@ def octave_filters(Nbands, BandsPerOctave):
     return [B, A, fi, f_low, f_high]
 
 
-def octave_filters_oneoctave(Nbands, BandsPerOctave):
+def octave_filters_oneoctave(total_band_count, bands_per_octave):
     # Bandpass Filter Generation
     pbrip = .5      # Pass band ripple
     sbrip = 50      # Stop band rejection
     # Filter order
     order = 2
 
-    fi, f_low, f_high = octave_frequencies(Nbands, BandsPerOctave)
+    fi, f_low, f_high = octave_frequencies(total_band_count, bands_per_octave)
 
-    fi = fi[-BandsPerOctave:]
-    f_low = f_low[-BandsPerOctave:]
-    f_high = f_high[-BandsPerOctave:]
+    fi = fi[-bands_per_octave:]
+    f_low = f_low[-bands_per_octave:]
+    f_high = f_high[-bands_per_octave:]
 
     fs = SAMPLING_RATE
     wi = fi / (fs / 2.)  # normalized frequencies
@@ -185,22 +185,21 @@ def generate_filters_params():
     params['dec'] = [bdec.tolist(), adec.tolist()]
 
     # generate the octave filters
-    for BandsPerOctave in [1, 3, 6, 12, 24]:
-        Nbands = NOCTAVE * BandsPerOctave
-        [boct, aoct, fi, flow, fhigh] = octave_filters_oneoctave(Nbands, BandsPerOctave)
-        params['%d' % BandsPerOctave] = [boct, aoct, fi.tolist(), flow.tolist(), fhigh.tolist()]
+    for bands_per_octave in [1, 3, 6, 12, 24]:
+        total_band_count = NOCTAVE * bands_per_octave
+        [boct, aoct, fi, flow, fhigh] = octave_filters_oneoctave(total_band_count, bands_per_octave)
+        params['%d' % bands_per_octave] = [boct, aoct, fi.tolist(), flow.tolist(), fhigh.tolist()]
 
     out = """\
 # Filters parameters generated from filter_design.py
 
 import json
-from numpy import array
 
-jsonparams = \"\"\"
+JSON_PARAMS = \"\"\"
 %s
 \"\"\"
 
-params = json.loads(jsonparams)
+PARAMS = json.loads(JSON_PARAMS)
 """ % json.dumps(params, indent=4, sort_keys=True)  # repr(params)
 
     path = os.path.dirname(__file__)
@@ -219,7 +218,7 @@ def main():
 
     N = 2048 * 2 * 2
     fs = float(SAMPLING_RATE)
-    Nchannels = 20
+    channel_count = 20
     low_freq = 20.
 
     impulse = zeros(N)
@@ -227,13 +226,13 @@ def main():
     f = 1000.
     # impulse = sin(2*pi*f*arange(0, N/fs, 1./fs))
 
-    # [ERBforward, ERBfeedback] = MakeERBFilters(fs, Nchannels, low_freq)
+    # [ERBforward, ERBfeedback] = MakeERBFilters(fs, channel_count, low_freq)
     # y = ERBFilterBank(ERBforward, ERBfeedback, impulse)
 
-    BandsPerOctave = 3
-    Nbands = NOCTAVE * BandsPerOctave
+    bands_per_octave = 3
+    total_band_count = NOCTAVE * bands_per_octave
 
-    [B, A, fi, fl, fh] = octave_filters(Nbands, BandsPerOctave)
+    [B, A, fi, fl, fh] = octave_filters(total_band_count, bands_per_octave)
     y, zfs = octave_filter_bank(B, A, impulse)
     # print "Filter lengths without decimation"
     # for b, a in zip(B, A):
@@ -302,7 +301,7 @@ def main():
     plot(list(range(0, len(impulse), 2)), ydec3, label="lowpass + dec2")
     legend()
 
-    [boct, aoct, fi, flow, fhigh] = octave_filters_oneoctave(Nbands, BandsPerOctave)
+    [boct, aoct, fi, flow, fhigh] = octave_filters_oneoctave(total_band_count, bands_per_octave)
     y, dec, zfs = octave_filter_bank_decimation(bdec, adec, boct, aoct, impulse)
     # print "Filter lengths with decimation"
     # print len(bdec), len(adec)
@@ -328,9 +327,9 @@ def main():
             semilogx(f / dec[m], p, 'ko')
             m += 1
 
-    [boct, aoct, fi, flow, fhigh] = octave_filters_oneoctave(Nbands, BandsPerOctave)
-    y1, dec, zfs = octave_filter_bank_decimation(bdec, adec, boct, aoct, impulse[0:N / 2])
-    y2, dec, zfs = octave_filter_bank_decimation(bdec, adec, boct, aoct, impulse[N / 2:], zis=zfs)
+    [boct, aoct, fi, flow, fhigh] = octave_filters_oneoctave(total_band_count, bands_per_octave)
+    y1, dec, zfs = octave_filter_bank_decimation(bdec, adec, boct, aoct, impulse[0:int(N / 2)])
+    y2, dec, zfs = octave_filter_bank_decimation(bdec, adec, boct, aoct, impulse[int(N / 2):], zis=zfs)
 
     y = []
     for y1one, y2one in zip(y1, y2):

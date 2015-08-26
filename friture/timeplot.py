@@ -18,8 +18,8 @@
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
 import sys
-from PyQt5 import QtCore, Qt, QtGui, QtWidgets
-from numpy import log10, interp, linspace, sin, array, ones, zeros
+from PyQt5 import Qt, QtGui, QtWidgets
+from numpy import interp, linspace, array, ones, zeros
 from friture.plotting.scaleWidget import VerticalScaleWidget, HorizontalScaleWidget
 from friture.plotting.scaleDivision import ScaleDivision
 from friture.plotting.coordinateTransform import CoordinateTransform
@@ -248,8 +248,7 @@ class TimePlot(QtWidgets.QWidget):
             self.canvasWidget.setGrid(array(self.horizontalScaleDivision.majorTicks()),
                                       array(self.horizontalScaleDivision.minorTicks()),
                                       array(self.verticalScaleDivision.majorTicks()),
-                                      array(self.verticalScaleDivision.minorTicks())
-                                      )
+                                      array(self.verticalScaleDivision.minorTicks()))
 
     def pause(self):
         self.paused = True
@@ -305,9 +304,9 @@ class TimePlot(QtWidgets.QWidget):
     def update_xscale(self):
         self.xscaled = linspace(self.xmin, self.xmax, self.canvas_width)
 
-    def settimerange(self, min, max):
-        self.horizontalScaleTransform.setRange(min, max)
-        self.horizontalScaleDivision.setRange(min, max)
+    def settimerange(self, time_min, time_max):
+        self.horizontalScaleTransform.setRange(time_min, time_max)
+        self.horizontalScaleDivision.setRange(time_min, time_max)
 
         # notify that sizeHint has changed (this should be done with a signal emitted from the scale division to the scale bar)
         self.horizontalScale.scaleBar.updateGeometry()

@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt5 import QtCore, QtGui, Qt, QtWidgets
+from PyQt5 import QtCore, QtGui, QtWidgets
 from fractions import Fraction
 import numpy as np
 from friture.spectrogram_image import CanvasScaledSpectrogram
@@ -105,12 +105,7 @@ class PlotImage:
         self.resampler.set_ratio(self.sfft_rate_frac, screen_rate_frac)
 
         # time advance
-        # FIXME ideally this function should be called at paintevent time, for better time sync
-        # but I'm not sure it is...
-
-        # FIXME there is a small bands of columns with jitter (on both sides of the spectrogram)
-        # solution: grow the rolling-canvas by a couple of columns,
-        # and slightly delay the spectrogram by the same number of columns
+        # This function is meant to be called at paintevent time, for better time sync.
 
         pixmap = self.canvasscaledspectrogram.getpixmap()
         offset = self.canvasscaledspectrogram.getpixmapoffset(delay=jitter_pix / 2)
@@ -126,8 +121,7 @@ class PlotImage:
             pixel_delay = rect.width() * time_delay / self.T
 
             draw_delay = time - self.last_time
-            # delta_t and draw_delay are almost equal => the problem does not come from PortAudio !
-            # print(draw_delay, draw_delay*rect.width()/self.T, delta_t)
+
             self.last_time = time
 
             offset += pixel_delay
@@ -139,8 +133,8 @@ class PlotImage:
             hints = painter.renderHints()
             # enable bilinear pixmap transformation
             painter.setRenderHints(hints | QtGui.QPainter.SmoothPixmapTransform)
-            # FIXME instead of a generic bilinear transformation, I need a specialized one
-            # since no transformation is needed in y, and the sampling rate is already known to be ok in x
+            # Note: nstead of a generic bilinear transformation, a specialized one could be more efficient,
+            # since no transformation is needed in y, and the sampling rate is already known to be ok in x.
             sw = rect.width()
             sh = rect.height()
 

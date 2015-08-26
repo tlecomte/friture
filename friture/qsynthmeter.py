@@ -19,7 +19,6 @@
 # along with Friture.  If not, see <http:#www.gnu.org/licenses/>.
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from numpy import log10
 
 # Meter level limits (in dB).
 MAXDB = +3.
@@ -257,13 +256,13 @@ class qsynthMeter(QtWidgets.QFrame):
         self.iecLevels = [0] * self.LevelCount
 
         self.colors = [QtGui.QColor(0, 0, 0)] * self.ColorCount
-        self.colors[self.ColorOver] = QtGui.QColor(240,   0, 20)
+        self.colors[self.ColorOver] = QtGui.QColor(240, 0, 20)
         self.colors[self.Color0dB] = QtGui.QColor(240, 160, 20)
         self.colors[self.Color3dB] = QtGui.QColor(220, 220, 20)
         self.colors[self.Color6dB] = QtGui.QColor(160, 220, 20)
         self.colors[self.Color10dB] = QtGui.QColor(40, 160, 40)
-        self.colors[self.ColorBack] = QtGui.QColor(20,  40, 20)
-        self.colors[self.ColorFore] = QtGui.QColor(80,  80, 80)
+        self.colors[self.ColorBack] = QtGui.QColor(20, 40, 20)
+        self.colors[self.ColorFore] = QtGui.QColor(80, 80, 80)
 
         self.setBackgroundRole(QtGui.QPalette.NoRole)
 
@@ -417,19 +416,19 @@ class IECScale:
     def iec_scale(self, dB):
         fDef = 1.
 
-        if (dB < -70.0):
+        if dB < -70.0:
             fDef = 0.0
-        elif (dB < -60.0):
+        elif dB < -60.0:
             fDef = (dB + 70.0) * 0.0025
-        elif (dB < -50.0):
+        elif dB < -50.0:
             fDef = (dB + 60.0) * 0.005 + 0.025
-        elif (dB < -40.0):
+        elif dB < -40.0:
             fDef = (dB + 50.0) * 0.0075 + 0.075
-        elif (dB < -30.0):
+        elif dB < -30.0:
             fDef = (dB + 40.0) * 0.015 + 0.15
-        elif (dB < -20.0):
+        elif dB < -20.0:
             fDef = (dB + 30.0) * 0.02 + 0.3
-        else:  # if (dB < 0.0)
+        else:  # if dB < 0.0
             fDef = (dB + 20.0) * 0.025 + 0.5
 
         return fDef * self.height

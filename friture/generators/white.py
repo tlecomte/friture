@@ -17,7 +17,6 @@
 # You should have received a copy of the GNU General Public License
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
-import numpy as np
 from numpy.random import standard_normal
 from PyQt5 import QtWidgets
 

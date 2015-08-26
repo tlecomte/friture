@@ -29,7 +29,7 @@ class DockManager(QtCore.QObject):
         super().__init__(parent)
 
         # the parent must of the QMainWindow so that docks are created as children of it
-        assert(isinstance(parent, QMainWindow))
+        assert isinstance(parent, QMainWindow)
 
         self.docks = []
         self.logger = logger

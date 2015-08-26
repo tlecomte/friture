@@ -23,13 +23,13 @@ from friture.audiobackend import SAMPLING_RATE
 
 try:
     from friture.norm_square import pyx_norm_square
-except ImportError as e:
+except ImportError as error:
     import sys
     from PyQt5 import QtWidgets
     app = QtWidgets.QApplication(sys.argv)
     QtWidgets.QMessageBox.critical(None, "Friture",
                                    "Error when loading one of the Cython extensions. Please make sure they are built, or rebuild them. See INSTALL.txt for details.")
-    raise(e)
+    raise error
 
 
 class audioproc():
@@ -57,16 +57,14 @@ class audioproc():
 
         # FFT for a linear transformation in frequency scale
         fft = rfft(samples * self.window)
-        spectrum = self.norm(fft)
+        spectrum = self.norm_square(fft)
 
         return spectrum
 
-    def norm(self, fft):
-        # FIXME I don't need abs, since I do a log anyway after that
-        # real**2 + imag**2 is enough, the sqrt is superfluous
-        # This should be done in Cython, too costly in numpy
-        return pyx_norm_square(fft, 1. / self.size_sq)
+    def norm_square(self, fft):
         # return (fft.real**2 + fft.imag**2) / self.size_sq
+        # This is done in Cython, too costly in numpy
+        return pyx_norm_square(fft, 1. / self.size_sq)
 
     def decimate(self, samples):
         # first we remove as much points as possible

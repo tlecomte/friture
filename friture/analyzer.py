@@ -20,9 +20,9 @@
 import sys
 import os
 import platform
-from PyQt5 import QtCore, QtOpenGL
+from PyQt5 import QtCore
 # specifically import from PyQt5.QtGui and QWidgets for startup time improvement :
-from PyQt5.QtWidgets import QMainWindow, QVBoxLayout, QErrorMessage, QApplication, QSplashScreen
+from PyQt5.QtWidgets import QMainWindow, QVBoxLayout, QApplication, QSplashScreen
 from PyQt5.QtGui import QPixmap
 from friture.ui_friture import Ui_MainWindow
 from friture.about import About_Dialog  # About dialog

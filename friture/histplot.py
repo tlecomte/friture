@@ -18,7 +18,8 @@
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
 from PyQt5 import QtCore, Qt, QtGui, QtWidgets
-from numpy import zeros, ones, log10, linspace, logspace, log2, array, round
+from numpy import zeros, ones, log10, array
+import numpy as np
 from friture.plotting.scaleWidget import VerticalScaleWidget, HorizontalScaleWidget
 from friture.plotting.scaleDivision import ScaleDivision
 from friture.plotting.coordinateTransform import CoordinateTransform
@@ -47,14 +48,14 @@ class HistogramItem:
         self.i = [0]
 
         self.pixmaps = [QtGui.QPixmap()]
-        self.maxLabelPixHWidth = 0
-        self.maxLabelPixVWidth = 0
-        self.pixHWidths = 0
-        self.pixVWidths = 0
-        self.pixHHeights = 0
-        self.pixVHeights = 0
-        self.Hpixmaps = [[QtGui.QPixmap(), QtGui.QPixmap()]]
-        self.Vpixmaps = [[QtGui.QPixmap(), QtGui.QPixmap()]]
+        self.max_label_pix_h_width = 0
+        self.max_label_pix_v_width = 0
+        self.pix_h_widths = 0
+        self.pix_v_widths = 0
+        self.pix_h_heights = 0
+        self.pix_v_heights = 0
+        self.h_pixmaps = [[QtGui.QPixmap(), QtGui.QPixmap()]]
+        self.v_pixmaps = [[QtGui.QPixmap(), QtGui.QPixmap()]]
 
     def setData(self, fl, fh, fc, y):
         if len(self.y) != len(y):
@@ -66,17 +67,14 @@ class HistogramItem:
 
         self.y = array(y)
 
-    def data(self):
-        return self.__data
-
-    def setColor(self, color):
+    def set_color(self, color):
         if self.__color != color:
             self.__color = color
 
     def color(self):
         return self.__color
 
-    def draw(self, painter, xMap, yMap, rect):
+    def draw(self, painter, x_map, y_map, rect):
         # update the cache according to possibly new canvas dimensions
         h = rect.height()
         if h != self.canvas_height:
@@ -90,43 +88,43 @@ class HistogramItem:
         # update the cached pixmaps and coordinates if necessary
         if self.need_transform:
             # round to pixels
-            self.x1 = round(xMap.toScreen(array(self.fl)))
-            self.x2 = round(xMap.toScreen(array(self.fh))) - 1
+            self.x1 = np.round(x_map.toScreen(array(self.fl)))
+            self.x2 = np.round(x_map.toScreen(array(self.fh))) - 1
 
             self.update_pixmap(self.x2[0] - self.x1[0], self.canvas_height)
             self.i = list(array(self.x2) - array(self.x1) - (self.cached_bar_width - 2))
 
             self.need_transform = False
 
-        y = self.canvas_height - yMap.toScreen(self.y)
+        y = self.canvas_height - y_map.toScreen(self.y)
 
         for x1, x2, y2, i in zip(self.x1, self.x2, y, self.i):
-            self.drawBar(painter, x1, y2, i)
+            self.draw_bar(painter, x1, y2, i)
 
         w = self.x2[0] - self.x1[0]
 
-        if self.maxLabelPixHWidth <= w:  # try to draw the frequency labels horizontally
-            self.drawLabels(painter, y, self.pixHWidths, self.pixHHeights, self.Hpixmaps)
-        elif self.maxLabelPixVWidth <= w:  # try to draw the frequency labels vertically
-            self.drawLabels(painter, y, self.pixVWidths, self.pixVHeights, self.Vpixmaps)
+        if self.max_label_pix_h_width <= w:  # try to draw the frequency labels horizontally
+            self.draw_labels(painter, y, self.pix_h_widths, self.pix_h_heights, self.h_pixmaps)
+        elif self.max_label_pix_v_width <= w:  # try to draw the frequency labels vertically
+            self.draw_labels(painter, y, self.pix_v_widths, self.pix_v_heights, self.v_pixmaps)
 
-    def drawLabels(self, painter, y, pixWidths, pixHeights, pixmaps):
-        x = (self.x1 + self.x2) / 2 - pixWidths / 2  # center
+    def draw_labels(self, painter, y, pix_widths, pix_heights, pixmaps):
+        x = (self.x1 + self.x2) / 2 - pix_widths / 2  # center
 
         Dy = 6
         y += Dy  # some margin between top of the bar and text
 
-        hBound = 3
-        y = (y >= hBound) * y + (y < hBound) * hBound
+        h_bound = 3
+        y = (y >= h_bound) * y + (y < h_bound) * h_bound
 
-        mask = y + pixHeights >= self.canvas_height - 1
-        y = mask * (self.canvas_height - hBound - pixHeights) + (-mask) * y
+        mask = y + pix_heights >= self.canvas_height - 1
+        y = mask * (self.canvas_height - h_bound - pix_heights) + (-mask) * y
         ps = mask * 1 + (-mask) * 0
 
         for x1, y2, p, pixmap in zip(x, y, ps, pixmaps):
             painter.drawPixmap(x1, y2, pixmap[p])
 
-    def drawBar(self, painter, left, top, i):
+    def draw_bar(self, painter, left, top, i):
         painter.drawPixmap(int(left), int(top), self.pixmaps[int(i)])
 
     # For a dramatic speedup, the bars are cached instead of drawn from scratch each time
@@ -141,10 +139,10 @@ class HistogramItem:
             pixmap.fill(color)
             painter = QtGui.QPainter(pixmap)
             if width > 3:
-                self.drawBarDecoration(painter, w, height)
+                self.draw_bar_decoration(painter, w, height)
             self.pixmaps += [pixmap]
 
-    def drawBarDecoration(self, painter, width, height):
+    def draw_bar_decoration(self, painter, width, height):
         color = QtGui.QColor(self.color())
         factor = 125
         light = color.lighter(factor)
@@ -177,71 +175,71 @@ class HistogramItem:
 
     # For a dramatic speedup, the frequency labels are cached
     # instead of drawn from scratch each time
-    def update_labels_pixmap(self, fList):
-        labels_pixmaps_H_black = []
-        labels_pixmaps_H_white = []
-        labels_pixmaps_V_black = []
-        labels_pixmaps_V_white = []
+    def update_labels_pixmap(self, freq_list):
+        labels_pixmaps_h_black = []
+        labels_pixmaps_h_white = []
+        labels_pixmaps_v_black = []
+        labels_pixmaps_v_white = []
 
         w = h = 1
         test_pixmap = QtGui.QPixmap(w, h)
         test_pixmap.fill()
         test_painter = QtGui.QPainter(test_pixmap)
-        fRect = QtCore.QRectF(0, 0, w, h)
+        f_rect = QtCore.QRectF(0, 0, w, h)
 
-        transparentColor = QtGui.QColor(0, 0, 0, 0)
+        transparent_color = QtGui.QColor(0, 0, 0, 0)
 
-        for f in fList:
+        for f in freq_list:
             # first, find the right pixmap size
-            bRect = test_painter.boundingRect(fRect, Qt.Qt.AlignLeft, f)
+            boundary_rect = test_painter.boundingRect(f_rect, Qt.Qt.AlignLeft, f)
 
             # second, create the pixmap with the right size
-            pixmap = QtGui.QPixmap(bRect.width(), bRect.height())
-            pixmap.fill(transparentColor)  # transparent background
+            pixmap = QtGui.QPixmap(boundary_rect.width(), boundary_rect.height())
+            pixmap.fill(transparent_color)  # transparent background
             painter = QtGui.QPainter(pixmap)
             painter.setPen(QtCore.Qt.black)
-            painter.drawText(bRect, Qt.Qt.AlignLeft, f)
-            labels_pixmaps_H_black += [pixmap]
+            painter.drawText(boundary_rect, Qt.Qt.AlignLeft, f)
+            labels_pixmaps_h_black += [pixmap]
 
-            pixmap = QtGui.QPixmap(bRect.width(), bRect.height())
-            pixmap.fill(transparentColor)  # transparent background
+            pixmap = QtGui.QPixmap(boundary_rect.width(), boundary_rect.height())
+            pixmap.fill(transparent_color)  # transparent background
             painter = QtGui.QPainter(pixmap)
             painter.setPen(QtCore.Qt.white)
-            painter.drawText(bRect, Qt.Qt.AlignLeft, f)
-            labels_pixmaps_H_white += [pixmap]
+            painter.drawText(boundary_rect, Qt.Qt.AlignLeft, f)
+            labels_pixmaps_h_white += [pixmap]
 
         angle = -90
-        for pix in labels_pixmaps_H_black:
+        for pix in labels_pixmaps_h_black:
             pixmap = QtGui.QPixmap(pix.height(), pix.width())
-            pixmap.fill(transparentColor)  # transparent background
+            pixmap.fill(transparent_color)  # transparent background
             painter = QtGui.QPainter(pixmap)
             painter.rotate(angle)
             painter.drawPixmap(-pix.width(), 0, pix)
-            labels_pixmaps_V_black += [pixmap]
+            labels_pixmaps_v_black += [pixmap]
 
-        for pix in labels_pixmaps_H_white:
+        for pix in labels_pixmaps_h_white:
             pixmap = QtGui.QPixmap(pix.height(), pix.width())
-            pixmap.fill(transparentColor)  # transparent background
+            pixmap.fill(transparent_color)  # transparent background
             painter = QtGui.QPainter(pixmap)
             painter.rotate(angle)
             painter.drawPixmap(-pix.width(), 0, pix)
-            labels_pixmaps_V_white += [pixmap]
+            labels_pixmaps_v_white += [pixmap]
 
         test_painter.end()  # manually ends painting to satisfy Qt
 
-        self.pixHWidths = array([pix.width() for pix in labels_pixmaps_H_white])
-        self.maxLabelPixHWidth = max(self.pixHWidths)
-        self.pixHHeights = array([pix.height() for pix in labels_pixmaps_H_white])
+        self.pix_h_widths = array([pix.width() for pix in labels_pixmaps_h_white])
+        self.max_label_pix_h_width = max(self.pix_h_widths)
+        self.pix_h_heights = array([pix.height() for pix in labels_pixmaps_h_white])
 
-        self.pixVWidths = array([pix.width() for pix in labels_pixmaps_V_white])
-        self.maxLabelPixVWidth = max(self.pixVWidths)
-        self.pixVHeights = array([pix.height() for pix in labels_pixmaps_V_white])
+        self.pix_v_widths = array([pix.width() for pix in labels_pixmaps_v_white])
+        self.max_label_pix_v_width = max(self.pix_v_widths)
+        self.pix_v_heights = array([pix.height() for pix in labels_pixmaps_v_white])
 
-        self.Hpixmaps = [[pix_white, pix_black] for pix_white, pix_black in zip(labels_pixmaps_H_white,
-                                                                                labels_pixmaps_H_black)]
+        self.h_pixmaps = [[pix_white, pix_black] for pix_white, pix_black in zip(labels_pixmaps_h_white,
+                                                                                 labels_pixmaps_h_black)]
 
-        self.Vpixmaps = [[pix_white, pix_black] for pix_white, pix_black in zip(labels_pixmaps_V_white,
-                                                                                labels_pixmaps_V_black)]
+        self.v_pixmaps = [[pix_white, pix_black] for pix_white, pix_black in zip(labels_pixmaps_v_white,
+                                                                                 labels_pixmaps_v_black)]
 
 
 class HistogramPeakBarItem:
@@ -254,7 +252,7 @@ class HistogramPeakBarItem:
         self.y = array([0.])
         self.canvas_width = 2
         self.need_transform = False
-        self.yMap = None
+        self.y_map = None
 
         self.palette = [Qt.QColor(255, gb, gb) for gb in range(0, 256)]
 
@@ -268,7 +266,7 @@ class HistogramPeakBarItem:
         self.palette_index = (255 * (1. - peaks_int)).astype(int)
         self.y = array(y)
 
-    def draw(self, painter, xMap, yMap, rect):
+    def draw(self, painter, x_map, y_map, rect):
         # update the cache according to possibly new canvas dimensions
         h = rect.height()
         w = rect.width()
@@ -278,13 +276,13 @@ class HistogramPeakBarItem:
 
         if self.need_transform:
             # round to pixels
-            self.x1 = round(xMap.toScreen(array(self.fl)))
-            self.x2 = round(xMap.toScreen(array(self.fh)))
+            self.x1 = np.round(x_map.toScreen(array(self.fl)))
+            self.x2 = np.round(x_map.toScreen(array(self.fh)))
 
             self.need_transform = False
 
-        peaks = h - yMap.toScreen(self.peaks)
-        ys = h - yMap.toScreen(self.y)
+        peaks = h - y_map.toScreen(self.peaks)
+        ys = h - y_map.toScreen(self.y)
 
         for x1, x2, peak, index, y in zip(self.x1, self.x2, peaks, self.palette_index, ys):
             painter.fillRect(x1, peak, x2 - x1, y - peak + 1, self.palette[index])
@@ -313,14 +311,14 @@ class HistPlot(QtWidgets.QWidget):
         self.canvasWidget = CanvasWidget(self, self.verticalScaleTransform, self.horizontalScaleTransform)
         self.canvasWidget.setTrackerFormatter(lambda x, y: "%d Hz, %.1f dB" % (x, y))
 
-        plotLayout = QtWidgets.QGridLayout()
-        plotLayout.setSpacing(0)
-        plotLayout.setContentsMargins(0, 0, 0, 0)
-        plotLayout.addWidget(self.verticalScale, 0, 0)
-        plotLayout.addWidget(self.canvasWidget, 0, 1)
-        plotLayout.addWidget(self.horizontalScale, 1, 1)
+        plot_layout = QtWidgets.QGridLayout()
+        plot_layout.setSpacing(0)
+        plot_layout.setContentsMargins(0, 0, 0, 0)
+        plot_layout.addWidget(self.verticalScale, 0, 0)
+        plot_layout.addWidget(self.canvasWidget, 0, 1)
+        plot_layout.addWidget(self.horizontalScale, 1, 1)
 
-        self.setLayout(plotLayout)
+        self.setLayout(plot_layout)
 
         self.needfullreplot = False
 
@@ -335,7 +333,7 @@ class HistPlot(QtWidgets.QWidget):
         self.peak_decay = PEAK_DECAY_RATE
 
         self.histogram = HistogramItem()
-        self.histogram.setColor(Qt.Qt.darkGreen)
+        self.histogram.set_color(Qt.Qt.darkGreen)
         self.canvasWidget.attach(self.histogram)
 
         # need to replot here for the size Hints to be computed correctly (depending on axis scales...)
@@ -356,27 +354,28 @@ class HistPlot(QtWidgets.QWidget):
 
             self.verticalScaleDivision.setLength(self.canvasWidget.height())
             self.verticalScaleTransform.setLength(self.canvasWidget.height())
-            startBorder, endBorder = self.verticalScale.spacingBorders()
-            self.verticalScaleTransform.setBorders(startBorder, endBorder)
+
+            start_border, end_border = self.verticalScale.spacingBorders()
+            self.verticalScaleTransform.setBorders(start_border, end_border)
 
             self.verticalScale.update()
 
             self.horizontalScaleDivision.setLength(self.canvasWidget.width())
             self.horizontalScaleTransform.setLength(self.canvasWidget.width())
-            startBorder, endBorder = self.horizontalScale.spacingBorders()
-            self.horizontalScaleTransform.setBorders(startBorder, endBorder)
+
+            start_border, end_border = self.horizontalScale.spacingBorders()
+            self.horizontalScaleTransform.setBorders(start_border, end_border)
 
             self.horizontalScale.update()
 
-            xMajorTick = self.horizontalScaleDivision.majorTicks()
-            xMinorTick = self.horizontalScaleDivision.minorTicks()
-            yMajorTick = self.verticalScaleDivision.majorTicks()
-            yMinorTick = self.verticalScaleDivision.minorTicks()
-            self.canvasWidget.setGrid(array(xMajorTick),
-                                      array(xMinorTick),
-                                      array(yMajorTick),
-                                      array(yMinorTick)
-                                      )
+            x_major_tick = self.horizontalScaleDivision.majorTicks()
+            x_minor_tick = self.horizontalScaleDivision.minorTicks()
+            y_major_tick = self.verticalScaleDivision.majorTicks()
+            y_minor_tick = self.verticalScaleDivision.minorTicks()
+            self.canvasWidget.setGrid(array(x_major_tick),
+                                      array(x_minor_tick),
+                                      array(y_major_tick),
+                                      array(y_minor_tick))
 
         self.canvasWidget.update()
 
@@ -406,9 +405,9 @@ class HistPlot(QtWidgets.QWidget):
         self.peak_int[mask1] = 1.
         self.peak_int[mask2_b] *= 0.975
 
-    def setspecrange(self, min, max):
-        self.verticalScaleTransform.setRange(min, max)
-        self.verticalScaleDivision.setRange(min, max)
+    def setspecrange(self, spec_min, spec_max):
+        self.verticalScaleTransform.setRange(spec_min, spec_max)
+        self.verticalScaleDivision.setRange(spec_min, spec_max)
 
         # notify that sizeHint has changed (this should be done with a signal emitted from the scale division to the scale bar)
         self.verticalScale.scaleBar.updateGeometry()

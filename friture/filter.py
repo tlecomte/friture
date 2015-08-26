@@ -25,7 +25,7 @@ def ERBFilterBank(forward, feedback, x):
     # specified by the forward and feedback parameters. Each row
     # of the forward and feedback parameters are the parameters
     # to the Matlab builtin function "filter".
-    (rows, cols) = feedback.shape
+    rows = feedback.shape[0]
     y = zeros((rows, len(x)))
     for i in range(0, rows):
         y[i, :] = lfilter(forward[i, :], feedback[i, :], x)
@@ -48,23 +48,18 @@ def ERBFilterBank(forward, feedback, x):
 #     b is the bandwidth designator and equals 1 for octave, 1/3 for 1/3 octave, 1/6 for 1/6 octave, 1/12 for 1/12 octave, and 1/24 for 1/24 octave.
 
 
-def octave_frequencies(Nbands, BandsPerOctave):
+def octave_frequencies(total_bands_count, bands_per_octave):
     f0 = 1000.  # audio reference frequency is 1 kHz
 
-    b = 1. / BandsPerOctave
+    b = 1. / bands_per_octave
 
-    imax = Nbands // 2
-    if Nbands % 2 == 0:
+    imax = total_bands_count // 2
+    if total_bands_count % 2 == 0:
         i = arange(-imax, imax)
     else:
         i = arange(-imax, imax + 1)
 
-    if BandsPerOctave % 2 == 1:
-        fi = f0 * 2 ** (i * b)
-    else:
-        # FIXME the official formula does not seem to work !
-        fi = f0 * 2 ** (i * b)  # fi = f0 * 2**((2*i+1)*b/2.)
-
+    fi = f0 * 2 ** (i * b)
     f_low = fi * sqrt(2 ** (-b))
     f_high = fi * sqrt(2 ** b)
 
@@ -76,18 +71,18 @@ def octave_filter_bank(forward, feedback, x, zis=None):
     # specified by the forward and feedback parameters. Each row
     # of the forward and feedback parameters are the parameters
     # to the Matlab builtin function "filter".
-    Nbank = len(forward)
-    y = zeros((Nbank, len(x)))
+    filter_count = len(forward)
+    y = zeros((filter_count, len(x)))
 
     zfs = []
     y = []
 
     if zis is None:
         zis = []
-        for i in range(0, Nbank):
+        for i in range(0, filter_count):
             zis += [zeros(max(len(forward[i]), len(feedback[i])) - 1)]
 
-    for i in range(0, Nbank):
+    for i in range(0, filter_count):
         filt, zf = lfilter(forward[i], feedback[i], x, zi=zis[i])
         # zf can be reused to restart the filter
         zfs += [zf]
@@ -105,21 +100,21 @@ def octave_filter_bank_decimation(blow, alow, forward, feedback, x, zis=None):
     # specified by the forward and feedback parameters. Each row
     # of the forward and feedback parameters are the parameters
     # to the Matlab builtin function "filter".
-    BandsPerOctave = len(forward)
-    Nbank = NOCTAVE * BandsPerOctave
+    bands_per_octave = len(forward)
+    filter_count = NOCTAVE * bands_per_octave
 
-    y = [0.] * Nbank
-    dec = [0.] * Nbank
+    y = [0.] * filter_count
+    dec = [0.] * filter_count
 
     x_dec = x
 
     zfs = []
 
     if zis is None:
-        k = Nbank - 1
+        k = filter_count - 1
 
         for j in range(0, NOCTAVE):
-            for i in range(0, BandsPerOctave)[::-1]:
+            for i in range(0, bands_per_octave)[::-1]:
                 filt = lfilter(forward[i], feedback[i], x_dec)
                 y[k] = filt
                 dec[k] = 2 ** j
@@ -129,10 +124,10 @@ def octave_filter_bank_decimation(blow, alow, forward, feedback, x, zis=None):
         return y, dec, None
     else:
         m = 0
-        k = Nbank - 1
+        k = filter_count - 1
 
         for j in range(0, NOCTAVE):
-            for i in range(0, BandsPerOctave)[::-1]:
+            for i in range(0, bands_per_octave)[::-1]:
                 filt, zf = lfilter(forward[i], feedback[i], x_dec, zi=zis[m])
                 m += 1
                 # zf can be reused to restart the filter
@@ -164,11 +159,11 @@ def decimate(bdec, adec, x, zi=None):
 
 
 def octave_filter_bank_decimation_filtic(blow, alow, forward, feedback):
-    BandsPerOctave = len(forward)
+    bands_per_octave = len(forward)
     zfs = []
 
     for j in range(0, NOCTAVE):
-        for i in range(0, BandsPerOctave)[::-1]:
+        for i in range(0, bands_per_octave)[::-1]:
             l = max(len(forward[i]), len(feedback[i])) - 1
             zfs += [zeros(l)]
         l = max(len(blow), len(alow)) - 1
