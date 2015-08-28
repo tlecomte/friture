@@ -6,4 +6,5 @@ sys.path.insert(0, '.')
 
 from friture.analyzer import main
 
-main()
+if __name__ == '__main__':
+    main()
