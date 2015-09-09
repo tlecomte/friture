@@ -19,6 +19,7 @@
 
 import sys
 import os
+import os.path
 import platform
 from PyQt5 import QtCore
 # specifically import from PyQt5.QtGui and QWidgets for startup time improvement :
@@ -198,8 +199,11 @@ def main():
     app = QApplication(sys.argv)
 
     if platform.system() == "Darwin":
+        print("Running on Mac OS")
         # help the py2app-packaged application find the Qt plugins (imageformats and platforms)
-        QApplication.addLibraryPath(QApplication.applicationDirPath() + '../PlugIns')
+        pluginsPath = os.path.join(QApplication.applicationDirPath(), os.path.pardir, 'PlugIns')
+        print("Adding the following to the Library paths: " + pluginsPath)
+        QApplication.addLibraryPath(pluginsPath)
 
     # Splash screen
     pixmap = QPixmap(":/images/splash.png")
