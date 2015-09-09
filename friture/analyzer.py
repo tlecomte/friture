@@ -201,7 +201,7 @@ def main():
     if platform.system() == "Darwin":
         print("Running on Mac OS")
         # help the py2app-packaged application find the Qt plugins (imageformats and platforms)
-        pluginsPath = os.path.join(QApplication.applicationDirPath(), os.path.pardir, 'PlugIns')
+        pluginsPath = os.path.normpath(os.path.join(QApplication.applicationDirPath(), os.path.pardir, 'PlugIns'))
         print("Adding the following to the Library paths: " + pluginsPath)
         QApplication.addLibraryPath(pluginsPath)
 
