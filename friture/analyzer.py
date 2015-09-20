@@ -179,7 +179,7 @@ class Friture(QMainWindow, ):
 
 
 def main():
-    print("Platform is " + platform.system())
+    print("Platform is %s (%s)" %(platform.system(), sys.platform))
 
     if platform.system() == "Windows":
         print("Applying Windows-specific setup")
