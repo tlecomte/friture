@@ -179,8 +179,10 @@ class Friture(QMainWindow, ):
 
 
 def main():
+    print("Platform is " + platform.system())
+
     if platform.system() == "Windows":
-        print("Running on Windows")
+        print("Applying Windows-specific setup")
         # On Windows, redirect stderr to a file
         import imp
         import ctypes
@@ -199,7 +201,7 @@ def main():
     app = QApplication(sys.argv)
 
     if platform.system() == "Darwin":
-        print("Running on Mac OS")
+        print("Applying Mac OS-specific setup")
         # help the py2app-packaged application find the Qt plugins (imageformats and platforms)
         pluginsPath = os.path.normpath(os.path.join(QApplication.applicationDirPath(), os.path.pardir, 'PlugIns'))
         print("Adding the following to the Library paths: " + pluginsPath)
