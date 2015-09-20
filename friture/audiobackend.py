@@ -100,13 +100,14 @@ class AudioBackend(QtCore.QObject):
             self.stream.close()
             self.stream = None
 
-        # call terminate on PortAudio
-        self.logger.push("Terminating PortAudio")
-        self.pa.terminate()
-        self.logger.push("PortAudio terminated")
+        if not self.terminated:
+            # call terminate on PortAudio
+            self.logger.push("Terminating PortAudio")
+            self.pa.terminate()
+            self.logger.push("PortAudio terminated")
 
-        # avoid calling PortAudio methods in the callback/slots
-        self.terminated = True
+            # avoid calling PortAudio methods in the callback/slots
+            self.terminated = True
 
     # method
     def get_readable_devices_list(self):
