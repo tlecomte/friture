@@ -72,7 +72,7 @@ class DockManager(QtCore.QObject):
                 settings.endGroup()
         else:
             self.logger.push("First launch, display a default set of docks")
-            self.docks = [Dock(self.parent(), self.logger, "Dock %d" % (i), type=type) for i, type in enumerate(DEFAULT_DOCKS)]
+            self.docks = [Dock(self.parent(), self.logger, "Dock %d" % (i), widget_type=widget_type) for i, widget_type in enumerate(DEFAULT_DOCKS)]
             for dock in self.docks:
                 self.parent().addDockWidget(QtCore.Qt.TopDockWidgetArea, dock)
 
