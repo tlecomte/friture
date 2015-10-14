@@ -25,6 +25,7 @@ from PyQt5 import QtCore
 # specifically import from PyQt5.QtGui and QWidgets for startup time improvement :
 from PyQt5.QtWidgets import QMainWindow, QVBoxLayout, QApplication, QSplashScreen
 from PyQt5.QtGui import QPixmap
+import friture.exceptionhandler
 from friture.ui_friture import Ui_MainWindow
 from friture.about import About_Dialog  # About dialog
 from friture.settings import Settings_Dialog  # Setting dialog
@@ -42,7 +43,6 @@ SMOOTH_DISPLAY_TIMER_PERIOD_MS = 10
 # Text has to be refreshed slowly in order to be readable.
 # (and text painting is costly)
 SLOW_TIMER_PERIOD_MS = 1000
-
 
 class Friture(QMainWindow, ):
 
