@@ -68,8 +68,8 @@ class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
 
         # signals
         self.comboBox_inputDevice.currentIndexChanged.connect(self.input_device_changed)
-        self.comboBox_firstChannel.currentIndexChanged.connect(self.first_channel_changed)
-        self.comboBox_secondChannel.currentIndexChanged.connect(self.second_channel_changed)
+        self.comboBox_firstChannel.activated.connect(self.first_channel_changed)
+        self.comboBox_secondChannel.activated.connect(self.second_channel_changed)
         self.radioButton_single.toggled.connect(self.single_input_type_selected)
         self.radioButton_duo.toggled.connect(self.duo_input_type_selected)
 
@@ -94,6 +94,15 @@ class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
             error_message.showMessage("Impossible to use the selected input device, reverting to the previous one")
 
         # reset the channels
+        channels = self.audiobackend.get_readable_current_channels()
+
+        self.comboBox_firstChannel.clear()
+        self.comboBox_secondChannel.clear()
+
+        for channel in channels:
+            self.comboBox_firstChannel.addItem(channel)
+            self.comboBox_secondChannel.addItem(channel)
+
         first_channel = self.audiobackend.get_current_first_channel()
         self.comboBox_firstChannel.setCurrentIndex(first_channel)
         second_channel = self.audiobackend.get_current_second_channel()
