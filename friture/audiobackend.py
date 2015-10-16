@@ -356,6 +356,10 @@ class AudioBackend(QtCore.QObject):
         if self.duo_input:
             channel_2 = self.get_current_second_channel()
 
+        if len(floatdata_all_channels) != frame_count*nchannels:
+            print("Incoming data is not consistent with current channel settings.")
+            return
+
         floatdata1 = floatdata_all_channels[channel::nchannels]
 
         if self.duo_input:
