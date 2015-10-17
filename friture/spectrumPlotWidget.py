@@ -32,7 +32,12 @@ def pre_tree_rebin(x1, x2):
         # enf of recursion !
         return x1, x2, 0
 
-    n0 = max(where(x2 - x1 >= 0.5)[0])
+    bins = where(x2 - x1 >= 0.5)[0]
+
+    if len(bins) == 0:
+        n0 = len(x2)
+    else:
+        n0 = max(where(x2 - x1 >= 0.5)[0])
 
     # leave untouched the frequency bins that span more than half a pixel
     # and first make sure that what will be left can be decimated by two
