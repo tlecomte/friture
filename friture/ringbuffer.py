@@ -110,6 +110,8 @@ class RingBuffer():
             old_offset_mod = self.offset % old_length
             new_offset_mod = self.offset % new_length
             shift = new_offset_mod - old_offset_mod
+            #shift can be negative, computing modulo again
+            shift %= new_length
             # first copy, always complete
             newbuffer[:, shift:shift + old_length] = self.buffer[:, :old_length]
             # second copy, can be folded
