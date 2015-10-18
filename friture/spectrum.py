@@ -193,19 +193,28 @@ class Spectrum_Widget(QtWidgets.QWidget):
         self.dispbuffers1 = zeros(len(self.freq))
         self.dispbuffers2 = zeros(len(self.freq))
 
-    def setminfreq(self, freq):
-        self.minfreq = freq
-        self.PlotZoneSpect.setfreqrange(self.minfreq, self.maxfreq)
+    def setminfreq(self, minfreq):
+        self.setMinMaxFreq(minfreq, self.maxfreq)
 
-    def setmaxfreq(self, freq):
-        self.maxfreq = freq
-        self.proc.set_maxfreq(self.maxfreq)
+    def setmaxfreq(self, maxfreq):
+        self.setMinMaxFreq(self.minfreq, maxfreq)
+
+    def setMinMaxFreq(self, minfreq, maxfreq):
+        self.minfreq = minfreq
+        self.maxfreq = maxfreq
+
+        realmin = min(self.minfreq, self.maxfreq)
+        realmax = max(self.minfreq, self.maxfreq)
+
+        self.proc.set_maxfreq(realmax)
+
         self.freq = self.proc.get_freq_scale()
         self.update_display_buffers()
         self.update_weighting()
         # reset kernel and parameters for the smoothing filter
         self.setresponsetime(self.response_time)
-        self.PlotZoneSpect.setfreqrange(self.minfreq, self.maxfreq)
+
+        self.PlotZoneSpect.setfreqrange(realmin, realmax)
 
     def setfftsize(self, fft_size):
         self.fft_size = fft_size

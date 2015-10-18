@@ -52,15 +52,19 @@ class CoordinateTransform(object):
         self.log = True
 
     def toScreen(self, x):
-        if self.coord_max == self.coord_min:
-            return self.startBorder + 0. * x  # keep x type (this can produce a RunTimeWarning if x contains inf)
-
         if self.log:
             logMin = max(1e-20, self.coord_min)
             logMax = max(logMin, self.coord_max)
+
+            if logMin == logMax:
+                return self.startBorder + 0. * x  # keep x type (this can produce a RunTimeWarning if x contains inf)
+
             x = (x < 1e-20) * 1e-20 + (x >= 1e-20) * x
             return (np.log10(x / logMin)) * (self.length - self.startBorder - self.endBorder) / np.log10(logMax / logMin) + self.startBorder
         else:
+            if self.coord_max == self.coord_min:
+                return self.startBorder + 0. * x  # keep x type (this can produce a RunTimeWarning if x contains inf)
+
             return (x - self.coord_min) * (self.length - self.startBorder - self.endBorder) / (self.coord_max - self.coord_min) + self.startBorder
 
     def toPlot(self, x):

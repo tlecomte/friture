@@ -157,6 +157,9 @@ class SpectrumPlotWidget(QtWidgets.QWidget):
         self.draw()
 
     def setspecrange(self, spec_min, spec_max):
+        if spec_min > spec_max:
+            spec_min, spec_max = spec_max, spec_min
+
         self.verticalScaleTransform.setRange(spec_min, spec_max)
         self.verticalScaleDivision.setRange(spec_min, spec_max)
 
