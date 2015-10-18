@@ -348,8 +348,8 @@ class QuadsItem:
         if xMap.log:
             y = tree_rebin(self.y, self.n, self.N)
         else:
-            n = floor(1. / (x2[2] - x1[1]))
-            if n > 0:
+            n = int(floor(1. / (x2[2] - x1[1])))
+            if n > 1:
                 new_len = len(self.y) // n
                 rest = len(self.y) - new_len * n
 
