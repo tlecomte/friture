@@ -207,22 +207,21 @@ class TimePlot(QtWidgets.QWidget):
             self.legendWidget.hide()
             # the canvas reisze event will trigger a full replot
 
-        x_ms = 1e3 * x
-        if self.xmax != x_ms[-1]:
+        if self.xmax != x[-1]:
             self.logger.push("timeplot : changing x max")
-            self.xmax = x_ms[-1]
+            self.xmax = x[-1]
             self.settimerange(self.xmin, self.xmax)
             self.update_xscale()
             self.needfullreplot = True
-        if self.xmin != x_ms[0]:
+        if self.xmin != x[0]:
             self.logger.push("timeplot : changing x min")
-            self.xmin = x_ms[0]
+            self.xmin = x[0]
             self.settimerange(self.xmin, self.xmax)
             self.update_xscale()
             self.needfullreplot = True
 
         if not self.paused:
-            y_interp = interp(self.xscaled, x_ms, y)
+            y_interp = interp(self.xscaled, x, y)
             self.curve.setData(self.xscaled, y_interp)
 
         self.draw()
@@ -277,27 +276,28 @@ class TimePlot(QtWidgets.QWidget):
             self.legendWidget.show()
             # the canvas reisze event will trigger a full replot
 
-        x_ms = 1e3 * x
-        if self.xmax != x_ms[-1]:
+        if self.xmax != x[-1]:
             self.logger.push("timeplot : changing x max")
-            self.xmax = x_ms[-1]
+            self.xmax = x[-1]
+            #print(self.xmin, self.xmax)
             self.settimerange(self.xmin, self.xmax)
             self.update_xscale()
             self.needfullreplot = True
-        if self.xmin != x_ms[0]:
+        if self.xmin != x[0]:
             self.logger.push("timeplot : changing x min")
-            self.xmin = x_ms[0]
+            self.xmin = x[0]
+            #print(self.xmin, self.xmax)
             self.settimerange(self.xmin, self.xmax)
             self.update_xscale()
             self.needfullreplot = True
 
         if not self.paused:
-            # y_interp = interp(self.xscaled, x_ms, y)
-            # y_interp2 = interp(self.xscaled, x_ms, y2)
+            # y_interp = interp(self.xscaled, x, y)
+            # y_interp2 = interp(self.xscaled, x, y2)
             # ClassPlot.setdata(self, self.xscaled, y_interp)
             # self.curve2.setData(self.xscaled, y_interp2)
-            self.curve.setData(x_ms, y)
-            self.curve2.setData(x_ms, y2)
+            self.curve.setData(x, y)
+            self.curve2.setData(x, y2)
 
         self.draw()
 
@@ -313,3 +313,22 @@ class TimePlot(QtWidgets.QWidget):
 
         self.needfullreplot = True
         self.draw()
+
+    def setverticalrange(self, v_min, v_max):
+        self.verticalScaleTransform.setRange(v_min, v_max)
+        self.verticalScaleDivision.setRange(v_min, v_max)
+
+        # notify that sizeHint has changed (this should be done with a signal emitted from the scale division to the scale bar)
+        self.verticalScale.scaleBar.updateGeometry()
+
+        self.needfullreplot = True
+        self.draw()
+
+    def setverticaltitle(self, title):
+        self.verticalScale.setTitle(title)
+
+    def sethorizontaltitle(self, title):
+        self.horizontalScale.setTitle(title)
+
+    def setTrackerFormatter(self, formatter):
+        self.canvasWidget.setTrackerFormatter(formatter)

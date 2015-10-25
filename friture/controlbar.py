@@ -37,6 +37,7 @@ class ControlBar(QtWidgets.QWidget):
         self.combobox_select.addItem("Octave Spectrum")
         self.combobox_select.addItem("Generator")
         self.combobox_select.addItem("Delay Estimator")
+        self.combobox_select.addItem("Long-time levels")
         self.combobox_select.setCurrentIndex(0)
         self.combobox_select.setToolTip("Select the type of audio widget")
 

@@ -25,6 +25,7 @@ from friture.octavespectrum import OctaveSpectrum_Widget
 from friture.scope import Scope_Widget
 from friture.generator import Generator_Widget
 from friture.delay_estimator import Delay_Estimator_Widget
+from friture.longlevels import LongLevelWidget
 from friture.controlbar import ControlBar
 from friture.defaults import DEFAULT_CENTRAL_WIDGET
 
@@ -77,6 +78,10 @@ class CentralWidget(QtWidgets.QWidget):
             self.audiowidget = Generator_Widget(self, self.parent().parent().audiobackend, self.logger)
         elif item is 6:
             self.audiowidget = Delay_Estimator_Widget(self, self.logger)
+        elif item is 7:
+            self.audiowidget = LongLevelWidget(self, self.logger)
+        else:
+            self.audiowidget = Levels_Widget(self, self.logger)
 
         self.audiowidget.set_buffer(self.parent().parent().audiobuffer)
         self.parent().parent().audiobuffer.new_data_available.connect(self.audiowidget.handle_new_data)

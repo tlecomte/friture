@@ -144,6 +144,9 @@ def octave_filter_bank_decimation(blow, alow, forward, feedback, x, zis=None):
 
 
 def decimate(bdec, adec, x, zi=None):
+    if len(x) == 0:
+        raise Exception("Filter input is too small")
+
     if zi is None:
         # utiliser un décimateur polyphase ici !!!
         x_dec = lfilter(bdec, adec, x)

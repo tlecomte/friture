@@ -118,7 +118,7 @@ class Levels_Widget(QtWidgets.QWidget):
         # we compute alpha so that the n most recent samples represent 100*w percent of the output
         w = 0.65
         n = self.response_time * SAMPLING_RATE
-        N = 4096
+        N = 5*n
         self.alpha = 1. - (1. - w) ** (1. / (n + 1))
         self.kernel = (1. - self.alpha) ** (np.arange(0, N)[::-1])
         # first channel

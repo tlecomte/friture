@@ -25,6 +25,7 @@ from friture.octavespectrum import OctaveSpectrum_Widget
 from friture.scope import Scope_Widget
 from friture.generator import Generator_Widget
 from friture.delay_estimator import Delay_Estimator_Widget
+from friture.longlevels import LongLevelWidget
 from friture.controlbar import ControlBar
 
 
@@ -79,6 +80,10 @@ class Dock(QtWidgets.QDockWidget):
             self.audiowidget = Generator_Widget(self, self.parent().audiobackend, self.logger)
         elif item is 6:
             self.audiowidget = Delay_Estimator_Widget(self, self.logger)
+        elif item is 7:
+            self.audiowidget = LongLevelWidget(self, self.logger)
+        else:
+            self.audiowidget = Levels_Widget(self, self.logger)
 
         self.audiowidget.set_buffer(self.parent().audiobuffer)
         self.parent().audiobuffer.new_data_available.connect(self.audiowidget.handle_new_data)
