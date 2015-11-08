@@ -280,11 +280,11 @@ class GlCanvasWidget(QtWidgets.QOpenGLWidget):
             painter.drawText(rect, Qt.Qt.AlignLeft, text)
 
     def resizeGL(self, width, height):
-        # give the opportunity to the scales to adapt
-        self.resized.emit(self.width(), self.height())
-
         self.setupViewport(self.width(), self.height())
         self.updateGrid()
+
+        # give the opportunity to the scales to adapt
+        self.resized.emit(self.width(), self.height())
 
     def setupViewport(self, width, height):
         GL.glViewport(0, 0, width, height)

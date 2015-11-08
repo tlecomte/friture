@@ -116,6 +116,7 @@ class SpectrumPlotWidget(QtWidgets.QWidget):
 
         self.canvasWidget = GlCanvasWidget(self, self.verticalScaleTransform, self.horizontalScaleTransform)
         self.canvasWidget.setTrackerFormatter(lambda x, y: "%d Hz, %.1f dB" % (x, y))
+        self.canvasWidget.resized.connect(self.canvasResized)
 
         self.quadsItem = QuadsItem()
         self.canvasWidget.attach(self.quadsItem)
@@ -246,7 +247,8 @@ class SpectrumPlotWidget(QtWidgets.QWidget):
         self.canvasWidget.restart()
 
     # redraw when the widget is resized to update coordinates transformations
-    def resizeEvent(self, event):
+    # QOpenGlWidget does not like that we override resizeEvent
+    def canvasResized(self, canvasWidth, canvasHeight):
         self.needtransform = True
         self.draw()
 
