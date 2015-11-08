@@ -43,6 +43,7 @@ class GlCanvasWidget(QtWidgets.QOpenGLWidget):
         self.attachedItems = []
 
         self.gridList = None
+        self.gridNeedsUpdating = True
 
         self.horizontalScaleTransform = horizontalScaleTransform
         self.verticalScaleTransform = verticalScaleTransform
@@ -104,7 +105,8 @@ class GlCanvasWidget(QtWidgets.QOpenGLWidget):
         self.yMajorTick = self.verticalScaleTransform.toScreen(yMajorTick)
         self.yMinorTick = self.verticalScaleTransform.toScreen(yMinorTick)
 
-        self.updateGrid()
+        # trigger a grid update on next paintGL call
+        self.gridNeedsUpdating = True
 
     def updateGrid(self):
         if self.gridList is None or self.gridList == 0:
@@ -148,6 +150,8 @@ class GlCanvasWidget(QtWidgets.QOpenGLWidget):
         #    GL.glEnd()
 
         GL.glEndList()
+
+        self.gridNeedsUpdating = False
 
     def paintGL(self):
         GL.glMatrixMode(GL.GL_PROJECTION)
@@ -281,7 +285,8 @@ class GlCanvasWidget(QtWidgets.QOpenGLWidget):
 
     def resizeGL(self, width, height):
         self.setupViewport(self.width(), self.height())
-        self.updateGrid()
+
+        self.gridNeedsUpdating = True
 
         # give the opportunity to the scales to adapt
         self.resized.emit(self.width(), self.height())
@@ -320,6 +325,7 @@ class GlCanvasWidget(QtWidgets.QOpenGLWidget):
             if self.gridList == 0 or self.gridList is None:
                 raise RuntimeError("""Unable to generate a new display-list, context may not support display lists""")
 
+        if self.gridNeedsUpdating:
             self.updateGrid()
 
         GL.glCallList(self.gridList)
