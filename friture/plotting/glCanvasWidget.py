@@ -154,34 +154,15 @@ class GlCanvasWidget(QtWidgets.QOpenGLWidget):
         self.gridNeedsUpdating = False
 
     def paintGL(self):
-        GL.glMatrixMode(GL.GL_PROJECTION)
-        GL.glPushMatrix()
-
-        GL.glShadeModel(GL.GL_SMOOTH)  # for gradient rendering
-        # GL.glDepthFunc(GL.GL_LESS) # The Type Of Depth Test To Do
-        GL.glDisable(GL.GL_DEPTH_TEST)  # we do 2D, we need no depth test !
-        GL.glMatrixMode(GL.GL_PROJECTION)
-        # GL.glEnable(GL.GL_CULL_FACE)
-
         # Clear The Screen And The Depth Buffer
         GL.glClearColor(1, 1, 1, 0)
         GL.glClear(GL.GL_COLOR_BUFFER_BIT)  # | GL.GL_DEPTH_BUFFER_BIT)
-
-        # Reset The View
-        self.setupViewport(self.width(), self.height())
 
         self.drawBackground()
         self.drawGrid()
         self.drawGlData()
         self.drawRuler()
         self.drawBorder()
-
-        # revert our changes for cooperation with QPainter
-        GL.glShadeModel(GL.GL_FLAT)
-        GL.glEnable(GL.GL_DEPTH_TEST)
-
-        GL.glMatrixMode(GL.GL_PROJECTION)
-        GL.glPopMatrix()
 
         painter = QtGui.QPainter(self)
         self.drawTrackerText(painter)
@@ -298,6 +279,11 @@ class GlCanvasWidget(QtWidgets.QOpenGLWidget):
         GL.glOrtho(0, width, 0, height, 0, 1)
         # Displacement trick for exact pixelization
         GL.glTranslatef(0.375, 0.375, 0)
+
+        GL.glShadeModel(GL.GL_SMOOTH)  # for gradient rendering
+        # GL.glDepthFunc(GL.GL_LESS) # The Type Of Depth Test To Do
+        GL.glDisable(GL.GL_DEPTH_TEST)  # we do 2D, we need no depth test !
+        # GL.glEnable(GL.GL_CULL_FACE)
 
     def drawBackground(self):
         if self.anyOpaqueItem:
