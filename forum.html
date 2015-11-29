@@ -1,0 +1,76 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+    <title>Friture: Forum</title>
+
+    <link rel="shortcut icon" type="image/x-icon" href="images/favicon.ico" />
+
+    <script type="text/javascript">
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-25716805-1']);
+        _gaq.push(['_trackPageview']);
+        (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+
+    <!--Bootstrap stuff-->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!--<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">-->
+    <!-- Bootstrap theme from https://bootswatch.com/darkly/ -->
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+</head>
+
+<body>
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="#">Friture.org</a>
+            </div>
+            <div>
+                <ul class="nav navbar-nav">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="download.html">Download</a></li>
+                    <li><a href="features.html">Features</a></li>
+                    <li class="active"><a href="#">Contributing</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <a href="http://github.com/tlecomte/friture">
+        <img style="position: absolute; top: 0; right: 0; border: 0;" src="images/forkme_right_darkblue_121621.png" alt="Fork me on GitHub" />
+    </a>
+
+    <div class="container" id="container">
+
+        <h1>Forum</h1>
+
+        <iframe id="forum_embed"
+         src="javascript:void(0)"
+         scrolling="no"
+         frameborder="0"
+         width="900"
+         height="700">
+        </iframe>
+
+        <script type="text/javascript">
+         document.getElementById("forum_embed").src =
+          "https://groups.google.com/forum/embed/?place=forum/friture" +
+          "&showsearch=true&showpopout=true&showtabs=false&parenturl=" +
+          encodeURIComponent(window.location.href);
+        </script>
+    </div>
+
+</body>
+
+</html>
