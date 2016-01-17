@@ -201,15 +201,15 @@ def main():
     app = QApplication(sys.argv)
 
     if platform.system() == "Darwin":
+        if hasattr(sys, "frozen"): #py2app
+            sys.stdout = open(os.path.expanduser("~/friture.out.txt"), "w")
+            sys.stderr = open(os.path.expanduser("~/friture.err.txt"), "w")
+
         print("Applying Mac OS-specific setup")
         # help the py2app-packaged application find the Qt plugins (imageformats and platforms)
         pluginsPath = os.path.normpath(os.path.join(QApplication.applicationDirPath(), os.path.pardir, 'PlugIns'))
         print("Adding the following to the Library paths: " + pluginsPath)
         QApplication.addLibraryPath(pluginsPath)
-
-        if (hasattr(sys, "frozen"): #py2app
-            sys.stdout = open(os.path.expanduser("~/friture.out.txt"), "w")
-            sys.stderr = open(os.path.expanduser("~/friture.err.txt"), "w")
 
     # Splash screen
     pixmap = QPixmap(":/images/splash.png")
