@@ -207,6 +207,10 @@ def main():
         print("Adding the following to the Library paths: " + pluginsPath)
         QApplication.addLibraryPath(pluginsPath)
 
+        if (hasattr(sys, "frozen"): #py2app
+            sys.stdout = open(os.path.expanduser("~/friture.out.txt"), "w")
+            sys.stderr = open(os.path.expanduser("~/friture.err.txt"), "w")
+
     # Splash screen
     pixmap = QPixmap(":/images/splash.png")
     splash = QSplashScreen(pixmap)
