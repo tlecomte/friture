@@ -1,5 +1,6 @@
 language: objective-c
 os: osx
+env: MACOSX_DEPLOYMENT_TARGET=10.7
 python:
   - '3.4'
 before_install:
