@@ -252,6 +252,8 @@ class SpectrumPlotWidget(QtWidgets.QWidget):
         self.needtransform = True
         self.draw()
 
+    def canvasUpdate(self):
+        self.canvasWidget.update()
 
 class QuadsItem:
 

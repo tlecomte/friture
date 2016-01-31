@@ -159,8 +159,7 @@ class Spectrum_Widget(QtWidgets.QWidget):
 
     # method
     def canvasUpdate(self):
-        if not self.isVisible():
-            return
+        self.PlotZoneSpect.update()
 
     def pause(self):
         self.PlotZoneSpect.pause()
