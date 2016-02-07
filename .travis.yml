@@ -40,6 +40,7 @@ script:
   #- ls -l
 deploy:
   provider: releases
+  prerelease: true
   api_key:
     secure: N19tf9SJmo3KluUL3DjGMxTTGaa9/qu6UNxqPtOyRu/StSzU1yeh1D8oZr+qYl6tWeqogvSWKlDw78Dp1c4Ro0IQB7ebgxT4YJGF6DeuCo1gvi1uE84Xh+Hl+Y4urS52F3ABSAHejhYhJW7XxsrA3MCiz56S7OEsuDp1u4fG8LM=
   file: dist/$DMG_FILENAME
