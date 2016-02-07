@@ -90,6 +90,7 @@ class PlotImage:
 
     def restart(self):
         self.isPlaying = True
+        self.last_time = self.audiobackend.get_stream_time()
         self.timer.restart()
 
     def draw(self, painter, xMap, yMap, rect):
