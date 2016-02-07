@@ -24,21 +24,15 @@ import io
 import traceback
 import friture
 from PyQt5 import QtCore
-from PyQt5 import QtWidgets
+from PyQt5.QtWidgets import QMessageBox
 
-def excepthook(exception_type, exception_value, traceback_object):
-    # call the standard exception handler to have prints on the console
+def fileexcepthook(exception_type, exception_value, traceback_object):
+    # also call the standard exception handler to have prints on the console
     sys.__excepthook__(exception_type, exception_value, traceback_object)
 
     separator = '-' * 80
     log_dir = QtCore.QStandardPaths.standardLocations(QtCore.QStandardPaths.AppDataLocation)[0]
     logFile = os.path.join(log_dir, "friture.log")
-
-    notice = \
-        """An unhandled exception occurred. Please report the problem\n"""\
-        """on GitHub or via email to <%s>.\n"""\
-        """A log has been written to "%s".\n\nError information:\n""" % \
-        ("contact@friture.org", logFile)
 
     versionInfo="Friture " + friture.__versionXXXX__
 
@@ -60,10 +54,27 @@ def excepthook(exception_type, exception_value, traceback_object):
         print(e)
         pass
 
-    errorbox = QtWidgets.QMessageBox()
+    notice = \
+        """An unhandled exception occurred. Please report the problem\n"""\
+        """on GitHub or via email to <%s>.\n"""\
+        """A log has been written to "%s".\n\nError information:\n""" % \
+        ("contact@friture.org", logFile)
+
+    return str(notice)+str(msg)
+
+def errorBox(message):
+    errorbox = QMessageBox()
     errorbox.setWindowTitle("Friture critical error")
-    errorbox.setText(str(notice)+str(msg))
-    errorbox.setIcon(QtWidgets.QMessageBox.Critical)
-    errorbox.exec_()
+    errorbox.setText(message)
+    errorbox.setIcon(QMessageBox.Critical)
+    errorbox.setStandardButtons(QMessageBox.Ignore | QMessageBox.Abort)
+    ret = errorbox.exec_()
+
+    if ret == QMessageBox.Abort:
+        sys.exit(1)
+
+def excepthook(exception_type, exception_value, traceback_object):
+    gui_message = fileexcepthook(exception_type, exception_value, traceback_object)
+    errorBox(gui_message)
 
 sys.excepthook = excepthook

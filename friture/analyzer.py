@@ -25,7 +25,8 @@ from PyQt5 import QtCore
 # specifically import from PyQt5.QtGui and QWidgets for startup time improvement :
 from PyQt5.QtWidgets import QMainWindow, QVBoxLayout, QApplication, QSplashScreen
 from PyQt5.QtGui import QPixmap
-import friture.exceptionhandler
+# importing friture.exceptionhandler also installs a temporary exception hook
+from friture.exceptionhandler import errorBox, fileexcepthook
 from friture.ui_friture import Ui_MainWindow
 from friture.about import About_Dialog  # About dialog
 from friture.settings import Settings_Dialog  # Setting dialog
@@ -48,6 +49,10 @@ class Friture(QMainWindow, ):
 
     def __init__(self, logger):
         QMainWindow.__init__(self)
+
+        # exception hook that logs to console, file, and display a message box
+        self.errorDialogOpened = False
+        sys.excepthook = self.excepthook
 
         # logger
         self.logger = logger
@@ -101,6 +106,16 @@ class Friture(QMainWindow, ):
         self.slow_timer.start()
 
         self.logger.push("Init finished, entering the main loop")
+
+    # exception hook that logs to console, file, and display a message box
+    def excepthook(self, exception_type, exception_value, traceback_object):
+        gui_message = fileexcepthook(exception_type, exception_value, traceback_object)
+
+        # we do not want to flood the user with message boxes when the error happens repeatedly on each timer event
+        if not self.errorDialogOpened:
+            self.errorDialogOpened = True
+            errorBox(gui_message)
+            self.errorDialogOpened = False
 
     # slot
     def settings_called(self):
