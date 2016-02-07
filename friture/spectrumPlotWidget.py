@@ -102,6 +102,11 @@ class SpectrumPlotWidget(QtWidgets.QWidget):
 
         self.paused = False
 
+        self.peaks_enabled = True
+        self.peak = zeros((3,))
+        self.peak_int = zeros((3,))
+        self.peak_decay = ones((3,)) * PEAK_DECAY_RATE
+
         self.verticalScaleDivision = ScaleDivision(0, 1, 100)
         self.verticalScaleTransform = CoordinateTransform(0, 1, 100, 0, 0)
 
@@ -118,7 +123,18 @@ class SpectrumPlotWidget(QtWidgets.QWidget):
         self.canvasWidget.setTrackerFormatter(lambda x, y: "%d Hz, %.1f dB" % (x, y))
         self.canvasWidget.resized.connect(self.canvasResized)
 
-        self.quadsItem = QuadsItem()
+        r_peak = lambda p: 1. + 0.*p
+        g_peak = lambda p: 1. - p
+        b_peak = lambda p: 1. - p
+
+        self.peakQuadsItem = QuadsItem(r_peak, g_peak, b_peak)
+        self.canvasWidget.attach(self.peakQuadsItem)
+
+        r_signal = lambda p: 0.*p
+        g_signal = lambda p: 0.5 + 0.*p
+        b_signal = lambda p: 0.*p
+
+        self.quadsItem = QuadsItem(r_signal, g_signal, b_signal)
         self.canvasWidget.attach(self.quadsItem)
 
         plotLayout = QtWidgets.QGridLayout()
@@ -188,7 +204,12 @@ class SpectrumPlotWidget(QtWidgets.QWidget):
         self.canvasWidget.setShowFreqLabel(showFreqLabel)
 
     def set_peaks_enabled(self, enabled):
-        self.quadsItem.set_peaks_enabled(enabled)
+        self.peaks_enabled = enabled
+
+        self.canvasWidget.detachAll()
+        if enabled:
+            self.canvasWidget.attach(self.peakQuadsItem)
+        self.canvasWidget.attach(self.quadsItem)
 
     def set_baseline_displayUnits(self, baseline):
         self.quadsItem.set_baseline_displayUnits(baseline)
@@ -211,7 +232,11 @@ class SpectrumPlotWidget(QtWidgets.QWidget):
 
         if not self.paused:
             self.canvasWidget.setfmax(fmax)
-            self.quadsItem.setData(x1, x2, y)
+            self.quadsItem.setData(x1, x2, y, 0.*y)
+
+            if self.peaks_enabled:
+                self.compute_peaks(y)
+                self.peakQuadsItem.setData(x1, x2, self.peak, self.peak_int)
 
     def draw(self):
         if self.needtransform:
@@ -235,6 +260,7 @@ class SpectrumPlotWidget(QtWidgets.QWidget):
                                       array(self.verticalScaleDivision.minorTicks()))
 
             self.quadsItem.transformUpdate()
+            self.peakQuadsItem.transformUpdate()
 
             self.needtransform = False
 
@@ -255,17 +281,39 @@ class SpectrumPlotWidget(QtWidgets.QWidget):
     def canvasUpdate(self):
         self.canvasWidget.update()
 
+    def compute_peaks(self, y):
+        if len(self.peak) != len(y):
+            y_ones = ones(y.shape)
+            self.peak = y_ones * (-500.)
+            self.peak_int = zeros(y.shape)
+            self.peak_decay = y_ones * 20. * log10(PEAK_DECAY_RATE) * 5000
+
+        mask1 = (self.peak < y)
+        mask2 = (-mask1)
+        mask2_a = mask2 * (self.peak_int < 0.2)
+        mask2_b = mask2 * (self.peak_int >= 0.2)
+
+        self.peak[mask1] = y[mask1]
+        self.peak[mask2_a] = self.peak[mask2_a] + self.peak_decay[mask2_a]
+
+        self.peak_decay[mask1] = 20. * log10(PEAK_DECAY_RATE) * 5000
+        self.peak_decay[mask2_a] += 20. * log10(PEAK_DECAY_RATE) * 5000
+
+        self.peak_int[mask1] = 1.
+        self.peak_int[mask2_b] *= 0.975
+
+
 class QuadsItem:
 
-    def __init__(self, *args):
-        self.peaks_enabled = True
-        self.peak = zeros((3,))
-        self.peak_int = zeros((3,))
-        self.peak_decay = ones((3,)) * PEAK_DECAY_RATE
-
+    def __init__(self, r, g, b, *args):
         self.x1 = array([0.1, 0.5, 1.])
         self.x2 = array([0.5, 1., 2.])
         self.y = array([0., 0., 0.])
+        self.y_int = array([0., 0., 0.])
+
+        self.r = r
+        self.g = g
+        self.b = b
 
         self.transformed_x1 = self.x1
         self.transformed_x2 = self.x2
@@ -278,9 +326,6 @@ class QuadsItem:
         self.vertices = array([])
         self.colors = array([])
 
-    def set_peaks_enabled(self, enabled):
-        self.peaks_enabled = enabled
-
     def set_baseline_displayUnits(self, baseline):
         self.baseline_transformed = False
         self.baseline = baseline
@@ -289,13 +334,14 @@ class QuadsItem:
         self.baseline_transformed = True
         self.baseline = baseline
 
-    def setData(self, x1, x2, y):
+    def setData(self, x1, x2, y, y_int):
         if len(x1) != len(self.x1):
             self.need_transform = True
 
         self.x1 = x1
         self.x2 = x2
         self.y = y
+        self.y_int = y_int
 
     def prepareQuadData(self, x, y, w, baseline, r, g, b):
         h = y - baseline
@@ -351,6 +397,7 @@ class QuadsItem:
 
         if xMap.log:
             y = tree_rebin(self.y, self.n, self.N)
+            y_int = tree_rebin(self.y_int, self.n, self.N)
         else:
             n = int(floor(1. / (x2[2] - x1[1])))
             if n > 1:
@@ -361,55 +408,21 @@ class QuadsItem:
                 new_y.shape = (new_len, n)
                 y = mean(new_y, axis=1)
 
+                new_y_int = self.y_int[:-rest]
+                new_y_int.shape = (new_len, n)
+                y_int = mean(new_y_int, axis=1)
+
                 x1 = x1[:-rest:n]
                 x2 = x2[n::n]
             else:
                 y = self.y
-
-        if self.peaks_enabled:
-            self.compute_peaks(y)
+                y_int = self.y_int
 
         transformed_y = yMap.toScreen(y)
 
-        Ones = ones(x1.shape)
-
-        if self.peaks_enabled:
-            transformed_peak = yMap.toScreen(self.peak)
-
-            n = x1.size
-
-            # TODO: should be done conditionally to need_transform
-            x1_with_peaks = zeros((2 * n))
-            x2_with_peaks = zeros((2 * n))
-            y_with_peaks = zeros((2 * n))
-            r_with_peaks = zeros((2 * n))
-            g_with_peaks = zeros((2 * n))
-            b_with_peaks = zeros((2 * n))
-
-            x1_with_peaks[:n] = x1
-            x1_with_peaks[n:] = x1
-
-            x2_with_peaks[:n] = x2
-            x2_with_peaks[n:] = x2
-
-            y_with_peaks[:n] = transformed_peak
-            y_with_peaks[n:] = transformed_y
-
-            r_with_peaks[:n] = 1. * Ones
-            r_with_peaks[n:] = 0. * Ones
-
-            g_with_peaks[:n] = 1. - self.peak_int
-            g_with_peaks[n:] = 0.5 * Ones
-
-            b_with_peaks[:n] = 1. - self.peak_int
-            b_with_peaks[n:] = 0. * Ones
-        else:
-            x1_with_peaks = x1
-            x2_with_peaks = x2
-            y_with_peaks = transformed_y
-            r_with_peaks = 0. * Ones
-            g_with_peaks = 0.5 * Ones
-            b_with_peaks = 0. * Ones
+        r = self.r(y_int)
+        g = self.g(y_int)
+        b = self.b(y_int)
 
         if self.baseline_transformed:
             # used for dual channel response measurement
@@ -418,7 +431,7 @@ class QuadsItem:
             # used for single channel analysis
             baseline = self.baseline
 
-        self.prepareQuadData(x1_with_peaks, y_with_peaks, x2_with_peaks - x1_with_peaks, baseline, r_with_peaks, g_with_peaks, b_with_peaks)
+        self.prepareQuadData(x1, transformed_y, x2 - x1, baseline, r, g, b)
 
         # TODO: instead of Arrays, VBOs should be used here, as a large part of
         # the data does not have to be modified on every call (x coordinates,
@@ -438,24 +451,3 @@ class QuadsItem:
 
         GL.glDisableClientState(GL.GL_COLOR_ARRAY)
         GL.glDisableClientState(GL.GL_VERTEX_ARRAY)
-
-    def compute_peaks(self, y):
-        if len(self.peak) != len(y):
-            y_ones = ones(y.shape)
-            self.peak = y_ones * (-500.)
-            self.peak_int = zeros(y.shape)
-            self.peak_decay = y_ones * 20. * log10(PEAK_DECAY_RATE) * 5000
-
-        mask1 = (self.peak < y)
-        mask2 = (-mask1)
-        mask2_a = mask2 * (self.peak_int < 0.2)
-        mask2_b = mask2 * (self.peak_int >= 0.2)
-
-        self.peak[mask1] = y[mask1]
-        self.peak[mask2_a] = self.peak[mask2_a] + self.peak_decay[mask2_a]
-
-        self.peak_decay[mask1] = 20. * log10(PEAK_DECAY_RATE) * 5000
-        self.peak_decay[mask2_a] += 20. * log10(PEAK_DECAY_RATE) * 5000
-
-        self.peak_int[mask1] = 1.
-        self.peak_int[mask2_b] *= 0.975

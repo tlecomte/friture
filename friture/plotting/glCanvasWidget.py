@@ -65,6 +65,10 @@ class GlCanvasWidget(QtWidgets.QOpenGLWidget):
         self.attachedItems.remove(item)
         self.reviewOpaqueItems()
 
+    def detachAll(self):
+        self.attachedItems.clear()
+        self.reviewOpaqueItems()
+
     def pause(self):
         self.paused = True
 
