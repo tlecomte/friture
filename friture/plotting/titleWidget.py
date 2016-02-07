@@ -25,7 +25,7 @@ class VerticalTitleWidget(QtWidgets.QWidget):
     def sizeHint(self):
         fm = QtGui.QFontMetrics(self.font())
         # for vertical title
-        return QtCore.QSize(fm.height() * 1.5, fm.width(self.title))
+        return QtCore.QSize(fm.height() * 1.2, fm.width(self.title))
 
     def paintEvent(self, paintEvent):
         painter = QtGui.QPainter(self)
@@ -35,7 +35,7 @@ class VerticalTitleWidget(QtWidgets.QWidget):
         fm = painter.fontMetrics()
         centeredTextShift = QtCore.QPoint(-fm.width(self.title) / 2, 0)
 
-        painter.translate(self.width() / 2, self.height() / 2)
+        painter.translate(fm.height() / 1.2, self.height() / 2)
         painter.rotate(-90)
         painter.translate(centeredTextShift)
 
@@ -63,7 +63,7 @@ class HorizontalTitleWidget(QtWidgets.QWidget):
     def sizeHint(self):
         fm = QtGui.QFontMetrics(self.font())
         # for vertical title
-        return QtCore.QSize(fm.width(self.title), fm.height() * 1.5)
+        return QtCore.QSize(fm.width(self.title), fm.height() * 1.2)
 
     def paintEvent(self, paintEvent):
         painter = QtGui.QPainter(self)
@@ -72,7 +72,7 @@ class HorizontalTitleWidget(QtWidgets.QWidget):
         fm = painter.fontMetrics()
         centeredTextShift = QtCore.QPoint(-fm.width(self.title) / 2, 0)
 
-        painter.translate(self.width() / 2, self.height() / 2)
+        painter.translate(self.width() / 2, fm.height())
         painter.translate(centeredTextShift)
 
         painter.drawText(0, 0, self.title)
