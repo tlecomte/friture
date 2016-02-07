@@ -131,7 +131,7 @@ class SpectrumPlotWidget(QtWidgets.QWidget):
         self.canvasWidget.attach(self.peakQuadsItem)
 
         r_signal = lambda p: 0.*p
-        g_signal = lambda p: 0.5 + 0.*p
+        g_signal = lambda p: 0.3 + 0.5*p
         b_signal = lambda p: 0.*p
 
         self.quadsItem = QuadsItem(r_signal, g_signal, b_signal)
@@ -232,7 +232,12 @@ class SpectrumPlotWidget(QtWidgets.QWidget):
 
         if not self.paused:
             self.canvasWidget.setfmax(fmax)
-            self.quadsItem.setData(x1, x2, y, 0.*y)
+
+            M = max(y)
+            m = self.verticalScaleTransform.coord_min
+            y_int = (y-m)/(np.abs(M-m)+1e-3)
+
+            self.quadsItem.setData(x1, x2, y, y_int)
 
             if self.peaks_enabled:
                 self.compute_peaks(y)
