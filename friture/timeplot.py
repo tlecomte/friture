@@ -279,14 +279,12 @@ class TimePlot(QtWidgets.QWidget):
         if self.xmax != x[-1]:
             self.logger.push("timeplot : changing x max")
             self.xmax = x[-1]
-            #print(self.xmin, self.xmax)
             self.settimerange(self.xmin, self.xmax)
             self.update_xscale()
             self.needfullreplot = True
         if self.xmin != x[0]:
             self.logger.push("timeplot : changing x min")
             self.xmin = x[0]
-            #print(self.xmin, self.xmax)
             self.settimerange(self.xmin, self.xmax)
             self.update_xscale()
             self.needfullreplot = True
