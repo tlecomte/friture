@@ -27,12 +27,14 @@ from friture.longlevels_settings import (LongLevels_Settings_Dialog,
 from friture.audioproc import audioproc
 from friture.logger import PrintLogger
 from friture.timeplot import TimePlot
-from .filter import decimate
+from .filter import decimate, lfilter
 from friture import generated_filters
 from friture.exp_smoothing_conv import pyx_exp_smoothed_value
 from .ringbuffer import RingBuffer
 
 from friture.audiobackend import SAMPLING_RATE
+
+# signal > square > low-pass filter > filter for screen > log
 
 SMOOTH_DISPLAY_TIMER_PERIOD_MS = 25
 LEVEL_TEXT_LABEL_PERIOD_MS = 1000
@@ -113,22 +115,6 @@ class LongLevelWidget(QtWidgets.QWidget):
         # initialize the class instance that will do the fft
         self.proc = audioproc(self.logger)
 
-        #self.response_time = 60. # 1 minute
-        self.response_time = 1.
-
-        # an exponential smoothing filter is a simple IIR filter
-        # s_i = alpha*x_i + (1-alpha)*s_{i-1}
-        # we compute alpha so that the n most recent samples represent 100*w percent of the output
-        w = 0.65
-
-        # how many times we should decimate to end up with 100 points in the kernel
-        self.Ndec = int(max(0, np.floor((np.log2(self.response_time * SAMPLING_RATE/100.)))))
-
-        n = self.response_time * SAMPLING_RATE / 2**self.Ndec
-        N = int(5*n)
-        self.alpha = 1. - (1. - w) ** (1. / (n + 1))
-        self.kernel = (1. - self.alpha) ** (np.arange(0, N)[::-1])
-
         self.level = None # 1e-30
         self.level_rms = -200.
 
@@ -136,10 +122,21 @@ class LongLevelWidget(QtWidgets.QWidget):
 
         self.i = 0
 
+        self.old_index = 0
+
+        #self.response_time = 60. # 1 minute
+        self.response_time = 20.
+
+        # how many times we should decimate to end up with 100 points in the kernel
+        self.Ndec = int(max(0, np.floor((np.log2(self.response_time * SAMPLING_RATE/100.)))))
+
+        Ngauss = 4
+        self.b = gauss(10*Ngauss+1, 2.*Ngauss)
+        self.a = [1.]
+        self.zf = np.zeros(max(len(self.b), len(self.a)) - 1)
+
         self.subsampled_sampling_rate = SAMPLING_RATE / 2 ** (self.Ndec)
         self.subsampler = Subsampler(self.Ndec)
-
-        self.old_index = 0
 
         self.length_seconds = 60.*10
         # actually this should be linked to the pixel width of the plot area
@@ -180,11 +177,7 @@ class LongLevelWidget(QtWidgets.QWidget):
                 # subsample
                 y0_squared_dec = self.subsampler.push(y0_squared)
 
-                # exponential smoothing
-                if self.level is None:
-                    self.level = y0_squared_dec[0]
-                else:
-                    self.level = self.alpha*y0_squared_dec[0] + (1. - self.alpha)*self.level
+                self.level, self.zf = lfilter(self.b, self.a, y0_squared_dec, zi=self.zf)
 
                 self.level_rms = 10. * np.log10(max(self.level, 1e-150))
 
