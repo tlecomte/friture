@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" ng-app="fritureApp">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 
@@ -28,6 +28,8 @@
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
 	<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+	<script src="js/angular.min.js"></script>
+	<script src="js/controllers.js"></script>
 </head>
 
 <body>
@@ -52,21 +54,21 @@
 		<img style="position: absolute; top: 0; right: 0; border: 0;" src="images/forkme_right_darkblue_121621.png" alt="Fork me on GitHub" />
 	</a>
 
-	<div class="container" id="container">
-
+	<div class="container" id="container" ng-controller="ReleasesCtrl">
 		<h1>Download Friture</h1>
 
 		<div class="alert alert-success">
-			<strong>Latest Version:</strong> 0.18 ‒ 20150824 ‒ August 24 2015
+			<strong>Latest Version:</strong> {{latest.name}}, built on {{latest.created_at | date:'short'}}
 		</div>
 
 		<h2><i class="fa fa-windows"></i> Windows</h2>
 		<p>Download the latest Friture package for Windows:</p>
-		<p><a href="https://s3-eu-west-1.amazonaws.com/friture-installers/friture-0.18-20150824.exe" onclick="_gaq.push(['_trackEvent','Download','Download windows-installer','2015/08/24']);">friture-0.18-20150824.exe</a></p>
+		<p><a href="{{windowsAsset.browser_download_url}}" onclick="_gaq.push(['_trackEvent','Download','Download windows-installer','{{windowsAsset.name}}']);">{{windowsAsset.name}}</a> ({{windowsAsset.size | bytes}})</p>
 
 		<h2><i class="fa fa-apple"></i> OS X</h2>
 		<p>Download the latest Friture package for OS X:</p>
-		<p><a href="https://s3-eu-west-1.amazonaws.com/friture-installers/friture-0.18-20150824.dmg" onclick="_gaq.push(['_trackEvent','Download','Download OS X-installer','2015/08/24']);">friture-0.18-20150824.dmg</a></p>
+		<p><a href="{{macAsset.browser_download_url}}" onclick="_gaq.push(['_trackEvent','Download','Download OS X-installer','{{macAsset.name}}']);">{{macAsset.name}}</a> ({{macAsset.size | bytes}})</p>
+
 
 		<h2><i class="fa fa-linux"></i> Linux (and other platforms)</h2>
 		<p>On Linux and other platforms (FreeBSD, etc.), please check within the packages prepared by your distribution.</p>
@@ -75,6 +77,9 @@
 		Some dependencies have to be manually installed in this case. They are documented for Linux
 		<a href="https://github.com/tlecomte/friture/wiki/Linux">in the wiki</a> (notes contributed by Lee McKusick) when installing from source. The
 		same dependencies are likely to have to be installed when using the PyPI package too.</p>
+
+		<h2>Previous Releases</h2>
+		Previous releases can be downloaded on the Github <a href='https://github.com/tlecomte/friture/releases'>Releases</a> page.
 
 		<h2>Bugs</h2>
 		<p>If you encounter any problems while installing or running Friture, please report them on <a href="https://github.com/tlecomte/friture/issues">Github</a> or by mail at <a href="mailto:contact@friture.org">contact@friture.org</a>.</p>
