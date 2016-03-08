@@ -381,7 +381,10 @@ class AudioBackend(QtCore.QObject):
 
     # returns the stream time in seconds
     def get_stream_time(self):
-        return self.stream.get_time()
+        try:
+            return self.stream.get_time()
+        except OSError:
+            return 0
 
     def pause(self):
         self.stream.stop_stream()
