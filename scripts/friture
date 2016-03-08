@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 import sys
 
 # allow this script to be executed as a child of another script (lsprofcalltree, for example)
