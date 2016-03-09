@@ -119,6 +119,6 @@ class CentralWidget(QtWidgets.QWidget):
 
     # method
     def restoreState(self, settings):
-        widget_type = settings.value("type", DEFAULT_CENTRAL_WIDGET)
+        widget_type = settings.value("type", DEFAULT_CENTRAL_WIDGET, type=int)
         self.widget_select(widget_type)
         self.audiowidget.restoreState(settings)

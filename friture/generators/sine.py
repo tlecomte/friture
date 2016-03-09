@@ -81,5 +81,5 @@ class SettingsWidget(QtWidgets.QWidget):
         settings.setValue("sine frequency", self.spinBox_sine_frequency.value())
 
     def restoreState(self, settings):
-        sine_freq = float(settings.value("sine frequency", DEFAULT_SINE_FREQUENCY))
+        sine_freq = settings.value("sine frequency", DEFAULT_SINE_FREQUENCY, type=float)
         self.spinBox_sine_frequency.setValue(sine_freq)

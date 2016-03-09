@@ -157,9 +157,9 @@ class SettingsWidget(QtWidgets.QWidget):
         settings.setValue("sweep period", self.spinBox_sweep_period.value())
 
     def restoreState(self, settings):
-        sweep_start_frequency = float(settings.value("sweep start frequency", DEFAULT_SWEEP_STARTFREQUENCY))
+        sweep_start_frequency = settings.value("sweep start frequency", DEFAULT_SWEEP_STARTFREQUENCY, type=float)
         self.spinBox_sweep_startfrequency.setValue(sweep_start_frequency)
-        sweep_stop_frequency = float(settings.value("sweep stop frequency", DEFAULT_SWEEP_STOPFREQUENCY))
+        sweep_stop_frequency = settings.value("sweep stop frequency", DEFAULT_SWEEP_STOPFREQUENCY, type=float)
         self.spinBox_sweep_stopfrequency.setValue(sweep_stop_frequency)
-        sweep_period = float(settings.value("sweep period", DEFAULT_SWEEP_PERIOD_S))
+        sweep_period = settings.value("sweep period", DEFAULT_SWEEP_PERIOD_S, type=float)
         self.spinBox_sweep_period.setValue(sweep_period)

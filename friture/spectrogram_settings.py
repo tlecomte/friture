@@ -157,19 +157,19 @@ class Spectrogram_Settings_Dialog(QtWidgets.QDialog):
 
     # method
     def restoreState(self, settings):
-        timeRange = float(settings.value("timeRange", DEFAULT_TIMERANGE))
+        timeRange = settings.value("timeRange", DEFAULT_TIMERANGE, type=float)
         self.doubleSpinBox_timerange.setValue(timeRange)
-        fft_size = settings.value("fftSize", DEFAULT_FFT_SIZE)  # 7th index is 1024 points
+        fft_size = settings.value("fftSize", DEFAULT_FFT_SIZE, type=int)  # 7th index is 1024 points
         self.comboBox_fftsize.setCurrentIndex(fft_size)
-        freqscale = settings.value("freqScale", DEFAULT_FREQ_SCALE)
+        freqscale = settings.value("freqScale", DEFAULT_FREQ_SCALE, type=int)
         self.comboBox_freqscale.setCurrentIndex(freqscale)
-        freqMin = settings.value("freqMin", DEFAULT_MINFREQ)
+        freqMin = settings.value("freqMin", DEFAULT_MINFREQ, type=int)
         self.spinBox_minfreq.setValue(freqMin)
-        freqMax = settings.value("freqMax", DEFAULT_MAXFREQ)
+        freqMax = settings.value("freqMax", DEFAULT_MAXFREQ, type=int)
         self.spinBox_maxfreq.setValue(freqMax)
-        colorMin = settings.value("colorMin", DEFAULT_SPEC_MIN)
+        colorMin = settings.value("colorMin", DEFAULT_SPEC_MIN, type=int)
         self.spinBox_specmin.setValue(colorMin)
-        colorMax = settings.value("colorMax", DEFAULT_SPEC_MAX)
+        colorMax = settings.value("colorMax", DEFAULT_SPEC_MAX, type=int)
         self.spinBox_specmax.setValue(colorMax)
-        weighting = settings.value("weighting", DEFAULT_WEIGHTING)
+        weighting = settings.value("weighting", DEFAULT_WEIGHTING, type=int)
         self.comboBox_weighting.setCurrentIndex(weighting)

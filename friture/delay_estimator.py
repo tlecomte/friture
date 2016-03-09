@@ -364,5 +364,5 @@ class Delay_Estimator_Settings_Dialog(QtWidgets.QDialog):
 
     # method
     def restoreState(self, settings):
-        delay_range = float(settings.value("delay_range", DEFAULT_DELAYRANGE))
+        delay_range = settings.value("delay_range", DEFAULT_DELAYRANGE, type=float)
         self.double_spinbox_delayrange.setValue(delay_range)

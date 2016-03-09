@@ -174,9 +174,9 @@ class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
         # change the device only if it exists in the device list
         if device_index >= 0:
             self.comboBox_inputDevice.setCurrentIndex(device_index)
-            channel = settings.value("firstChannel", 0)
+            channel = settings.value("firstChannel", 0, type=int)
             self.comboBox_firstChannel.setCurrentIndex(channel)
-            channel = settings.value("secondChannel", 0)
+            channel = settings.value("secondChannel", 0, type=int)
             self.comboBox_secondChannel.setCurrentIndex(channel)
-            duo_input_id = settings.value("duoInput", 0)
+            duo_input_id = settings.value("duoInput", 0, type=int)
             self.inputTypeButtonGroup.button(duo_input_id).setChecked(True)

@@ -79,5 +79,5 @@ class SettingsWidget(QtWidgets.QWidget):
         settings.setValue("burst period", self.spinBox_burst_period.value())
 
     def restoreState(self, settings):
-        burst_period = float(settings.value("burst period", DEFAULT_BURST_PERIOD_S))
+        burst_period = settings.value("burst period", DEFAULT_BURST_PERIOD_S, type=float)
         self.spinBox_burst_period.setValue(burst_period)

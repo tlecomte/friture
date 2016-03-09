@@ -70,7 +70,7 @@ class LongLevels_Settings_Dialog(QtWidgets.QDialog):
 
     # method
     def restoreState(self, settings):
-        colorMin = settings.value("Min", DEFAULT_LEVEL_MIN)
+        colorMin = settings.value("Min", DEFAULT_LEVEL_MIN, type=int)
         self.spinBox_specmin.setValue(colorMin)
-        colorMax = settings.value("Max", DEFAULT_LEVEL_MAX)
+        colorMax = settings.value("Max", DEFAULT_LEVEL_MAX, type=int)
         self.spinBox_specmax.setValue(colorMax)

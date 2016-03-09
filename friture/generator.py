@@ -295,7 +295,7 @@ class Generator_Widget(QtWidgets.QWidget):
         self.settings_dialog.saveState(settings)
 
     def restoreState(self, settings):
-        generator_kind = settings.value("generator kind", DEFAULT_GENERATOR_KIND_INDEX)
+        generator_kind = settings.value("generator kind", DEFAULT_GENERATOR_KIND_INDEX, type=int)
         self.combobox_generator_kind.setCurrentIndex(generator_kind)
         self.stacked_settings_layout.setCurrentIndex(generator_kind)
 

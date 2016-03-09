@@ -165,5 +165,5 @@ class Scope_Settings_Dialog(QtWidgets.QDialog):
 
     # method
     def restoreState(self, settings):
-        timeRange = float(settings.value("timeRange", DEFAULT_TIMERANGE))
+        timeRange = settings.value("timeRange", DEFAULT_TIMERANGE, type=float)
         self.doubleSpinBox_timerange.setValue(timeRange)

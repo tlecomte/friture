@@ -199,21 +199,21 @@ class Spectrum_Settings_Dialog(QtWidgets.QDialog):
 
     # method
     def restoreState(self, settings):
-        fft_size = settings.value("fftSize", DEFAULT_FFT_SIZE)  # 7th index is 1024 points
+        fft_size = settings.value("fftSize", DEFAULT_FFT_SIZE, type=int)  # 7th index is 1024 points
         self.comboBox_fftsize.setCurrentIndex(fft_size)
-        freqscale = settings.value("freqScale", DEFAULT_FREQ_SCALE)
+        freqscale = settings.value("freqScale", DEFAULT_FREQ_SCALE, type=int)
         self.comboBox_freqscale.setCurrentIndex(freqscale)
-        freqMin = settings.value("freqMin", DEFAULT_MINFREQ)
+        freqMin = settings.value("freqMin", DEFAULT_MINFREQ, type=int)
         self.spinBox_minfreq.setValue(freqMin)
-        freqMax = settings.value("freqMax", DEFAULT_MAXFREQ)
+        freqMax = settings.value("freqMax", DEFAULT_MAXFREQ, type=int)
         self.spinBox_maxfreq.setValue(freqMax)
-        colorMin = settings.value("Min", DEFAULT_SPEC_MIN)
+        colorMin = settings.value("Min", DEFAULT_SPEC_MIN, type=int)
         self.spinBox_specmin.setValue(colorMin)
-        colorMax = settings.value("Max", DEFAULT_SPEC_MAX)
+        colorMax = settings.value("Max", DEFAULT_SPEC_MAX, type=int)
         self.spinBox_specmax.setValue(colorMax)
-        weighting = settings.value("weighting", DEFAULT_WEIGHTING)
+        weighting = settings.value("weighting", DEFAULT_WEIGHTING, type=int)
         self.comboBox_weighting.setCurrentIndex(weighting)
-        responseTime = settings.value("responseTime", DEFAULT_RESPONSE_TIME_INDEX)
+        responseTime = settings.value("responseTime", DEFAULT_RESPONSE_TIME_INDEX, type=int)
         self.comboBox_response_time.setCurrentIndex(responseTime)
         showFreqLabels = settings.value("showFreqLabels", DEFAULT_SHOW_FREQ_LABELS, type=bool)
         self.checkBox_showFreqLabels.setChecked(showFreqLabels)

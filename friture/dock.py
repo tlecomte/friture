@@ -115,6 +115,6 @@ class Dock(QtWidgets.QDockWidget):
 
     # method
     def restoreState(self, settings):
-        widget_type = settings.value("type", 0)
+        widget_type = settings.value("type", 0, type=int)
         self.widget_select(widget_type)
         self.audiowidget.restoreState(settings)
