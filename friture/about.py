@@ -19,7 +19,7 @@
 
 import sys
 from PyQt5 import QtGui, QtCore, QtWidgets
-import pyaudio
+import sounddevice
 import numpy
 import scipy
 import Cython
@@ -41,7 +41,7 @@ aboutText = """
 <ul>
         <li>Python %s</li>
         <li>PyQt %s (Qt %s)</li>
-        <li>PyAudio %s (%s)</li>
+        <li>Python-sounddevice %s (%s)</li>
         <li>Numpy %s</li>
         <li>Scipy %s</li>
         <li>Cython %s</li>
@@ -52,8 +52,8 @@ aboutText = """
        "%d.%d" % (sys.version_info.major, sys.version_info.minor),
        QtCore.PYQT_VERSION_STR,
        QtCore.qVersion(),
-       pyaudio.__version__,
-       pyaudio.pa.get_version_text(),
+       sounddevice.__version__,
+       sounddevice.get_portaudio_version()[1],
        numpy.__version__,
        scipy.__version__,
        Cython.__version__,

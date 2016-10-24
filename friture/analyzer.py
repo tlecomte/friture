@@ -192,7 +192,6 @@ class Friture(QMainWindow, ):
             self.centralwidget.restart()
             self.dockmanager.restart()
 
-
 def main():
     print("Platform is %s (%s)" %(platform.system(), sys.platform))
 

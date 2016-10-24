@@ -19,7 +19,7 @@
 
 from PyQt5 import QtGui, QtCore, QtWidgets
 import numpy as np
-import pyaudio
+import sounddevice
 from friture.audiobackend import SAMPLING_RATE
 from friture.logger import PrintLogger
 from friture.generators.sweep import SweepGenerator
@@ -83,16 +83,16 @@ class Generator_Widget(QtWidgets.QWidget):
         # we will try to open all the output devices until one
         # works, starting by the default input device
         for device in self.audiobackend.output_devices:
-            self.logger.push("Opening the stream")
+            self.logger.push("Opening the stream for device: "+ device['name'])
             try:
                 self.stream = self.audiobackend.open_output_stream(device, self.audio_callback)
-                self.stream.start_stream()
-                self.stream.stop_stream()
+                self.stream.start()
+                self.stream.stop()
                 self.device = device
                 self.logger.push("Success")
                 break
-            except:
-                self.logger.push("Fail")
+            except Exception as exception:
+                self.logger.push("Fail: " + str(exception))
 
         self.start_stop_button = QtWidgets.QPushButton(self)
 
@@ -149,35 +149,33 @@ class Generator_Widget(QtWidgets.QWidget):
 
         error_message = ""
 
-        self.logger.push("Trying to write to output device #%d" % (device))
+        self.logger.push("Trying to write to output device " + device['name'])
 
         # first see if the format is supported by PortAudio
         try:
-            success = self.audiobackend.is_output_format_supported(device, pyaudio.paInt16)
-        except ValueError as error:
-            error_message = error.args[0]
-            self.logger.push("Format is not supported. " + error_message)
+            success = self.audiobackend.is_output_format_supported(device, np.int16)
+        except Exception as exception:
+            self.logger.push("Format is not supported: " + str(exception))
             success = False
 
         if success:
             try:
                 self.stream = self.audiobackend.open_output_stream(device, self.audio_callback)
                 self.device = device
-                self.stream.start_stream()
+                self.stream.start()
                 if self.state not in [STARTING, PLAYING]:
-                    self.stream.stop_stream()
+                    self.stream.stop()
                 success = True
             except OSError as error:
-                error_message = str(error)
-                self.logger.push("Fail. " + error_message)
+                self.logger.push("Fail: " + str(error))
                 success = False
 
         if success:
             self.logger.push("Success")
-            previous_stream.close()
+            previous_stream.stop()
         else:
             if self.stream is not None:
-                self.stream.close()
+                self.stream.stop()
             # restore previous stream
             self.stream = previous_stream
             self.device = previous_device
@@ -204,7 +202,7 @@ class Generator_Widget(QtWidgets.QWidget):
             if self.state == STOPPED or self.state == STOPPING:
                 self.state = STARTING
                 self.t_start = 0.
-                self.stream.start_stream()
+                self.stream.start()
         else:
             self.start_stop_button.setText("Start")
             if self.state == PLAYING or self.state == STARTING:
@@ -213,21 +211,25 @@ class Generator_Widget(QtWidgets.QWidget):
                 # will stop at the end of the ramp
 
     def stop_stream_after_ramp(self):
-        self.stream.stop_stream()
+        self.stream.stop()
 
     def handle_new_data(self, floatdata):
         # we do not make anything of the input data in the generator...
         return
 
-    def audio_callback(self, in_data, frame_count, time_info, status):
+    def audio_callback(self, out_data, frame_count, time_info, status):
+        if status:
+            print(status, flush=True)
+
         N = frame_count
 
         if self.state == STOPPED:
-            return ("", pyaudio.paContinue)
+            out_data.fill(0)
+            return
 
         # if we cannot write any sample, return now
         if N == 0:
-            return ("", pyaudio.paContinue)
+            return
 
         t = self.t + np.arange(0, N / float(SAMPLING_RATE), 1. / float(SAMPLING_RATE))
 
@@ -237,11 +239,13 @@ class Generator_Widget(QtWidgets.QWidget):
 
         if len(generators) == 0:
             print("generator error : index of signal type not found")
-            return (None, pyaudio.paContinue)
+            out_data.fill(0)
+            return
 
         if len(generators) > 1:
             print("generator error : 2 (or more) generators have the same name")
-            return (None, pyaudio.paContinue)
+            out_data.fill(0)
+            return
 
         generator = generators[0]
         floatdata = generator.signal(t)
@@ -271,17 +275,17 @@ class Generator_Widget(QtWidgets.QWidget):
         # output channels are interleaved
         # we output to all channels simultaneously with the same data
         maxOutputChannels = self.audiobackend.get_device_outputchannels_count(self.device)
-        floatdata = floatdata.repeat(maxOutputChannels)
+        floatdata = np.tile(floatdata, (maxOutputChannels, 1)).transpose()
 
         int16info = np.iinfo(np.int16)
         norm_coeff = min(abs(int16info.min), int16info.max)
         intdata = (np.clip(floatdata, int16info.min, int16info.max) * norm_coeff).astype(np.int16)
-        chardata = intdata.tostring()
 
         # update the time counter
         self.t += N / float(SAMPLING_RATE)
 
-        return (chardata, pyaudio.paContinue)
+        # data copy
+        out_data[:]  = intdata
 
     def canvasUpdate(self):
         return
