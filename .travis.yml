@@ -17,6 +17,7 @@ install:
   - pip3 install --upgrade --user setuptools
   - pip3 install --upgrade wheel
   - pip3 install --upgrade sounddevice
+  - pip3 install --upgrade Cython
   - pip3 install -U py2app
 script:
   - python3 setup.py build_ext --inplace
