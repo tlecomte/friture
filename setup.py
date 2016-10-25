@@ -62,7 +62,8 @@ includes = ["sip",
             "OpenGL.arrays.lists",
             "OpenGL.arrays.numbers",
             "OpenGL.arrays.strings",
-            "OpenGL_accelerate.formathandler"]
+            "OpenGL_accelerate.formathandler",
+            "_sounddevice_data"]
 
 if py2exe_build:
     data_files = []
