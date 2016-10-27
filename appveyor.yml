@@ -25,6 +25,8 @@ init:
   # disable pip upgrade, seems to be broken (permission error)
   #- "%PYTHON%/Scripts/pip3 install --upgrade pip setuptools"
 install:
+  # Temporary fix for PyQt not being installed in correct directory: https://github.com/appveyor/ci/issues/363
+  - REG ADD HKCU\Software\Python\PythonCore\3.4\InstallPath /f /ve /t REG_SZ /d C:\Python34
   # PyQt
   - ps: Start-FileDownload $env:PyQT -FileName $env:temp/pyqt5_install.exe
   - ps: c:\programdata\chocolatey\bin\7z.exe x $env:temp\pyqt5_install.exe -oC:\\Python34 -r
