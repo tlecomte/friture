@@ -97,34 +97,29 @@ Function .onInit
   done:
 FunctionEnd
 
-Section "SectionPrincipale" SEC01
+Section "MainSection" SEC01
   SetOutPath "$INSTDIR"
   SetOverwrite try
   CreateDirectory "$SMPROGRAMS\Friture"
   CreateShortCut "$SMPROGRAMS\Friture\Friture.lnk" "$INSTDIR\friture.exe"
   CreateShortCut "$DESKTOP\Friture.lnk" "$INSTDIR\friture.exe"
-  SetOutPath "$INSTDIR\imageformats"
-  File "${PROJECT_PATH}\dist\imageformats\*"
-  SetOutPath "$INSTDIR\platforms"
-  File "${PROJECT_PATH}\dist\platforms\*"
+
+  SetOutPath "$INSTDIR\_sounddevice_data"
+  File "${PROJECT_PATH}\dist\friture\_sounddevice_data\*"
+
+  SetOutPath "$INSTDIR\qt5_plugins"
+  File /r "${PROJECT_PATH}\dist\friture\qt5_plugins\*"
+
   SetOutPath "$INSTDIR"
-  File "${PROJECT_PATH}\dist\library.zip"
-  File "${PROJECT_PATH}\dist\*.pyd"
+  File "${PROJECT_PATH}\dist\friture\base_library.zip"
+  File "${PROJECT_PATH}\dist\friture\*.pyd"
   ; take all dlls except icudt*.dll which will be taken from the installer folder, where a stripped down version is stored
-  File /x icudt*.dll "${PROJECT_PATH}\dist\*.dll"
+  File /x icudt*.dll "${PROJECT_PATH}\dist\friture\*.dll"
   File "${PROJECT_PATH}\installer\icudt*.dll"
-  File "${PROJECT_PATH}\dist\friture.exe"
+  File "${PROJECT_PATH}\dist\friture\friture.exe"
   File "${PROJECT_PATH}\COPYING.txt"
   File "${PROJECT_PATH}\README.rst"
   File "${PROJECT_PATH}\TODO.txt"
-SectionEnd
-
-Section MSVC
-  InitPluginsDir
-  SetOutPath $PLUGINSDIR
-  File "${PROJECT_PATH}\installer\vcredist_x86.exe"
-  DetailPrint "Installing Visual C++ 2010 Libraries"
-  ExecWait '"$PLUGINSDIR\vcredist_x86.exe" /passive /norestart"'
 SectionEnd
 
 Section -AdditionalIcons

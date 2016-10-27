@@ -48,10 +48,10 @@ install:
   - ps: New-Item -ItemType file C:\Python34\lib\site-packages\scipy\signal\__init__.py
   # Python libraries
   - "%PYTHON%/Scripts/pip3 install -r requirements.txt"
-  - "%PYTHON%/Scripts/pip3 install -U py2exe"
+  - "%PYTHON%/Scripts/pip3 install -U pyinstaller"
   - "%PYTHON%/python setup.py build_ext --inplace"
-  - "%PYTHON%/python setup.py py2exe"
-  - ps: "ls -R dist"
+  - "%PYTHON%/Scripts/pyinstaller friture.spec
+  - ps: "ls -R dist/friture"
   - SET PATH=C:\Program Files (x86)\NSIS;%PATH%
   - cd installer
   - "makensis.exe friture-setup.nsi"
