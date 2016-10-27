@@ -50,7 +50,7 @@ install:
   - "%PYTHON%/Scripts/pip3 install -r requirements.txt"
   - "%PYTHON%/Scripts/pip3 install -U pyinstaller"
   - "%PYTHON%/python setup.py build_ext --inplace"
-  - "%PYTHON%/Scripts/pyinstaller friture.spec
+  - "%PYTHON%/Scripts/pyinstaller friture.spec"
   - ps: "ls -R dist/friture"
   - SET PATH=C:\Program Files (x86)\NSIS;%PATH%
   - cd installer
