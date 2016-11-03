@@ -17,7 +17,7 @@ init:
   - cmd: ECHO Path - %PATH%
 install:
   # the real work happens there
-  - ps: winbuild.ps1
+  - ps: ./winbuild.ps1
 build: false
 artifacts:
   - path: installer/friture-*.exe
