@@ -83,20 +83,3 @@ def compute_colors(N):
     cmap /= np.max(cmap)
 
     return cmap
-
-if __name__ == "__main__":
-    import matplotlib.pyplot as plt
-
-    N = 256
-
-    cmap = compute_colors(N)
-
-    xref = np.linspace(0, 1, CMRref.shape[0])
-    x = np.linspace(0, 1, N)
-
-    plt.figure()
-    plt.plot(xref, CMRref[:, 0], 'xr', x, cmap[:, 0], 'r')
-    plt.plot(xref, CMRref[:, 1], 'xg', x, cmap[:, 1], 'g')
-    plt.plot(xref, CMRref[:, 2], 'xb', x, cmap[:, 2], 'b')
-    plt.legend(['Linear', 'Cubic Spline'])
-    plt.show()
