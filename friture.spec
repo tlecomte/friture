@@ -7,8 +7,12 @@ block_cipher = None
 sounddevice_data = collect_data_files("sounddevice", subdir="_sounddevice_data")
 libportaudio = [(file[0], "_sounddevice_data") for file in sounddevice_data if "libportaudio" in file[0]]
 
+# workaround for PyInstaller that does not look where the new PyQt5 official wheels put the Qt dlls
+from PyInstaller.compat import getsitepackages
+pathex = [os.path.join(x, 'PyQt5', 'Qt', 'bin') for x in getsitepackages()]
+
 a = Analysis(['main.py'],
-             pathex=[],
+             pathex=pathex,
              binaries=None,
              datas=libportaudio,
              hiddenimports=[],
@@ -26,7 +30,7 @@ exe = EXE(pyz,
           name='friture',
           debug=False,
           strip=False,
-          upx=True,
+          upx=False,
           console=False,
           icon="resources/images/friture.ico")
 coll = COLLECT(exe,
@@ -34,5 +38,5 @@ coll = COLLECT(exe,
                a.zipfiles,
                a.datas,
                strip=False,
-               upx=True,
+               upx=False,
                name='friture')

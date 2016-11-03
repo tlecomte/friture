@@ -6,5 +6,4 @@ docutils
 numpy
 psutil
 scipy
-# PyQt # PyQt does not seem to be available in PyPI
-
+PyQt5
