@@ -37,13 +37,14 @@ class AudioBackend(QtCore.QObject):
         if status:
             print(status, flush=True)
 
-        input_time = time_info.inputBufferAdcTime
-
-        # some API drivers in PortAudio do not return a valid time, so fallback to the current stream time
-        if input_time == 0.:
-            input_time = time_info.currentTime
-        if input_time == 0.:
+        # some API drivers in PortAudio do not return a valid inputBufferAdcTime (MME for example)
+        # so fallback to the current stream time in that case
+        if time_info.currentTime == 0. or time_info.inputBufferAdcTime == 0.:
             input_time = self.get_stream_time()
+        elif time_info.inputBufferAdcTime == 0.:
+            input_time = time_info.currentTime
+        else:
+            input_time = time_info.inputBufferAdcTime
 
         self.new_data_available_from_callback.emit(in_data, frame_count, input_time, status.input_overflow)
 
