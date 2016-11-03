@@ -1,6 +1,7 @@
 $virtualenv = "buildenv"
 
 # check for python and pip in PATH
+
 $pythonPath = Get-Command "python" -ErrorAction SilentlyContinue
 if ($pythonPath -eq $null)
 {
@@ -55,28 +56,28 @@ Write-Host "==========================================="
 Write-Host "Making sure setuptools is up-to-date (for compiler compatibility)"
 Write-Host "==========================================="
 
-pip install --upgrade setuptools
+& pip install --upgrade setuptools
 
 Write-Host ""
 Write-Host "==========================================="
 Write-Host "Installing virtualenv"
 Write-Host "==========================================="
 
-pip install -U virtualenv
+& pip install -U virtualenv
 
 Write-Host ""
 Write-Host "==========================================="
 Write-Host "Creating a virtualenv"
 Write-Host "==========================================="
 
-virtualenv $virtualenv
+& virtualenv $virtualenv
 
 Write-Host ""
 Write-Host "==========================================="
 Write-Host "Activating the virtualenv"
 Write-Host "==========================================="
 
-iex "$virtualenv\Scripts\activate"
+& "$virtualenv\Scripts\activate"
 
 Write-Host ""
 Write-Host "==========================================="
@@ -84,8 +85,8 @@ Write-Host "Installing Numpy, Scipy custom wheels"
 Write-Host "==========================================="
 
 # copied from http://www.lfd.uci.edu/~gohlke/pythonlibs/
-pip install https://www.dropbox.com/s/4dkx7yvdqfahsxi/numpy-1.11.2%2Bmkl-cp35-cp35m-win32.whl?dl=1
-pip install https://www.dropbox.com/s/bilym1blfykd0za/scipy-0.18.1-cp35-cp35m-win32.whl?dl=1
+& pip install https://www.dropbox.com/s/4dkx7yvdqfahsxi/numpy-1.11.2%2Bmkl-cp35-cp35m-win32.whl?dl=1
+& pip install https://www.dropbox.com/s/bilym1blfykd0za/scipy-0.18.1-cp35-cp35m-win32.whl?dl=1
 
 Write-Host ""
 Write-Host "==========================================="
@@ -103,32 +104,32 @@ Write-Host "==========================================="
 Write-Host "Installing all other requirements"
 Write-Host "==========================================="
 
-pip install -r requirements.txt
+& pip install -r requirements.txt
 
 Write-Host ""
 Write-Host "==========================================="
 Write-Host "Installing pyinstaller"
 Write-Host "==========================================="
 
-pip install -U pyinstaller
+& pip install -U pyinstaller
 
 Write-Host ""
 Write-Host "==========================================="
 Write-Host "Building Cython extensions"
 Write-Host "==========================================="
 
-python setup.py build_ext --inplace
+& python setup.py build_ext --inplace
 
 Write-Host ""
 Write-Host "==========================================="
 Write-Host "Packaging with pyinstaller"
 Write-Host "==========================================="
 
-pyinstaller friture.spec -y
+& pyinstaller friture.spec -y
 
 Write-Host ""
 Write-Host "==========================================="
 Write-Host "Building the NSIS installer"
 Write-Host "==========================================="
 
-makensis.exe "installer\friture-setup.nsi"
+& makensis.exe installer\friture-setup.nsi
