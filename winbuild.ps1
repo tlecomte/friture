@@ -125,7 +125,7 @@ Write-Host "==========================================="
 Write-Host "Packaging with pyinstaller"
 Write-Host "==========================================="
 
-& pyinstaller friture.spec -y
+& pyinstaller friture.spec -y --log-level=DEBUG
 
 Write-Host ""
 Write-Host "==========================================="

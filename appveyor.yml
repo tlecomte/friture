@@ -22,6 +22,8 @@ build: false
 artifacts:
   - path: installer/friture-*.exe
     name: friture-setup
+  - path: build/friture/xref-friture.html
+    name: xref-friture
 deploy:
   provider: GitHub
   auth_token:
