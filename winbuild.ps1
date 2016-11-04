@@ -53,6 +53,13 @@ Remove-Item "dist" -Recurse -ErrorAction Ignore
 
 Write-Host ""
 Write-Host "==========================================="
+Write-Host "Making sure pip is up-to-date"
+Write-Host "==========================================="
+
+& python -m pip install --upgrade pip
+
+Write-Host ""
+Write-Host "==========================================="
 Write-Host "Making sure setuptools is up-to-date (for compiler compatibility)"
 Write-Host "==========================================="
 
