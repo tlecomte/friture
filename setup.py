@@ -2,7 +2,7 @@
 import sys
 from setuptools import setup
 from setuptools.extension import Extension
-from Cython.Distutils import build_ext
+from Cython.Build import cythonize
 from glob import glob
 import os
 from os.path import join, dirname  # for README content reading and py2exe fix
@@ -170,8 +170,7 @@ setup(name="friture",
                 'friture.plotting',
                 'friture.generators'],
       scripts=['scripts/friture'],
-      cmdclass={"build_ext": build_ext},
-      ext_modules=ext_modules,
+      ext_modules=cythonize(ext_modules),
       **extra_options
       )
 
