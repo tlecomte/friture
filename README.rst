@@ -2,6 +2,12 @@
 Friture
 =======
 
+.. image:: https://travis-ci.org/tlecomte/friture.svg?branch=master
+    :target: https://travis-ci.org/tlecomte/friture
+
+.. image:: https://ci.appveyor.com/api/projects/status/github/tlecomte/friture?branch=master&svg=true
+    :target: https://ci.appveyor.com/project/tlecomte/friture
+
 **Friture** is an application to visualize and analyze live audio data in real-time.
 
 Friture displays audio data in several widgets, such as a scope, a spectrum analyzer, or a rolling 2D spectrogram.
