@@ -6,6 +6,13 @@
 *.wav
 *.exe
 *.zip
+*.c
+*.bak
+*.db
+*.cpp
+*.cprof
 build/*
 dist/*
 doc/_build/*
+env/*
+buildenv/*
