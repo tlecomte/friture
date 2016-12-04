@@ -142,6 +142,8 @@ ext_modules = [Extension("friture.exp_smoothing_conv", ["friture/extension/exp_s
                Extension("friture.lookup_table", ["friture/extension/lookup_table.pyx"],
                          include_dirs=[numpy.get_include()]),
                Extension("friture.norm_square", ["friture/extension/norm_square.pyx"],
+                         include_dirs=[numpy.get_include()]),
+               Extension("friture.lfilter", ["friture/extension/lfilter.pyx"],
                          include_dirs=[numpy.get_include()])]
 
 setup(name="friture",

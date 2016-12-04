@@ -27,10 +27,11 @@ from friture.longlevels_settings import (LongLevels_Settings_Dialog,
 from friture.audioproc import audioproc
 from friture.logger import PrintLogger
 from friture.timeplot import TimePlot
-from .filter import decimate, lfilter
+from .filter import decimate
 from friture import generated_filters
 from friture.exp_smoothing_conv import pyx_exp_smoothed_value
 from .ringbuffer import RingBuffer
+from .lfilter import pyx_lfilter_float64_1D
 
 from friture.audiobackend import SAMPLING_RATE
 
@@ -52,8 +53,9 @@ class Subsampler:
         # to maintain non-negativeness of the subsampled signal, we use a gaussian filter here
         # (IIR ringing produces negative values)
         #[self.bdec, self.adec] = generated_filters.PARAMS['dec']
-        self.bdec = gauss(11, 2.)
-        self.adec = [1.]
+        self.bdec = np.array(gauss(11, 2.))
+        self.adec = np.zeros(self.bdec.shape)
+        self.adec[0] = 1.
 
         # build a proper array of zero initial conditions to start the subsampler
         self.zfs = []
@@ -131,8 +133,9 @@ class LongLevelWidget(QtWidgets.QWidget):
         self.Ndec = int(max(0, np.floor((np.log2(self.response_time * SAMPLING_RATE/100.)))))
 
         Ngauss = 4
-        self.b = gauss(10*Ngauss+1, 2.*Ngauss)
-        self.a = [1.]
+        self.b = np.array(gauss(10*Ngauss+1, 2.*Ngauss))
+        self.a = np.zeros(self.b.shape)
+        self.a[0] = 1.
         self.zf = np.zeros(max(len(self.b), len(self.a)) - 1)
 
         self.subsampled_sampling_rate = SAMPLING_RATE / 2 ** (self.Ndec)
@@ -177,7 +180,7 @@ class LongLevelWidget(QtWidgets.QWidget):
                 # subsample
                 y0_squared_dec = self.subsampler.push(y0_squared)
 
-                self.level, self.zf = lfilter(self.b, self.a, y0_squared_dec, zi=self.zf)
+                self.level, self.zf = pyx_lfilter_float64_1D(self.b, self.a, y0_squared_dec, self.zf)
 
                 self.level_rms = 10. * np.log10(max(self.level, 1e-150))
 

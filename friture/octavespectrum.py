@@ -190,6 +190,9 @@ class octave_filters():
     def __init__(self, bandsperoctave):
         [self.bdec, self.adec] = generated_filters.PARAMS['dec']
 
+        self.bdec = array(self.bdec)
+        self.adec = array(self.adec)
+
         self.setbandsperoctave(bandsperoctave)
 
     def filter(self, floatdata):
@@ -211,6 +214,9 @@ class octave_filters():
         self.nbands = NOCTAVE * self.bandsperoctave
         self.fi, self.flow, self.fhigh = octave_frequencies(self.nbands, self.bandsperoctave)
         [self.boct, self.aoct, fi, flow, fhigh] = generated_filters.PARAMS['%d' % bandsperoctave]
+
+        self.boct = [array(f) for f in self.boct]
+        self.aoct = [array(f) for f in self.aoct]
 
         # [self.b_nodec, self.a_nodec, fi, fl, fh] = octave_filters(self.nbands, self.bandsperoctave)
 
