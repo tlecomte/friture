@@ -10,7 +10,6 @@ before_install:
   - which python3
   - python3 --version
   - brew install qt5 # this is needed to get macdeployqt, which is not in the PyPI PyQt5 wheel
-  - brew install coreutils
 install:
   - pip3 install --upgrade --user setuptools
   - pip3 install --upgrade wheel
