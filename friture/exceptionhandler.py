@@ -24,15 +24,13 @@ import io
 import traceback
 import friture
 from PyQt5 import QtCore
-from PyQt5.QtWidgets import QMessageBox
+from PyQt5.QtWidgets import QMessageBox, QApplication
 
 def fileexcepthook(exception_type, exception_value, traceback_object):
     # also call the standard exception handler to have prints on the console
     sys.__excepthook__(exception_type, exception_value, traceback_object)
 
     separator = '-' * 80
-    log_dir = QtCore.QStandardPaths.standardLocations(QtCore.QStandardPaths.AppDataLocation)[0]
-    logFile = os.path.join(log_dir, "friture.log")
 
     versionInfo="Friture " + friture.__versionXXXX__
 
@@ -47,12 +45,14 @@ def fileexcepthook(exception_type, exception_value, traceback_object):
     msg = '\n'.join(sections)
 
     try:
+        log_dir = QtCore.QStandardPaths.standardLocations(QtCore.QStandardPaths.AppDataLocation)[0]
+        logFile = os.path.join(log_dir, "friture.log")
         os.makedirs(log_dir, exist_ok=True)
         with open(logFile, "w") as f:
             f.write(msg)
     except IOError as e:
-        print(e)
-        pass
+        print("Failed to write to the log file", e)
+        logFile = "?"
 
     notice = \
         """An unhandled exception occurred. Please report the problem\n"""\
@@ -63,15 +63,21 @@ def fileexcepthook(exception_type, exception_value, traceback_object):
     return str(notice)+str(msg)
 
 def errorBox(message):
-    errorbox = QMessageBox()
-    errorbox.setWindowTitle("Friture critical error")
-    errorbox.setText(message)
-    errorbox.setIcon(QMessageBox.Critical)
-    errorbox.setStandardButtons(QMessageBox.Ignore | QMessageBox.Abort)
-    ret = errorbox.exec_()
+    try:
+        if QApplication.instance() is None:
+            app = QApplication(sys.argv) # assignment is needed to keep the application alive
 
-    if ret == QMessageBox.Abort:
-        sys.exit(1)
+        errorbox = QMessageBox()
+        errorbox.setWindowTitle("Friture critical error")
+        errorbox.setText(message)
+        errorbox.setIcon(QMessageBox.Critical)
+        errorbox.setStandardButtons(QMessageBox.Ignore | QMessageBox.Abort)
+        ret = errorbox.exec_()
+
+        if ret == QMessageBox.Abort:
+           sys.exit(1)
+    except Exception as e:
+        print("Failed to display the error box", e)
 
 def excepthook(exception_type, exception_value, traceback_object):
     gui_message = fileexcepthook(exception_type, exception_value, traceback_object)
