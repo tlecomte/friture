@@ -21,7 +21,6 @@ import sys
 from PyQt5 import QtGui, QtCore, QtWidgets
 import sounddevice
 import numpy
-import scipy
 import OpenGL
 import friture.friture_rc
 import friture
@@ -42,7 +41,6 @@ aboutText = """
         <li>PyQt %s (Qt %s)</li>
         <li>Python-sounddevice %s (%s)</li>
         <li>Numpy %s</li>
-        <li>Scipy %s</li>
         <li>Cython</li>
         <li>PyOpenGL %s</li>
 </ul>
@@ -54,7 +52,6 @@ aboutText = """
        sounddevice.__version__,
        sounddevice.get_portaudio_version()[1],
        numpy.__version__,
-       scipy.__version__,
        #Cython.__version__, #this pulls the whole Cython, makes PyInstaller think it needs all the dependencies, even IPython!
        OpenGL.__version__)
 

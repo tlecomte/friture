@@ -88,27 +88,7 @@ Write-Host "==========================================="
 
 Write-Host ""
 Write-Host "==========================================="
-Write-Host "Installing Numpy, Scipy custom wheels"
-Write-Host "==========================================="
-
-# copied from http://www.lfd.uci.edu/~gohlke/pythonlibs/
-& pip install https://www.dropbox.com/s/4dkx7yvdqfahsxi/numpy-1.11.2%2Bmkl-cp35-cp35m-win32.whl?dl=1
-& pip install https://www.dropbox.com/s/bilym1blfykd0za/scipy-0.18.1-cp35-cp35m-win32.whl?dl=1
-
-Write-Host ""
-Write-Host "==========================================="
-Write-Host "Applying Scipy tweaks"
-Write-Host "==========================================="
-
-# Fix Scipy massive imports by replacing 2 init files by empty files
-Rename-Item "$virtualenv\lib\site-packages\scipy\interpolate\__init__.py" __init__.py.bak *>$null
-Rename-Item "$virtualenv\lib\site-packages\scipy\signal\__init__.py" __init__.py.bak *>$null
-New-Item -ItemType file "$virtualenv\lib\site-packages\scipy\interpolate\__init__.py" *>$null
-New-Item -ItemType file "$virtualenv\lib\site-packages\scipy\signal\__init__.py" *>$null
-
-Write-Host ""
-Write-Host "==========================================="
-Write-Host "Installing all other requirements"
+Write-Host "Installing requirements"
 Write-Host "==========================================="
 
 & pip install -r requirements.txt

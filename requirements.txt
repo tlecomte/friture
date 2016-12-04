@@ -5,5 +5,4 @@ PyOpenGL-accelerate
 docutils
 numpy
 psutil
-scipy
 PyQt5
