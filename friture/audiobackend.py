@@ -389,7 +389,8 @@ class AudioBackend(QtCore.QObject):
     def get_stream_time(self):
         try:
             return self.stream.time
-        except OSError:
+        except (sounddevice.PortAudioError, OSError) as exception:
+            print("Failed to read stream time", exception)
             return 0
 
     def pause(self):
