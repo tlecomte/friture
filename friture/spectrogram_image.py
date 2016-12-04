@@ -19,7 +19,7 @@
 
 import numpy
 from PyQt5 import QtCore, QtGui
-from friture.plotting import cmrmap
+from friture.plotting import generated_cmrmap
 from friture.lookup_table import pyx_color_from_float_2D
 
 
@@ -142,12 +142,11 @@ class CanvasScaledSpectrogram(QtCore.QObject):
     def prepare_palette(self):
         print("palette preparation")
 
-        N = 256
-        cmap = cmrmap.compute_colors(N)
+        cmap = generated_cmrmap.CMAP
 
-        self.colors = numpy.zeros((N), dtype=numpy.uint32)
+        self.colors = numpy.zeros((cmap.shape[0]), dtype=numpy.uint32)
 
-        for i in range(N):
+        for i in range(cmap.shape[0]):
             self.colors[i] = QtGui.QColor(cmap[i, 0] * 255, cmap[i, 1] * 255, cmap[i, 2] * 255).rgb()
 
     def color_from_float(self, v):

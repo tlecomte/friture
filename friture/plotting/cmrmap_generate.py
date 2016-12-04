@@ -29,13 +29,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 import numpy as np
-
-# import directly from fitpack to avoid extra module imports that make the py2exe package grow
 from scipy.interpolate.fitpack import splrep, splev
-
-# NOTE: by default scipy.interpolate.__init__.py imports all of its submodules
-# To decrease the py2exe distributions dramatically, these import lines can
-# be commented out !
 
 #   Returns a colour map CMAP (varying black -
 #   purple - red - yellow - white) that is monochrome-
@@ -83,3 +77,67 @@ def compute_colors(N):
     cmap /= np.max(cmap)
 
     return cmap
+
+def generate_cmrmap():
+    import os
+    import json
+
+    cmap = compute_colors(256)
+
+    out = """\
+# CMRMAP generated from cmrmap_generate.py
+
+#   Returns a colour map CMAP (varying black -
+#   purple - red - yellow - white) that is monochrome-
+#   compatible, i.e. it produces a monotonic greyscale
+#   colour map.
+#
+#   The map is a slight modification to that suggested in
+#   [1].
+#
+#   Reference:
+#
+#   [1] Rappaport, C. 2002: "A Color Map for Effective
+#   Black-and-White Rendering of Color Scale Images", IEEE
+#   Antenna's and Propagation Magazine, Vol.44, No.3,
+#   pp.94-96 (June).
+#
+# http://stackoverflow.com/questions/7251872/is-there-a-better-color-scale-than-the-rainbow-colormap
+# http://matplotlib.org/users/colormaps.html
+# http://www.mathworks.com/matlabcentral/fileexchange/39552-modified-cmrmap
+
+import json
+import numpy
+
+JSON_CMAP = \"\"\"
+%s
+\"\"\"
+
+CMAP = numpy.array(json.loads(JSON_CMAP))
+""" % json.dumps(cmap.tolist(), indent=4, sort_keys=True)
+
+    path = os.path.dirname(__file__)
+    fname = os.path.join(path, 'generated_cmrmap.py')
+    output = open(fname, 'w')
+    with open(fname, 'w') as output:
+        output.write(out)
+
+
+if __name__ == "__main__":
+    import matplotlib.pyplot as plt
+
+    N = 256
+
+    generate_cmrmap()
+
+    cmap = compute_colors(N)
+
+    xref = np.linspace(0, 1, CMRref.shape[0])
+    x = np.linspace(0, 1, N)
+
+    plt.figure()
+    plt.plot(xref, CMRref[:, 0], 'xr', x, cmap[:, 0], 'r')
+    plt.plot(xref, CMRref[:, 1], 'xg', x, cmap[:, 1], 'g')
+    plt.plot(xref, CMRref[:, 2], 'xb', x, cmap[:, 2], 'b')
+    plt.legend(['Linear', 'Cubic Spline'])
+    plt.show()

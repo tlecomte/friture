@@ -1,6 +1,6 @@
 from PyQt5 import QtGui, QtCore, QtWidgets
 from friture.plotting.scaleDivision import numberPrecision
-from friture.plotting import cmrmap
+from friture.plotting import generated_cmrmap
 
 # A widget canvas with a baseline, ticks and tick labels
 # The logic of the placement of scale min/max and ticks belongs to another class.
@@ -207,9 +207,8 @@ class ColorScaleBar(QtWidgets.QWidget):
         self.colorBarWidth = self.tickLength * 2
 
         # should be shared with spectrogram_image in a dedicated class
-        N = 256
-        cmap = cmrmap.compute_colors(N)
-        self.colors = [QtGui.QColor(cmap[i, 0] * 255, cmap[i, 1] * 255, cmap[i, 2] * 255) for i in range(N)]
+        cmap = generated_cmrmap.CMAP
+        self.colors = [QtGui.QColor(cmap[i, 0] * 255, cmap[i, 1] * 255, cmap[i, 2] * 255) for i in range(cmap.shape[0])]
 
         # for vertical scale bar
         self.setSizePolicy(QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum))
