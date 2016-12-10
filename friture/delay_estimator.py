@@ -160,6 +160,8 @@ class Delay_Estimator_Widget(QtWidgets.QWidget):
         self.Ndec = 2
         self.subsampled_sampling_rate = SAMPLING_RATE / 2 ** (self.Ndec)
         [self.bdec, self.adec] = generated_filters.PARAMS['dec']
+        self.bdec = numpy.array(self.bdec)
+        self.adec = numpy.array(self.adec)
         self.zfs0 = subsampler_filtic(self.Ndec, self.bdec, self.adec)
         self.zfs1 = subsampler_filtic(self.Ndec, self.bdec, self.adec)
 
