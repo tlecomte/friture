@@ -92,6 +92,8 @@ class AudioBackend(QtCore.QObject):
 
         self.new_data_available_from_callback.connect(self.handle_new_data)
 
+        self.devices_with_timing_errors = []
+
     def close(self):
         if self.stream is not None:
             self.stream.stop()
@@ -390,7 +392,9 @@ class AudioBackend(QtCore.QObject):
         try:
             return self.stream.time
         except (sounddevice.PortAudioError, OSError) as exception:
-            print("Failed to read stream time", exception)
+            if self.stream.device not in self.devices_with_timing_errors:
+                self.devices_with_timing_errors.append(self.stream.device)
+                print("Failed to read stream time", exception)
             return 0
 
     def pause(self):
