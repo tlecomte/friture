@@ -158,6 +158,8 @@ class GlCanvasWidget(QtWidgets.QOpenGLWidget):
         self.gridNeedsUpdating = False
 
     def paintGL(self):
+        self.setupViewport(self.width(), self.height())
+
         # Clear The Screen And The Depth Buffer
         GL.glClearColor(1, 1, 1, 0)
         GL.glClear(GL.GL_COLOR_BUFFER_BIT)  # | GL.GL_DEPTH_BUFFER_BIT)
@@ -269,8 +271,6 @@ class GlCanvasWidget(QtWidgets.QOpenGLWidget):
             painter.drawText(rect, Qt.Qt.AlignLeft, text)
 
     def resizeGL(self, width, height):
-        self.setupViewport(self.width(), self.height())
-
         self.gridNeedsUpdating = True
 
         # give the opportunity to the scales to adapt
