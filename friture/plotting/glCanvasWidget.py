@@ -277,7 +277,7 @@ class GlCanvasWidget(QtWidgets.QOpenGLWidget):
         self.resized.emit(self.width(), self.height())
 
     def setupViewport(self, width, height):
-        GL.glViewport(0, 0, width, height)
+        #GL.glViewport(0, 0, width, height) #redundant with Qt setup, and possibly buggy
         GL.glMatrixMode(GL.GL_PROJECTION)
         GL.glLoadIdentity()
         GL.glOrtho(0, width, 0, height, 0, 1)
