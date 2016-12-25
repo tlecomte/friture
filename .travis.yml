@@ -5,9 +5,9 @@ python:
   - '3.5'
 before_install:
   - brew update
-  - cd $(brew --repo)
+  - cd $(brew --repo)/Library/Taps/homebrew/homebrew-core
   # Checkout the old formula to get 3.5
-  - git checkout ec545d45d4512ace3570782283df4ecda6bb0044 Library/Taps/homebrew/homebrew-core/Formula/python3.rb
+  - git checkout ec545d45d4512ace3570782283df4ecda6bb0044 Formula/python3.rb
   # cd back to build dir
   - cd $TRAVIS_BUILD_DIR
   - sed -i '.bak' -e 's/#{MacOS.version}/10.6/g' $(brew --repo)/Library/Taps/homebrew/homebrew-core/Formula/python3.rb
