@@ -18,6 +18,9 @@ except ImportError:
                                    "PyOpenGL must be installed to run this example.")
     sys.exit(1)
 
+from OpenGL.GL import shaders
+from ctypes import sizeof, c_float, c_void_p, c_uint
+
 from numpy import zeros, ones, log10, hstack, array, floor, mean, where
 import numpy as np
 
@@ -328,8 +331,7 @@ class QuadsItem:
         self.baseline_transformed = False
         self.baseline = 0.
 
-        self.vertices = array([])
-        self.colors = array([])
+        self.vertices_data = array([], dtype=np.float32)
 
     def set_baseline_displayUnits(self, baseline):
         self.baseline_transformed = False
@@ -350,38 +352,21 @@ class QuadsItem:
 
     def prepareQuadData(self, x, y, w, baseline, r, g, b):
         h = y - baseline
-        y = baseline
+        y = baseline + 0.*y
 
         n = x.shape[0]
 
-        self.vertices = zeros((n, 4, 2))
-        self.vertices[:, 0, 0] = x
-        self.vertices[:, 0, 1] = y + h
-        self.vertices[:, 1, 0] = x + w
-        self.vertices[:, 1, 1] = y + h
-        self.vertices[:, 2, 0] = x + w
-        self.vertices[:, 2, 1] = y
-        self.vertices[:, 3, 0] = x
-        self.vertices[:, 3, 1] = y
-
-        self.colors = zeros((n, 4, 3))
-        self.colors[:, 0, 0] = r
-        self.colors[:, 1, 0] = r
-        self.colors[:, 2, 0] = r
-        self.colors[:, 3, 0] = r
-        self.colors[:, 0, 1] = g
-        self.colors[:, 1, 1] = g
-        self.colors[:, 2, 1] = g
-        self.colors[:, 3, 1] = g
-        self.colors[:, 0, 2] = b
-        self.colors[:, 1, 2] = b
-        self.colors[:, 2, 2] = b
-        self.colors[:, 3, 2] = b
+        # 4 vertices per quad * (3 coordinates + 3 color coordinates)
+        self.vertices_data = zeros((n, 4, 6), dtype=np.float32)
+        self.vertices_data[:, 0, :] = np.dstack((x,     y + h, 0*x, r, g, b))
+        self.vertices_data[:, 1, :] = np.dstack((x + w, y + h, 0*x, r, g, b))
+        self.vertices_data[:, 2, :] = np.dstack((x + w, y,     0*x, r, g, b))
+        self.vertices_data[:, 3, :] = np.dstack((x,     y,     0*x, r, g, b))
 
     def transformUpdate(self):
         self.need_transform = True
 
-    def glDraw(self, xMap, yMap, rect):
+    def glDraw(self, xMap, yMap, rect, vbo, shader_program):
         # transform the coordinates only when needed
         if self.need_transform:
             self.transformed_x1 = xMap.toScreen(self.x1)
@@ -438,21 +423,24 @@ class QuadsItem:
 
         self.prepareQuadData(x1, transformed_y, x2 - x1, baseline, r, g, b)
 
-        # TODO: instead of Arrays, VBOs should be used here, as a large part of
-        # the data does not have to be modified on every call (x coordinates,
-        # green colored quads)
+        vbo.set_array(self.vertices_data)
 
-        # TODO: If the arrays could be drawn as SHORTs istead of FLOATs, it
-        # could also be dramatically faster
+        shaders.glUseProgram(shader_program)
 
-        GL.glVertexPointerd(self.vertices)
-        GL.glColorPointerd(self.colors)
-        GL.glEnableClientState(GL.GL_VERTEX_ARRAY)
-        GL.glEnableClientState(GL.GL_COLOR_ARRAY)
-
-        # GL.glDisable(GL.GL_LIGHTING)
-        GL.glDrawArrays(GL.GL_QUADS, 0, 4 * self.vertices.shape[0])
-        # GL.glEnable(GL.GL_LIGHTING)
-
-        GL.glDisableClientState(GL.GL_COLOR_ARRAY)
-        GL.glDisableClientState(GL.GL_VERTEX_ARRAY)
+        try:
+            vbo.bind()
+            try:
+                GL.glEnableVertexAttribArray(0)
+                GL.glEnableVertexAttribArray(1)
+                stride = self.vertices_data.shape[-1]*sizeof(c_float)
+                vertex_offset = c_void_p(0 * sizeof(c_float))
+                color_offset  = c_void_p(3 * sizeof(c_float))
+                GL.glVertexAttribPointer(0, 3, GL.GL_FLOAT, GL.GL_FALSE, stride, vertex_offset)
+                GL.glVertexAttribPointer(1, 3, GL.GL_FLOAT, GL.GL_FALSE, stride, color_offset)
+                GL.glDrawArrays(GL.GL_QUADS, 0, self.vertices_data.size)
+                GL.glDisableVertexAttribArray(0)
+                GL.glDisableVertexAttribArray(1)
+            finally:
+                vbo.unbind()
+        finally:
+            shaders.glUseProgram(0)

@@ -11,6 +11,9 @@ except ImportError:
                                    "PyOpenGL must be installed to run this example.")
     sys.exit(1)
 
+from OpenGL.arrays import vbo
+from OpenGL.GL import shaders
+from ctypes import sizeof, c_float, c_void_p, c_uint
 
 class GlCanvasWidget(QtWidgets.QOpenGLWidget):
 
@@ -87,13 +90,49 @@ class GlCanvasWidget(QtWidgets.QOpenGLWidget):
 
     def drawGlData(self):
         for item in self.attachedItems:
-            item.glDraw(self.horizontalScaleTransform, self.verticalScaleTransform, self.rect())
+            item.glDraw(self.horizontalScaleTransform, self.verticalScaleTransform, self.rect(), self.data_vbo, self.quad_shader)
 
     def sizeHint(self):
         return QtCore.QSize(50, 50)
 
     def initializeGL(self):
-        return
+        quad_vertex_shader = shaders.compileShader("""#version 120
+            in vec3 color;
+            out vec3 theColor;
+
+            void main()
+            {
+                gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+                theColor = color;
+            }""", GL.GL_VERTEX_SHADER)
+
+        quad_fragment_shader = shaders.compileShader("""#version 120
+            in vec3 theColor;
+            out vec4 out_color;
+
+            void main()
+            {
+                out_color = vec4(theColor.x, theColor.y, theColor.z, 1.);
+            }""", GL.GL_FRAGMENT_SHADER)
+
+        self.quad_shader = shaders.compileProgram(quad_vertex_shader, quad_fragment_shader)
+
+        vertices = np.array(
+            [[ 0, 100, 0 ],
+             [ 100, 100, 0],
+             [ 100, 0, 0 ],
+             [200, 200, 0],
+             [200, 400, 0],
+             [400, 400, 0],
+             [400, 400, 0],
+             [200, 200, 0],
+             [400, 200, 0]], 'f')
+
+        self.background_vbo = vbo.VBO(vertices)
+        self.border_vbo = vbo.VBO(vertices)
+        self.ruler_vbo = vbo.VBO(vertices)
+        self.grid_vbo = vbo.VBO(vertices)
+        self.data_vbo = vbo.VBO(vertices)
 
     def setfmax(self, fmax):
         self.fmax = fmax
@@ -301,14 +340,34 @@ class GlCanvasWidget(QtWidgets.QOpenGLWidget):
 
         w = self.width()
         h = self.height()
-        GL.glBegin(GL.GL_QUADS)
-        GL.glColor3f(0.85, 0.85, 0.85)
-        GL.glVertex2d(0, h)
-        GL.glVertex2d(w, h)
-        GL.glColor3f(1, 1, 1)
-        GL.glVertex2d(w, h / 2)
-        GL.glVertex2d(0, h / 2)
-        GL.glEnd()
+        self.background_data = np.array(
+            [[0, h,   0, 0.85, 0.85, 0.85],
+             [w, h,   0, 0.85, 0.85, 0.85],
+             [w, h/2, 0, 1.0,  1.0,  1.0],
+             [0, h/2, 0, 1.0,  1.0,  1.0]],
+            dtype=np.float32)
+
+        self.background_vbo.set_array(self.background_data)
+
+        shaders.glUseProgram(self.quad_shader)
+
+        try:
+            self.background_vbo.bind()
+            try:
+                GL.glEnableVertexAttribArray(0)
+                GL.glEnableVertexAttribArray(1)
+                stride = self.background_data.shape[1]*sizeof(c_float)
+                vertex_offset = c_void_p(0 * sizeof(c_float))
+                color_offset  = c_void_p(3 * sizeof(c_float))
+                GL.glVertexAttribPointer(0, 3, GL.GL_FLOAT, GL.GL_FALSE, stride, vertex_offset)
+                GL.glVertexAttribPointer(1, 3, GL.GL_FLOAT, GL.GL_FALSE, stride, color_offset)
+                GL.glDrawArrays(GL.GL_QUADS, 0, self.background_data.size)
+                GL.glDisableVertexAttribArray(0)
+                GL.glDisableVertexAttribArray(1)
+            finally:
+                self.background_vbo.unbind()
+        finally:
+            shaders.glUseProgram(0)
 
     def drawGrid(self):
         if self.anyOpaqueItem:
@@ -324,32 +383,131 @@ class GlCanvasWidget(QtWidgets.QOpenGLWidget):
         if self.gridNeedsUpdating:
             self.updateGrid()
 
-        GL.glCallList(self.gridList)
+        w = self.width()
+        h = self.height()
+
+        # given the usual aspect ratio of the canvas, the vertical minor ticks would make it look crowded
+        num_lines = len(self.xMajorTick) + len(self.xMinorTick) + len(self.yMajorTick) #+ len(self.yMinorTick)
+        num_lines *= 2
+
+        self.grid_data = np.zeros((num_lines, 6), dtype=np.float32)
+
+        i = 0
+
+        color = QtGui.QColor(Qt.Qt.gray)
+        for x in self.xMajorTick:
+            self.grid_data[i,   :] = [x, 0, 0, color.redF(), color.greenF(), color.blueF()]
+            self.grid_data[i+1, :] = [x, h, 0, color.redF(), color.greenF(), color.blueF()]
+            i += 2
+
+        color = QtGui.QColor(Qt.Qt.lightGray)
+        for x in self.xMinorTick:
+            self.grid_data[i,   :] = [x, 0, 0, color.redF(), color.greenF(), color.blueF()]
+            self.grid_data[i+1, :] = [x, h, 0, color.redF(), color.greenF(), color.blueF()]
+            i += 2
+
+        color = QtGui.QColor(Qt.Qt.gray)
+        for y in self.yMajorTick:
+            self.grid_data[i,   :] = [0, y, 0, color.redF(), color.greenF(), color.blueF()]
+            self.grid_data[i+1, :] = [w, y, 0, color.redF(), color.greenF(), color.blueF()]
+            i += 2
+
+        # given the usual aspect ratio of the canvas, the vertical minor ticks would make it look crowded
+        # color = QtGui.QColor(Qt.Qt.lightGray)
+        # for y in self.yMinorTick:
+        #     self.grid_data[i,   :] = [0, y, 0, color.redF(), color.greenF(), color.blueF()]
+        #     self.grid_data[i+1, :] = [w, y, 0, color.redF(), color.greenF(), color.blueF()]
+        #     i += 2
+
+        self.grid_vbo.set_array(self.grid_data)
+
+        shaders.glUseProgram(self.quad_shader)
+
+        try:
+            self.grid_vbo.bind()
+            try:
+                GL.glEnableVertexAttribArray(0)
+                GL.glEnableVertexAttribArray(1)
+                stride = self.grid_data.shape[1]*sizeof(c_float)
+                vertex_offset = c_void_p(0 * sizeof(c_float))
+                color_offset  = c_void_p(3 * sizeof(c_float))
+                GL.glVertexAttribPointer(0, 3, GL.GL_FLOAT, GL.GL_FALSE, stride, vertex_offset)
+                GL.glVertexAttribPointer(1, 3, GL.GL_FLOAT, GL.GL_FALSE, stride, color_offset)
+                GL.glDrawArrays(GL.GL_LINES, 0, self.grid_data.size)
+                GL.glDisableVertexAttribArray(0)
+                GL.glDisableVertexAttribArray(1)
+            finally:
+                self.grid_vbo.unbind()
+        finally:
+            shaders.glUseProgram(0)
 
     def drawBorder(self):
         w = self.width()
         h = self.height()
         color = QtGui.QColor(Qt.Qt.gray)
-        GL.glColor3f(color.redF(), color.greenF(), color.blueF())
-        GL.glBegin(GL.GL_LINE_LOOP)
-        GL.glVertex2f(0, 0)
-        GL.glVertex2f(0, h - 1)
-        GL.glVertex2f(w - 1, h - 1)
-        GL.glVertex2f(w - 1, 0)
-        GL.glEnd()
+        self.border_data = np.array(
+            [[0,   0,   0, color.redF(), color.greenF(), color.blueF()],
+             [0,   h-1, 0, color.redF(), color.greenF(), color.blueF()],
+             [w-1, h-1, 0, color.redF(), color.greenF(), color.blueF()],
+             [w-1, 0,   0, color.redF(), color.greenF(), color.blueF()],
+             [0,   0,   0, color.redF(), color.greenF(), color.blueF()]],
+            dtype=np.float32)
+
+        self.border_vbo.set_array(self.border_data)
+
+        shaders.glUseProgram(self.quad_shader)
+
+        try:
+            self.border_vbo.bind()
+            try:
+                GL.glEnableVertexAttribArray(0)
+                GL.glEnableVertexAttribArray(1)
+                stride = self.border_data.shape[1]*sizeof(c_float)
+                vertex_offset = c_void_p(0 * sizeof(c_float))
+                color_offset  = c_void_p(3 * sizeof(c_float))
+                GL.glVertexAttribPointer(0, 3, GL.GL_FLOAT, GL.GL_FALSE, stride, vertex_offset)
+                GL.glVertexAttribPointer(1, 3, GL.GL_FLOAT, GL.GL_FALSE, stride, color_offset)
+                GL.glDrawArrays(GL.GL_LINE_STRIP, 0, self.border_data.size)
+                GL.glDisableVertexAttribArray(0)
+                GL.glDisableVertexAttribArray(1)
+            finally:
+                self.border_vbo.unbind()
+        finally:
+            shaders.glUseProgram(0)
 
     def drawRuler(self):
         if self.ruler:
             w = self.width()
             h = self.height()
             color = QtGui.QColor(Qt.Qt.black)
-            GL.glColor3f(color.redF(), color.greenF(), color.blueF())
-            GL.glBegin(GL.GL_LINES)
-            GL.glVertex2f(self.mousex, 0)
-            GL.glVertex2f(self.mousex, h)
-            GL.glVertex2f(0, h - self.mousey)
-            GL.glVertex2f(w, h - self.mousey)
-            GL.glEnd()
+            self.ruler_data = np.array(
+                [[self.mousex, 0,               0, color.redF(), color.greenF(), color.blueF()],
+                 [self.mousex, h,               0, color.redF(), color.greenF(), color.blueF()],
+                 [0,           h - self.mousey, 0, color.redF(), color.greenF(), color.blueF()],
+                 [w,           h - self.mousey, 0, color.redF(), color.greenF(), color.blueF()]],
+                dtype=np.float32)
+
+            self.ruler_vbo.set_array(self.ruler_data)
+
+            shaders.glUseProgram(self.quad_shader)
+
+            try:
+                self.ruler_vbo.bind()
+                try:
+                    GL.glEnableVertexAttribArray(0)
+                    GL.glEnableVertexAttribArray(1)
+                    stride = self.ruler_data.shape[1]*sizeof(c_float)
+                    vertex_offset = c_void_p(0 * sizeof(c_float))
+                    color_offset  = c_void_p(3 * sizeof(c_float))
+                    GL.glVertexAttribPointer(0, 3, GL.GL_FLOAT, GL.GL_FALSE, stride, vertex_offset)
+                    GL.glVertexAttribPointer(1, 3, GL.GL_FLOAT, GL.GL_FALSE, stride, color_offset)
+                    GL.glDrawArrays(GL.GL_LINES, 0, self.ruler_data.size)
+                    GL.glDisableVertexAttribArray(0)
+                    GL.glDisableVertexAttribArray(1)
+                finally:
+                    self.ruler_vbo.unbind()
+            finally:
+                shaders.glUseProgram(0)
 
     def mousePressEvent(self, event):
         self.lastPos = event.pos()
