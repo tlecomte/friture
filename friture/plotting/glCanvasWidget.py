@@ -158,6 +158,12 @@ class GlCanvasWidget(QtWidgets.QOpenGLWidget):
         self.gridNeedsUpdating = False
 
     def paintGL(self):
+        # try to clear the errors that are produced outside of this code - for example Qt errors
+        error = GL.glGetError()
+        while error != GL.GL_NO_ERROR:
+            print("Clearing an OpenGL error that occured outside of Friture code", error)
+            error = GL.glGetError()
+
         self.setupViewport(self.width(), self.height())
 
         # Clear The Screen And The Depth Buffer
