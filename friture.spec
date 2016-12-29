@@ -11,8 +11,7 @@ libportaudio = [(file[0], "_sounddevice_data") for file in sounddevice_data if "
 from PyInstaller.compat import getsitepackages
 pathex = [os.path.join(x, 'PyQt5', 'Qt', 'bin') for x in getsitepackages()]
 
-# add vcruntime140.dll - PyInstaller excludes it by default because it thinks it comes from c:\Windows
-a = Analysis(['main.py', "C:\\Python35\\vcruntime140.dll"],
+a = Analysis(['main.py'],
              pathex=pathex,
              binaries=None,
              datas=libportaudio,
@@ -35,7 +34,8 @@ exe = EXE(pyz,
           console=False,
           icon="resources/images/friture.ico")
 coll = COLLECT(exe,
-               a.binaries,
+               # add vcruntime140.dll - PyInstaller excludes it by default because it thinks it comes from c:\Windows
+               a.binaries + [('vcruntime140.dll', 'C:\\Python35\\vcruntime140.dll', 'BINARY')],
                a.zipfiles,
                a.datas,
                strip=False,
