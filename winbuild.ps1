@@ -99,7 +99,7 @@ Write-Host "Installing pyinstaller"
 Write-Host "==========================================="
 
 & pip install git+https://github.com/tlecomte/pefile.git@tlecomte-remove-past
-& pip install -U git+https://github.com/pyinstaller/pyinstaller.git@develop
+& pip install -U pyinstaller
 
 Write-Host ""
 Write-Host "==========================================="
