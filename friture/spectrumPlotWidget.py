@@ -357,11 +357,11 @@ class QuadsItem:
         n = x.shape[0]
 
         # 4 vertices per quad * (3 coordinates + 3 color coordinates)
-        self.vertices_data = zeros((n, 4, 6), dtype=np.float32)
-        self.vertices_data[:, 0, :] = np.dstack((x,     y + h, 0*x, r, g, b))
-        self.vertices_data[:, 1, :] = np.dstack((x + w, y + h, 0*x, r, g, b))
-        self.vertices_data[:, 2, :] = np.dstack((x + w, y,     0*x, r, g, b))
-        self.vertices_data[:, 3, :] = np.dstack((x,     y,     0*x, r, g, b))
+        self.vertices_data = zeros((n*4, 6), dtype=np.float32)
+        self.vertices_data[0::4, :] = np.dstack((x,     y + h, 0*x, r, g, b))
+        self.vertices_data[1::4, :] = np.dstack((x + w, y + h, 0*x, r, g, b))
+        self.vertices_data[2::4, :] = np.dstack((x + w, y,     0*x, r, g, b))
+        self.vertices_data[3::4, :] = np.dstack((x,     y,     0*x, r, g, b))
 
     def transformUpdate(self):
         self.need_transform = True
@@ -437,7 +437,7 @@ class QuadsItem:
                 color_offset  = c_void_p(3 * sizeof(c_float))
                 GL.glVertexAttribPointer(0, 3, GL.GL_FLOAT, GL.GL_FALSE, stride, vertex_offset)
                 GL.glVertexAttribPointer(1, 3, GL.GL_FLOAT, GL.GL_FALSE, stride, color_offset)
-                GL.glDrawArrays(GL.GL_QUADS, 0, self.vertices_data.size)
+                GL.glDrawArrays(GL.GL_QUADS, 0, self.vertices_data.shape[0])
                 GL.glDisableVertexAttribArray(0)
                 GL.glDisableVertexAttribArray(1)
             finally:

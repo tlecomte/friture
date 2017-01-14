@@ -361,7 +361,7 @@ class GlCanvasWidget(QtWidgets.QOpenGLWidget):
                 color_offset  = c_void_p(3 * sizeof(c_float))
                 GL.glVertexAttribPointer(0, 3, GL.GL_FLOAT, GL.GL_FALSE, stride, vertex_offset)
                 GL.glVertexAttribPointer(1, 3, GL.GL_FLOAT, GL.GL_FALSE, stride, color_offset)
-                GL.glDrawArrays(GL.GL_QUADS, 0, self.background_data.size)
+                GL.glDrawArrays(GL.GL_QUADS, 0, self.background_data.shape[0])
                 GL.glDisableVertexAttribArray(0)
                 GL.glDisableVertexAttribArray(1)
             finally:
@@ -433,7 +433,7 @@ class GlCanvasWidget(QtWidgets.QOpenGLWidget):
                 color_offset  = c_void_p(3 * sizeof(c_float))
                 GL.glVertexAttribPointer(0, 3, GL.GL_FLOAT, GL.GL_FALSE, stride, vertex_offset)
                 GL.glVertexAttribPointer(1, 3, GL.GL_FLOAT, GL.GL_FALSE, stride, color_offset)
-                GL.glDrawArrays(GL.GL_LINES, 0, self.grid_data.size)
+                GL.glDrawArrays(GL.GL_LINES, 0, self.grid_data.shape[0])
                 GL.glDisableVertexAttribArray(0)
                 GL.glDisableVertexAttribArray(1)
             finally:
@@ -467,7 +467,7 @@ class GlCanvasWidget(QtWidgets.QOpenGLWidget):
                 color_offset  = c_void_p(3 * sizeof(c_float))
                 GL.glVertexAttribPointer(0, 3, GL.GL_FLOAT, GL.GL_FALSE, stride, vertex_offset)
                 GL.glVertexAttribPointer(1, 3, GL.GL_FLOAT, GL.GL_FALSE, stride, color_offset)
-                GL.glDrawArrays(GL.GL_LINE_STRIP, 0, self.border_data.size)
+                GL.glDrawArrays(GL.GL_LINE_STRIP, 0, self.border_data.shape[0])
                 GL.glDisableVertexAttribArray(0)
                 GL.glDisableVertexAttribArray(1)
             finally:
@@ -501,7 +501,7 @@ class GlCanvasWidget(QtWidgets.QOpenGLWidget):
                     color_offset  = c_void_p(3 * sizeof(c_float))
                     GL.glVertexAttribPointer(0, 3, GL.GL_FLOAT, GL.GL_FALSE, stride, vertex_offset)
                     GL.glVertexAttribPointer(1, 3, GL.GL_FLOAT, GL.GL_FALSE, stride, color_offset)
-                    GL.glDrawArrays(GL.GL_LINES, 0, self.ruler_data.size)
+                    GL.glDrawArrays(GL.GL_LINES, 0, self.ruler_data.shape[0])
                     GL.glDisableVertexAttribArray(0)
                     GL.glDisableVertexAttribArray(1)
                 finally:

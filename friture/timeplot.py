@@ -60,8 +60,8 @@ class CurveItem:
                 g = self.color().green() / 255. * Ones
                 b = self.color().blue() / 255. * Ones
 
-                self.vertices_data[:, 0, 2:] = np.dstack((0*r, r, g, b))
-                self.vertices_data[:, 1, 2:] = np.dstack((0*r, r, g, b))
+                self.vertices_data[0::2, 2:] = np.dstack((0*r, r, g, b))
+                self.vertices_data[1::2, 2:] = np.dstack((0*r, r, g, b))
 
     def color(self):
         return self.__color
@@ -81,9 +81,9 @@ class CurveItem:
             b = self.color().blue() / 255. * Ones
 
             # 2 vertices per segment * (3 coordinates + 3 color coordinates)
-            self.vertices_data = np.zeros((n, 2, 6), dtype=np.float32)
-            self.vertices_data[:, 0, 2:] = np.dstack((0*r, r, g, b))
-            self.vertices_data[:, 1, 2:] = np.dstack((0*r, r, g, b))
+            self.vertices_data = np.zeros((n*2, 6), dtype=np.float32)
+            self.vertices_data[0::2, 2:] = np.dstack((0*r, r, g, b))
+            self.vertices_data[1::2, 2:] = np.dstack((0*r, r, g, b))
 
     def setTitle(self, title):
         self.__title = title
@@ -95,8 +95,8 @@ class CurveItem:
         x = xMap.toScreen(self.x)
         y = yMap.toScreen(self.y)
 
-        self.vertices_data[:, 0, :2] = np.dstack((x[:-1], y[:-1]))
-        self.vertices_data[:, 1, :2] = np.dstack((x[1:], y[1:]))
+        self.vertices_data[0::2, :2] = np.dstack((x[:-1], y[:-1]))
+        self.vertices_data[1::2, :2] = np.dstack((x[1:], y[1:]))
 
         if self.vertices_data.size == 0:
             return
@@ -115,7 +115,7 @@ class CurveItem:
                 color_offset  = c_void_p(3 * sizeof(c_float))
                 GL.glVertexAttribPointer(0, 3, GL.GL_FLOAT, GL.GL_FALSE, stride, vertex_offset)
                 GL.glVertexAttribPointer(1, 3, GL.GL_FLOAT, GL.GL_FALSE, stride, color_offset)
-                GL.glDrawArrays(GL.GL_LINES, 0, self.vertices_data.size)
+                GL.glDrawArrays(GL.GL_LINES, 0, self.vertices_data.shape[0])
                 GL.glDisableVertexAttribArray(0)
                 GL.glDisableVertexAttribArray(1)
             finally:
