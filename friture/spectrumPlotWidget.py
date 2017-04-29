@@ -73,7 +73,7 @@ def tree_rebin(y, ns, N):
     for i in range(len(ns) - 1):
         y3 = y[ns[i]:ns[i + 1]]
         d = 2 ** i
-        l = len(y3) / d
+        l = len(y3) // d
         y3.shape = (l, d)
 
         # Note: the FFT spectrum is mostly used to identify frequency content
@@ -392,7 +392,7 @@ class QuadsItem:
                 self.n = [0] + n
                 self.N = 0
                 for i in range(len(self.n) - 1):
-                    self.N += (self.n[i + 1] - self.n[i]) / 2 ** i
+                    self.N += (self.n[i + 1] - self.n[i]) // 2 ** i
 
             self.need_transform = False
 
