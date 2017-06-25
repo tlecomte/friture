@@ -65,6 +65,8 @@ class AudioBackend(QtCore.QObject):
         self.first_channel = None
         self.second_channel = None
 
+        self.stream = None
+
         # we will try to open all the input devices until one
         # works, starting by the default input device
         for device in self.input_devices:
@@ -104,8 +106,13 @@ class AudioBackend(QtCore.QObject):
         input_devices = self.get_input_devices()
 
         raw_devices = sounddevice.query_devices()
-        default_input_device = sounddevice.query_devices(kind='input')
-        default_input_device['index'] = raw_devices.index(default_input_device)
+
+        try:
+            default_input_device = sounddevice.query_devices(kind='input')
+            default_input_device['index'] = raw_devices.index(default_input_device)
+        except sounddevice.PortAudioError as exception:
+            self.logger.push("Failed to query the default input device: %s" % (exception))
+            default_input_device = None
 
         devices_list = []
         for device in input_devices:
@@ -172,7 +179,19 @@ class AudioBackend(QtCore.QObject):
     def get_input_devices(self):
         devices = sounddevice.query_devices()
 
-        default_input_device = sounddevice.query_devices(kind='input')
+        # early exit if there is no input device. Otherwise query_devices(kind='input') fails
+        input_devices = [device for device in devices if device['max_input_channels'] > 0]
+
+        print(input_devices)
+
+        if len(input_devices) == 0:
+            return []
+
+        try:
+            default_input_device = sounddevice.query_devices(kind='input')
+        except sounddevice.PortAudioError as exception:
+            self.logger.push("Failed to query the default input device: %s" % (exception))
+            default_input_device = None
 
         input_devices = []
         if default_input_device is not None:
@@ -398,7 +417,9 @@ class AudioBackend(QtCore.QObject):
             return 0
 
     def pause(self):
-        self.stream.stop()
+        if self.stream != None:
+            self.stream.stop()
 
     def restart(self):
-        self.stream.start()
+        if self.stream != None:
+            self.stream.start()

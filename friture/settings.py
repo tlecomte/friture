@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
+import sys
 from PyQt5 import QtCore, QtWidgets
 from friture.ui_settings import Ui_Settings_Dialog
 
@@ -24,7 +25,7 @@ no_input_device_title = "No audio input device found"
 
 no_input_device_message = """No audio input device has been found.
 
-Please check your audio configuration.
+Friture needs at least one input device. Please check your audio configuration.
 
 Friture will now exit.
 """
@@ -48,6 +49,7 @@ class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
             # no audio input device: display a message and exit
             QtWidgets.QMessageBox.critical(self, no_input_device_title, no_input_device_message)
             QtCore.QTimer.singleShot(0, self.exitOnInit)
+            sys.exit(1)
             return
 
         for device in devices:
