@@ -11,8 +11,26 @@
 *.db
 *.cpp
 *.cprof
+*.trace
+MANIFEST
+autopep8.out.txt
+
 build/*
 dist/*
 doc/_build/*
+doc/Makefile
+doc/make.bat
 env/*
 buildenv/*
+venv/*
+tools/*
+friture.egg-info
+
+##################
+# IDE files
+##################
+*.pydevproject
+.project
+.ropeproject
+.spyderproject
+Notepad++
