@@ -182,8 +182,6 @@ class AudioBackend(QtCore.QObject):
         # early exit if there is no input device. Otherwise query_devices(kind='input') fails
         input_devices = [device for device in devices if device['max_input_channels'] > 0]
 
-        print(input_devices)
-
         if len(input_devices) == 0:
             return []
 
