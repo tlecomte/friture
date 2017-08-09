@@ -294,7 +294,7 @@ class SpectrumPlotWidget(QtWidgets.QWidget):
             self.peak_decay = y_ones * 20. * log10(PEAK_DECAY_RATE) * 5000
 
         mask1 = (self.peak < y)
-        mask2 = (-mask1)
+        mask2 = (~mask1)
         mask2_a = mask2 * (self.peak_int < 0.2)
         mask2_b = mask2 * (self.peak_int >= 0.2)
 

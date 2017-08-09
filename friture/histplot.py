@@ -118,8 +118,8 @@ class HistogramItem:
         y = (y >= h_bound) * y + (y < h_bound) * h_bound
 
         mask = y + pix_heights >= self.canvas_height - 1
-        y = mask * (self.canvas_height - h_bound - pix_heights) + (-mask) * y
-        ps = mask * 1 + (-mask) * 0
+        y = mask * (self.canvas_height - h_bound - pix_heights) + (~mask) * y
+        ps = mask * 1 + (~mask) * 0
 
         for x1, y2, p, pixmap in zip(x, y, ps, pixmaps):
             painter.drawPixmap(x1, y2, pixmap[p])
@@ -392,7 +392,7 @@ class HistPlot(QtWidgets.QWidget):
             self.peak_decay = y_ones * 20. * log10(PEAK_DECAY_RATE) * 5000
 
         mask1 = (self.peak < y)
-        mask2 = (-mask1)
+        mask2 = (~mask1)
         mask2_a = mask2 * (self.peak_int < 0.2)
         mask2_b = mask2 * (self.peak_int >= 0.2)
 
