@@ -101,9 +101,8 @@ Write-Host "==========================================="
 # install a version of pefile that does not use the past library, which in turn imports too many things
 & pip install git+https://github.com/tlecomte/pefile.git@tlecomte-remove-past
 
-# & pip install -U pyinstaller
 # install a version of pyinstaller that takes pefile from outside
-& pip install -U git+https://github.com/pyinstaller/pyinstaller@41c426f6d7beb13ec3c1428ff68ab7fc9b9d462c
+& pip install -U pyinstaller==3.2
 
 Write-Host ""
 Write-Host "==========================================="
