@@ -230,32 +230,39 @@ class octave_filters():
         self.zfs = octave_filter_bank_decimation_filtic(self.bdec, self.adec, self.boct, self.aoct)
 
         if bandsperoctave == 1:
-            basis = renard.R5
-        elif bandsperoctave == 3:
-            basis = renard.R10
-        elif bandsperoctave == 6:
-            basis = renard.R20
-        elif bandsperoctave == 12:
-            basis = renard.R40
-        elif bandsperoctave == 24:
-            basis = renard.R80
+            # with 1 band per octave, we would need the "R3.33" Renard series, but it does not exist.
+            # However, that is not really a problem, since the numbers simply round up.
+            self.f_nominal = [  "%.1fk"%(f/1000) if f>= 10000
+                                else "%.2fk"%(f/1000) if f>= 1000
+                                else "%d"%(f)
+                                for f in self.fi]
         else:
-            raise Exception("Unknown bandsperoctave: %d" % (bandsperoctave))
+            # with more than 1 band per octave, use the preferred numbers from the Renard series
+            if bandsperoctave == 3:
+                basis = renard.R10
+            elif bandsperoctave == 6:
+                basis = renard.R20
+            elif bandsperoctave == 12:
+                basis = renard.R40
+            elif bandsperoctave == 24:
+                basis = renard.R80
+            else:
+                raise Exception("Unknown bandsperoctave: %d" % (bandsperoctave))
 
-        # search the index of 1 kHz, the reference
-        i = where(self.fi == 1000.)[0][0]
+            # search the index of 1 kHz, the reference
+            i = where(self.fi == 1000.)[0][0]
 
-        # build the frequency scale
-        self.f_nominal = []
+            # build the frequency scale
+            self.f_nominal = []
 
-        k = 0
-        while len(self.f_nominal) < len(self.fi) - i:
-            self.f_nominal += ["{0:.{width}f}k".format(10 ** k * f, width=2 - k) for f in basis]
-            k += 1
-        self.f_nominal = self.f_nominal[:len(self.fi) - i]
+            k = 0
+            while len(self.f_nominal) < len(self.fi) - i:
+                self.f_nominal += ["{0:.{width}f}k".format(10 ** k * f, width=2 - k) for f in basis]
+                k += 1
+            self.f_nominal = self.f_nominal[:len(self.fi) - i]
 
-        k = 0
-        while len(self.f_nominal) < len(self.fi):
-            self.f_nominal = ["%d" % (10 ** (2 - k) * f) for f in basis] + self.f_nominal
-            k += 1
-        self.f_nominal = self.f_nominal[-len(self.fi):]
+            k = 0
+            while len(self.f_nominal) < len(self.fi):
+                self.f_nominal = ["%d" % (10 ** (2 - k) * f) for f in basis] + self.f_nominal
+                k += 1
+            self.f_nominal = self.f_nominal[-len(self.fi):]
