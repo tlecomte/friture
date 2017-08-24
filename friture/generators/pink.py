@@ -42,8 +42,8 @@ def pinknoise(n, rvs=standard_normal):
 class PinkGenerator:
     name = "Pink noise"
 
-    def __init__(self, parent, logger):
-        self.settings = SettingsWidget(parent, logger)
+    def __init__(self, parent):
+        self.settings = SettingsWidget(parent)
 
     def settingsWidget(self):
         return self.settings
@@ -55,10 +55,8 @@ class PinkGenerator:
 
 class SettingsWidget(QtWidgets.QWidget):
 
-    def __init__(self, parent, logger):
+    def __init__(self, parent):
         super().__init__(parent)
-
-        self.logger = logger
 
     def saveState(self, settings):
         return

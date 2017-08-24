@@ -19,7 +19,6 @@
 
 from PyQt5 import QtWidgets
 from numpy import log10, array, arange, where
-from friture.logger import PrintLogger
 from friture.histplot import HistPlot
 from friture.octavespectrum_settings import (OctaveSpectrum_Settings_Dialog,  # settings dialog
                                              DEFAULT_SPEC_MIN,
@@ -44,16 +43,15 @@ SMOOTH_DISPLAY_TIMER_PERIOD_MS = 25
 
 class OctaveSpectrum_Widget(QtWidgets.QWidget):
 
-    def __init__(self, parent, logger=PrintLogger()):
+    def __init__(self, parent):
         super().__init__(parent)
 
-        self.logger = logger
         self.audiobuffer = None
 
         self.setObjectName("Spectrum_Widget")
         self.gridLayout = QtWidgets.QGridLayout(self)
         self.gridLayout.setObjectName("gridLayout")
-        self.PlotZoneSpect = HistPlot(self, self.logger)
+        self.PlotZoneSpect = HistPlot(self)
         self.PlotZoneSpect.setObjectName("PlotZoneSpect")
         self.gridLayout.addWidget(self.PlotZoneSpect, 0, 0, 1, 1)
 
@@ -72,7 +70,7 @@ class OctaveSpectrum_Widget(QtWidgets.QWidget):
         self.setresponsetime(self.response_time)
 
         # initialize the settings dialog
-        self.settings_dialog = OctaveSpectrum_Settings_Dialog(self, self.logger)
+        self.settings_dialog = OctaveSpectrum_Settings_Dialog(self)
 
     # method
     def set_buffer(self, buffer):

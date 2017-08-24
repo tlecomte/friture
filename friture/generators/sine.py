@@ -27,10 +27,10 @@ class SineGenerator:
 
     name = "Sine"
 
-    def __init__(self, parent, logger):
+    def __init__(self, parent):
         self.f = 440.
 
-        self.settings = SettingsWidget(parent, logger)
+        self.settings = SettingsWidget(parent)
         self.settings.spinBox_sine_frequency.valueChanged.connect(self.setf)
 
         self.offset = 0
@@ -56,10 +56,8 @@ class SineGenerator:
 
 class SettingsWidget(QtWidgets.QWidget):
 
-    def __init__(self, parent, logger):
+    def __init__(self, parent):
         super().__init__(parent)
-
-        self.logger = logger
 
         self.spinBox_sine_frequency = QtWidgets.QDoubleSpinBox(self)
         self.spinBox_sine_frequency.setKeyboardTracking(False)

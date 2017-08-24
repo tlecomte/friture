@@ -21,12 +21,12 @@ from PyQt5 import QtGui, QtCore, QtWidgets
 import numpy as np
 import sounddevice
 from friture.audiobackend import SAMPLING_RATE
-from friture.logger import PrintLogger
 from friture.generators.sweep import SweepGenerator
 from friture.generators.sine import SineGenerator
 from friture.generators.burst import BurstGenerator
 from friture.generators.pink import PinkGenerator
 from friture.generators.white import WhiteGenerator
+from friture.logger import Logger
 
 SMOOTH_DISPLAY_TIMER_PERIOD_MS = 25
 FRAMES_PER_BUFFER = 2 * 1024
@@ -40,10 +40,9 @@ class Generator_Widget(QtWidgets.QWidget):
 
     stream_stop_ramp_finished = QtCore.pyqtSignal()
 
-    def __init__(self, parent, audiobackend, logger=PrintLogger()):
+    def __init__(self, parent, audiobackend):
         super().__init__(parent)
 
-        self.logger = logger
         self.audiobuffer = None
 
         self.setObjectName("Generator_Widget")
@@ -51,11 +50,11 @@ class Generator_Widget(QtWidgets.QWidget):
         self.grid_layout.setObjectName("grid_layout")
 
         self.generators = []
-        self.generators.append(SineGenerator(self, logger))
-        self.generators.append(WhiteGenerator(self, logger))
-        self.generators.append(PinkGenerator(self, logger))
-        self.generators.append(SweepGenerator(self, logger))
-        self.generators.append(BurstGenerator(self, logger))
+        self.generators.append(SineGenerator(self))
+        self.generators.append(WhiteGenerator(self))
+        self.generators.append(PinkGenerator(self))
+        self.generators.append(SweepGenerator(self))
+        self.generators.append(BurstGenerator(self))
 
         self.combobox_generator_kind = QtWidgets.QComboBox(self)
         self.combobox_generator_kind.setObjectName("combobox_generator_kind")
@@ -83,16 +82,16 @@ class Generator_Widget(QtWidgets.QWidget):
         # we will try to open all the output devices until one
         # works, starting by the default input device
         for device in self.audiobackend.output_devices:
-            self.logger.push("Opening the stream for device: "+ device['name'])
+            Logger().push("Opening the stream for device: "+ device['name'])
             try:
                 self.stream = self.audiobackend.open_output_stream(device, self.audio_callback)
                 self.stream.start()
                 self.stream.stop()
                 self.device = device
-                self.logger.push("Success")
+                Logger().push("Stream opened successfully")
                 break
             except Exception as exception:
-                self.logger.push("Fail: " + str(exception))
+                Logger().push("Failed to open stream: " + str(exception))
 
         self.start_stop_button = QtWidgets.QPushButton(self)
 
@@ -123,7 +122,7 @@ class Generator_Widget(QtWidgets.QWidget):
             device_index = self.audiobackend.output_devices.index(self.device)
         else:
             device_index = None
-        self.settings_dialog = Generator_Settings_Dialog(self, self.logger, devices, device_index)
+        self.settings_dialog = Generator_Settings_Dialog(self, devices, device_index)
 
         self.settings_dialog.combobox_output_device.currentIndexChanged.connect(self.device_changed)
 
@@ -149,13 +148,13 @@ class Generator_Widget(QtWidgets.QWidget):
 
         error_message = ""
 
-        self.logger.push("Trying to write to output device " + device['name'])
+        Logger().push("Trying to write to output device " + device['name'])
 
         # first see if the format is supported by PortAudio
         try:
             success = self.audiobackend.is_output_format_supported(device, np.int16)
         except Exception as exception:
-            self.logger.push("Format is not supported: " + str(exception))
+            Logger().push("Format is not supported: " + str(exception))
             success = False
 
         if success:
@@ -167,11 +166,11 @@ class Generator_Widget(QtWidgets.QWidget):
                     self.stream.stop()
                 success = True
             except OSError as error:
-                self.logger.push("Fail: " + str(error))
+                Logger().push("Fail: " + str(error))
                 success = False
 
         if success:
-            self.logger.push("Success")
+            Logger().push("Success")
             previous_stream.stop()
         else:
             if self.stream is not None:
@@ -311,10 +310,8 @@ class Generator_Widget(QtWidgets.QWidget):
 
 class Generator_Settings_Dialog(QtWidgets.QDialog):
 
-    def __init__(self, parent, logger, devices, device_index):
+    def __init__(self, parent, devices, device_index):
         super().__init__(parent)
-
-        self.logger = logger
 
         self.setWindowTitle("Generator settings")
 

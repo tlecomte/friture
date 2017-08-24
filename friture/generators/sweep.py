@@ -28,7 +28,7 @@ DEFAULT_SWEEP_PERIOD_S = 1.
 class SweepGenerator:
     name = "Sweep"
 
-    def __init__(self, parent, logger):
+    def __init__(self, parent):
         self.f1 = 20.
         self.f2 = 22000.
         self.Tuser = 1.
@@ -36,7 +36,7 @@ class SweepGenerator:
         self.timeoffset = 0.
         self.nextParams = None
 
-        self.settings = SettingsWidget(parent, logger)
+        self.settings = SettingsWidget(parent)
         self.settings.spinBox_sweep_startfrequency.valueChanged.connect(self.setf1)
         self.settings.spinBox_sweep_stopfrequency.valueChanged.connect(self.setf2)
         self.settings.spinBox_sweep_period.valueChanged.connect(self.setT)
@@ -112,10 +112,8 @@ class SweepGenerator:
 
 class SettingsWidget(QtWidgets.QWidget):
 
-    def __init__(self, parent, logger):
+    def __init__(self, parent):
         super().__init__(parent)
-
-        self.logger = logger
 
         self.spinBox_sweep_startfrequency = QtWidgets.QSpinBox(self)
         self.spinBox_sweep_startfrequency.setKeyboardTracking(False)

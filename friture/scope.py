@@ -21,7 +21,6 @@ from PyQt5 import QtWidgets
 from numpy import log10, where, sign, arange, zeros
 from friture.timeplot import TimePlot
 from friture.audiobackend import SAMPLING_RATE
-from friture.logger import PrintLogger
 
 SMOOTH_DISPLAY_TIMER_PERIOD_MS = 25
 DEFAULT_TIMERANGE = 2 * SMOOTH_DISPLAY_TIMER_PERIOD_MS
@@ -29,20 +28,19 @@ DEFAULT_TIMERANGE = 2 * SMOOTH_DISPLAY_TIMER_PERIOD_MS
 
 class Scope_Widget(QtWidgets.QWidget):
 
-    def __init__(self, parent, logger=PrintLogger()):
+    def __init__(self, parent):
         super().__init__(parent)
 
         self.audiobuffer = None
-        self.logger = logger
 
         self.setObjectName("Scope_Widget")
         self.gridLayout = QtWidgets.QGridLayout(self)
         self.gridLayout.setObjectName("gridLayout")
-        self.PlotZoneUp = TimePlot(self, self.logger)
+        self.PlotZoneUp = TimePlot(self)
         self.PlotZoneUp.setObjectName("PlotZoneUp")
         self.gridLayout.addWidget(self.PlotZoneUp, 0, 0, 1, 1)
 
-        self.settings_dialog = Scope_Settings_Dialog(self, self.logger)
+        self.settings_dialog = Scope_Settings_Dialog(self)
 
         self.timerange = DEFAULT_TIMERANGE
 
@@ -136,10 +134,8 @@ class Scope_Widget(QtWidgets.QWidget):
 
 class Scope_Settings_Dialog(QtWidgets.QDialog):
 
-    def __init__(self, parent, logger):
+    def __init__(self, parent):
         super().__init__(parent)
-
-        self.logger = logger
 
         self.setWindowTitle("Scope settings")
 

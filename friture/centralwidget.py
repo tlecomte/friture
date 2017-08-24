@@ -32,12 +32,10 @@ from friture.defaults import DEFAULT_CENTRAL_WIDGET
 
 class CentralWidget(QtWidgets.QWidget):
 
-    def __init__(self, parent, logger, name, widget_type=0):
+    def __init__(self, parent, name, widget_type=0):
         super().__init__(parent)
 
         self.setObjectName(name)
-
-        self.logger = logger
 
         self.control_bar = ControlBar(self)
 
@@ -65,23 +63,23 @@ class CentralWidget(QtWidgets.QWidget):
         self.type = item
 
         if item is 0:
-            self.audiowidget = Levels_Widget(self, self.logger)
+            self.audiowidget = Levels_Widget(self)
         elif item is 1:
-            self.audiowidget = Scope_Widget(self, self.logger)
+            self.audiowidget = Scope_Widget(self)
         elif item is 2:
-            self.audiowidget = Spectrum_Widget(self, self.logger)
+            self.audiowidget = Spectrum_Widget(self)
         elif item is 3:
-            self.audiowidget = Spectrogram_Widget(self, self.parent().parent().audiobackend, self.logger)
+            self.audiowidget = Spectrogram_Widget(self, self.parent().parent().audiobackend)
         elif item is 4:
-            self.audiowidget = OctaveSpectrum_Widget(self, self.logger)
+            self.audiowidget = OctaveSpectrum_Widget(self)
         elif item is 5:
-            self.audiowidget = Generator_Widget(self, self.parent().parent().audiobackend, self.logger)
+            self.audiowidget = Generator_Widget(self, self.parent().parent().audiobackend)
         elif item is 6:
-            self.audiowidget = Delay_Estimator_Widget(self, self.logger)
+            self.audiowidget = Delay_Estimator_Widget(self)
         elif item is 7:
-            self.audiowidget = LongLevelWidget(self, self.logger)
+            self.audiowidget = LongLevelWidget(self)
         else:
-            self.audiowidget = Levels_Widget(self, self.logger)
+            self.audiowidget = Levels_Widget(self)
 
         self.audiowidget.set_buffer(self.parent().parent().audiobuffer)
         self.parent().parent().audiobuffer.new_data_available.connect(self.audiowidget.handle_new_data)

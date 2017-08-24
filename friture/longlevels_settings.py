@@ -30,10 +30,8 @@ DEFAULT_LEVEL_MAX = -20
 
 class LongLevels_Settings_Dialog(QtWidgets.QDialog):
 
-    def __init__(self, parent, logger):
+    def __init__(self, parent):
         super().__init__(parent)
-
-        self.logger = logger
 
         self.setWindowTitle("Long levels settings")
 

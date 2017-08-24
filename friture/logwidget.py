@@ -18,14 +18,12 @@
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
 from PyQt5 import QtCore, QtWidgets
-
+from friture.logger import Logger
 
 class LogWidget(QtWidgets.QWidget):
 
-    def __init__(self, parent, logger):
+    def __init__(self, parent):
         super().__init__(parent)
-
-        self.logger = logger
 
         self.setObjectName("tab_log")
 
@@ -53,13 +51,13 @@ class LogWidget(QtWidgets.QWidget):
         self.tab_log_layout = QtWidgets.QGridLayout(self)
         self.tab_log_layout.addWidget(self.log_scrollarea)
 
-        self.logger.logChanged.connect(self.log_changed)
+        Logger().logChanged.connect(self.log_changed)
         self.log_scrollarea.verticalScrollBar().rangeChanged.connect(self.log_scroll_range_changed)
 
     # slot
     # update the log widget with the new log content
     def log_changed(self):
-        self.LabelLog.setText(self.logger.text())
+        self.LabelLog.setText(Logger().text())
 
     # slot
     # scroll the log widget so that the last line is visible

@@ -24,8 +24,8 @@ from PyQt5 import QtWidgets
 class WhiteGenerator:
     name = "White noise"
 
-    def __init__(self, parent, logger):
-        self.settings = SettingsWidget(parent, logger)
+    def __init__(self, parent):
+        self.settings = SettingsWidget(parent)
 
     def settingsWidget(self):
         return self.settings
@@ -37,10 +37,8 @@ class WhiteGenerator:
 
 class SettingsWidget(QtWidgets.QWidget):
 
-    def __init__(self, parent, logger):
+    def __init__(self, parent):
         super().__init__(parent)
-
-        self.logger = logger
 
     def saveState(self, settings):
         return

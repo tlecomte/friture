@@ -31,7 +31,6 @@ from friture.spectrum_settings import (Spectrum_Settings_Dialog,  # settings dia
                                        DEFAULT_RESPONSE_TIME,
                                        DEFAULT_SHOW_FREQ_LABELS)
 
-from friture.logger import PrintLogger
 from friture.audiobackend import SAMPLING_RATE
 from friture.spectrumPlotWidget import SpectrumPlotWidget
 from friture.exp_smoothing_conv import pyx_exp_smoothed_value_numpy
@@ -39,21 +38,20 @@ from friture.exp_smoothing_conv import pyx_exp_smoothed_value_numpy
 
 class Spectrum_Widget(QtWidgets.QWidget):
 
-    def __init__(self, parent, logger=PrintLogger()):
+    def __init__(self, parent):
         super().__init__(parent)
 
-        self.logger = logger
         self.audiobuffer = None
 
         self.setObjectName("Spectrum_Widget")
         self.gridLayout = QtWidgets.QGridLayout(self)
         self.gridLayout.setObjectName("gridLayout")
-        self.PlotZoneSpect = SpectrumPlotWidget(self, self.logger)
+        self.PlotZoneSpect = SpectrumPlotWidget(self)
         self.PlotZoneSpect.setObjectName("PlotZoneSpect")
         self.gridLayout.addWidget(self.PlotZoneSpect, 0, 0, 1, 1)
 
         # initialize the class instance that will do the fft
-        self.proc = audioproc(self.logger)
+        self.proc = audioproc()
 
         self.maxfreq = DEFAULT_MAXFREQ
         self.proc.set_maxfreq(self.maxfreq)
@@ -86,7 +84,7 @@ class Spectrum_Widget(QtWidgets.QWidget):
         self.PlotZoneSpect.setShowFreqLabel(DEFAULT_SHOW_FREQ_LABELS)
 
         # initialize the settings dialog
-        self.settings_dialog = Spectrum_Settings_Dialog(self, self.logger)
+        self.settings_dialog = Spectrum_Settings_Dialog(self)
 
     # method
     def set_buffer(self, buffer):

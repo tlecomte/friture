@@ -92,7 +92,7 @@ def tree_rebin(y, ns, N):
 
 class SpectrumPlotWidget(QtWidgets.QWidget):
 
-    def __init__(self, parent, logger=None):
+    def __init__(self, parent):
         super(SpectrumPlotWidget, self).__init__(parent)
 
         self.x1 = array([0.1, 0.5, 1.])

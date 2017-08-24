@@ -20,16 +20,15 @@
 # FIXME problem when self.offset overflows the MAXINT limit !
 
 from numpy import zeros
-
+from friture.logger import Logger
 
 class RingBuffer():
 
-    def __init__(self, logger):
+    def __init__(self):
         # buffer length is dynamic based on the needs
         self.buffer_length = 10000
         self.buffer = zeros((1, 2 * self.buffer_length))
         self.offset = 0
-        self.logger = logger
 
     def push(self, floatdata):
         # update the circular buffer
@@ -98,11 +97,7 @@ class RingBuffer():
             old_length = self.buffer_length
             new_length = int(1.5 * length)
 
-            message = "Ringbuffer: growing buffer for length %d" % (new_length)
-            if self.logger is not None:
-                self.logger.push(message)
-            else:
-                print(message)
+            Logger().push("Ringbuffer: growing buffer for length %d" % (new_length))
 
             # create new buffer
             newbuffer = zeros((self.buffer.shape[0], 2 * new_length))

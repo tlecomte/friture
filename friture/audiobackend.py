@@ -21,6 +21,8 @@ from PyQt5 import QtCore
 import sounddevice
 from numpy import ndarray, int16, fromstring, vstack, iinfo, float64
 
+from friture.logger import Logger
+
 # the sample rate below should be dynamic, taken from PyAudio/PortAudio
 SAMPLING_RATE = 48000
 FRAMES_PER_BUFFER = 512
@@ -48,14 +50,12 @@ class AudioBackend(QtCore.QObject):
 
         self.new_data_available_from_callback.emit(in_data, frame_count, input_time, status.input_overflow)
 
-    def __init__(self, logger):
+    def __init__(self):
         QtCore.QObject.__init__(self)
-
-        self.logger = logger
 
         self.duo_input = False
 
-        self.logger.push("Initializing audio backend")
+        Logger().push("Initializing audio backend")
 
         # look for devices
         self.input_devices = self.get_input_devices()
@@ -74,10 +74,10 @@ class AudioBackend(QtCore.QObject):
                 self.stream = self.open_stream(device)
                 self.stream.start()
                 self.device = device
-                self.logger.push("Success")
+                Logger().push("Success")
                 break
             except Exception as exception:
-                self.logger.push("Failed to open stream: " + str(exception))
+                Logger().push("Failed to open stream: " + str(exception))
 
         if self.device is not None:
             self.first_channel = 0
@@ -111,7 +111,7 @@ class AudioBackend(QtCore.QObject):
             default_input_device = sounddevice.query_devices(kind='input')
             default_input_device['index'] = raw_devices.index(default_input_device)
         except sounddevice.PortAudioError as exception:
-            self.logger.push("Failed to query the default input device: %s" % (exception))
+            Logger().push("Failed to query the default input device: %s" % (exception))
             default_input_device = None
 
         devices_list = []
@@ -188,7 +188,7 @@ class AudioBackend(QtCore.QObject):
         try:
             default_input_device = sounddevice.query_devices(kind='input')
         except sounddevice.PortAudioError as exception:
-            self.logger.push("Failed to query the default input device: %s" % (exception))
+            Logger().push("Failed to query the default input device: %s" % (exception))
             default_input_device = None
 
         input_devices = []
@@ -240,7 +240,7 @@ class AudioBackend(QtCore.QObject):
         previous_stream = self.stream
         previous_device = self.device
 
-        self.logger.push("Trying to open input device #%d" % (index))
+        Logger().push("Trying to open input device #%d" % (index))
 
         try:
             self.stream = self.open_stream(device)
@@ -248,7 +248,7 @@ class AudioBackend(QtCore.QObject):
             self.stream.start()
             success = True
         except Exception as exception:
-            self.logger.push("Fail: " + str(exception))
+            Logger().push("Fail: " + str(exception))
             success = False
             if self.stream is not None:
                 self.stream.stop()
@@ -257,7 +257,7 @@ class AudioBackend(QtCore.QObject):
             self.device = previous_device
 
         if success:
-            self.logger.push("Success")
+            Logger().push("Success")
             previous_stream.stop()
 
             self.first_channel = 0
@@ -283,7 +283,7 @@ class AudioBackend(QtCore.QObject):
 
     # method
     def open_stream(self, device):
-        self.logger.push("Opening the stream for device: " + device['name'])
+        Logger().push("Opening the stream for device: " + device['name'])
 
         # by default we open the device stream with all the channels
         # (interleaved in the data buffer)
@@ -296,7 +296,7 @@ class AudioBackend(QtCore.QObject):
             callback=self.callback)
 
         lat_ms = 1000 * stream.latency
-        self.logger.push("Device claims %d ms latency" % (lat_ms))
+        Logger().push("Device claims %d ms latency" % (lat_ms))
 
         return stream
 
@@ -324,7 +324,7 @@ class AudioBackend(QtCore.QObject):
 
             success = True
         except Exception as exception:
-            self.logger.push("Format is not supported: " + str(exception))
+            Logger().push("Format is not supported: " + str(exception))
             success = False
 
         return success

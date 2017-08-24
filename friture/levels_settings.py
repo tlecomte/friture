@@ -22,10 +22,8 @@ from PyQt5 import QtWidgets
 
 class Levels_Settings_Dialog(QtWidgets.QDialog):
 
-    def __init__(self, parent, logger):
+    def __init__(self, parent):
         super().__init__(parent)
-
-        self.logger = logger
 
         self.setWindowTitle("Levels settings")
 

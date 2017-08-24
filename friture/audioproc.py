@@ -20,6 +20,7 @@
 from numpy import linspace, log2, floor, log10, cos, arange, pi
 from numpy.fft import rfft
 from friture.audiobackend import SAMPLING_RATE
+from friture.logger import Logger
 
 try:
     from friture.norm_square import pyx_norm_square
@@ -34,7 +35,7 @@ except ImportError as error:
 
 class audioproc():
 
-    def __init__(self, logger):
+    def __init__(self):
         self.freq = linspace(0, SAMPLING_RATE / 2, 10)
         self.A = 0. * self.freq
         self.B = 0. * self.freq
@@ -45,9 +46,6 @@ class audioproc():
         self.size_sq = 1.
 
         self.fft_size = 10
-
-        # store the logger instance
-        self.logger = logger
 
     def analyzelive(self, samples):
         samples = self.decimate(samples)
@@ -96,7 +94,7 @@ class audioproc():
             self.update_window()
             self.update_size()
 
-        self.logger.push("audioproc: will decimate %d times" % self.decimation)
+        Logger().push("audioproc: will decimate %d times" % self.decimation)
 
     def get_freq_scale(self):
         return self.freq
@@ -112,11 +110,11 @@ class audioproc():
         n = arange(0, N)
         # Hann window : better frequency resolution than the rectangular window
         self.window = 0.5 * (1. - cos(2 * pi * n / (N - 1)))
-        self.logger.push("audioproc: updating window")
+        Logger().push("audioproc: updating window")
 
     def update_freq_cache(self):
         if len(self.freq) != self.fft_size / (2 * self.decimation) + 1:
-            self.logger.push("audioproc: updating self.freq cache")
+            Logger().push("audioproc: updating self.freq cache")
             self.freq = linspace(0, SAMPLING_RATE / (2 * self.decimation), self.fft_size / (2 * self.decimation) + 1)
 
             # compute psychoacoustic weighting. See http://en.wikipedia.org/wiki/A-weighting

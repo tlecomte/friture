@@ -30,7 +30,7 @@ from friture.plotting.scaleBar import VerticalScaleBar, HorizontalScaleBar, Colo
 
 class VerticalScaleWidget(QtWidgets.QWidget):
 
-    def __init__(self, parent, transformation, scaleDivision, logger=None):
+    def __init__(self, parent, transformation, scaleDivision):
         super(VerticalScaleWidget, self).__init__()
 
         self.titleWidget = VerticalTitleWidget("Scale Widget Title", self)
@@ -56,7 +56,7 @@ class VerticalScaleWidget(QtWidgets.QWidget):
 
 class HorizontalScaleWidget(QtWidgets.QWidget):
 
-    def __init__(self, parent, transformation, scaleDivision, logger=None):
+    def __init__(self, parent, transformation, scaleDivision):
         super(HorizontalScaleWidget, self).__init__()
 
         self.titleWidget = HorizontalTitleWidget("Scale Widget Title", self)
@@ -82,7 +82,7 @@ class HorizontalScaleWidget(QtWidgets.QWidget):
 
 class ColorScaleWidget(QtWidgets.QWidget):
 
-    def __init__(self, parent, transformation, scaleDivision, logger=None):
+    def __init__(self, parent, transformation, scaleDivision):
         super(ColorScaleWidget, self).__init__()
 
         self.titleWidget = ColorTitleWidget("Scale Widget Title", self)

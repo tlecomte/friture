@@ -25,7 +25,6 @@ from friture.longlevels_settings import (LongLevels_Settings_Dialog,
                                          DEFAULT_LEVEL_MIN,
                                          DEFAULT_LEVEL_MAX)
 from friture.audioproc import audioproc
-from friture.logger import PrintLogger
 from friture.timeplot import TimePlot
 from .filter import decimate
 from friture import generated_filters
@@ -87,16 +86,14 @@ class Subsampler:
 
 class LongLevelWidget(QtWidgets.QWidget):
 
-    def __init__(self, parent=None, logger=PrintLogger()):
+    def __init__(self, parent=None):
         super().__init__(parent)
         self.setObjectName("LongLevels_Widget")
-
-        self.logger = logger
 
         self.setObjectName("Scope_Widget")
         self.gridLayout = QtWidgets.QGridLayout(self)
         self.gridLayout.setObjectName("gridLayout")
-        self.PlotZoneUp = TimePlot(self, self.logger)
+        self.PlotZoneUp = TimePlot(self)
         self.PlotZoneUp.setObjectName("PlotZoneUp")
         self.PlotZoneUp.setverticaltitle("Level (dB FS RMS)")
         self.PlotZoneUp.sethorizontaltitle("Time (min)")
@@ -108,14 +105,13 @@ class LongLevelWidget(QtWidgets.QWidget):
 
         self.gridLayout.addWidget(self.PlotZoneUp, 0, 0, 1, 1)
 
-        self.logger = logger
         self.audiobuffer = None
 
         # initialize the settings dialog
-        self.settings_dialog = LongLevels_Settings_Dialog(self, self.logger)
+        self.settings_dialog = LongLevels_Settings_Dialog(self)
 
         # initialize the class instance that will do the fft
-        self.proc = audioproc(self.logger)
+        self.proc = audioproc()
 
         self.level = None # 1e-30
         self.level_rms = -200.
@@ -146,7 +142,7 @@ class LongLevelWidget(QtWidgets.QWidget):
         self.length_samples = self.length_seconds * self.subsampled_sampling_rate
 
         # ringbuffer for the subsampled data
-        self.ringbuffer = RingBuffer(self.logger)
+        self.ringbuffer = RingBuffer()
 
     # method
     def set_buffer(self, buffer):

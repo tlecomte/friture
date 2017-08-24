@@ -290,11 +290,8 @@ class HistogramPeakBarItem:
 
 class HistPlot(QtWidgets.QWidget):
 
-    def __init__(self, parent, logger):
+    def __init__(self, parent):
         super(HistPlot, self).__init__()
-
-        # store the logger instance
-        self.logger = logger
 
         self.verticalScaleDivision = ScaleDivision(-140, 0, 100)
         self.verticalScaleTransform = CoordinateTransform(-140, 0, 100, 0, 0)

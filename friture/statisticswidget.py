@@ -23,7 +23,7 @@ import psutil  # for CPU usage monitoring
 
 class StatisticsWidget(QtWidgets.QWidget):
 
-    def __init__(self, parent, logger, timer, audiobackend):
+    def __init__(self, parent, timer, audiobackend):
         super().__init__(parent)
 
         self.audiobackend = audiobackend

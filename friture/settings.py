@@ -20,6 +20,7 @@
 import sys
 from PyQt5 import QtCore, QtWidgets
 from friture.ui_settings import Ui_Settings_Dialog
+from friture.logger import Logger
 
 no_input_device_title = "No audio input device found"
 
@@ -33,7 +34,7 @@ Friture will now exit.
 
 class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
 
-    def __init__(self, parent, logger, audiobackend):
+    def __init__(self, parent, audiobackend):
         QtWidgets.QDialog.__init__(self, parent)
         Ui_Settings_Dialog.__init__(self)
 
@@ -41,7 +42,6 @@ class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
         self.setupUi(self)
 
         self.audiobackend = audiobackend
-        self.logger = logger
 
         devices = self.audiobackend.get_readable_devices_list()
 
@@ -151,14 +151,14 @@ class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
         if checked:
             self.groupBox_second.setEnabled(False)
             self.audiobackend.set_single_input()
-            self.logger.push("Switching to single input")
+            Logger().push("Switching to single input")
 
     # slot
     def duo_input_type_selected(self, checked):
         if checked:
             self.groupBox_second.setEnabled(True)
             self.audiobackend.set_duo_input()
-            self.logger.push("Switching to difference between two inputs")
+            Logger().push("Switching to difference between two inputs")
 
     # method
     def saveState(self, settings):

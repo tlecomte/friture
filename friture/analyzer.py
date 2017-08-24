@@ -47,25 +47,22 @@ SLOW_TIMER_PERIOD_MS = 1000
 
 class Friture(QMainWindow, ):
 
-    def __init__(self, logger):
+    def __init__(self):
         QMainWindow.__init__(self)
 
         # exception hook that logs to console, file, and display a message box
         self.errorDialogOpened = False
         sys.excepthook = self.excepthook
 
-        # logger
-        self.logger = logger
-
         # Setup the user interface
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
 
         # Initialize the audio data ring buffer
-        self.audiobuffer = AudioBuffer(self.logger)
+        self.audiobuffer = AudioBuffer()
 
         # Initialize the audio backend
-        self.audiobackend = AudioBackend(self.logger)
+        self.audiobackend = AudioBackend()
 
         # signal containing new data from the audio callback thread, processed as numpy array
         self.audiobackend.new_data_available.connect(self.audiobuffer.handle_new_data)
@@ -78,15 +75,15 @@ class Friture(QMainWindow, ):
         self.slow_timer = QtCore.QTimer()
         self.slow_timer.setInterval(SLOW_TIMER_PERIOD_MS)  # constant timing
 
-        self.about_dialog = About_Dialog(self, self.logger, self.audiobackend, self.slow_timer)
-        self.settings_dialog = Settings_Dialog(self, self.logger, self.audiobackend)
+        self.about_dialog = About_Dialog(self, self.audiobackend, self.slow_timer)
+        self.settings_dialog = Settings_Dialog(self, self.audiobackend)
 
-        self.centralwidget = CentralWidget(self.ui.centralwidget, self.logger, "central_widget", 0)
+        self.centralwidget = CentralWidget(self.ui.centralwidget, "central_widget", 0)
         self.centralLayout = QVBoxLayout(self.ui.centralwidget)
         self.centralLayout.setContentsMargins(0, 0, 0, 0)
         self.centralLayout.addWidget(self.centralwidget)
 
-        self.dockmanager = DockManager(self, self.logger)
+        self.dockmanager = DockManager(self)
 
         # timer ticks
         self.display_timer.timeout.connect(self.centralwidget.canvasUpdate)
@@ -105,7 +102,7 @@ class Friture(QMainWindow, ):
         self.timer_toggle()
         self.slow_timer.start()
 
-        self.logger.push("Init finished, entering the main loop")
+        Logger().push("Init finished, entering the main loop")
 
     # exception hook that logs to console, file, and display a message box
     def excepthook(self, exception_type, exception_value, traceback_object):
@@ -178,14 +175,14 @@ class Friture(QMainWindow, ):
     # slot
     def timer_toggle(self):
         if self.display_timer.isActive():
-            self.logger.push("Timer stop")
+            Logger().push("Timer stop")
             self.display_timer.stop()
             self.ui.actionStart.setText("Start")
             self.audiobackend.pause()
             self.centralwidget.pause()
             self.dockmanager.pause()
         else:
-            self.logger.push("Timer start")
+            Logger().push("Timer start")
             self.display_timer.start()
             self.ui.actionStart.setText("Stop")
             self.audiobackend.restart()
@@ -232,10 +229,7 @@ def main():
     splash.showMessage("Initializing the audio subsystem")
     app.processEvents()
 
-    # Logger class
-    logger = Logger()
-
-    window = Friture(logger)
+    window = Friture()
     window.show()
     splash.finish(window)
 

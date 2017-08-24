@@ -24,7 +24,6 @@ from numpy.fft import rfft, irfft
 from .filter import decimate
 from friture import generated_filters
 from .ringbuffer import RingBuffer
-from friture.logger import PrintLogger
 
 from friture.audiobackend import SAMPLING_RATE
 
@@ -95,11 +94,10 @@ def generalized_cross_correlation(d0, d1):
 
 class Delay_Estimator_Widget(QtWidgets.QWidget):
 
-    def __init__(self, parent=None, logger=PrintLogger()):
+    def __init__(self, parent=None):
         super().__init__(parent)
 
         self.audiobuffer = None
-        self.logger = logger
 
         self.previous_delay_message = ""
         self.previous_correlation_message = ""
@@ -146,7 +144,7 @@ class Delay_Estimator_Widget(QtWidgets.QWidget):
         self.layout.addRow(self.polarity_text_label, self.polarity_label)
         self.layout.addRow(None, self.channel_info_label)
 
-        self.settings_dialog = Delay_Estimator_Settings_Dialog(self, self.logger)
+        self.settings_dialog = Delay_Estimator_Settings_Dialog(self)
 
         # We will decimate several times
         # no decimation => 1/fs = 23 µs resolution
@@ -166,8 +164,8 @@ class Delay_Estimator_Widget(QtWidgets.QWidget):
         self.zfs1 = subsampler_filtic(self.Ndec, self.bdec, self.adec)
 
         # ringbuffers for the subsampled data
-        self.ringbuffer0 = RingBuffer(self.logger)
-        self.ringbuffer1 = RingBuffer(self.logger)
+        self.ringbuffer0 = RingBuffer()
+        self.ringbuffer1 = RingBuffer()
 
         self.delayrange_s = DEFAULT_DELAYRANGE  # confidence range
 
@@ -337,10 +335,8 @@ in the setup window."""
 
 class Delay_Estimator_Settings_Dialog(QtWidgets.QDialog):
 
-    def __init__(self, parent, logger):
+    def __init__(self, parent):
         super().__init__(parent)
-
-        self.logger = logger
 
         self.setWindowTitle("Delay estimator settings")
 

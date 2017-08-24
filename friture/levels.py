@@ -24,7 +24,6 @@ import numpy as np
 from friture.levels_settings import Levels_Settings_Dialog  # settings dialog
 from friture.qsynthmeter import qsynthMeter
 from friture.audioproc import audioproc
-from friture.logger import PrintLogger
 
 from friture.exp_smoothing_conv import pyx_exp_smoothed_value
 
@@ -46,7 +45,7 @@ LEVEL_TEXT_LABEL_STEPS = LEVEL_TEXT_LABEL_PERIOD_MS / SMOOTH_DISPLAY_TIMER_PERIO
 
 class Levels_Widget(QtWidgets.QWidget):
 
-    def __init__(self, parent=None, logger=PrintLogger()):
+    def __init__(self, parent=None):
         super().__init__(parent)
         self.setObjectName("Levels_Widget")
 
@@ -99,14 +98,13 @@ class Levels_Widget(QtWidgets.QWidget):
         # self.label_peak.setSizePolicy(QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding))
         # self.label_peak_legend.setSizePolicy(QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding))
 
-        self.logger = logger
         self.audiobuffer = None
 
         # initialize the settings dialog
-        self.settings_dialog = Levels_Settings_Dialog(self, self.logger)
+        self.settings_dialog = Levels_Settings_Dialog(self)
 
         # initialize the class instance that will do the fft
-        self.proc = audioproc(self.logger)
+        self.proc = audioproc()
 
         # time = SMOOTH_DISPLAY_TIMER_PERIOD_MS/1000. #DISPLAY
         # time = 0.025 #IMPULSE setting for a sound level meter

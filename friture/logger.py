@@ -19,8 +19,16 @@
 
 from PyQt5 import QtCore
 
+__loggerInstance = None
 
-class Logger(QtCore.QObject):
+def Logger():
+    global __loggerInstance
+    if __loggerInstance is None:
+        __loggerInstance = __Logger()
+
+    return __loggerInstance
+
+class __Logger(QtCore.QObject):
 
     logChanged = QtCore.pyqtSignal()
 

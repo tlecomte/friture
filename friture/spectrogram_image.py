@@ -20,17 +20,15 @@
 import numpy
 from PyQt5 import QtCore, QtGui
 from friture.plotting import generated_cmrmap
+from friture.logger import Logger
 from friture.lookup_table import pyx_color_from_float_2D
 
 
 class CanvasScaledSpectrogram(QtCore.QObject):
     canvasWidthChanged = QtCore.pyqtSignal(int)
 
-    def __init__(self, logger, canvas_height=2, canvas_width=2):
+    def __init__(self, canvas_height=2, canvas_width=2):
         super().__init__()
-
-        # store the logger instance
-        self.logger = logger
 
         self.canvas_height = canvas_height
         self.canvas_width = canvas_width
@@ -71,14 +69,14 @@ class CanvasScaledSpectrogram(QtCore.QObject):
         if self.canvas_height != canvas_height:
             self.canvas_height = canvas_height
             self.resize(self.canvas_width, self.canvas_height)
-            self.logger.push("Spectrogram image: canvas_height changed, now: %d" % (canvas_height))
+            Logger().push("Spectrogram image: canvas_height changed, now: %d" % (canvas_height))
 
     def setcanvas_width(self, canvas_width):
         if self.canvas_width != canvas_width:
             self.canvas_width = canvas_width
             self.resize(self.canvas_width, self.canvas_height)
             self.canvasWidthChanged.emit(canvas_width)
-            self.logger.push("Spectrogram image: canvas_width changed, now: %d" % (canvas_width))
+            Logger().push("Spectrogram image: canvas_width changed, now: %d" % (canvas_width))
 
     def addPixelAdvance(self, pixel_advance):
         self.time_offset += pixel_advance

@@ -19,6 +19,7 @@
 
 from PyQt5 import QtWidgets
 from friture.audiobackend import SAMPLING_RATE
+from friture.logger import Logger
 
 # shared with spectrum_settings.py
 DEFAULT_FFT_SIZE = 8  # 8192 points
@@ -35,10 +36,8 @@ DEFAULT_RESPONSE_TIME_INDEX = 0
 
 class Spectrum_Settings_Dialog(QtWidgets.QDialog):
 
-    def __init__(self, parent, logger):
+    def __init__(self, parent):
         super().__init__(parent)
-
-        self.logger = logger
 
         self.setWindowTitle("Spectrum settings")
 
@@ -155,18 +154,14 @@ class Spectrum_Settings_Dialog(QtWidgets.QDialog):
 
     # slot
     def fftsizechanged(self, index):
-        # FIXME default logger
-        if self.logger is not None:
-            self.logger.push("fft_size_changed slot %d %d %f" % (index, 2 ** index * 32, 150000 / 2 ** index * 32))
+        Logger().push("fft_size_changed slot %d %d %f" % (index, 2 ** index * 32, 150000 / 2 ** index * 32))
         # FIXME the size should not be found from the index, but attached as item data
         fft_size = 2 ** index * 32
         self.parent().setfftsize(fft_size)
 
     # slot
     def freqscalechanged(self, index):
-        # FIXME default logger
-        if self.logger is not None:
-            self.logger.push("freq_scale slot %d" % index)
+        Logger().push("freq_scale slot %d" % index)
         if index == 1:
             self.parent().PlotZoneSpect.setlogfreqscale()
         else:
@@ -182,7 +177,7 @@ class Spectrum_Settings_Dialog(QtWidgets.QDialog):
             response_time = 0.3
         elif index == 3:
             response_time = 1.
-        self.logger.push("responsetimechanged slot %d %d" % (index, response_time))
+        Logger().push("responsetimechanged slot %d %d" % (index, response_time))
         self.parent().setresponsetime(response_time)
 
     # method

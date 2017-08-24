@@ -39,8 +39,8 @@ def tickFormatter(value, digits):
 
 class PlotImage:
 
-    def __init__(self, logger, audiobackend):
-        self.canvasscaledspectrogram = CanvasScaledSpectrogram(logger)
+    def __init__(self, audiobackend):
+        self.canvasscaledspectrogram = CanvasScaledSpectrogram()
         self.T = 0.
         self.dT = 1.
         self.audiobackend = audiobackend
@@ -174,7 +174,7 @@ class PlotImage:
 
 class ImagePlot(QtWidgets.QWidget):
 
-    def __init__(self, parent, logger, audiobackend):
+    def __init__(self, parent, audiobackend):
         super(ImagePlot, self).__init__(parent)
 
         self.verticalScaleDivision = ScaleDivision(20, 20000, 100)
@@ -212,7 +212,7 @@ class ImagePlot(QtWidgets.QWidget):
         self.needfullreplot = False
 
         # attach a plot image
-        self.plotImage = PlotImage(logger, audiobackend)
+        self.plotImage = PlotImage(audiobackend)
         self.canvasWidget.attach(self.plotImage)
 
         self.setlinfreqscale()

@@ -9,7 +9,7 @@ from friture.plotting import generated_cmrmap
 
 class VerticalScaleBar(QtWidgets.QWidget):
 
-    def __init__(self, parent, division, transform, logger=None):
+    def __init__(self, parent, division, transform):
         super(VerticalScaleBar, self).__init__()
 
         self.scaleDivision = division
@@ -104,7 +104,7 @@ class VerticalScaleBar(QtWidgets.QWidget):
 
 class HorizontalScaleBar(QtWidgets.QWidget):
 
-    def __init__(self, parent, division, transform, logger=None):
+    def __init__(self, parent, division, transform):
         super(HorizontalScaleBar, self).__init__()
 
         self.scaleDivision = division
@@ -193,7 +193,7 @@ class HorizontalScaleBar(QtWidgets.QWidget):
 
 class ColorScaleBar(QtWidgets.QWidget):
 
-    def __init__(self, parent, division, transform, logger=None):
+    def __init__(self, parent, division, transform):
         super(ColorScaleBar, self).__init__()
 
         self.scaleDivision = division

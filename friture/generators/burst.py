@@ -27,10 +27,10 @@ DEFAULT_BURST_PERIOD_S = 1.
 class BurstGenerator:
     name = "Burst"
 
-    def __init__(self, parent, logger):
+    def __init__(self, parent):
         self.T = 1.
 
-        self.settings = SettingsWidget(parent, logger)
+        self.settings = SettingsWidget(parent)
         self.settings.spinBox_burst_period.valueChanged.connect(self.setT)
 
     def setT(self, T):
@@ -54,10 +54,8 @@ class BurstGenerator:
 
 class SettingsWidget(QtWidgets.QWidget):
 
-    def __init__(self, parent, logger):
+    def __init__(self, parent):
         super().__init__(parent)
-
-        self.logger = logger
 
         self.spinBox_burst_period = QtWidgets.QDoubleSpinBox(self)
         self.spinBox_burst_period.setKeyboardTracking(False)
