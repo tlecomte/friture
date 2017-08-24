@@ -20,7 +20,7 @@
 from PyQt5 import QtGui, QtCore, QtWidgets
 import numpy as np
 import sounddevice
-from friture.audiobackend import SAMPLING_RATE
+from friture.audiobackend import SAMPLING_RATE, AudioBackend
 from friture.generators.sweep import SweepGenerator
 from friture.generators.sine import SineGenerator
 from friture.generators.burst import BurstGenerator
@@ -40,7 +40,7 @@ class Generator_Widget(QtWidgets.QWidget):
 
     stream_stop_ramp_finished = QtCore.pyqtSignal()
 
-    def __init__(self, parent, audiobackend):
+    def __init__(self, parent):
         super().__init__(parent)
 
         self.audiobuffer = None
@@ -72,8 +72,6 @@ class Generator_Widget(QtWidgets.QWidget):
         self.t_stop = RAMP_LENGTH
         self.state = STOPPED
 
-        self.audiobackend = audiobackend
-
         self.stream_stop_ramp_finished.connect(self.stop_stream_after_ramp)
 
         self.device = None
@@ -81,10 +79,10 @@ class Generator_Widget(QtWidgets.QWidget):
 
         # we will try to open all the output devices until one
         # works, starting by the default input device
-        for device in self.audiobackend.output_devices:
+        for device in AudioBackend().output_devices:
             Logger().push("Opening the stream for device: "+ device['name'])
             try:
-                self.stream = self.audiobackend.open_output_stream(device, self.audio_callback)
+                self.stream = AudioBackend().open_output_stream(device, self.audio_callback)
                 self.stream.start()
                 self.stream.stop()
                 self.device = device
@@ -117,30 +115,30 @@ class Generator_Widget(QtWidgets.QWidget):
         self.start_stop_button.toggled.connect(self.start_stop_button_toggle)
 
         # initialize the settings dialog
-        devices = self.audiobackend.get_readable_output_devices_list()
+        devices = AudioBackend().get_readable_output_devices_list()
         if self.device is not None:
-            device_index = self.audiobackend.output_devices.index(self.device)
+            device_index = AudioBackend().output_devices.index(self.device)
         else:
             device_index = None
         self.settings_dialog = Generator_Settings_Dialog(self, devices, device_index)
 
         self.settings_dialog.combobox_output_device.currentIndexChanged.connect(self.device_changed)
 
-#        channels = self.audiobackend.get_readable_current_output_channels()
+#        channels = AudioBackend().get_readable_current_output_channels()
 #        for channel in channels:
 #            self.settings_dialog.comboBox_firstChannel.addItem(channel)
 #            self.settings_dialog.comboBox_secondChannel.addItem(channel)
 
-#        current_device = self.audiobackend.get_readable_current_output_device()
+#        current_device = AudioBackend().get_readable_current_output_device()
 #        self.settings_dialog.combobox_output_device.setCurrentIndex(current_device)
 
-#        first_channel = self.audiobackend.get_current_first_channel()
+#        first_channel = AudioBackend().get_current_first_channel()
 #        self.settings_dialog.comboBox_firstChannel.setCurrentIndex(first_channel)
-#        second_channel = self.audiobackend.get_current_second_channel()
+#        second_channel = AudioBackend().get_current_second_channel()
 #        self.settings_dialog.comboBox_secondChannel.setCurrentIndex(second_channel)
 
     def device_changed(self, index):
-        device = self.audiobackend.output_devices[index]
+        device = AudioBackend().output_devices[index]
 
         # save current stream in case we need to restore it
         previous_stream = self.stream
@@ -152,14 +150,14 @@ class Generator_Widget(QtWidgets.QWidget):
 
         # first see if the format is supported by PortAudio
         try:
-            success = self.audiobackend.is_output_format_supported(device, np.int16)
+            success = AudioBackend().is_output_format_supported(device, np.int16)
         except Exception as exception:
             Logger().push("Format is not supported: " + str(exception))
             success = False
 
         if success:
             try:
-                self.stream = self.audiobackend.open_output_stream(device, self.audio_callback)
+                self.stream = AudioBackend().open_output_stream(device, self.audio_callback)
                 self.device = device
                 self.stream.start()
                 if self.state not in [STARTING, PLAYING]:
@@ -185,7 +183,7 @@ class Generator_Widget(QtWidgets.QWidget):
             error_message.setWindowTitle("Output device error")
             error_message.showMessage("Impossible to use the selected output device, reverting to the previous one. Reason is: " + error_message)
 
-        self.settings_dialog.combobox_output_device.setCurrentIndex(self.audiobackend.output_devices.index(self.device))
+        self.settings_dialog.combobox_output_device.setCurrentIndex(AudioBackend().output_devices.index(self.device))
 
     def settings_called(self, checked):
         self.settings_dialog.show()
@@ -273,7 +271,7 @@ class Generator_Widget(QtWidgets.QWidget):
 
         # output channels are interleaved
         # we output to all channels simultaneously with the same data
-        maxOutputChannels = self.audiobackend.get_device_outputchannels_count(self.device)
+        maxOutputChannels = AudioBackend().get_device_outputchannels_count(self.device)
         floatdata = np.tile(floatdata, (maxOutputChannels, 1)).transpose()
 
         int16info = np.iinfo(np.int16)

@@ -20,6 +20,7 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from fractions import Fraction
 import numpy as np
+from friture.audiobackend import AudioBackend
 from friture.spectrogram_image import CanvasScaledSpectrogram
 from friture.online_linear_2D_resampler import Online_Linear_2D_resampler
 from friture.frequency_resampler import Frequency_Resampler
@@ -39,11 +40,10 @@ def tickFormatter(value, digits):
 
 class PlotImage:
 
-    def __init__(self, audiobackend):
+    def __init__(self):
         self.canvasscaledspectrogram = CanvasScaledSpectrogram()
         self.T = 0.
         self.dT = 1.
-        self.audiobackend = audiobackend
 
         self.jitter_s = 0.
 
@@ -90,7 +90,7 @@ class PlotImage:
 
     def restart(self):
         self.isPlaying = True
-        self.last_time = self.audiobackend.get_stream_time()
+        self.last_time = AudioBackend().get_stream_time()
         self.timer.restart()
 
     def draw(self, painter, xMap, yMap, rect):
@@ -117,7 +117,7 @@ class PlotImage:
             pixel_advance = delta_t / (self.T + self.jitter_s) * rect.width()
             self.canvasscaledspectrogram.addPixelAdvance(pixel_advance)
 
-            time = self.audiobackend.get_stream_time()
+            time = AudioBackend().get_stream_time()
             time_delay = time - self.last_data_time
             pixel_delay = rect.width() * time_delay / self.T
 
@@ -174,7 +174,7 @@ class PlotImage:
 
 class ImagePlot(QtWidgets.QWidget):
 
-    def __init__(self, parent, audiobackend):
+    def __init__(self, parent):
         super(ImagePlot, self).__init__(parent)
 
         self.verticalScaleDivision = ScaleDivision(20, 20000, 100)
@@ -212,7 +212,7 @@ class ImagePlot(QtWidgets.QWidget):
         self.needfullreplot = False
 
         # attach a plot image
-        self.plotImage = PlotImage(audiobackend)
+        self.plotImage = PlotImage()
         self.canvasWidget.attach(self.plotImage)
 
         self.setlinfreqscale()

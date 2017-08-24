@@ -62,10 +62,8 @@ class Friture(QMainWindow, ):
         self.audiobuffer = AudioBuffer()
 
         # Initialize the audio backend
-        self.audiobackend = AudioBackend()
-
         # signal containing new data from the audio callback thread, processed as numpy array
-        self.audiobackend.new_data_available.connect(self.audiobuffer.handle_new_data)
+        AudioBackend().new_data_available.connect(self.audiobuffer.handle_new_data)
 
         # this timer is used to update widgets that just need to display as fast as they can
         self.display_timer = QtCore.QTimer()
@@ -75,8 +73,8 @@ class Friture(QMainWindow, ):
         self.slow_timer = QtCore.QTimer()
         self.slow_timer.setInterval(SLOW_TIMER_PERIOD_MS)  # constant timing
 
-        self.about_dialog = About_Dialog(self, self.audiobackend, self.slow_timer)
-        self.settings_dialog = Settings_Dialog(self, self.audiobackend)
+        self.about_dialog = About_Dialog(self, self.slow_timer)
+        self.settings_dialog = Settings_Dialog(self)
 
         self.centralwidget = CentralWidget(self.ui.centralwidget, "central_widget", 0)
         self.centralLayout = QVBoxLayout(self.ui.centralwidget)
@@ -124,7 +122,7 @@ class Friture(QMainWindow, ):
 
     # event handler
     def closeEvent(self, event):
-        self.audiobackend.close()
+        AudioBackend().close()
         self.saveAppState()
         event.accept()
 
@@ -178,14 +176,14 @@ class Friture(QMainWindow, ):
             Logger().push("Timer stop")
             self.display_timer.stop()
             self.ui.actionStart.setText("Start")
-            self.audiobackend.pause()
+            AudioBackend().pause()
             self.centralwidget.pause()
             self.dockmanager.pause()
         else:
             Logger().push("Timer start")
             self.display_timer.start()
             self.ui.actionStart.setText("Stop")
-            self.audiobackend.restart()
+            AudioBackend().restart()
             self.centralwidget.restart()
             self.dockmanager.restart()
 

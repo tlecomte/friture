@@ -58,7 +58,7 @@ aboutText = """
 
 class About_Dialog(QtWidgets.QDialog):
 
-    def __init__(self, parent, audiobackend, timer):
+    def __init__(self, parent, timer):
         super().__init__(parent)
 
         self.setObjectName("About_Dialog")
@@ -92,7 +92,7 @@ class About_Dialog(QtWidgets.QDialog):
         self.horizontalLayout.addWidget(self.label)
         self.tabWidget.addTab(self.aboutTab, "About")
 
-        self.tab_stats = StatisticsWidget(self, timer, audiobackend)
+        self.tab_stats = StatisticsWidget(self, timer)
         self.tabWidget.addTab(self.tab_stats, "Statistics")
 
         self.tab_log = LogWidget(self)

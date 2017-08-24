@@ -27,7 +27,15 @@ from friture.logger import Logger
 SAMPLING_RATE = 48000
 FRAMES_PER_BUFFER = 512
 
-class AudioBackend(QtCore.QObject):
+__audiobackendInstance = None
+
+def AudioBackend():
+    global __audiobackendInstance
+    if __audiobackendInstance is None:
+        __audiobackendInstance = __AudioBackend()
+    return __audiobackendInstance
+
+class __AudioBackend(QtCore.QObject):
 
     underflow = QtCore.pyqtSignal()
     new_data_available_from_callback = QtCore.pyqtSignal(ndarray, int, float, bool)

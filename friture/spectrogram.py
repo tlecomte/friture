@@ -33,24 +33,23 @@ from friture.spectrogram_settings import (Spectrogram_Settings_Dialog,  # settin
                                           DEFAULT_TIMERANGE,
                                           DEFAULT_WEIGHTING)
 
-from friture.audiobackend import SAMPLING_RATE, FRAMES_PER_BUFFER
+from friture.audiobackend import SAMPLING_RATE, FRAMES_PER_BUFFER, AudioBackend
 from fractions import Fraction
 
 
 class Spectrogram_Widget(QtWidgets.QWidget):
 
-    def __init__(self, parent, audiobackend):
+    def __init__(self, parent):
         super().__init__(parent)
 
         self.setObjectName("Spectrogram_Widget")
         self.gridLayout = QtWidgets.QGridLayout(self)
         self.gridLayout.setObjectName("gridLayout")
-        self.PlotZoneImage = ImagePlot(self, audiobackend)
+        self.PlotZoneImage = ImagePlot(self)
         self.PlotZoneImage.setObjectName("PlotZoneImage")
         self.gridLayout.addWidget(self.PlotZoneImage, 0, 1, 1, 1)
 
         self.audiobuffer = None
-        self.audiobackend = audiobackend
 
         # initialize the class instance that will do the fft
         self.proc = audioproc()
@@ -88,7 +87,7 @@ class Spectrogram_Widget(QtWidgets.QWidget):
         # initialize the settings dialog
         self.settings_dialog = Spectrogram_Settings_Dialog(self)
 
-        self.audiobackend.underflow.connect(self.PlotZoneImage.plotImage.canvasscaledspectrogram.syncOffsets)
+        AudioBackend().underflow.connect(self.PlotZoneImage.plotImage.canvasscaledspectrogram.syncOffsets)
 
         self.last_data_time = 0.
 

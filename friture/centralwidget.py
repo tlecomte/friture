@@ -69,11 +69,11 @@ class CentralWidget(QtWidgets.QWidget):
         elif item is 2:
             self.audiowidget = Spectrum_Widget(self)
         elif item is 3:
-            self.audiowidget = Spectrogram_Widget(self, self.parent().parent().audiobackend)
+            self.audiowidget = Spectrogram_Widget(self)
         elif item is 4:
             self.audiowidget = OctaveSpectrum_Widget(self)
         elif item is 5:
-            self.audiowidget = Generator_Widget(self, self.parent().parent().audiobackend)
+            self.audiowidget = Generator_Widget(self)
         elif item is 6:
             self.audiowidget = Delay_Estimator_Widget(self)
         elif item is 7:

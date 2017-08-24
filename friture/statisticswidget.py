@@ -19,14 +19,13 @@
 
 from PyQt5 import QtCore, QtWidgets
 import psutil  # for CPU usage monitoring
+from friture.audiobackend import AudioBackend
 
 
 class StatisticsWidget(QtWidgets.QWidget):
 
-    def __init__(self, parent, timer, audiobackend):
+    def __init__(self, parent, timer):
         super().__init__(parent)
-
-        self.audiobackend = audiobackend
 
         self.setObjectName("tab_stats")
 
@@ -66,8 +65,8 @@ class StatisticsWidget(QtWidgets.QWidget):
         label = "Chunk #%d\n"\
             "Global CPU usage: %d %%\n"\
             "Number of overflowed inputs (XRUNs): %d"\
-            % (self.audiobackend.chunk_number,
+            % (AudioBackend().chunk_number,
                cpu_percent,
-               self.audiobackend.xruns)
+               AudioBackend().xruns)
 
         self.LabelStats.setText(label)

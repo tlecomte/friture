@@ -19,6 +19,7 @@
 
 import sys
 from PyQt5 import QtCore, QtWidgets
+from friture.audiobackend import AudioBackend
 from friture.ui_settings import Ui_Settings_Dialog
 from friture.logger import Logger
 
@@ -34,16 +35,14 @@ Friture will now exit.
 
 class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
 
-    def __init__(self, parent, audiobackend):
+    def __init__(self, parent):
         QtWidgets.QDialog.__init__(self, parent)
         Ui_Settings_Dialog.__init__(self)
 
         # Setup the user interface
         self.setupUi(self)
 
-        self.audiobackend = audiobackend
-
-        devices = self.audiobackend.get_readable_devices_list()
+        devices = AudioBackend().get_readable_devices_list()
 
         if devices == []:
             # no audio input device: display a message and exit
@@ -55,17 +54,17 @@ class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
         for device in devices:
             self.comboBox_inputDevice.addItem(device)
 
-        channels = self.audiobackend.get_readable_current_channels()
+        channels = AudioBackend().get_readable_current_channels()
         for channel in channels:
             self.comboBox_firstChannel.addItem(channel)
             self.comboBox_secondChannel.addItem(channel)
 
-        current_device = self.audiobackend.get_readable_current_device()
+        current_device = AudioBackend().get_readable_current_device()
         self.comboBox_inputDevice.setCurrentIndex(current_device)
 
-        first_channel = self.audiobackend.get_current_first_channel()
+        first_channel = AudioBackend().get_current_first_channel()
         self.comboBox_firstChannel.setCurrentIndex(first_channel)
-        second_channel = self.audiobackend.get_current_second_channel()
+        second_channel = AudioBackend().get_current_second_channel()
         self.comboBox_secondChannel.setCurrentIndex(second_channel)
 
         # signals
@@ -84,7 +83,7 @@ class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
     def input_device_changed(self, index):
         self.parent().ui.actionStart.setChecked(False)
 
-        success, index = self.audiobackend.select_input_device(index)
+        success, index = AudioBackend().select_input_device(index)
 
         self.comboBox_inputDevice.setCurrentIndex(index)
 
@@ -96,7 +95,7 @@ class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
             error_message.showMessage("Impossible to use the selected input device, reverting to the previous one")
 
         # reset the channels
-        channels = self.audiobackend.get_readable_current_channels()
+        channels = AudioBackend().get_readable_current_channels()
 
         self.comboBox_firstChannel.clear()
         self.comboBox_secondChannel.clear()
@@ -105,9 +104,9 @@ class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
             self.comboBox_firstChannel.addItem(channel)
             self.comboBox_secondChannel.addItem(channel)
 
-        first_channel = self.audiobackend.get_current_first_channel()
+        first_channel = AudioBackend().get_current_first_channel()
         self.comboBox_firstChannel.setCurrentIndex(first_channel)
-        second_channel = self.audiobackend.get_current_second_channel()
+        second_channel = AudioBackend().get_current_second_channel()
         self.comboBox_secondChannel.setCurrentIndex(second_channel)
 
         self.parent().ui.actionStart.setChecked(True)
@@ -116,7 +115,7 @@ class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
     def first_channel_changed(self, index):
         self.parent().ui.actionStart.setChecked(False)
 
-        success, index = self.audiobackend.select_first_channel(index)
+        success, index = AudioBackend().select_first_channel(index)
 
         self.comboBox_firstChannel.setCurrentIndex(index)
 
@@ -133,7 +132,7 @@ class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
     def second_channel_changed(self, index):
         self.parent().ui.actionStart.setChecked(False)
 
-        success, index = self.audiobackend.select_second_channel(index)
+        success, index = AudioBackend().select_second_channel(index)
 
         self.comboBox_secondChannel.setCurrentIndex(index)
 
@@ -150,14 +149,14 @@ class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
     def single_input_type_selected(self, checked):
         if checked:
             self.groupBox_second.setEnabled(False)
-            self.audiobackend.set_single_input()
+            Audiobackend().set_single_input()
             Logger().push("Switching to single input")
 
     # slot
     def duo_input_type_selected(self, checked):
         if checked:
             self.groupBox_second.setEnabled(True)
-            self.audiobackend.set_duo_input()
+            Audiobackend().set_duo_input()
             Logger().push("Switching to difference between two inputs")
 
     # method
