@@ -18,14 +18,7 @@
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
 from PyQt5 import QtWidgets
-from friture.levels import Levels_Widget
-from friture.spectrum import Spectrum_Widget
-from friture.spectrogram import Spectrogram_Widget
-from friture.octavespectrum import OctaveSpectrum_Widget
-from friture.scope import Scope_Widget
-from friture.generator import Generator_Widget
-from friture.delay_estimator import Delay_Estimator_Widget
-from friture.longlevels import LongLevelWidget
+from friture.widgetdict import widgetDictionary
 from friture.controlbar import ControlBar
 from friture.defaults import DEFAULT_CENTRAL_WIDGET
 
@@ -60,27 +53,11 @@ class CentralWidget(QtWidgets.QWidget):
             self.audiowidget.close()
             self.audiowidget.deleteLater()
 
+        if item not in widgetDictionary:
+            item = list(widgetDictionary.keys())[0]
+
         self.type = item
-
-        if item is 0:
-            self.audiowidget = Levels_Widget(self)
-        elif item is 1:
-            self.audiowidget = Scope_Widget(self)
-        elif item is 2:
-            self.audiowidget = Spectrum_Widget(self)
-        elif item is 3:
-            self.audiowidget = Spectrogram_Widget(self)
-        elif item is 4:
-            self.audiowidget = OctaveSpectrum_Widget(self)
-        elif item is 5:
-            self.audiowidget = Generator_Widget(self)
-        elif item is 6:
-            self.audiowidget = Delay_Estimator_Widget(self)
-        elif item is 7:
-            self.audiowidget = LongLevelWidget(self)
-        else:
-            self.audiowidget = Levels_Widget(self)
-
+        self.audiowidget = widgetDictionary[item](self)
         self.audiowidget.set_buffer(self.parent().parent().audiobuffer)
         self.parent().parent().audiobuffer.new_data_available.connect(self.audiowidget.handle_new_data)
 
