@@ -48,7 +48,7 @@ class __Logger(QtCore.QObject):
         self.logChanged.emit()
 
         # also print to the console
-        print(text)
+        print(text, flush=True)
 
     # return the current log
     def text(self):
@@ -60,7 +60,7 @@ class PrintLogger:
     # push some text to the log
 
     def push(self, text):
-        print(text)
+        print(text, flush=True)
 
     # return the current log
     def text(self):
