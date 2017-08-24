@@ -26,13 +26,19 @@ from friture.generator import Generator_Widget
 from friture.delay_estimator import Delay_Estimator_Widget
 from friture.longlevels import LongLevelWidget
 
-widgetDictionary = {
-    0: Levels_Widget,
-    1: Scope_Widget,
-    2: Spectrum_Widget,
-    3: Spectrogram_Widget,
-    4: OctaveSpectrum_Widget,
-    5: Generator_Widget,
-    6: Delay_Estimator_Widget,
-    7: LongLevelWidget
-    }
+widgets = [
+    {'Id':0, "Class":Levels_Widget, "Name":"Levels"},
+    {'Id':1, "Class":Scope_Widget, "Name":"Scope"},
+    {'Id':2, "Class":Spectrum_Widget, "Name":"FFT Spectrum"},
+    {'Id':3, "Class":Spectrogram_Widget, "Name":"2D Spectrogram"},
+    {'Id':4, "Class":OctaveSpectrum_Widget, "Name":"Octave Spectrum"},
+    {'Id':5, "Class":Generator_Widget, "Name":"Generator"},
+    {'Id':6, "Class":Delay_Estimator_Widget, "Name":"Delay Estimator"},
+    {'Id':7, "Class":LongLevelWidget, "Name":"Long-time levels"}
+]
+
+def widgetIds():
+    return [widget['Id'] for widget in widgets]
+
+def getWidgetById(widgetId):
+    return next(widget for widget in widgets if widget["Id"] == widgetId)

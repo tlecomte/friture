@@ -18,7 +18,7 @@
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
 from PyQt5 import QtWidgets
-from friture.widgetdict import widgetDictionary
+from friture.widgetdict import getWidgetById, widgetIds
 from friture.controlbar import ControlBar
 
 
@@ -55,11 +55,11 @@ class Dock(QtWidgets.QDockWidget):
             self.audiowidget.close()
             self.audiowidget.deleteLater()
 
-        if item not in widgetDictionary:
-            item = list(widgetDictionary.keys())[0]
+        if item not in widgetIds():
+            item = widgetIds()[0]
 
         self.type = item
-        self.audiowidget = widgetDictionary[item](self)
+        self.audiowidget = getWidgetById(item)["Class"](self)
         self.audiowidget.set_buffer(self.parent().audiobuffer)
         self.parent().audiobuffer.new_data_available.connect(self.audiowidget.handle_new_data)
 

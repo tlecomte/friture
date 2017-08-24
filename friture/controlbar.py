@@ -18,6 +18,7 @@
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
 from PyQt5 import QtGui, QtWidgets
+from friture.widgetdict import widgets
 
 
 class ControlBar(QtWidgets.QWidget):
@@ -30,14 +31,10 @@ class ControlBar(QtWidgets.QWidget):
         self.layout = QtWidgets.QHBoxLayout(self)
 
         self.combobox_select = QtWidgets.QComboBox(self)
-        self.combobox_select.addItem("Levels")
-        self.combobox_select.addItem("Scope")
-        self.combobox_select.addItem("FFT Spectrum")
-        self.combobox_select.addItem("2D Spectrogram")
-        self.combobox_select.addItem("Octave Spectrum")
-        self.combobox_select.addItem("Generator")
-        self.combobox_select.addItem("Delay Estimator")
-        self.combobox_select.addItem("Long-time levels")
+
+        for widget in widgets:
+            self.combobox_select.addItem(widget["Name"])
+
         self.combobox_select.setCurrentIndex(0)
         self.combobox_select.setToolTip("Select the type of audio widget")
 
