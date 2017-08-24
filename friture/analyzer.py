@@ -76,7 +76,7 @@ class Friture(QMainWindow, ):
         self.about_dialog = About_Dialog(self, self.slow_timer)
         self.settings_dialog = Settings_Dialog(self)
 
-        self.centralwidget = CentralWidget(self.ui.centralwidget, "central_widget", 0)
+        self.centralwidget = CentralWidget(self.ui.centralwidget, "central_widget")
         self.centralLayout = QVBoxLayout(self.ui.centralwidget)
         self.centralLayout.setContentsMargins(0, 0, 0, 0)
         self.centralLayout.addWidget(self.centralwidget)

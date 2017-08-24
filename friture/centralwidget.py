@@ -25,14 +25,14 @@ from friture.defaults import DEFAULT_CENTRAL_WIDGET
 
 class CentralWidget(QtWidgets.QWidget):
 
-    def __init__(self, parent, name, widget_type=0):
+    def __init__(self, parent, name):
         super().__init__(parent)
 
         self.setObjectName(name)
 
         self.control_bar = ControlBar(self)
 
-        self.control_bar.combobox_select.activated.connect(self.widget_select)
+        self.control_bar.combobox_select.activated.connect(self.indexChanged)
         self.control_bar.settings_button.clicked.connect(self.settings_slot)
 
         self.label = QtWidgets.QLabel(self)
@@ -45,25 +45,33 @@ class CentralWidget(QtWidgets.QWidget):
         self.setLayout(self.layout)
 
         self.audiowidget = None
-        self.widget_select(widget_type)
+        self.indexChanged(0)
 
     # slot
-    def widget_select(self, item):
+    def indexChanged(self, index):
+        if index > len(widgetIds()):
+            index = widgetIds()[0]
+
+        self.widget_select(widgetIds()[index])
+
+    # slot
+    def widget_select(self, widgetId):
         if self.audiowidget is not None:
             self.audiowidget.close()
             self.audiowidget.deleteLater()
 
-        if item not in widgetIds():
-            item = widgetIds()[0]
+        if widgetId not in widgetIds():
+            widgetId = widgetIds()[0]
 
-        self.type = item
-        self.audiowidget = getWidgetById(item)["Class"](self)
+        self.widgetId = widgetId
+        self.audiowidget = getWidgetById(widgetId)["Class"](self)
         self.audiowidget.set_buffer(self.parent().parent().audiobuffer)
         self.parent().parent().audiobuffer.new_data_available.connect(self.audiowidget.handle_new_data)
 
         self.layout.addWidget(self.audiowidget)
 
-        self.control_bar.combobox_select.setCurrentIndex(item)
+        index = widgetIds().index(widgetId)
+        self.control_bar.combobox_select.setCurrentIndex(index)
 
     def canvasUpdate(self):
         if self.audiowidget is not None:
@@ -89,11 +97,11 @@ class CentralWidget(QtWidgets.QWidget):
 
     # method
     def saveState(self, settings):
-        settings.setValue("type", self.type)
+        settings.setValue("type", self.widgetId)
         self.audiowidget.saveState(settings)
 
     # method
     def restoreState(self, settings):
-        widget_type = settings.value("type", DEFAULT_CENTRAL_WIDGET, type=int)
-        self.widget_select(widget_type)
+        widgetId = settings.value("type", DEFAULT_CENTRAL_WIDGET, type=int)
+        self.widget_select(widgetId)
         self.audiowidget.restoreState(settings)
