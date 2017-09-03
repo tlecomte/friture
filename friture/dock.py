@@ -22,10 +22,13 @@ from friture.widgetdict import getWidgetById, widgetIds
 from friture.controlbar import ControlBar
 
 
-class Dock(QtWidgets.QDockWidget):
+class Dock(QtWidgets.QWidget):
 
     def __init__(self, parent, name, widgetId = None):
-        super().__init__(name, parent)
+        super().__init__(parent)
+
+        self.dockmanager = parent.dockmanager
+        self.audiobuffer = parent.audiobuffer
 
         self.setObjectName(name)
 
@@ -33,21 +36,25 @@ class Dock(QtWidgets.QDockWidget):
 
         self.control_bar.combobox_select.activated.connect(self.indexChanged)
         self.control_bar.settings_button.clicked.connect(self.settings_slot)
+        self.control_bar.close_button.clicked.connect(self.closeClicked)
 
-        self.dockwidget = QtWidgets.QWidget(self)
-        self.layout = QtWidgets.QVBoxLayout(self.dockwidget)
+        #self.dockwidget = QtWidgets.QWidget(self)
+        self.layout = QtWidgets.QVBoxLayout(self)
         self.layout.addWidget(self.control_bar)
         self.layout.setContentsMargins(0, 0, 0, 0)
-        self.dockwidget.setLayout(self.layout)
+        #self.dockwidget.setLayout(self.layout)
 
-        self.setWidget(self.dockwidget)
+        #self.setWidget(self.dockwidget)
 
         self.audiowidget = None
         self.widget_select(widgetId)
 
     # note that by default the closeEvent is accepted, no need to do it explicitely
     def closeEvent(self, event):
-        self.parent().dockmanager.close_dock(self)
+        self.dockmanager.close_dock(self)
+
+    def closeClicked(self, checked):
+        self.close()
 
     # slot
     def indexChanged(self, index):
@@ -67,8 +74,8 @@ class Dock(QtWidgets.QDockWidget):
 
         self.widgetId = widgetId
         self.audiowidget = getWidgetById(widgetId)["Class"](self)
-        self.audiowidget.set_buffer(self.parent().audiobuffer)
-        self.parent().audiobuffer.new_data_available.connect(self.audiowidget.handle_new_data)
+        self.audiowidget.set_buffer(self.audiobuffer)
+        self.audiobuffer.new_data_available.connect(self.audiowidget.handle_new_data)
 
         self.layout.addWidget(self.audiowidget)
 

@@ -45,12 +45,14 @@ class DockManager(QtCore.QObject):
             index = max(dockindexes) + 1
         name = "Dock %d" % index
         new_dock = Dock(self.parent(), name)
-        self.parent().addDockWidget(QtCore.Qt.TopDockWidgetArea, new_dock)
+        #self.parent().addDockWidget(QtCore.Qt.TopDockWidgetArea, new_dock)
+        self.parent().centralLayout.addWidget(new_dock)
 
         self.docks += [new_dock]
 
     # slot
     def close_dock(self, dock):
+        self.parent().centralLayout.removeWidget(dock)
         self.docks.remove(dock)
 
     def saveState(self, settings):
@@ -67,6 +69,7 @@ class DockManager(QtCore.QObject):
             # list of docks
             self.docks = [Dock(self.parent(), name) for name in docknames]
             for dock in self.docks:
+                self.parent().centralLayout.addWidget(dock)
                 settings.beginGroup(dock.objectName())
                 dock.restoreState(settings)
                 settings.endGroup()
@@ -74,7 +77,8 @@ class DockManager(QtCore.QObject):
             Logger().push("First launch, display a default set of docks")
             self.docks = [Dock(self.parent(), "Dock %d" % (i), widget_type=widget_type) for i, widget_type in enumerate(DEFAULT_DOCKS)]
             for dock in self.docks:
-                self.parent().addDockWidget(QtCore.Qt.TopDockWidgetArea, dock)
+                #self.parent().addDockWidget(QtCore.Qt.TopDockWidgetArea, dock)
+                self.parent().centralLayout.addWidget(dock)
 
     def canvasUpdate(self):
         for dock in self.docks:

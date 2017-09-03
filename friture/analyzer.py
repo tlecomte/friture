@@ -23,7 +23,7 @@ import os.path
 import platform
 from PyQt5 import QtCore
 # specifically import from PyQt5.QtGui and QWidgets for startup time improvement :
-from PyQt5.QtWidgets import QMainWindow, QVBoxLayout, QApplication, QSplashScreen
+from PyQt5.QtWidgets import QMainWindow, QHBoxLayout, QApplication, QSplashScreen
 from PyQt5.QtGui import QPixmap
 # importing friture.exceptionhandler also installs a temporary exception hook
 from friture.exceptionhandler import errorBox, fileexcepthook
@@ -35,6 +35,8 @@ from friture.audiobuffer import AudioBuffer  # audio ring buffer class
 from friture.audiobackend import AudioBackend  # audio backend class
 from friture.centralwidget import CentralWidget
 from friture.dockmanager import DockManager
+from friture.tilelayout import TileLayout
+from friture.levels import Levels_Widget
 
 # the display timer could be made faster when the processing
 # power allows it, firing down to every 10 ms
@@ -76,16 +78,28 @@ class Friture(QMainWindow, ):
         self.about_dialog = About_Dialog(self, self.slow_timer)
         self.settings_dialog = Settings_Dialog(self)
 
-        self.centralwidget = CentralWidget(self.ui.centralwidget, "central_widget")
-        self.centralLayout = QVBoxLayout(self.ui.centralwidget)
+        self.level_widget = Levels_Widget(self)
+        self.level_widget.set_buffer(self.audiobuffer)
+        self.audiobuffer.new_data_available.connect(self.level_widget.handle_new_data)
+
+        self.hboxLayout = QHBoxLayout(self.ui.centralwidget)
+        self.hboxLayout.setContentsMargins(0, 0, 0, 0)
+        self.hboxLayout.addWidget(self.level_widget)
+
+        self.centralLayout = TileLayout()
         self.centralLayout.setContentsMargins(0, 0, 0, 0)
+
+        self.centralwidget = CentralWidget(self.ui.centralwidget, "central_widget")
         self.centralLayout.addWidget(self.centralwidget)
+
+        self.hboxLayout.addLayout(self.centralLayout)
 
         self.dockmanager = DockManager(self)
 
         # timer ticks
         self.display_timer.timeout.connect(self.centralwidget.canvasUpdate)
         self.display_timer.timeout.connect(self.dockmanager.canvasUpdate)
+        self.display_timer.timeout.connect(self.level_widget.canvasUpdate)
 
         # toolbar clicks
         self.ui.actionStart.triggered.connect(self.timer_toggle)

@@ -45,8 +45,12 @@ class ControlBar(QtWidgets.QWidget):
         settings_icon.addPixmap(QtGui.QPixmap(":/images-src/dock-settings.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.settings_button.setIcon(settings_icon)
 
+        self.close_button = QtWidgets.QToolButton(self)
+        self.close_button.setToolTip("Close the audio widget")
+
         self.layout.addWidget(self.combobox_select)
         self.layout.addWidget(self.settings_button)
+        self.layout.addWidget(self.close_button)
         self.layout.addStretch()
 
         self.setLayout(self.layout)

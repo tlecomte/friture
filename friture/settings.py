@@ -149,14 +149,14 @@ class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
     def single_input_type_selected(self, checked):
         if checked:
             self.groupBox_second.setEnabled(False)
-            Audiobackend().set_single_input()
+            AudioBackend().set_single_input()
             Logger().push("Switching to single input")
 
     # slot
     def duo_input_type_selected(self, checked):
         if checked:
             self.groupBox_second.setEnabled(True)
-            Audiobackend().set_duo_input()
+            AudioBackend().set_duo_input()
             Logger().push("Switching to difference between two inputs")
 
     # method
