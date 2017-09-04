@@ -85,7 +85,7 @@ class Levels_Widget(QtWidgets.QWidget):
         self.gridLayout.addWidget(self.label_rms, 2, 0, 1, 1)
         self.gridLayout.addWidget(self.label_rms_legend, 3, 0, 1, 1)
 
-        self.gridLayout.addWidget(self.meter, 0, 1, 4, 1)
+        self.gridLayout.addWidget(self.meter, 4, 0, 1, 1)
 
         self.label_rms.setText("-100.0")
         self.label_peak.setText("-100.0")
