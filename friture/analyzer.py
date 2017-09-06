@@ -33,7 +33,6 @@ from friture.settings import Settings_Dialog  # Setting dialog
 from friture.logger import Logger  # Logging class
 from friture.audiobuffer import AudioBuffer  # audio ring buffer class
 from friture.audiobackend import AudioBackend  # audio backend class
-from friture.centralwidget import CentralWidget
 from friture.dockmanager import DockManager
 from friture.tilelayout import TileLayout
 from friture.levels import Levels_Widget
@@ -88,16 +87,11 @@ class Friture(QMainWindow, ):
 
         self.centralLayout = TileLayout()
         self.centralLayout.setContentsMargins(0, 0, 0, 0)
-
-        self.centralwidget = CentralWidget(self.ui.centralwidget, "central_widget")
-        self.centralLayout.addWidget(self.centralwidget)
-
         self.hboxLayout.addLayout(self.centralLayout)
 
         self.dockmanager = DockManager(self)
 
         # timer ticks
-        self.display_timer.timeout.connect(self.centralwidget.canvasUpdate)
         self.display_timer.timeout.connect(self.dockmanager.canvasUpdate)
         self.display_timer.timeout.connect(self.level_widget.canvasUpdate)
 
@@ -148,10 +142,6 @@ class Friture(QMainWindow, ):
         self.dockmanager.saveState(settings)
         settings.endGroup()
 
-        settings.beginGroup("CentralWidget")
-        self.centralwidget.saveState(settings)
-        settings.endGroup()
-
         settings.beginGroup("MainWindow")
         windowGeometry = self.saveGeometry()
         settings.setValue("windowGeometry", windowGeometry)
@@ -171,10 +161,6 @@ class Friture(QMainWindow, ):
         self.dockmanager.restoreState(settings)
         settings.endGroup()
 
-        settings.beginGroup("CentralWidget")
-        self.centralwidget.restoreState(settings)
-        settings.endGroup()
-
         settings.beginGroup("MainWindow")
         self.restoreGeometry(settings.value("windowGeometry", type=QtCore.QByteArray))
         self.restoreState(settings.value("windowState", type=QtCore.QByteArray))
@@ -191,14 +177,12 @@ class Friture(QMainWindow, ):
             self.display_timer.stop()
             self.ui.actionStart.setText("Start")
             AudioBackend().pause()
-            self.centralwidget.pause()
             self.dockmanager.pause()
         else:
             Logger().push("Timer start")
             self.display_timer.start()
             self.ui.actionStart.setText("Stop")
             AudioBackend().restart()
-            self.centralwidget.restart()
             self.dockmanager.restart()
 
 def main():
