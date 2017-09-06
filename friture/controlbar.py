@@ -17,7 +17,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt5 import QtGui, QtWidgets
+from PyQt5 import QtGui, QtWidgets, QtCore
+import qtawesome
 from friture.widgetdict import widgets
 
 
@@ -46,6 +47,8 @@ class ControlBar(QtWidgets.QWidget):
         self.settings_button.setIcon(settings_icon)
 
         self.close_button = QtWidgets.QToolButton(self)
+        close_icon = qtawesome.icon('fa.close', scale_factor=1.3)
+        self.close_button.setIcon(close_icon)
         self.close_button.setToolTip("Close the audio widget")
 
         self.layout.addWidget(self.combobox_select)

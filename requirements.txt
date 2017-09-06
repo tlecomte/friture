@@ -6,3 +6,4 @@ docutils
 numpy
 psutil
 PyQt5
+qtawesome
