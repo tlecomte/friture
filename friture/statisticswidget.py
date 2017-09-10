@@ -18,7 +18,6 @@
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
 from PyQt5 import QtCore, QtWidgets
-import psutil  # for CPU usage monitoring
 from friture.audiobackend import AudioBackend
 
 
@@ -60,13 +59,9 @@ class StatisticsWidget(QtWidgets.QWidget):
         if not self.LabelStats.isVisible():
             return
 
-        cpu_percent = psutil.cpu_percent(0)
-
         label = "Chunk #%d\n"\
-            "Global CPU usage: %d %%\n"\
             "Number of overflowed inputs (XRUNs): %d"\
             % (AudioBackend().chunk_number,
-               cpu_percent,
                AudioBackend().xruns)
 
         self.LabelStats.setText(label)

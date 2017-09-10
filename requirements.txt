@@ -4,6 +4,5 @@ PyOpenGL
 PyOpenGL-accelerate
 docutils
 numpy
-psutil
 PyQt5
 qtawesome
