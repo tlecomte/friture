@@ -27,7 +27,6 @@ from friture.delay_estimator import Delay_Estimator_Widget
 from friture.longlevels import LongLevelWidget
 
 widgets = [
-    {'Id':0, "Class":Levels_Widget, "Name":"Levels"},
     {'Id':1, "Class":Scope_Widget, "Name":"Scope"},
     {'Id':2, "Class":Spectrum_Widget, "Name":"FFT Spectrum"},
     {'Id':3, "Class":Spectrogram_Widget, "Name":"2D Spectrogram"},
