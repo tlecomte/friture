@@ -154,7 +154,43 @@ class Friture(QMainWindow, ):
         settings.endGroup()
 
     # method
+    def migrateSettings(self):
+        settings = QtCore.QSettings("Friture", "Friture")
+
+        #1. move the central widget to a normal dock
+        if settings.contains("CentralWidget/type"):
+            settings.beginGroup("CentralWidget")
+            centralWidgetKeys = settings.allKeys()
+            children = {key: settings.value(key, type=QtCore.QVariant) for key in centralWidgetKeys}
+            settings.endGroup()
+
+            if not settings.contains("Docks/central/type"):
+                #write them to a new dock instead
+                for key, value in children.items():
+                    settings.setValue("Docks/central/" + key, value)
+
+                #add the new dock name to dockNames
+                docknames = settings.value("Docks/dockNames", [])
+                docknames = ["central"] + docknames
+                settings.setValue("Docks/dockNames", docknames)
+
+            settings.remove("CentralWidget")
+
+        #2. remove any level widget
+        docknames = settings.value("Docks/dockNames", [])
+        newDockNames = []
+        for dockname in docknames:
+            widgetType = settings.value("Docks/" + dockname + "/type", 0, type=int)
+            if widgetType == 0:
+                settings.remove("Docks/" + dockname)
+            else:
+                newDockNames.append(dockname)
+        settings.setValue("Docks/dockNames", newDockNames)
+
+    # method
     def restoreAppState(self):
+        self.migrateSettings()
+
         settings = QtCore.QSettings("Friture", "Friture")
 
         settings.beginGroup("Docks")
