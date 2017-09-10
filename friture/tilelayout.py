@@ -85,6 +85,9 @@ class TileLayout(QLayout):
         return size
 
     def doLayout(self, rect, testOnly):
+        if len(self.itemList) == 0:
+            return rect.height()
+
         rowCount = math.ceil(math.sqrt(len(self.itemList)))
         columnCount = math.ceil(len(self.itemList)/rowCount)
 

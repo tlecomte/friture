@@ -177,15 +177,16 @@ class Friture(QMainWindow, ):
             settings.remove("CentralWidget")
 
         #2. remove any level widget
-        docknames = settings.value("Docks/dockNames", [])
-        newDockNames = []
-        for dockname in docknames:
-            widgetType = settings.value("Docks/" + dockname + "/type", 0, type=int)
-            if widgetType == 0:
-                settings.remove("Docks/" + dockname)
-            else:
-                newDockNames.append(dockname)
-        settings.setValue("Docks/dockNames", newDockNames)
+        if settings.contains("Docks/dockNames"):
+            docknames = settings.value("Docks/dockNames")
+            newDockNames = []
+            for dockname in docknames:
+                widgetType = settings.value("Docks/" + dockname + "/type", 0, type=int)
+                if widgetType == 0:
+                    settings.remove("Docks/" + dockname)
+                else:
+                    newDockNames.append(dockname)
+            settings.setValue("Docks/dockNames", newDockNames)
 
     # method
     def restoreAppState(self):
