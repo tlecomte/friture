@@ -230,6 +230,9 @@ class Levels_Widget(QtWidgets.QWidget):
 
         self.i = self.i%LEVEL_TEXT_LABEL_STEPS
 
+        # prevent re-layout
+        self.label_rms.setMinimumWidth(self.label_rms.width())
+
     # slot
     def settings_called(self, checked):
         self.settings_dialog.show()
