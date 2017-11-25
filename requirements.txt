@@ -5,4 +5,3 @@ PyOpenGL-accelerate
 docutils
 numpy
 PyQt5
-qtawesome

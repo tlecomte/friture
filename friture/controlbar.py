@@ -18,7 +18,6 @@
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
 from PyQt5 import QtGui, QtWidgets, QtCore
-import qtawesome
 from friture.widgetdict import widgets
 
 
@@ -47,7 +46,8 @@ class ControlBar(QtWidgets.QWidget):
         self.settings_button.setIcon(settings_icon)
 
         self.close_button = QtWidgets.QToolButton(self)
-        close_icon = qtawesome.icon('fa.close', scale_factor=1.3)
+        close_icon = QtGui.QIcon()
+        close_icon.addPixmap(QtGui.QPixmap(":/images-src/dock-close.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.close_button.setIcon(close_icon)
         self.close_button.setToolTip("Close the audio widget")
 
