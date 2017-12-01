@@ -157,7 +157,7 @@ class Spectrum_Widget(QtWidgets.QWidget):
 
     # method
     def canvasUpdate(self):
-        self.PlotZoneSpect.update()
+        self.PlotZoneSpect.canvasUpdate()
 
     def pause(self):
         self.PlotZoneSpect.pause()
