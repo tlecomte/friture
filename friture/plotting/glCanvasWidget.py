@@ -45,8 +45,8 @@ class GlCanvasWidget(QtWidgets.QOpenGLWidget):
 
         self.attachedItems = []
 
-        self.gridList = None
         self.gridNeedsUpdating = True
+        self.backgroundNeedsUpdating = True
 
         self.horizontalScaleTransform = horizontalScaleTransform
         self.verticalScaleTransform = verticalScaleTransform
@@ -152,49 +152,71 @@ class GlCanvasWidget(QtWidgets.QOpenGLWidget):
         self.gridNeedsUpdating = True
 
     def updateGrid(self):
-        if self.gridList is None or self.gridList == 0:
-            return
-
         w = self.width()
         h = self.height()
 
-        GL.glNewList(self.gridList, GL.GL_COMPILE)
+        # given the usual aspect ratio of the canvas, the vertical minor ticks would make it look crowded
+        num_lines = len(self.xMajorTick) + len(self.xMinorTick) + len(self.yMajorTick) #+ len(self.yMinorTick)
+        num_lines *= 2
+
+        self.grid_data = np.zeros((num_lines, 6), dtype=np.float32)
+
+        i = 0
 
         color = QtGui.QColor(Qt.Qt.gray)
-        GL.glColor3f(color.redF(), color.greenF(), color.blueF())
         for x in self.xMajorTick:
-            GL.glBegin(GL.GL_LINES)
-            GL.glVertex2f(x, 0)
-            GL.glVertex2f(x, h)
-            GL.glEnd()
+            self.grid_data[i,   :] = [x, 0, 0, color.redF(), color.greenF(), color.blueF()]
+            self.grid_data[i+1, :] = [x, h, 0, color.redF(), color.greenF(), color.blueF()]
+            i += 2
 
         color = QtGui.QColor(Qt.Qt.lightGray)
-        GL.glColor3f(color.redF(), color.greenF(), color.blueF())
         for x in self.xMinorTick:
-            GL.glBegin(GL.GL_LINES)
-            GL.glVertex2f(x, 0)
-            GL.glVertex2f(x, h)
-            GL.glEnd()
+            self.grid_data[i,   :] = [x, 0, 0, color.redF(), color.greenF(), color.blueF()]
+            self.grid_data[i+1, :] = [x, h, 0, color.redF(), color.greenF(), color.blueF()]
+            i += 2
 
         color = QtGui.QColor(Qt.Qt.gray)
-        GL.glColor3f(color.redF(), color.greenF(), color.blueF())
         for y in self.yMajorTick:
-            GL.glBegin(GL.GL_LINES)
-            GL.glVertex2f(0, y)
-            GL.glVertex2f(w, y)
-            GL.glEnd()
+            self.grid_data[i,   :] = [0, y, 0, color.redF(), color.greenF(), color.blueF()]
+            self.grid_data[i+1, :] = [w, y, 0, color.redF(), color.greenF(), color.blueF()]
+            i += 2
 
         # given the usual aspect ratio of the canvas, the vertical minor ticks would make it look crowded
-        # GL.glColor3f(0.5, 0.5, 0.5)
+        # color = QtGui.QColor(Qt.Qt.lightGray)
         # for y in self.yMinorTick:
-        #    GL.glBegin(GL.GL_LINES)
-        #    GL.glVertex2f(0, y)
-        #    GL.glVertex2f(w, y)
-        #    GL.glEnd()
+        #     self.grid_data[i,   :] = [0, y, 0, color.redF(), color.greenF(), color.blueF()]
+        #     self.grid_data[i+1, :] = [w, y, 0, color.redF(), color.greenF(), color.blueF()]
+        #     i += 2
 
-        GL.glEndList()
+        self.grid_vbo.set_array(self.grid_data)
 
         self.gridNeedsUpdating = False
+
+    def updateBackground(self):
+        w = self.width()
+        h = self.height()
+        self.background_data = np.array(
+            [[0, h,   0, 0.85, 0.85, 0.85],
+             [w, h,   0, 0.85, 0.85, 0.85],
+             [w, h/2, 0, 1.0,  1.0,  1.0],
+             [0, h/2, 0, 1.0,  1.0,  1.0]],
+            dtype=np.float32)
+
+        self.background_vbo.set_array(self.background_data)
+
+        # also update the border
+        color = QtGui.QColor(Qt.Qt.gray)
+        self.border_data = np.array(
+            [[0,   0,   0, color.redF(), color.greenF(), color.blueF()],
+             [0,   h-1, 0, color.redF(), color.greenF(), color.blueF()],
+             [w-1, h-1, 0, color.redF(), color.greenF(), color.blueF()],
+             [w-1, 0,   0, color.redF(), color.greenF(), color.blueF()],
+             [0,   0,   0, color.redF(), color.greenF(), color.blueF()]],
+            dtype=np.float32)
+
+        self.border_vbo.set_array(self.border_data)
+
+        self.backgroundNeedsUpdating = False
 
     def paintGL(self):
         # try to clear the errors that are produced outside of this code - for example Qt errors
@@ -317,6 +339,7 @@ class GlCanvasWidget(QtWidgets.QOpenGLWidget):
 
     def resizeGL(self, width, height):
         self.gridNeedsUpdating = True
+        self.backgroundNeedsUpdating = True
 
         # give the opportunity to the scales to adapt
         self.resized.emit(self.width(), self.height())
@@ -338,16 +361,8 @@ class GlCanvasWidget(QtWidgets.QOpenGLWidget):
         if self.anyOpaqueItem:
             return
 
-        w = self.width()
-        h = self.height()
-        self.background_data = np.array(
-            [[0, h,   0, 0.85, 0.85, 0.85],
-             [w, h,   0, 0.85, 0.85, 0.85],
-             [w, h/2, 0, 1.0,  1.0,  1.0],
-             [0, h/2, 0, 1.0,  1.0,  1.0]],
-            dtype=np.float32)
-
-        self.background_vbo.set_array(self.background_data)
+        if self.backgroundNeedsUpdating:
+            self.updateBackground()
 
         shaders.glUseProgram(self.quad_shader)
 
@@ -373,53 +388,8 @@ class GlCanvasWidget(QtWidgets.QOpenGLWidget):
         if self.anyOpaqueItem:
             return
 
-        if self.gridList is None:
-            # display list used for the grid
-            self.gridList = GL.glGenLists(1)
-
-            if self.gridList == 0 or self.gridList is None:
-                raise RuntimeError("""Unable to generate a new display-list, context may not support display lists""")
-
         if self.gridNeedsUpdating:
             self.updateGrid()
-
-        w = self.width()
-        h = self.height()
-
-        # given the usual aspect ratio of the canvas, the vertical minor ticks would make it look crowded
-        num_lines = len(self.xMajorTick) + len(self.xMinorTick) + len(self.yMajorTick) #+ len(self.yMinorTick)
-        num_lines *= 2
-
-        self.grid_data = np.zeros((num_lines, 6), dtype=np.float32)
-
-        i = 0
-
-        color = QtGui.QColor(Qt.Qt.gray)
-        for x in self.xMajorTick:
-            self.grid_data[i,   :] = [x, 0, 0, color.redF(), color.greenF(), color.blueF()]
-            self.grid_data[i+1, :] = [x, h, 0, color.redF(), color.greenF(), color.blueF()]
-            i += 2
-
-        color = QtGui.QColor(Qt.Qt.lightGray)
-        for x in self.xMinorTick:
-            self.grid_data[i,   :] = [x, 0, 0, color.redF(), color.greenF(), color.blueF()]
-            self.grid_data[i+1, :] = [x, h, 0, color.redF(), color.greenF(), color.blueF()]
-            i += 2
-
-        color = QtGui.QColor(Qt.Qt.gray)
-        for y in self.yMajorTick:
-            self.grid_data[i,   :] = [0, y, 0, color.redF(), color.greenF(), color.blueF()]
-            self.grid_data[i+1, :] = [w, y, 0, color.redF(), color.greenF(), color.blueF()]
-            i += 2
-
-        # given the usual aspect ratio of the canvas, the vertical minor ticks would make it look crowded
-        # color = QtGui.QColor(Qt.Qt.lightGray)
-        # for y in self.yMinorTick:
-        #     self.grid_data[i,   :] = [0, y, 0, color.redF(), color.greenF(), color.blueF()]
-        #     self.grid_data[i+1, :] = [w, y, 0, color.redF(), color.greenF(), color.blueF()]
-        #     i += 2
-
-        self.grid_vbo.set_array(self.grid_data)
 
         shaders.glUseProgram(self.quad_shader)
 
@@ -442,19 +412,6 @@ class GlCanvasWidget(QtWidgets.QOpenGLWidget):
             shaders.glUseProgram(0)
 
     def drawBorder(self):
-        w = self.width()
-        h = self.height()
-        color = QtGui.QColor(Qt.Qt.gray)
-        self.border_data = np.array(
-            [[0,   0,   0, color.redF(), color.greenF(), color.blueF()],
-             [0,   h-1, 0, color.redF(), color.greenF(), color.blueF()],
-             [w-1, h-1, 0, color.redF(), color.greenF(), color.blueF()],
-             [w-1, 0,   0, color.redF(), color.greenF(), color.blueF()],
-             [0,   0,   0, color.redF(), color.greenF(), color.blueF()]],
-            dtype=np.float32)
-
-        self.border_vbo.set_array(self.border_data)
-
         shaders.glUseProgram(self.quad_shader)
 
         try:

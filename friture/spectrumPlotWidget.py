@@ -357,11 +357,36 @@ class QuadsItem:
         n = x.shape[0]
 
         # 4 vertices per quad * (3 coordinates + 3 color coordinates)
-        self.vertices_data = zeros((n*4, 6), dtype=np.float32)
-        self.vertices_data[0::4, :] = np.dstack((x,     y + h, 0*x, r, g, b))
-        self.vertices_data[1::4, :] = np.dstack((x + w, y + h, 0*x, r, g, b))
-        self.vertices_data[2::4, :] = np.dstack((x + w, y,     0*x, r, g, b))
-        self.vertices_data[3::4, :] = np.dstack((x,     y,     0*x, r, g, b))
+        if self.vertices_data.shape != (n*4, 6):
+            self.vertices_data = zeros((n*4, 6), dtype=np.float32)
+
+        self.vertices_data[0::4, 0::6] = x[:,np.newaxis]
+        self.vertices_data[0::4, 1::6] = (y + h)[:,np.newaxis]
+        self.vertices_data[0::4, 2::6] = 0*x[:,np.newaxis]
+        self.vertices_data[0::4, 3::6] = r[:,np.newaxis]
+        self.vertices_data[0::4, 4::6] = g[:,np.newaxis]
+        self.vertices_data[0::4, 5::6] = b[:,np.newaxis]
+
+        self.vertices_data[1::4, 0::6] = (x + w)[:,np.newaxis]
+        self.vertices_data[1::4, 1::6] = (y + h)[:,np.newaxis]
+        self.vertices_data[1::4, 2::6] = 0*x[:,np.newaxis]
+        self.vertices_data[1::4, 3::6] = r[:,np.newaxis]
+        self.vertices_data[1::4, 4::6] = g[:,np.newaxis]
+        self.vertices_data[1::4, 5::6] = b[:,np.newaxis]
+
+        self.vertices_data[2::4, 0::6] = (x + w)[:,np.newaxis]
+        self.vertices_data[2::4, 1::6] = y[:,np.newaxis]
+        self.vertices_data[2::4, 2::6] = 0*x[:,np.newaxis]
+        self.vertices_data[2::4, 3::6] = r[:,np.newaxis]
+        self.vertices_data[2::4, 4::6] = g[:,np.newaxis]
+        self.vertices_data[2::4, 5::6] = b[:,np.newaxis]
+
+        self.vertices_data[3::4, 0::6] = x[:,np.newaxis]
+        self.vertices_data[3::4, 1::6] = y[:,np.newaxis]
+        self.vertices_data[3::4, 2::6] = 0*x[:,np.newaxis]
+        self.vertices_data[3::4, 3::6] = r[:,np.newaxis]
+        self.vertices_data[3::4, 4::6] = g[:,np.newaxis]
+        self.vertices_data[3::4, 5::6] = b[:,np.newaxis]
 
     def transformUpdate(self):
         self.need_transform = True
