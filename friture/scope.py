@@ -65,8 +65,8 @@ class Scope_Widget(QtWidgets.QWidget):
         # trigger on the first channel only
         triggerdata = floatdata[0, :]
         # trigger on half of the waveform
-        trig_search_start = width / 2
-        trig_search_stop = -width / 2
+        trig_search_start = width // 2
+        trig_search_stop = -width // 2
         triggerdata = triggerdata[trig_search_start: trig_search_stop]
 
         trigger_level = floatdata.max() * 2. / 3.
@@ -81,7 +81,7 @@ class Scope_Widget(QtWidgets.QWidget):
             shift = 0
         shift += trig_search_start
         datarange = width
-        floatdata = floatdata[:, shift - datarange / 2: shift + datarange / 2]
+        floatdata = floatdata[:, shift - datarange // 2: shift + datarange // 2]
 
         self.y = floatdata[0, :]
         if twoChannels:
@@ -98,7 +98,7 @@ class Scope_Widget(QtWidgets.QWidget):
             else:
                 self.y2 = None
 
-        self.time = (arange(len(self.y)) - datarange / 2) / float(SAMPLING_RATE)
+        self.time = (arange(len(self.y)) - datarange // 2) / float(SAMPLING_RATE)
 
         if self.y2 is not None:
             self.PlotZoneUp.setdataTwoChannels(self.time*1e3, self.y, self.y2)
