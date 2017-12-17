@@ -5,11 +5,6 @@ python:
   - '3.5'
 before_install:
   - brew update
-  - cd $(brew --repo)/Library/Taps/homebrew/homebrew-core
-  # Checkout the old formula to get 3.5
-  - git checkout ec545d45d4512ace3570782283df4ecda6bb0044 Formula/python3.rb
-  # cd back to build dir
-  - cd $TRAVIS_BUILD_DIR
   - sed -i '.bak' -e 's/#{MacOS.version}/10.6/g' $(brew --repo)/Library/Taps/homebrew/homebrew-core/Formula/python3.rb
   - brew install python3 --build-from-source
   - which python3
@@ -31,15 +26,11 @@ script:
   - cp -R /usr/local/lib/python3.5/site-packages/PyQt5/Qt/plugins/imageformats/libqsvg.dylib dist/friture.app/Contents/PlugIns/imageformats/
   - cp -R /usr/local/lib/python3.5/site-packages/PyQt5/Qt/plugins/platforms/libqcocoa.dylib dist/friture.app/Contents/PlugIns/platforms/
   - "/usr/local/opt/qt5/bin/macdeployqt dist/friture.app -dmg"
-  #- "/usr/local/opt/coreutils/libexec/gnubin/timeout 15s open dist/friture.app"
-  #- ls -R dist
   - du -hs dist/friture.app
   - du -hs dist/friture.dmg
   - export DMG_FILENAME=friture-$(python3 -c 'import friture; print(friture.__version__)')-$(date +'%Y%m%d').dmg
   - echo $DMG_FILENAME
   - mv dist/friture.dmg dist/$DMG_FILENAME
-  #- ls -l dist
-  #- ls -l
 deploy:
   provider: releases
   draft: true
