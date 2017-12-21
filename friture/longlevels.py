@@ -139,7 +139,7 @@ class LongLevelWidget(QtWidgets.QWidget):
 
         self.length_seconds = 60.*10
         # actually this should be linked to the pixel width of the plot area
-        self.length_samples = self.length_seconds * self.subsampled_sampling_rate
+        self.length_samples = int(self.length_seconds * self.subsampled_sampling_rate)
 
         # ringbuffer for the subsampled data
         self.ringbuffer = RingBuffer()
@@ -161,7 +161,7 @@ class LongLevelWidget(QtWidgets.QWidget):
             self.old_index = index
 
         # if we have enough data to add a frequency column in the time-frequency plane, compute it
-        needed = 2**self.Ndec
+        needed = int(2**self.Ndec)
         realizable = int(np.floor(available / needed))
 
         if realizable > 0:
@@ -185,7 +185,7 @@ class LongLevelWidget(QtWidgets.QWidget):
 
                 self.ringbuffer.push(l)
 
-                self.old_index += int(needed)
+                self.old_index += needed
 
             self.time = np.arange(self.length_samples) / self.subsampled_sampling_rate
 

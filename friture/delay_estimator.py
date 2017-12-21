@@ -220,11 +220,11 @@ class Delay_Estimator_Widget(QtWidgets.QWidget):
             # print available, needed, realizable
 
             for i in range(realizable):
-                self.old_index += int(needed)
+                self.old_index += needed
 
                 # retrieve data
-                d0 = self.ringbuffer0.data_indexed(self.old_index, length)
-                d1 = self.ringbuffer1.data_indexed(self.old_index, length)
+                d0 = self.ringbuffer0.data_indexed(self.old_index, int(length))
+                d1 = self.ringbuffer1.data_indexed(self.old_index, int(length))
                 d0.shape = (d0.size)
                 d1.shape = (d1.size)
                 std0 = numpy.std(d0)
