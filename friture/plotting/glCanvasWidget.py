@@ -57,6 +57,13 @@ class GlCanvasWidget(QtWidgets.QOpenGLWidget):
 
         self.paused = False
 
+        self.quad_shader = None
+        self.background_vbo = None
+        self.border_vbo = None
+        self.ruler_vbo = None
+        self.grid_vbo = None
+        self.data_vbo = None
+
     def setTrackerFormatter(self, formatter):
         self.trackerFormatter = formatter
 
@@ -219,6 +226,9 @@ class GlCanvasWidget(QtWidgets.QOpenGLWidget):
         self.backgroundNeedsUpdating = False
 
     def paintGL(self):
+        if self.quad_shader is None:
+            return # not yet initiliazed
+
         # try to clear the errors that are produced outside of this code - for example Qt errors
         error = GL.glGetError()
         while error != GL.GL_NO_ERROR:
