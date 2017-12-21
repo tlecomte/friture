@@ -49,7 +49,7 @@ class audioproc():
         return spectrum
 
     def norm_square(self, fft):
-        return fft*fft.conjugate() / self.size_sq
+        return (fft*fft.conjugate()).real / self.size_sq
 
     def decimate(self, samples):
         # first we remove as much points as possible
