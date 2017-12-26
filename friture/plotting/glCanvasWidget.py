@@ -103,7 +103,7 @@ class GlCanvasWidget(QtWidgets.QOpenGLWidget):
         return QtCore.QSize(50, 50)
 
     def initializeGL(self):
-        quad_vertex_shader = shaders.compileShader("""#version 120
+        quad_vertex_shader = shaders.compileShader("""#version 130
             in vec3 color;
             out vec3 theColor;
 
@@ -113,7 +113,7 @@ class GlCanvasWidget(QtWidgets.QOpenGLWidget):
                 theColor = color;
             }""", GL.GL_VERTEX_SHADER)
 
-        quad_fragment_shader = shaders.compileShader("""#version 120
+        quad_fragment_shader = shaders.compileShader("""#version 130
             in vec3 theColor;
             out vec4 out_color;
 
