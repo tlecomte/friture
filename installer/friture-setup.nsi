@@ -105,7 +105,7 @@ Section "MainSection" SEC01
   CreateShortCut "$DESKTOP\Friture.lnk" "$INSTDIR\friture.exe"
 
   SetOutPath "$INSTDIR\_sounddevice_data"
-  File "${PROJECT_PATH}\dist\friture\_sounddevice_data\*"
+  File /r "${PROJECT_PATH}\dist\friture\_sounddevice_data\*"
 
   SetOutPath "$INSTDIR\qt5_plugins"
   File /r "${PROJECT_PATH}\dist\friture\qt5_plugins\*"
