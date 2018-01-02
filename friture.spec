@@ -5,7 +5,7 @@ from PyInstaller.utils.hooks import collect_data_files
 block_cipher = None
 
 sounddevice_data = collect_data_files("sounddevice", subdir="_sounddevice_data")
-libportaudio = [(file[0], "_sounddevice_data") for file in sounddevice_data if "libportaudio" in file[0]]
+libportaudio = [(file[0], "_sounddevice_data/portaudio-binaries") for file in sounddevice_data if "libportaudio" in file[0]]
 
 # workaround for PyInstaller that does not look where the new PyQt5 official wheels put the Qt dlls
 from PyInstaller.compat import getsitepackages
