@@ -7,6 +7,10 @@ block_cipher = None
 sounddevice_data = collect_data_files("sounddevice", subdir="_sounddevice_data")
 libportaudio = [(file[0], "_sounddevice_data/portaudio-binaries") for file in sounddevice_data if "libportaudio" in file[0]]
 
+print(libportaudio)
+if len(libportaudio) != 1:
+  raise ValueError('libportaudio dll could not be found')
+
 # workaround for PyInstaller that does not look where the new PyQt5 official wheels put the Qt dlls
 from PyInstaller.compat import getsitepackages
 pathex = [os.path.join(x, 'PyQt5', 'Qt', 'bin') for x in getsitepackages()]
