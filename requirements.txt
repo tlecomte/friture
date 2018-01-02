@@ -1,7 +1,7 @@
-Cython
-sounddevice
-PyOpenGL
-PyOpenGL-accelerate
-docutils
-numpy
-PyQt5
+Cython==0.27.3
+sounddevice==0.9.10
+PyOpenGL==3.1.0
+PyOpenGL-accelerate==3.1.0
+docutils==0.14
+numpy==1.13.3
+PyQt5==5.9.2
