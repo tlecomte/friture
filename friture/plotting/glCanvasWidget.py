@@ -103,6 +103,8 @@ class GlCanvasWidget(QtWidgets.QOpenGLWidget):
         return QtCore.QSize(50, 50)
 
     def initializeGL(self):
+        self.clearErrors()
+
         quad_vertex_shader = shaders.compileShader("""#version 130
             in vec3 color;
             out vec3 theColor;
@@ -225,15 +227,18 @@ class GlCanvasWidget(QtWidgets.QOpenGLWidget):
 
         self.backgroundNeedsUpdating = False
 
-    def paintGL(self):
-        if self.quad_shader is None:
-            return # not yet initiliazed
-
+    def clearErrors(self):
         # try to clear the errors that are produced outside of this code - for example Qt errors
         error = GL.glGetError()
         while error != GL.GL_NO_ERROR:
             print("Clearing an OpenGL error that occured outside of Friture code", error)
             error = GL.glGetError()
+
+    def paintGL(self):
+        if self.quad_shader is None:
+            return # not yet initiliazed
+
+        self.clearErrors()
 
         self.setupViewport(self.width(), self.height())
 
