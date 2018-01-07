@@ -1,4 +1,5 @@
 import sys
+import logging
 
 from PyQt5 import QtCore, QtGui, Qt, QtWidgets
 import numpy as np
@@ -21,6 +22,8 @@ class GlCanvasWidget(QtWidgets.QOpenGLWidget):
 
     def __init__(self, parent, verticalScaleTransform, horizontalScaleTransform):
         super(GlCanvasWidget, self).__init__(parent)
+
+        self.logger = logging.getLogger(__name__)
 
         self.lastPos = QtCore.QPoint()
 
@@ -231,7 +234,7 @@ class GlCanvasWidget(QtWidgets.QOpenGLWidget):
         # try to clear the errors that are produced outside of this code - for example Qt errors
         error = GL.glGetError()
         while error != GL.GL_NO_ERROR:
-            print("Clearing an OpenGL error that occured outside of Friture code", error)
+            self.logger.error("Clearing an OpenGL error that occured outside of Friture code: %s", error)
             error = GL.glGetError()
 
     def paintGL(self):

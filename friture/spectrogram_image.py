@@ -17,10 +17,11 @@
 # You should have received a copy of the GNU General Public License
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
+import logging
+
 import numpy
 from PyQt5 import QtCore, QtGui
 from friture.plotting import generated_cmrmap
-from friture.logger import Logger
 from friture.lookup_table import pyx_color_from_float_2D
 
 
@@ -29,6 +30,8 @@ class CanvasScaledSpectrogram(QtCore.QObject):
 
     def __init__(self, canvas_height=2, canvas_width=2):
         super().__init__()
+
+        self.logger = logging.getLogger(__name__)
 
         self.canvas_height = canvas_height
         self.canvas_width = canvas_width
@@ -69,14 +72,14 @@ class CanvasScaledSpectrogram(QtCore.QObject):
         if self.canvas_height != canvas_height:
             self.canvas_height = canvas_height
             self.resize(self.canvas_width, self.canvas_height)
-            Logger().push("Spectrogram image: canvas_height changed, now: %d" % (canvas_height))
+            self.logger.info("Spectrogram image: canvas_height changed, now: %d", canvas_height)
 
     def setcanvas_width(self, canvas_width):
         if self.canvas_width != canvas_width:
             self.canvas_width = canvas_width
             self.resize(self.canvas_width, self.canvas_height)
             self.canvasWidthChanged.emit(canvas_width)
-            Logger().push("Spectrogram image: canvas_width changed, now: %d" % (canvas_width))
+            self.logger.info("Spectrogram image: canvas_width changed, now: %d", canvas_width)
 
     def addPixelAdvance(self, pixel_advance):
         self.time_offset += pixel_advance
@@ -138,7 +141,7 @@ class CanvasScaledSpectrogram(QtCore.QObject):
         return myimage
 
     def prepare_palette(self):
-        print("palette preparation")
+        self.logger.info("palette preparation")
 
         cmap = generated_cmrmap.CMAP
 

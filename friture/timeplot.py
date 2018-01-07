@@ -18,9 +18,10 @@
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
 import sys
+import logging
+
 from PyQt5 import Qt, QtGui, QtWidgets
 import numpy as np
-from friture.logger import Logger
 from friture.plotting.scaleWidget import VerticalScaleWidget, HorizontalScaleWidget
 from friture.plotting.scaleDivision import ScaleDivision
 from friture.plotting.coordinateTransform import CoordinateTransform
@@ -129,6 +130,8 @@ class TimePlot(QtWidgets.QWidget):
     def __init__(self, parent):
         super(TimePlot, self).__init__()
 
+        self.logger = logging.getLogger(__name__)
+
         self.verticalScaleDivision = ScaleDivision(-1, 1, 100)
         self.verticalScaleTransform = CoordinateTransform(-1, 1, 100, 0, 0)
 
@@ -187,7 +190,7 @@ class TimePlot(QtWidgets.QWidget):
 
     def setdata(self, x, y):
         if self.canvas_width != self.canvasWidget.width():
-            Logger().push("timeplot : changed canvas width")
+            self.logger.info("timeplot : changed canvas width")
             self.canvas_width = self.canvasWidget.width()
             self.update_xscale()
 
@@ -199,13 +202,13 @@ class TimePlot(QtWidgets.QWidget):
             # the canvas reisze event will trigger a full replot
 
         if self.xmax != x[-1]:
-            Logger().push("timeplot : changing x max")
+            self.logger.info("timeplot : changing x max")
             self.xmax = x[-1]
             self.settimerange(self.xmin, self.xmax)
             self.update_xscale()
             self.needfullreplot = True
         if self.xmin != x[0]:
-            Logger().push("timeplot : changing x min")
+            self.logger.info("timeplot : changing x min")
             self.xmin = x[0]
             self.settimerange(self.xmin, self.xmax)
             self.update_xscale()
@@ -256,7 +259,7 @@ class TimePlot(QtWidgets.QWidget):
 
     def setdataTwoChannels(self, x, y, y2):
         if self.canvas_width != self.canvasWidget.width():
-            Logger().push("timeplot : changed canvas width")
+            self.logger.info("timeplot : changed canvas width")
             self.canvas_width = self.canvasWidget.width()
             self.update_xscale()
 
@@ -268,13 +271,13 @@ class TimePlot(QtWidgets.QWidget):
             # the canvas reisze event will trigger a full replot
 
         if self.xmax != x[-1]:
-            Logger().push("timeplot : changing x max")
+            self.logger.info("timeplot : changing x max")
             self.xmax = x[-1]
             self.settimerange(self.xmin, self.xmax)
             self.update_xscale()
             self.needfullreplot = True
         if self.xmin != x[0]:
-            Logger().push("timeplot : changing x min")
+            self.logger.info("timeplot : changing x min")
             self.xmin = x[0]
             self.settimerange(self.xmin, self.xmax)
             self.update_xscale()

@@ -17,9 +17,10 @@
 # You should have received a copy of the GNU General Public License
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
+import logging
+
 from PyQt5 import QtWidgets
 from friture.audiobackend import SAMPLING_RATE
-from friture.logger import Logger
 
 # shared with spectrogram.py
 DEFAULT_FFT_SIZE = 7  # 4096 points
@@ -36,6 +37,8 @@ class Spectrogram_Settings_Dialog(QtWidgets.QDialog):
 
     def __init__(self, parent):
         super().__init__(parent)
+
+        self.logger = logging.getLogger(__name__)
 
         self.setWindowTitle("Spectrogram settings")
 
@@ -131,13 +134,13 @@ class Spectrogram_Settings_Dialog(QtWidgets.QDialog):
 
     # slot
     def fftsizechanged(self, index):
-        Logger().push("fft_size_changed slot %d %d %f" % (index, 2 ** index * 32, 150000 / 2 ** index * 32))
+        self.logger.info("fft_size_changed slot %d %d %f", index, 2 ** index * 32, 150000 / 2 ** index * 32)
         fft_size = 2 ** index * 32
         self.parent().setfftsize(fft_size)
 
     # slot
     def freqscalechanged(self, index):
-        Logger().push("freq_scale slot %d" % index)
+        self.logger.info("freq_scale slot %d", index)
         if index == 1:
             self.parent().PlotZoneImage.setlog10freqscale()
         else:

@@ -17,8 +17,9 @@
 # You should have received a copy of the GNU General Public License
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
+import logging
+
 from PyQt5 import QtWidgets
-from friture.logger import Logger
 
 # shared with octavespectrum.py
 DEFAULT_SPEC_MIN = -80
@@ -34,6 +35,8 @@ class OctaveSpectrum_Settings_Dialog(QtWidgets.QDialog):
 
     def __init__(self, parent):
         super().__init__(parent)
+
+        self.logger = logging.getLogger(__name__)
 
         self.setWindowTitle("Octave Spectrum settings")
 
@@ -97,7 +100,7 @@ class OctaveSpectrum_Settings_Dialog(QtWidgets.QDialog):
     # slot
     def bandsperoctavechanged(self, index):
         bandsperoctave = 3 * 2 ** (index - 1) if index >= 1 else 1
-        Logger().push("bandsperoctavechanged slot %d %d" % (index, bandsperoctave))
+        self.logger.info("bandsperoctavechanged slot %d %d", index, bandsperoctave)
         self.parent().setbandsperoctave(bandsperoctave)
 
     # slot
@@ -110,7 +113,7 @@ class OctaveSpectrum_Settings_Dialog(QtWidgets.QDialog):
             response_time = 0.3
         elif index == 3:
             response_time = 1.
-        Logger().push("responsetimechanged slot %d %d" % (index, response_time))
+        self.logger.info("responsetimechanged slot %d %d", index, response_time)
         self.parent().setresponsetime(response_time)
 
     # method
