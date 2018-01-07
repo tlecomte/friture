@@ -17,6 +17,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
+import logging
+
 from PyQt5 import QtGui, QtCore, QtWidgets
 import numpy as np
 import sounddevice
@@ -26,7 +28,6 @@ from friture.generators.sine import SineGenerator
 from friture.generators.burst import BurstGenerator
 from friture.generators.pink import PinkGenerator
 from friture.generators.white import WhiteGenerator
-from friture.logger import Logger
 
 SMOOTH_DISPLAY_TIMER_PERIOD_MS = 25
 FRAMES_PER_BUFFER = 2 * 1024
@@ -42,6 +43,8 @@ class Generator_Widget(QtWidgets.QWidget):
 
     def __init__(self, parent):
         super().__init__(parent)
+
+        self.logger = logging.getLogger(__name__)
 
         self.audiobuffer = None
 
@@ -80,16 +83,16 @@ class Generator_Widget(QtWidgets.QWidget):
         # we will try to open all the output devices until one
         # works, starting by the default input device
         for device in AudioBackend().output_devices:
-            Logger().push("Opening the stream for device: "+ device['name'])
+            self.logger.info("Opening the stream for device '%s'", device['name'])
             try:
                 self.stream = AudioBackend().open_output_stream(device, self.audio_callback)
                 self.stream.start()
                 self.stream.stop()
                 self.device = device
-                Logger().push("Stream opened successfully")
+                self.logger.info("Stream opened successfully")
                 break
-            except Exception as exception:
-                Logger().push("Failed to open stream: " + str(exception))
+            except Exception:
+                self.logger.exception("Failed to open stream")
 
         self.start_stop_button = QtWidgets.QPushButton(self)
 
@@ -146,13 +149,13 @@ class Generator_Widget(QtWidgets.QWidget):
 
         error_message = ""
 
-        Logger().push("Trying to write to output device " + device['name'])
+        self.logger.info("Trying to write to output device '%s'", device['name'])
 
         # first see if the format is supported by PortAudio
         try:
             success = AudioBackend().is_output_format_supported(device, np.int16)
-        except Exception as exception:
-            Logger().push("Format is not supported: " + str(exception))
+        except Exception:
+            self.logger.exception("Format is not supported")
             success = False
 
         if success:
@@ -163,12 +166,12 @@ class Generator_Widget(QtWidgets.QWidget):
                 if self.state not in [STARTING, PLAYING]:
                     self.stream.stop()
                 success = True
-            except OSError as error:
-                Logger().push("Fail: " + str(error))
+            except OSError:
+                self.logger.exception("Failed to open output device")
                 success = False
 
         if success:
-            Logger().push("Success")
+            self.logger.info("Success")
             previous_stream.stop()
         else:
             if self.stream is not None:
@@ -216,7 +219,7 @@ class Generator_Widget(QtWidgets.QWidget):
 
     def audio_callback(self, out_data, frame_count, time_info, status):
         if status:
-            print(status, flush=True)
+            self.logger.info(status)
 
         N = frame_count
 
@@ -235,12 +238,12 @@ class Generator_Widget(QtWidgets.QWidget):
         generators = [generator for generator in self.generators if generator.name == name]
 
         if len(generators) == 0:
-            print("generator error : index of signal type not found")
+            self.logger.error("generator error : index of signal type not found")
             out_data.fill(0)
             return
 
         if len(generators) > 1:
-            print("generator error : 2 (or more) generators have the same name")
+            self.logger.error("generator error : 2 (or more) generators have the same name")
             out_data.fill(0)
             return
 
@@ -258,7 +261,7 @@ class Generator_Widget(QtWidgets.QWidget):
                 self.state = PLAYING
 
         if self.state == STOPPING:
-            print("stopping", self.t_stop, N)
+            self.logging.info("stopping", self.t_stop, N)
             # add a ramp at the end
             t_ramp = self.t_stop - np.arange(0, N / float(SAMPLING_RATE), 1. / float(SAMPLING_RATE))
             t_ramp = np.clip(t_ramp, 0., RAMP_LENGTH)

@@ -17,14 +17,17 @@
 # You should have received a copy of the GNU General Public License
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
+import logging
+
 from numpy import linspace, log2, floor, log10, cos, arange, pi
 from numpy.fft import rfft
 from friture.audiobackend import SAMPLING_RATE
-from friture.logger import Logger
 
 class audioproc():
 
     def __init__(self):
+        self.logger = logging.getLogger(__name__)
+
         self.freq = linspace(0, SAMPLING_RATE / 2, 10)
         self.A = 0. * self.freq
         self.B = 0. * self.freq
@@ -81,7 +84,7 @@ class audioproc():
             self.update_window()
             self.update_size()
 
-        Logger().push("audioproc: will decimate %d times" % self.decimation)
+        self.logger.info("audioproc: will decimate %d times", self.decimation)
 
     def get_freq_scale(self):
         return self.freq
@@ -97,11 +100,11 @@ class audioproc():
         n = arange(0, N)
         # Hann window : better frequency resolution than the rectangular window
         self.window = 0.5 * (1. - cos(2 * pi * n / (N - 1)))
-        Logger().push("audioproc: updating window")
+        self.logger.info("audioproc: updating window")
 
     def update_freq_cache(self):
         if len(self.freq) != self.fft_size / (2 * self.decimation) + 1:
-            Logger().push("audioproc: updating self.freq cache")
+            self.logger.info("audioproc: updating self.freq cache")
             self.freq = linspace(0, SAMPLING_RATE / (2 * self.decimation), self.fft_size / (2 * self.decimation) + 1)
 
             # compute psychoacoustic weighting. See http://en.wikipedia.org/wiki/A-weighting

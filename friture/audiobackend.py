@@ -17,11 +17,11 @@
 # You should have received a copy of the GNU General Public License
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
+import logging
+
 from PyQt5 import QtCore
 import sounddevice
 from numpy import ndarray, int16, fromstring, vstack, iinfo, float64
-
-from friture.logger import Logger
 
 # the sample rate below should be dynamic, taken from PyAudio/PortAudio
 SAMPLING_RATE = 48000
@@ -45,7 +45,7 @@ class __AudioBackend(QtCore.QObject):
         # do the minimum from here to prevent overflows, just pass the data to the main thread
 
         if status:
-            print(status, flush=True)
+            self.logger.info(status)
 
         # some API drivers in PortAudio do not return a valid inputBufferAdcTime (MME for example)
         # so fallback to the current stream time in that case
@@ -61,9 +61,11 @@ class __AudioBackend(QtCore.QObject):
     def __init__(self):
         QtCore.QObject.__init__(self)
 
+        self.logger = logging.getLogger(__name__)
+
         self.duo_input = False
 
-        Logger().push("Initializing audio backend")
+        self.logger.info("Initializing audio backend")
 
         # look for devices
         self.input_devices = self.get_input_devices()
@@ -82,10 +84,10 @@ class __AudioBackend(QtCore.QObject):
                 self.stream = self.open_stream(device)
                 self.stream.start()
                 self.device = device
-                Logger().push("Success")
+                self.logger.info("Success")
                 break
-            except Exception as exception:
-                Logger().push("Failed to open stream: " + str(exception))
+            except Exception:
+                self.logger.exception("Failed to open stream")
 
         if self.device is not None:
             self.first_channel = 0
@@ -118,8 +120,8 @@ class __AudioBackend(QtCore.QObject):
         try:
             default_input_device = sounddevice.query_devices(kind='input')
             default_input_device['index'] = raw_devices.index(default_input_device)
-        except sounddevice.PortAudioError as exception:
-            Logger().push("Failed to query the default input device: %s" % (exception))
+        except sounddevice.PortAudioError:
+            self.logger.exception("Failed to query the default input device")
             default_input_device = None
 
         devices_list = []
@@ -195,8 +197,8 @@ class __AudioBackend(QtCore.QObject):
 
         try:
             default_input_device = sounddevice.query_devices(kind='input')
-        except sounddevice.PortAudioError as exception:
-            Logger().push("Failed to query the default input device: %s" % (exception))
+        except sounddevice.PortAudioError:
+            self.logger.exception("Failed to query the default input device")
             default_input_device = None
 
         input_devices = []
@@ -248,15 +250,15 @@ class __AudioBackend(QtCore.QObject):
         previous_stream = self.stream
         previous_device = self.device
 
-        Logger().push("Trying to open input device #%d" % (index))
+        self.logger.info("Trying to open input device #%d", index)
 
         try:
             self.stream = self.open_stream(device)
             self.device = device
             self.stream.start()
             success = True
-        except Exception as exception:
-            Logger().push("Fail: " + str(exception))
+        except Exception:
+            self.logger.exception("Failed to open input device")
             success = False
             if self.stream is not None:
                 self.stream.stop()
@@ -265,7 +267,7 @@ class __AudioBackend(QtCore.QObject):
             self.device = previous_device
 
         if success:
-            Logger().push("Success")
+            self.logger.info("Success")
             previous_stream.stop()
 
             self.first_channel = 0
@@ -291,7 +293,7 @@ class __AudioBackend(QtCore.QObject):
 
     # method
     def open_stream(self, device):
-        Logger().push("Opening the stream for device: " + device['name'])
+        self.logger.info("Opening the stream for device '%s'", device['name'])
 
         # by default we open the device stream with all the channels
         # (interleaved in the data buffer)
@@ -304,7 +306,7 @@ class __AudioBackend(QtCore.QObject):
             callback=self.callback)
 
         lat_ms = 1000 * stream.latency
-        Logger().push("Device claims %d ms latency" % (lat_ms))
+        self.logger.info("Device claims %d ms latency", lat_ms)
 
         return stream
 
@@ -331,8 +333,8 @@ class __AudioBackend(QtCore.QObject):
                 samplerate=SAMPLING_RATE)
 
             success = True
-        except Exception as exception:
-            Logger().push("Format is not supported: " + str(exception))
+        except Exception:
+            self.logger.exception("Format is not supported")
             success = False
 
         return success
@@ -374,7 +376,7 @@ class __AudioBackend(QtCore.QObject):
 
     def handle_new_data(self, in_data, frame_count, input_time, input_overflow):
         if input_overflow:
-            print("Stream overflow!")
+            self.logger.info("Stream overflow!")
             self.xruns += 1
             self.underflow.emit()
 
@@ -390,7 +392,7 @@ class __AudioBackend(QtCore.QObject):
             channel_2 = self.get_current_second_channel()
 
         if len(floatdata_all_channels) != frame_count*nchannels:
-            print("Incoming data is not consistent with current channel settings.")
+            self.logger.error("Incoming data is not consistent with current channel settings.")
             return
 
         floatdata1 = floatdata_all_channels[channel::nchannels]
@@ -416,10 +418,10 @@ class __AudioBackend(QtCore.QObject):
     def get_stream_time(self):
         try:
             return self.stream.time
-        except (sounddevice.PortAudioError, OSError) as exception:
+        except (sounddevice.PortAudioError, OSError):
             if self.stream.device not in self.devices_with_timing_errors:
                 self.devices_with_timing_errors.append(self.stream.device)
-                print("Failed to read stream time", exception)
+                self.logger.exception("Failed to read stream time")
             return 0
 
     def pause(self):

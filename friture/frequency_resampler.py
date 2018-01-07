@@ -5,12 +5,16 @@ Created on Sat Apr 21 20:29:18 2012
 @author: timothee
 """
 
+import logging
+
 import numpy as np
 
 
 class Frequency_Resampler:
 
     def __init__(self, logfreqscale=0, minfreq=20., maxfreq=20000., nsamples=1):
+        self.logger = logging.getLogger(__name__)
+
         self.logfreqscale = logfreqscale  # 0: linear
         self.minfreq = minfreq
         self.maxfreq = maxfreq
@@ -18,7 +22,7 @@ class Frequency_Resampler:
         self.update_xscale()
 
     def setfreqrange(self, minfreq, maxfreq):
-        print("freq range changed", minfreq, maxfreq)
+        self.logger.info("freq range changed %f %f", minfreq, maxfreq)
         self.minfreq = minfreq
         self.maxfreq = maxfreq
         self.update_xscale()
@@ -35,11 +39,11 @@ class Frequency_Resampler:
         if self.nsamples != nsamples:
             self.nsamples = nsamples
             self.update_xscale()
-            print("nsamples changed, now: %d" % (nsamples))
+            self.logger.info("nsamples changed, now: %d", nsamples)
 
     def setlogfreqscale(self, logfreqscale):
         if logfreqscale != self.logfreqscale:
-            print("freq scale changed", logfreqscale)
+            self.logger.info("freq scale changed to %f", logfreqscale)
             self.logfreqscale = logfreqscale
             self.update_xscale()
 

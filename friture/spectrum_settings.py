@@ -17,9 +17,10 @@
 # You should have received a copy of the GNU General Public License
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
+import logging
+
 from PyQt5 import QtWidgets
 from friture.audiobackend import SAMPLING_RATE
-from friture.logger import Logger
 
 # shared with spectrum_settings.py
 DEFAULT_FFT_SIZE = 8  # 8192 points
@@ -38,6 +39,8 @@ class Spectrum_Settings_Dialog(QtWidgets.QDialog):
 
     def __init__(self, parent):
         super().__init__(parent)
+
+        self.logger = logging.getLogger(__name__)
 
         self.setWindowTitle("Spectrum settings")
 
@@ -154,14 +157,14 @@ class Spectrum_Settings_Dialog(QtWidgets.QDialog):
 
     # slot
     def fftsizechanged(self, index):
-        Logger().push("fft_size_changed slot %d %d %f" % (index, 2 ** index * 32, 150000 / 2 ** index * 32))
+        self.logger.info("fft_size_changed slot %d %d %f", index, 2 ** index * 32, 150000 / 2 ** index * 32)
         # FIXME the size should not be found from the index, but attached as item data
         fft_size = 2 ** index * 32
         self.parent().setfftsize(fft_size)
 
     # slot
     def freqscalechanged(self, index):
-        Logger().push("freq_scale slot %d" % index)
+        self.logger.info("freq_scale slot %d", index)
         if index == 1:
             self.parent().PlotZoneSpect.setlogfreqscale()
         else:
@@ -177,7 +180,7 @@ class Spectrum_Settings_Dialog(QtWidgets.QDialog):
             response_time = 0.3
         elif index == 3:
             response_time = 1.
-        Logger().push("responsetimechanged slot %d %d" % (index, response_time))
+        self.logger.info("responsetimechanged slot %d %d", index, response_time)
         self.parent().setresponsetime(response_time)
 
     # method

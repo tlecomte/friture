@@ -20,17 +20,23 @@
 import sys
 import os
 import os.path
+import errno
 import platform
+import logging
+import logging.handlers
+
 from PyQt5 import QtCore
 # specifically import from PyQt5.QtGui and QWidgets for startup time improvement :
 from PyQt5.QtWidgets import QMainWindow, QHBoxLayout, QApplication, QSplashScreen
 from PyQt5.QtGui import QPixmap
+import appdirs
+
 # importing friture.exceptionhandler also installs a temporary exception hook
 from friture.exceptionhandler import errorBox, fileexcepthook
+import friture
 from friture.ui_friture import Ui_MainWindow
 from friture.about import About_Dialog  # About dialog
 from friture.settings import Settings_Dialog  # Setting dialog
-from friture.logger import Logger  # Logging class
 from friture.audiobuffer import AudioBuffer  # audio ring buffer class
 from friture.audiobackend import AudioBackend  # audio backend class
 from friture.dockmanager import DockManager
@@ -50,6 +56,8 @@ class Friture(QMainWindow, ):
 
     def __init__(self):
         QMainWindow.__init__(self)
+
+        self.logger = logging.getLogger(__name__)
 
         # exception hook that logs to console, file, and display a message box
         self.errorDialogOpened = False
@@ -108,7 +116,7 @@ class Friture(QMainWindow, ):
         self.timer_toggle()
         self.slow_timer.start()
 
-        Logger().push("Init finished, entering the main loop")
+        self.logger.info("Init finished, entering the main loop")
 
     # exception hook that logs to console, file, and display a message box
     def excepthook(self, exception_type, exception_value, traceback_object):
@@ -210,23 +218,73 @@ class Friture(QMainWindow, ):
     # slot
     def timer_toggle(self):
         if self.display_timer.isActive():
-            Logger().push("Timer stop")
+            self.logger.info("Timer stop")
             self.display_timer.stop()
             self.ui.actionStart.setText("Start")
             AudioBackend().pause()
             self.dockmanager.pause()
         else:
-            Logger().push("Timer start")
+            self.logger.info("Timer start")
             self.display_timer.start()
             self.ui.actionStart.setText("Stop")
             AudioBackend().restart()
             self.dockmanager.restart()
 
+def qt_message_handler(mode, context, message):
+    logger = logging.getLogger(__name__)
+    if mode == QtCore.QtInfoMsg:
+        logger.info(message)
+    elif mode == QtCore.QtWarningMsg:
+        logger.warning(message)
+    elif mode == QtCore.QtCriticalMsg:
+        logger.error(message)
+    elif mode == QtCore.QtFatalMsg:
+        logger.critical(message)
+    else:
+        logger.debug(message)
+
 def main():
-    print("Platform is %s (%s)" %(platform.system(), sys.platform))
+    # make the Python warnings go to Friture logger
+    logging.captureWarnings(True)
+
+    logFormat = "%(asctime)s %(levelname)s %(name)s: %(message)s"
+    formatter = logging.Formatter(logFormat)
+
+    logFileName = "friture.log.txt"
+    dirs = appdirs.AppDirs("Friture", "")
+    logDir = dirs.user_data_dir
+    try:
+        os.makedirs(logDir)
+    except OSError as e:
+        if e.errno != errno.EEXIST:
+            raise
+    logFilePath = os.path.join(logDir, logFileName)
+
+    # log to file
+    fileHandler = logging.handlers.RotatingFileHandler(logFilePath, maxBytes=100000, backupCount=5)
+    fileHandler.setLevel(logging.DEBUG)
+    fileHandler.setFormatter(formatter)
+
+    rootLogger = logging.getLogger()
+    rootLogger.setLevel(logging.DEBUG)
+    rootLogger.addHandler(fileHandler)
+
+    # log to console if this is not a py2app or pyinstaller bundle
+    if not hasattr(sys, "frozen"):
+        console = logging.StreamHandler()
+        console.setLevel(logging.DEBUG)
+        console.setFormatter(formatter)
+        rootLogger.addHandler(console)
+
+    # make Qt logs go to Friture logger
+    QtCore.qInstallMessageHandler(qt_message_handler)
+
+    logger = logging.getLogger(__name__)
+
+    logger.info("Friture %s starting on %s (%s)", friture.__versionXXXX__, platform.system(), sys.platform)
 
     if platform.system() == "Windows":
-        print("Applying Windows-specific setup")
+        logger.info("Applying Windows-specific setup")
         # On Windows, redirect stderr to a file
         import imp
         import ctypes
@@ -240,7 +298,7 @@ def main():
         try:
             ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
         except:
-            print("Could not set the app model ID. If the plaftorm is older than Windows 7, this is normal.")
+            logger.error("Could not set the app model ID. If the plaftorm is older than Windows 7, this is normal.")
 
     app = QApplication(sys.argv)
 
@@ -249,10 +307,10 @@ def main():
             sys.stdout = open(os.path.expanduser("~/friture.out.txt"), "w")
             sys.stderr = open(os.path.expanduser("~/friture.err.txt"), "w")
 
-        print("Applying Mac OS-specific setup")
+        logger.info("Applying Mac OS-specific setup")
         # help the py2app-packaged application find the Qt plugins (imageformats and platforms)
         pluginsPath = os.path.normpath(os.path.join(QApplication.applicationDirPath(), os.path.pardir, 'PlugIns'))
-        print("Adding the following to the Library paths: " + pluginsPath)
+        logger.info("Adding the following to the Library paths: %s", pluginsPath)
         QApplication.addLibraryPath(pluginsPath)
 
     # Splash screen
@@ -276,7 +334,7 @@ def main():
         elif sys.argv[1] == "--no":
             profile = "no"
         else:
-            print("command-line arguments (%s) not recognized" % sys.argv[1:])
+            logger.info("command-line arguments (%s) not recognized", sys.argv[1:])
 
     if profile == "python":
         import cProfile

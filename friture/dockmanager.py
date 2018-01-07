@@ -17,17 +17,20 @@
 # You should have received a copy of the GNU General Public License
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
+import logging
+
 from PyQt5 import QtCore
 from PyQt5.QtWidgets import QMainWindow
 from friture.defaults import DEFAULT_DOCKS
 from friture.dock import Dock
-from friture.logger import Logger
 
 
 class DockManager(QtCore.QObject):
 
     def __init__(self, parent):
         super().__init__(parent)
+
+        self.logger = logging.getLogger(__name__)
 
         # the parent must of the QMainWindow so that docks are created as children of it
         assert isinstance(parent, QMainWindow)
@@ -74,7 +77,7 @@ class DockManager(QtCore.QObject):
                 dock.restoreState(settings)
                 settings.endGroup()
         else:
-            Logger().push("First launch, display a default set of docks")
+            self.logger.info("First launch, display a default set of docks")
             self.docks = [Dock(self.parent(), "Dock %d" % (i), widgetId=widget_type) for i, widget_type in enumerate(DEFAULT_DOCKS)]
             for dock in self.docks:
                 #self.parent().addDockWidget(QtCore.Qt.TopDockWidgetArea, dock)

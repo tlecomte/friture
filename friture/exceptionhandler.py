@@ -18,66 +18,72 @@
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
 import sys
+import logging
 import os.path
 import time
 import io
 import traceback
 import friture
+import appdirs
 from PyQt5 import QtCore
 from PyQt5.QtWidgets import QMessageBox, QApplication
 
 def fileexcepthook(exception_type, exception_value, traceback_object):
-    # also call the standard exception handler to have prints on the console
-    sys.__excepthook__(exception_type, exception_value, traceback_object)
+    logger = logging.getLogger(__name__)
 
-    separator = '-' * 80
+    exceptionText = "".join(traceback.format_exception(exception_type, exception_value, traceback_object))
+    logger.critical("Unhandled exception: %s", exceptionText)
 
     versionInfo="Friture " + friture.__versionXXXX__
-
     timeString = time.strftime("%Y-%m-%d, %H:%M:%S")
 
-    tbinfofile = io.StringIO()
-    traceback.print_tb(traceback_object, None, tbinfofile)
-    tbinfofile.seek(0)
-    tbinfo = tbinfofile.read()
-    errmsg = '%s: \n%s' % (str(exception_type), str(exception_value))
-    sections = [separator, timeString, separator, errmsg, separator, tbinfo, separator, versionInfo]
-    msg = '\n'.join(sections)
+    # same as in analyzer.py
+    logFileName = "friture.log.txt"
+    dirs = appdirs.AppDirs("Friture", "")
+    logDir = dirs.user_data_dir
 
-    try:
-        log_dir = QtCore.QStandardPaths.standardLocations(QtCore.QStandardPaths.AppDataLocation)[0]
-        logFile = os.path.join(log_dir, "friture.log")
-        os.makedirs(log_dir, exist_ok=True)
-        with open(logFile, "w") as f:
-            f.write(msg)
-    except IOError as e:
-        print("Failed to write to the log file", e)
-        logFile = "?"
+    email = "contact@friture.org"
 
     notice = \
-        """An unhandled exception occurred. Please report the problem\n"""\
-        """on GitHub or via email to <%s>.\n"""\
-        """A log has been written to "%s".\n\nError information:\n""" % \
-        ("contact@friture.org", logFile)
+        """<h1>Opps! Something went wrong!</h1>\n\n"""\
+        """<p>Sorry, there was an error we could not handle.</p>"""\
+        """<p>You can choose to abort, or to ignore the error and try to continue """\
+        """(this is not guaranteed to work).</p>"""\
+        """<h2>Please help us fix it!</h2>\n\n"""\
+        """<p>Please contact us directly via email at <a href="mailto:%s?Subject=Friture%%20acrash report">%s</a> """\
+        """and include the log file named <i>%s</i> from the following folder:</p>"""\
+        """<p><a href="file:///%s">%s</a></p>"""\
+        """<p>Alternatively, if you have a GitHub account, you can create a new issue on <a href="https://github.com/tlecomte/friture/issues">https://github.com/tlecomte/friture/issues</a></p>"""\
+        """<h3>Error details</h3>""" % \
+        (email, email, logFileName, logDir, logDir)
 
-    return str(notice)+str(msg)
+    msg = notice + timeString + ' (%s)' % versionInfo + '<br>' + exceptionText.replace("\r\n", "\n").replace("\n", "<br>").replace(" ",'&nbsp;')
+
+    return msg
 
 def errorBox(message):
+    logger = logging.getLogger(__name__)
+
     try:
         if QApplication.instance() is None:
             app = QApplication(sys.argv) # assignment is needed to keep the application alive
 
         errorbox = QMessageBox()
-        errorbox.setWindowTitle("Friture critical error")
+        errorbox.setWindowTitle("Friture error occured")
         errorbox.setText(message)
-        errorbox.setIcon(QMessageBox.Critical)
-        errorbox.setStandardButtons(QMessageBox.Ignore | QMessageBox.Abort)
+        errorbox.setTextFormat(QtCore.Qt.RichText)
+        errorbox.setStandardButtons(QMessageBox.Abort)
+
+        continueButton = errorbox.addButton("Ignore and try to continue", QMessageBox.RejectRole);
+
         ret = errorbox.exec_()
 
         if ret == QMessageBox.Abort:
            sys.exit(1)
-    except Exception as e:
-        print("Failed to display the error box", e)
+        else:
+            logger.info("Try to continue")
+    except Exception:
+        logger.exception("Failed to display the error box")
 
 def excepthook(exception_type, exception_value, traceback_object):
     gui_message = fileexcepthook(exception_type, exception_value, traceback_object)

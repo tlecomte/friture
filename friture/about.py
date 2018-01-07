@@ -24,7 +24,6 @@ import numpy
 import OpenGL
 import friture.friture_rc
 import friture
-from friture.logwidget import LogWidget
 from friture.statisticswidget import StatisticsWidget
 
 aboutText = """
@@ -94,9 +93,6 @@ class About_Dialog(QtWidgets.QDialog):
 
         self.tab_stats = StatisticsWidget(self, timer)
         self.tabWidget.addTab(self.tab_stats, "Statistics")
-
-        self.tab_log = LogWidget(self)
-        self.tabWidget.addTab(self.tab_log, "Log")
 
         self.tabWidget.setCurrentIndex(0)
 

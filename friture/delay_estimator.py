@@ -217,8 +217,6 @@ class Delay_Estimator_Widget(QtWidgets.QWidget):
 
             realizable = int(available / needed)
 
-            # print available, needed, realizable
-
             for i in range(realizable):
                 self.old_index += needed
 
