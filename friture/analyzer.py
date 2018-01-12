@@ -283,6 +283,10 @@ def main():
 
     logger.info("Friture %s starting on %s (%s)", friture.__versionXXXX__, platform.system(), sys.platform)
 
+    # make sure Qt loads the desktop OpenGL stack, rather than OpenGL ES or a software OpenGL
+    # only the former option is compatible with the use of PyOpenGL
+    QtCore.QCoreApplication.setAttribute(QtCore.Qt.AA_UseDesktopOpenGL)
+
     if platform.system() == "Windows":
         logger.info("Applying Windows-specific setup")
         # On Windows, redirect stderr to a file
