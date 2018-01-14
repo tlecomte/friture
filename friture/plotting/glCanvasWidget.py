@@ -108,24 +108,27 @@ class GlCanvasWidget(QtWidgets.QOpenGLWidget):
     def initializeGL(self):
         self.clearErrors()
 
-        quad_vertex_shader = shaders.compileShader("""#version 130
-            in vec3 color;
-            out vec3 theColor;
+        quad_vertex_shader = shaders.compileShader(
+            """#version 110
+            attribute vec3 color;
+            varying vec3 theColor;
 
             void main()
             {
                 gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
                 theColor = color;
-            }""", GL.GL_VERTEX_SHADER)
+            }""",
+            GL.GL_VERTEX_SHADER)
 
-        quad_fragment_shader = shaders.compileShader("""#version 130
-            in vec3 theColor;
-            out vec4 out_color;
+        quad_fragment_shader = shaders.compileShader(
+            """#version 110
+            varying vec3 theColor;
 
             void main()
             {
-                out_color = vec4(theColor.x, theColor.y, theColor.z, 1.);
-            }""", GL.GL_FRAGMENT_SHADER)
+                gl_FragColor = vec4(theColor.x, theColor.y, theColor.z, 1.);
+            }""",
+            GL.GL_FRAGMENT_SHADER)
 
         self.quad_shader = shaders.compileProgram(quad_vertex_shader, quad_fragment_shader)
 
