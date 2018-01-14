@@ -243,6 +243,19 @@ def qt_message_handler(mode, context, message):
     else:
         logger.debug(message)
 
+class StreamToLogger(object):
+   """
+   Fake file-like stream object that redirects writes to a logger instance.
+   """
+   def __init__(self, logger, log_level=logging.INFO):
+      self.logger = logger
+      self.log_level = log_level
+      self.linebuf = ''
+
+   def write(self, buf):
+      for line in buf.rstrip().splitlines():
+         self.logger.log(self.log_level, line.rstrip())
+
 def main():
     # make the Python warnings go to Friture logger
     logging.captureWarnings(True)
@@ -269,8 +282,12 @@ def main():
     rootLogger.setLevel(logging.DEBUG)
     rootLogger.addHandler(fileHandler)
 
-    # log to console if this is not a py2app or pyinstaller bundle
-    if not hasattr(sys, "frozen"):
+    if hasattr(sys, "frozen"):
+        # redirect stdout and stderr to the logger if this is a py2app or pyinstaller bundle
+        sys.stdout = StreamToLogger(logging.getLogger('STDOUT'), logging.INFO)
+        sys.stderr = StreamToLogger(logging.getLogger('STDERR'), logging.ERROR)
+    else:
+        # log to console if this is not a py2app or pyinstaller bundle
         console = logging.StreamHandler()
         console.setLevel(logging.DEBUG)
         console.setFormatter(formatter)
@@ -293,15 +310,9 @@ def main():
         # enable automatic scaling for high-DPI screens
         os.environ["QT_AUTO_SCREEN_SCALE_FACTOR"] = "1"
 
-        # On Windows, redirect stderr to a file
-        import imp
-        import ctypes
-        if (hasattr(sys, "frozen") or  # new py2exe
-                hasattr(sys, "importers") or  # old py2exe
-                imp.is_frozen("__main__")):  # tools/freeze
-            sys.stderr = open(os.path.expanduser("~/friture.exe.log"), "w")
         # set the App ID for Windows 7 to properly display the icon in the
         # taskbar.
+        import ctypes
         myappid = 'Friture.Friture.Friture.current'  # arbitrary string
         try:
             ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
@@ -311,10 +322,6 @@ def main():
     app = QApplication(sys.argv)
 
     if platform.system() == "Darwin":
-        if hasattr(sys, "frozen"): #py2app
-            sys.stdout = open(os.path.expanduser("~/friture.out.txt"), "w")
-            sys.stderr = open(os.path.expanduser("~/friture.err.txt"), "w")
-
         logger.info("Applying Mac OS-specific setup")
         # help the py2app-packaged application find the Qt plugins (imageformats and platforms)
         pluginsPath = os.path.normpath(os.path.join(QApplication.applicationDirPath(), os.path.pardir, 'PlugIns'))
