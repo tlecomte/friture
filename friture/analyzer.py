@@ -289,6 +289,10 @@ def main():
 
     if platform.system() == "Windows":
         logger.info("Applying Windows-specific setup")
+
+        # enable automatic scaling for high-DPI screens
+        os.environ["QT_AUTO_SCREEN_SCALE_FACTOR"] = "1"
+
         # On Windows, redirect stderr to a file
         import imp
         import ctypes
