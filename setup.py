@@ -9,6 +9,7 @@ from os.path import join, dirname  # for README content reading and py2exe fix
 import os.path
 import numpy
 import friture  # for the version number
+import sounddevice # to find the libportaudio.dylib path
 
 py2exe_build = False
 py2app_build = False
@@ -127,10 +128,20 @@ if py2exe_build:
     )
 
 elif py2app_build:
+    # by default libportaudio.dylib is copied inside the pythonXXX.zip bundle,
+    # but a library cannot be loaded from inside such a bundle
+    # so copy it explicitely instead
+    base = os.path.dirname(sounddevice.__file__)
+    libportaudio_path = os.path.join(base, "_sounddevice_data", "portaudio-binaries", "libportaudio.dylib")
+
+    py2app_options = {'includes': includes,
+                      'iconfile': 'resources/images/friture.icns',
+                      'frameworks': [libportaudio_path]}
+
     extra_options = dict(
         setup_requires=['py2app'],
         app=['main.py'],
-        options={'py2app': {'includes': includes, 'iconfile': 'resources/images/friture.icns'}},
+        options={'py2app': py2app_options},
     )
 else:
     extra_options = dict()
