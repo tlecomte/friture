@@ -105,7 +105,52 @@ class GlCanvasWidget(QtWidgets.QOpenGLWidget):
     def sizeHint(self):
         return QtCore.QSize(50, 50)
 
+    def logOpenGLFormat(self):
+        try:
+            format = self.format()
+
+            profile = format.profile()
+            if profile == QtGui.QSurfaceFormat.NoProfile:
+                profile_name = "No profile"
+            elif profile == QtGui.QSurfaceFormat.CoreProfile:
+                profile_name = "Core profile"
+            elif profile == QtGui.QSurfaceFormat.CompatibilityProfile:
+                profile_name = "Compatibility profile"
+            else:
+                profile_name = "Unknown profile"
+
+            renderableType = format.renderableType()
+            if renderableType == QtGui.QSurfaceFormat.DefaultRenderableType:
+                renderableType_name = "Unspecified rendering"
+            elif renderableType == QtGui.QSurfaceFormat.OpenGL:
+                renderableType_name = "Desktop OpenGL rendering"
+            elif renderableType == QtGui.QSurfaceFormat.OpenGLES:
+                renderableType_name = "OpenGL ES 2.0 rendering"
+            elif renderableType == QtGui.QSurfaceFormat.OpenVG:
+                renderableType_name = "OpenVG rendering"
+            else:
+                renderableType_name = "Unknown rendering"
+
+            self.logger.info(
+                "OpenGL format: version %d.%d, %s, %s",
+                format.majorVersion(),
+                format.minorVersion(),
+                profile_name,
+                renderableType_name)
+
+            self.logger.info(
+                "%s, %s, Version: %s, Shaders: %s, Extensions: %s",
+                GL.glGetString(GL.GL_VENDOR).decode("utf-8"),
+                GL.glGetString(GL.GL_RENDERER).decode("utf-8"),
+                GL.glGetString(GL.GL_VERSION).decode("utf-8"),
+                GL.glGetString(GL.GL_SHADING_LANGUAGE_VERSION).decode("utf-8"),
+                GL.glGetIntegerv(GL.GL_NUM_EXTENSIONS)
+                )
+        except Exception:
+            self.logger.exception("Failed to log the OpenGL info")
+
     def initializeGL(self):
+        self.logOpenGLFormat()
         self.clearErrors()
 
         quad_vertex_shader = shaders.compileShader(
