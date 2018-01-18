@@ -268,7 +268,9 @@ class __AudioBackend(QtCore.QObject):
 
         if success:
             self.logger.info("Success")
-            previous_stream.stop()
+
+            if previous_stream is not None:
+                previous_stream.stop()
 
             self.first_channel = 0
             nchannels = self.device['max_input_channels']
@@ -425,9 +427,9 @@ class __AudioBackend(QtCore.QObject):
             return 0
 
     def pause(self):
-        if self.stream != None:
+        if self.stream is not None:
             self.stream.stop()
 
     def restart(self):
-        if self.stream != None:
+        if self.stream is not None:
             self.stream.start()
