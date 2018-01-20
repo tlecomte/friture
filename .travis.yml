@@ -15,18 +15,18 @@ install:
   - pip3 install -U "py2app==0.14"
 script:
   - python3 setup.py py2app
-  - "/usr/local/opt/qt5/bin/macdeployqt dist/friture.app -dmg"
-  - du -hs dist/friture.app
-  - du -hs dist/friture.dmg
+  - "/usr/local/opt/qt5/bin/macdeployqt ../friture-dist/friture.app -dmg"
+  - du -hs ../friture-dist/friture.app
+  - du -hs ../friture-dist/friture.dmg
   - export DMG_FILENAME=friture-$(python3 -c 'import friture; print(friture.__version__)')-$(date +'%Y%m%d').dmg
   - echo $DMG_FILENAME
-  - mv dist/friture.dmg dist/$DMG_FILENAME
+  - mv ../friture-dist/friture.dmg ../friture-dist/$DMG_FILENAME
 deploy:
   provider: releases
   draft: true
   api_key:
     secure: N19tf9SJmo3KluUL3DjGMxTTGaa9/qu6UNxqPtOyRu/StSzU1yeh1D8oZr+qYl6tWeqogvSWKlDw78Dp1c4Ro0IQB7ebgxT4YJGF6DeuCo1gvi1uE84Xh+Hl+Y4urS52F3ABSAHejhYhJW7XxsrA3MCiz56S7OEsuDp1u4fG8LM=
-  file: dist/$DMG_FILENAME
+  file: ../friture-dist/$DMG_FILENAME
   skip_cleanup: true
   on:
     repo: tlecomte/friture
