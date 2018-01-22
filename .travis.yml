@@ -30,4 +30,3 @@ deploy:
   skip_cleanup: true
   on:
     repo: tlecomte/friture
-    tags: true
