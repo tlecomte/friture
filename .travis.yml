@@ -14,6 +14,7 @@ install:
   - pip3 install -r requirements.txt
   - pip3 install -U "py2app==0.14"
 script:
+  - python3 setup.py build_ext --inplace
   - python3 setup.py py2app
   - "/usr/local/opt/qt5/bin/macdeployqt ../friture-dist/friture.app -dmg"
   - du -hs ../friture-dist/friture.app
