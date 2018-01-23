@@ -7,6 +7,7 @@ from glob import glob
 import os
 from os.path import join, dirname  # for README content reading and py2exe fix
 import os.path
+from pathlib import Path
 import numpy
 import friture  # for the version number
 import sounddevice # to find the libportaudio.dylib path
@@ -134,9 +135,14 @@ elif py2app_build:
     base = os.path.dirname(sounddevice.__file__)
     libportaudio_path = os.path.join(base, "_sounddevice_data", "portaudio-binaries", "libportaudio.dylib")
 
+    # prevent a py2app self-referencing loop by moving the bdist and dist folders out of the current directory
+    # see https://stackoverflow.com/questions/7701255/py2app-ioerror-errno-63-file-name-too-long
+    parent_dir = str(Path(os.getcwd()).parent)
     py2app_options = {'includes': includes,
                       'iconfile': 'resources/images/friture.icns',
-                      'frameworks': [libportaudio_path]}
+                      'frameworks': [libportaudio_path],
+                      'bdist_base': os.path.join(parent_dir, 'friture-build'),
+                      'dist_dir': os.path.join(parent_dir, 'friture-dist')}
 
     extra_options = dict(
         setup_requires=['py2app'],
