@@ -51,6 +51,9 @@ elif "py2app" in sys.argv:
 # https://forum.qt.io/topic/37891/minimal-icudt51-dll-icudt52-dll-and-icudt53-dll
 # http://qlcplus.sourceforge.net/icudt53.dll
 
+parent_dir = str(Path(os.getcwd()).parent)
+dist_dir = os.path.join(parent_dir, 'friture-dist')
+
 # manually include python libraries that py2exe/py2app fails to detect
 # for pyOpenGL : http://www.jstump.com/blog/archive/2009/06/30/py2exe-and-pyopengl-3x-with-no-manual-tinkering/
 # + OpenGL_accelerate.formathandler that is imported by the Python/C
@@ -137,12 +140,11 @@ elif py2app_build:
 
     # prevent a py2app self-referencing loop by moving the bdist and dist folders out of the current directory
     # see https://stackoverflow.com/questions/7701255/py2app-ioerror-errno-63-file-name-too-long
-    parent_dir = str(Path(os.getcwd()).parent)
     py2app_options = {'includes': includes,
                       'iconfile': 'resources/images/friture.icns',
                       'frameworks': [libportaudio_path],
                       'bdist_base': os.path.join(parent_dir, 'friture-build'),
-                      'dist_dir': os.path.join(parent_dir, 'friture-dist')}
+                      'dist_dir': dist_dir}
 
     extra_options = dict(
         setup_requires=['py2app'],
@@ -199,3 +201,42 @@ if py2exe_build:
         for filename in glob(path):
             print("Remove %s that py2exe should have excluded." % (filename))
             os.remove(filename)
+
+# py2app does not respect the dylib_excludes option
+# so we manually remove the unused Qt frameworks
+if py2app_build:
+    print('*** Removing unused Qt frameworks ***')
+    framework_dir = dist_dir + './friture.app/Contents/Resources/lib/python3.6/PyQt5/Qt/lib/'
+    frameworks = [
+        'QtDeclarative.framework',
+        'QtHelp.framework',
+        'QtMultimedia.framework',
+        'QtNetwork.framework',
+        'QtScript.framework',
+        'QtScriptTools.framework',
+        'QtSql.framework',
+        'QtDesigner.framework',
+        'QtTest.framework',
+        'QtWebKit.framework',
+        'QtXMLPatterns.framework',
+        'QtCLucene.framework',
+        'QtBluetooth.framework',
+        'QtConcurrent.framework',
+        'QtMultimediaWidgets.framework',
+        'QtPositioning.framework',
+        'QtQml.framework',
+        'QtQuick.framework',
+        'QtQuickWidgets.framework',
+        'QtSensors.framework',
+        'QtSerialPort.framework',
+        'QtWebChannel.framework',
+        'QtWebEngine.framework',
+        'QtWebEngineCore.framework',
+        'QtWebEngineWidgets.framework',
+        'QtWebKitWidgets.framework',
+        'QtWebSockets.framework']
+
+    for framework in frameworks:
+        for root, dirs, files in os.walk(os.path.join(framework_dir, framework)):
+            for file in files:
+                os.remove(os.path.join(root,file))
