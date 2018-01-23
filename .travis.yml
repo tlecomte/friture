@@ -8,26 +8,25 @@ before_install:
   - before_install
   - which python3
   - python3 -c 'import sys; print(sys.version)'
-  - brew update
-  - brew install qt5 # this is needed to get macdeployqt, which is not in the PyPI PyQt5 wheel
 install:
   - pip3 install -r requirements.txt
   - pip3 install -U "py2app==0.14"
 script:
+  # py2app chokes when the extensions are not built explicitely
   - python3 setup.py build_ext --inplace
   - python3 setup.py py2app
-  - "/usr/local/opt/qt5/bin/macdeployqt ../friture-dist/friture.app -dmg"
-  - du -hs ../friture-dist/friture.app
-  - du -hs ../friture-dist/friture.dmg
+  # prepare a dmg out of friture.app
   - export DMG_FILENAME=friture-$(python3 -c 'import friture; print(friture.__version__)')-$(date +'%Y%m%d').dmg
   - echo $DMG_FILENAME
-  - mv ../friture-dist/friture.dmg ../friture-dist/$DMG_FILENAME
+  - hdiutil create $DMG_FILENAME -volname "Friture" -fs HFS+ -srcfolder ../friture-dist/
+  - du -hs ../friture-dist/friture.app
+  - du -hs $DMG_FILENAME
 deploy:
   provider: releases
   draft: true
   api_key:
     secure: N19tf9SJmo3KluUL3DjGMxTTGaa9/qu6UNxqPtOyRu/StSzU1yeh1D8oZr+qYl6tWeqogvSWKlDw78Dp1c4Ro0IQB7ebgxT4YJGF6DeuCo1gvi1uE84Xh+Hl+Y4urS52F3ABSAHejhYhJW7XxsrA3MCiz56S7OEsuDp1u4fG8LM=
-  file: ../friture-dist/$DMG_FILENAME
+  file: $DMG_FILENAME
   skip_cleanup: true
   on:
     repo: tlecomte/friture
