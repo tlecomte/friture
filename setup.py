@@ -206,7 +206,7 @@ if py2exe_build:
 # so we manually remove the unused Qt frameworks
 if py2app_build:
     print('*** Removing unused Qt frameworks ***')
-    framework_dir = dist_dir + './friture.app/Contents/Resources/lib/python3.6/PyQt5/Qt/lib/'
+    framework_dir = os.path.join(dist_dir, 'friture.app/Contents/Resources/lib/python3.6/PyQt5/Qt/lib')
     frameworks = [
         'QtDeclarative.framework',
         'QtHelp.framework',
@@ -239,4 +239,4 @@ if py2app_build:
     for framework in frameworks:
         for root, dirs, files in os.walk(os.path.join(framework_dir, framework)):
             for file in files:
-                os.remove(os.path.join(root,file))
+                os.remove(os.path.join(root, file))
