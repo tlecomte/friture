@@ -138,16 +138,32 @@ class GlCanvasWidget(QtWidgets.QOpenGLWidget):
                 profile_name,
                 renderableType_name)
 
+            vendor = ""
+
             self.logger.info(
                 "%s, %s, Version: %s, Shaders: %s, Extensions: %s",
-                GL.glGetString(GL.GL_VENDOR).decode("utf-8"),
-                GL.glGetString(GL.GL_RENDERER).decode("utf-8"),
-                GL.glGetString(GL.GL_VERSION).decode("utf-8"),
-                GL.glGetString(GL.GL_SHADING_LANGUAGE_VERSION).decode("utf-8"),
-                GL.glGetIntegerv(GL.GL_NUM_EXTENSIONS)
+                self.tryGlGetString(GL.GL_VENDOR),
+                self.tryGlGetString(GL.GL_RENDERER),
+                self.tryGlGetString(GL.GL_VERSION),
+                self.tryGlGetString(GL.GL_SHADING_LANGUAGE_VERSION),
+                self.tryGlGetIntegerv(GL.GL_NUM_EXTENSIONS)
                 )
         except Exception:
             self.logger.exception("Failed to log the OpenGL info")
+
+    def tryGlGetString(self, enum):
+        try:
+            return GL.glGetString(enum).decode("utf-8")
+        except Exception:
+            self.logger.exception("glGetString failed")
+            return "unknown"
+
+    def tryGlGetIntegerv(self, enum):
+        try:
+            return GL.glGetIntegerv(enum)
+        except Exception:
+            self.logger.exception("glGetIntegerv failed")
+            return "unknown"
 
     def initializeGL(self):
         self.logOpenGLFormat()
