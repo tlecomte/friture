@@ -261,7 +261,7 @@ class Generator_Widget(QtWidgets.QWidget):
                 self.state = PLAYING
 
         if self.state == STOPPING:
-            self.logging.info("stopping", self.t_stop, N)
+            self.logger.info("stopping", self.t_stop, N)
             # add a ramp at the end
             t_ramp = self.t_stop - np.arange(0, N / float(SAMPLING_RATE), 1. / float(SAMPLING_RATE))
             t_ramp = np.clip(t_ramp, 0., RAMP_LENGTH)
