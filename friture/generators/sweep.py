@@ -98,7 +98,7 @@ class SweepGenerator:
             maxdetections = np.argwhere(maxdetection != 0.)
 
             if len(maxdetections) > 0:
-                firstmaxpos = np.argwhere(maxdetection != 0.)[0] + 1
+                firstmaxpos = np.argwhere(maxdetection != 0.)[0][0] + 1
 
                 # the first samples use the previous parameters
                 # the next samples use the new parameters
