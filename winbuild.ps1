@@ -101,8 +101,8 @@ Write-Host "==========================================="
 # install a version of pefile that does not use the past library, which in turn imports too many things
 & pip install git+https://github.com/tlecomte/pefile.git@tlecomte-remove-past
 
-# install a version of pyinstaller that takes pefile from outside
-& pip install -U pyinstaller==3.2
+# install our fork of pyinstaller that lets python35.dll be signed
+& pip install -U git+https://github.com/tlecomte/pyinstaller.git@tlecomte-sign
 
 Write-Host ""
 Write-Host "==========================================="
