@@ -57,7 +57,7 @@ class audioproc():
     def decimate(self, samples):
         # first we remove as much points as possible
         if self.decimation > 1:
-            samples.shape = len(samples) / self.decimation, self.decimation
+            samples.shape = len(samples) // self.decimation, self.decimation
             # the full way
             # samples = samples.mean(axis=1)
             # the simplest way
@@ -75,7 +75,7 @@ class audioproc():
         if maxfreq != self.maxfreq:
             self.maxfreq = maxfreq
             decimation = SAMPLING_RATE / (2 * maxfreq)
-            self.decimation = 2 ** (floor(log2(decimation)))
+            self.decimation = int(2 ** (floor(log2(decimation))))
 
             if self.decimation < 1:
                 self.decimation = 1
