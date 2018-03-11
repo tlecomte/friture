@@ -206,7 +206,7 @@ if py2exe_build:
 # so we manually remove the unused Qt frameworks
 if py2app_build:
     print('*** Removing unused Qt frameworks ***')
-    framework_dir = os.path.join(dist_dir, 'friture.app/Contents/Resources/lib/python3.6/PyQt5/Qt/lib')
+    framework_dir = os.path.join(dist_dir, "friture.app/Contents/Resources/lib/python{0}.{1}/PyQt5/Qt/lib".format(sys.version_info.major, sys.version_info.minor))
     frameworks = [
         'QtDeclarative.framework',
         'QtHelp.framework',
