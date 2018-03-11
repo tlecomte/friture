@@ -3,6 +3,7 @@ import logging
 
 from PyQt5 import QtCore, QtGui, Qt, QtWidgets
 import numpy as np
+import pyrr
 
 try:
     from OpenGL import GL
@@ -50,6 +51,7 @@ class GlCanvasWidget(QtWidgets.QOpenGLWidget):
 
         self.gridNeedsUpdating = True
         self.backgroundNeedsUpdating = True
+        self.matrixNotSet = True
 
         self.horizontalScaleTransform = horizontalScaleTransform
         self.verticalScaleTransform = verticalScaleTransform
@@ -66,6 +68,10 @@ class GlCanvasWidget(QtWidgets.QOpenGLWidget):
         self.ruler_vbo = None
         self.grid_vbo = None
         self.data_vbo = None
+        self.vao = None
+
+        # True for OpenGL Core profile, False for Compatibility profile
+        self.is_core = None
 
     def setTrackerFormatter(self, formatter):
         self.trackerFormatter = formatter
@@ -105,10 +111,8 @@ class GlCanvasWidget(QtWidgets.QOpenGLWidget):
     def sizeHint(self):
         return QtCore.QSize(50, 50)
 
-    def logOpenGLFormat(self):
+    def logOpenGLFormat(self, format):
         try:
-            format = self.format()
-
             profile = format.profile()
             if profile == QtGui.QSurfaceFormat.NoProfile:
                 profile_name = "No profile"
@@ -165,31 +169,89 @@ class GlCanvasWidget(QtWidgets.QOpenGLWidget):
             self.logger.exception("glGetIntegerv failed")
             return "unknown"
 
+    def build_model_view_projection_matrix(self, translation, rotation, scale):
+        translation_matrix = np.transpose(pyrr.matrix44.create_from_translation(translation))
+        rotation_matrix = np.transpose(pyrr.matrix44.create_from_y_rotation(rotation))
+        scale_matrix = np.transpose(pyrr.matrix44.create_from_scale(scale))
+
+        model_matrix = np.matmul(np.matmul(translation_matrix, rotation_matrix), scale_matrix)
+        view_matrix = np.transpose(pyrr.matrix44.create_identity())
+        projection_matrix = np.transpose(pyrr.matrix44.create_orthogonal_projection_matrix(0, self.width(), 0, self.height(), 0, 1))
+        m = np.matmul(np.matmul(projection_matrix, view_matrix), model_matrix)
+
+        return np.transpose(m)
+
     def initializeGL(self):
-        self.logOpenGLFormat()
+        openGL_format = self.format()
+
+        self.is_core = openGL_format.profile() == QtGui.QSurfaceFormat.CoreProfile
+
+        self.logOpenGLFormat(openGL_format)
         self.clearErrors()
 
-        quad_vertex_shader = shaders.compileShader(
-            """#version 110
-            attribute vec3 color;
-            varying vec3 theColor;
+        legacy_vertex_shader_source = """
+            #version 110
+
+            // input
+            attribute vec3 in_color;
+            uniform mat4 mvp;
+
+            // output
+            varying vec3 out_color;
 
             void main()
             {
-                gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
-                theColor = color;
-            }""",
-            GL.GL_VERTEX_SHADER)
+                gl_Position = mvp * gl_Vertex;
+                out_color = in_color;
+            }"""
 
-        quad_fragment_shader = shaders.compileShader(
-            """#version 110
-            varying vec3 theColor;
+        core_vertex_shader_source = """
+            #version 150 core
+
+            // input
+            in vec3 in_position;
+            in vec3 in_color;
+            uniform mat4 mvp;
+
+            // output
+            out vec3 out_color;
 
             void main()
             {
-                gl_FragColor = vec4(theColor.x, theColor.y, theColor.z, 1.);
-            }""",
-            GL.GL_FRAGMENT_SHADER)
+                gl_Position = mvp * vec4(in_position, 1.0);
+                out_color = in_color;
+            }"""
+
+        vertex_shader_source = core_vertex_shader_source if self.is_core else legacy_vertex_shader_source
+        quad_vertex_shader = shaders.compileShader(vertex_shader_source, GL.GL_VERTEX_SHADER)
+
+        legacy_fragment_shader_source = """
+            #version 110
+
+            // input
+            varying vec3 out_color;
+
+            void main()
+            {
+                gl_FragColor = vec4(out_color, 1.0);
+            }"""
+
+        core_fragment_shader_source = """
+            #version 150 core
+
+            // input
+            in vec3 out_color;
+
+            // output
+            out vec4 frag_color;
+
+            void main()
+            {
+                frag_color = vec4(out_color, 1.0);
+            }"""
+
+        fragment_shader_source = core_fragment_shader_source if self.is_core else legacy_fragment_shader_source
+        quad_fragment_shader = shaders.compileShader(fragment_shader_source, GL.GL_FRAGMENT_SHADER)
 
         self.quad_shader = shaders.compileProgram(quad_vertex_shader, quad_fragment_shader)
 
@@ -209,6 +271,10 @@ class GlCanvasWidget(QtWidgets.QOpenGLWidget):
         self.ruler_vbo = vbo.VBO(vertices)
         self.grid_vbo = vbo.VBO(vertices)
         self.data_vbo = vbo.VBO(vertices)
+
+        if self.is_core:
+            # on OpenGL 3 core, create a vertex array object (on non-core, there is one default VAO)
+            self.vao = GL.glGenVertexArrays(1)
 
     def setfmax(self, fmax):
         self.fmax = fmax
@@ -273,9 +339,9 @@ class GlCanvasWidget(QtWidgets.QOpenGLWidget):
         h = self.height()
         self.background_data = np.array(
             [[0, h,   0, 0.85, 0.85, 0.85],
-             [w, h,   0, 0.85, 0.85, 0.85],
-             [w, h/2, 0, 1.0,  1.0,  1.0],
-             [0, h/2, 0, 1.0,  1.0,  1.0]],
+             [w, h, 0, 0.85, 0.85, 0.85],
+             [0, h/2, 0, 1.0,  1.0,  1.0],
+             [w, h / 2, 0, 1.0, 1.0, 1.0]],
             dtype=np.float32)
 
         self.background_vbo.set_array(self.background_data)
@@ -307,17 +373,29 @@ class GlCanvasWidget(QtWidgets.QOpenGLWidget):
 
         self.clearErrors()
 
-        self.setupViewport(self.width(), self.height())
-
         # Clear The Screen And The Depth Buffer
         GL.glClearColor(1, 1, 1, 0)
         GL.glClear(GL.GL_COLOR_BUFFER_BIT)  # | GL.GL_DEPTH_BUFFER_BIT)
 
-        self.drawBackground()
-        self.drawGrid()
-        self.drawGlData()
-        self.drawRuler()
-        self.drawBorder()
+        shaders.glUseProgram(self.quad_shader)
+
+        if self.is_core:
+            # on OpenGL 3 core, create and bind a vertex array object (on non-core, there is one default VAO)
+            GL.glBindVertexArray(self.vao)
+
+        try:
+            self.setupViewport(self.width(), self.height())
+
+            self.drawBackground()
+            self.drawGrid()
+            self.drawGlData()
+            self.drawRuler()
+            self.drawBorder()
+        finally:
+            if self.is_core:
+                GL.glBindVertexArray(0)
+
+            shaders.glUseProgram(0)
 
         painter = QtGui.QPainter(self)
         self.drawTrackerText(painter)
@@ -422,17 +500,22 @@ class GlCanvasWidget(QtWidgets.QOpenGLWidget):
     def resizeGL(self, width, height):
         self.gridNeedsUpdating = True
         self.backgroundNeedsUpdating = True
+        self.matrixNotSet = True
 
         # give the opportunity to the scales to adapt
         self.resized.emit(self.width(), self.height())
 
     def setupViewport(self, width, height):
-        #GL.glViewport(0, 0, width, height) #redundant with Qt setup, and possibly buggy
-        GL.glMatrixMode(GL.GL_PROJECTION)
-        GL.glLoadIdentity()
-        GL.glOrtho(0, width, 0, height, 0, 1)
-        # Displacement trick for exact pixelization
-        GL.glTranslatef(0.375, 0.375, 0)
+        if self.matrixNotSet:
+            translation = pyrr.Vector3([0.375, 0.375, 0])
+            rotation = 0.0
+            scale = pyrr.Vector3([1.0, 1.0, 1.0])
+            mvp = self.build_model_view_projection_matrix(translation, rotation, scale)
+
+            mvp_uniform_location = GL.glGetUniformLocation(self.quad_shader, "mvp")
+            GL.glUniformMatrix4fv(mvp_uniform_location, 1, GL.GL_FALSE, mvp)
+
+            self.matrixNotSet = False
 
         GL.glShadeModel(GL.GL_SMOOTH)  # for gradient rendering
         # GL.glDepthFunc(GL.GL_LESS) # The Type Of Depth Test To Do
@@ -446,25 +529,20 @@ class GlCanvasWidget(QtWidgets.QOpenGLWidget):
         if self.backgroundNeedsUpdating:
             self.updateBackground()
 
-        shaders.glUseProgram(self.quad_shader)
-
+        self.background_vbo.bind()
         try:
-            self.background_vbo.bind()
-            try:
-                GL.glEnableVertexAttribArray(0)
-                GL.glEnableVertexAttribArray(1)
-                stride = self.background_data.shape[1]*sizeof(c_float)
-                vertex_offset = c_void_p(0 * sizeof(c_float))
-                color_offset  = c_void_p(3 * sizeof(c_float))
-                GL.glVertexAttribPointer(0, 3, GL.GL_FLOAT, GL.GL_FALSE, stride, vertex_offset)
-                GL.glVertexAttribPointer(1, 3, GL.GL_FLOAT, GL.GL_FALSE, stride, color_offset)
-                GL.glDrawArrays(GL.GL_QUADS, 0, self.background_data.shape[0])
-                GL.glDisableVertexAttribArray(0)
-                GL.glDisableVertexAttribArray(1)
-            finally:
-                self.background_vbo.unbind()
+            GL.glEnableVertexAttribArray(0)
+            GL.glEnableVertexAttribArray(1)
+            stride = self.background_data.shape[1]*sizeof(c_float)
+            vertex_offset = c_void_p(0 * sizeof(c_float))
+            color_offset  = c_void_p(3 * sizeof(c_float))
+            GL.glVertexAttribPointer(0, 3, GL.GL_FLOAT, GL.GL_FALSE, stride, vertex_offset)
+            GL.glVertexAttribPointer(1, 3, GL.GL_FLOAT, GL.GL_FALSE, stride, color_offset)
+            GL.glDrawArrays(GL.GL_TRIANGLE_STRIP, 0, self.background_data.shape[0])
+            GL.glDisableVertexAttribArray(0)
+            GL.glDisableVertexAttribArray(1)
         finally:
-            shaders.glUseProgram(0)
+            self.background_vbo.unbind()
 
     def drawGrid(self):
         if self.anyOpaqueItem:
@@ -473,46 +551,36 @@ class GlCanvasWidget(QtWidgets.QOpenGLWidget):
         if self.gridNeedsUpdating:
             self.updateGrid()
 
-        shaders.glUseProgram(self.quad_shader)
-
+        self.grid_vbo.bind()
         try:
-            self.grid_vbo.bind()
-            try:
-                GL.glEnableVertexAttribArray(0)
-                GL.glEnableVertexAttribArray(1)
-                stride = self.grid_data.shape[1]*sizeof(c_float)
-                vertex_offset = c_void_p(0 * sizeof(c_float))
-                color_offset  = c_void_p(3 * sizeof(c_float))
-                GL.glVertexAttribPointer(0, 3, GL.GL_FLOAT, GL.GL_FALSE, stride, vertex_offset)
-                GL.glVertexAttribPointer(1, 3, GL.GL_FLOAT, GL.GL_FALSE, stride, color_offset)
-                GL.glDrawArrays(GL.GL_LINES, 0, self.grid_data.shape[0])
-                GL.glDisableVertexAttribArray(0)
-                GL.glDisableVertexAttribArray(1)
-            finally:
-                self.grid_vbo.unbind()
+            GL.glEnableVertexAttribArray(0)
+            GL.glEnableVertexAttribArray(1)
+            stride = self.grid_data.shape[1]*sizeof(c_float)
+            vertex_offset = c_void_p(0 * sizeof(c_float))
+            color_offset  = c_void_p(3 * sizeof(c_float))
+            GL.glVertexAttribPointer(0, 3, GL.GL_FLOAT, GL.GL_FALSE, stride, vertex_offset)
+            GL.glVertexAttribPointer(1, 3, GL.GL_FLOAT, GL.GL_FALSE, stride, color_offset)
+            GL.glDrawArrays(GL.GL_LINES, 0, self.grid_data.shape[0])
+            GL.glDisableVertexAttribArray(0)
+            GL.glDisableVertexAttribArray(1)
         finally:
-            shaders.glUseProgram(0)
+            self.grid_vbo.unbind()
 
     def drawBorder(self):
-        shaders.glUseProgram(self.quad_shader)
-
+        self.border_vbo.bind()
         try:
-            self.border_vbo.bind()
-            try:
-                GL.glEnableVertexAttribArray(0)
-                GL.glEnableVertexAttribArray(1)
-                stride = self.border_data.shape[1]*sizeof(c_float)
-                vertex_offset = c_void_p(0 * sizeof(c_float))
-                color_offset  = c_void_p(3 * sizeof(c_float))
-                GL.glVertexAttribPointer(0, 3, GL.GL_FLOAT, GL.GL_FALSE, stride, vertex_offset)
-                GL.glVertexAttribPointer(1, 3, GL.GL_FLOAT, GL.GL_FALSE, stride, color_offset)
-                GL.glDrawArrays(GL.GL_LINE_STRIP, 0, self.border_data.shape[0])
-                GL.glDisableVertexAttribArray(0)
-                GL.glDisableVertexAttribArray(1)
-            finally:
-                self.border_vbo.unbind()
+            GL.glEnableVertexAttribArray(0)
+            GL.glEnableVertexAttribArray(1)
+            stride = self.border_data.shape[1]*sizeof(c_float)
+            vertex_offset = c_void_p(0 * sizeof(c_float))
+            color_offset  = c_void_p(3 * sizeof(c_float))
+            GL.glVertexAttribPointer(0, 3, GL.GL_FLOAT, GL.GL_FALSE, stride, vertex_offset)
+            GL.glVertexAttribPointer(1, 3, GL.GL_FLOAT, GL.GL_FALSE, stride, color_offset)
+            GL.glDrawArrays(GL.GL_LINE_STRIP, 0, self.border_data.shape[0])
+            GL.glDisableVertexAttribArray(0)
+            GL.glDisableVertexAttribArray(1)
         finally:
-            shaders.glUseProgram(0)
+            self.border_vbo.unbind()
 
     def drawRuler(self):
         if self.ruler:
@@ -528,25 +596,20 @@ class GlCanvasWidget(QtWidgets.QOpenGLWidget):
 
             self.ruler_vbo.set_array(self.ruler_data)
 
-            shaders.glUseProgram(self.quad_shader)
-
+            self.ruler_vbo.bind()
             try:
-                self.ruler_vbo.bind()
-                try:
-                    GL.glEnableVertexAttribArray(0)
-                    GL.glEnableVertexAttribArray(1)
-                    stride = self.ruler_data.shape[1]*sizeof(c_float)
-                    vertex_offset = c_void_p(0 * sizeof(c_float))
-                    color_offset  = c_void_p(3 * sizeof(c_float))
-                    GL.glVertexAttribPointer(0, 3, GL.GL_FLOAT, GL.GL_FALSE, stride, vertex_offset)
-                    GL.glVertexAttribPointer(1, 3, GL.GL_FLOAT, GL.GL_FALSE, stride, color_offset)
-                    GL.glDrawArrays(GL.GL_LINES, 0, self.ruler_data.shape[0])
-                    GL.glDisableVertexAttribArray(0)
-                    GL.glDisableVertexAttribArray(1)
-                finally:
-                    self.ruler_vbo.unbind()
+                GL.glEnableVertexAttribArray(0)
+                GL.glEnableVertexAttribArray(1)
+                stride = self.ruler_data.shape[1]*sizeof(c_float)
+                vertex_offset = c_void_p(0 * sizeof(c_float))
+                color_offset  = c_void_p(3 * sizeof(c_float))
+                GL.glVertexAttribPointer(0, 3, GL.GL_FLOAT, GL.GL_FALSE, stride, vertex_offset)
+                GL.glVertexAttribPointer(1, 3, GL.GL_FLOAT, GL.GL_FALSE, stride, color_offset)
+                GL.glDrawArrays(GL.GL_LINES, 0, self.ruler_data.shape[0])
+                GL.glDisableVertexAttribArray(0)
+                GL.glDisableVertexAttribArray(1)
             finally:
-                shaders.glUseProgram(0)
+                self.ruler_vbo.unbind()
 
     def mousePressEvent(self, event):
         self.lastPos = event.pos()
