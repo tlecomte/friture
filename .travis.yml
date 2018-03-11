@@ -1,7 +1,7 @@
 os: osx
 language: generic
 env:
-  - MB_PYTHON_VERSION=3.6
+  - MB_PYTHON_VERSION=3.5
 before_install:
   - source multibuild/common_utils.sh
   - source multibuild/travis_steps.sh
