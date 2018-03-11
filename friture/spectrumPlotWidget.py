@@ -374,14 +374,14 @@ class QuadsItem:
         self.vertices_data[1::4, 4::6] = g[:,np.newaxis]
         self.vertices_data[1::4, 5::6] = b[:,np.newaxis]
 
-        self.vertices_data[2::4, 0::6] = (x + w)[:,np.newaxis]
+        self.vertices_data[2::4, 0::6] = x[:,np.newaxis]
         self.vertices_data[2::4, 1::6] = y[:,np.newaxis]
         self.vertices_data[2::4, 2::6] = 0*x[:,np.newaxis]
         self.vertices_data[2::4, 3::6] = r[:,np.newaxis]
         self.vertices_data[2::4, 4::6] = g[:,np.newaxis]
         self.vertices_data[2::4, 5::6] = b[:,np.newaxis]
 
-        self.vertices_data[3::4, 0::6] = x[:,np.newaxis]
+        self.vertices_data[3::4, 0::6] = (x + w)[:,np.newaxis]
         self.vertices_data[3::4, 1::6] = y[:,np.newaxis]
         self.vertices_data[3::4, 2::6] = 0*x[:,np.newaxis]
         self.vertices_data[3::4, 3::6] = r[:,np.newaxis]
@@ -462,7 +462,7 @@ class QuadsItem:
                 color_offset  = c_void_p(3 * sizeof(c_float))
                 GL.glVertexAttribPointer(0, 3, GL.GL_FLOAT, GL.GL_FALSE, stride, vertex_offset)
                 GL.glVertexAttribPointer(1, 3, GL.GL_FLOAT, GL.GL_FALSE, stride, color_offset)
-                GL.glDrawArrays(GL.GL_QUADS, 0, self.vertices_data.shape[0])
+                GL.glDrawArrays(GL.GL_TRIANGLE_STRIP, 0, self.vertices_data.shape[0])
                 GL.glDisableVertexAttribArray(0)
                 GL.glDisableVertexAttribArray(1)
             finally:

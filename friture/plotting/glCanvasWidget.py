@@ -273,9 +273,9 @@ class GlCanvasWidget(QtWidgets.QOpenGLWidget):
         h = self.height()
         self.background_data = np.array(
             [[0, h,   0, 0.85, 0.85, 0.85],
-             [w, h,   0, 0.85, 0.85, 0.85],
-             [w, h/2, 0, 1.0,  1.0,  1.0],
-             [0, h/2, 0, 1.0,  1.0,  1.0]],
+             [w, h, 0, 0.85, 0.85, 0.85],
+             [0, h/2, 0, 1.0,  1.0,  1.0],
+             [w, h / 2, 0, 1.0, 1.0, 1.0]],
             dtype=np.float32)
 
         self.background_vbo.set_array(self.background_data)
@@ -458,7 +458,7 @@ class GlCanvasWidget(QtWidgets.QOpenGLWidget):
                 color_offset  = c_void_p(3 * sizeof(c_float))
                 GL.glVertexAttribPointer(0, 3, GL.GL_FLOAT, GL.GL_FALSE, stride, vertex_offset)
                 GL.glVertexAttribPointer(1, 3, GL.GL_FLOAT, GL.GL_FALSE, stride, color_offset)
-                GL.glDrawArrays(GL.GL_QUADS, 0, self.background_data.shape[0])
+                GL.glDrawArrays(GL.GL_TRIANGLE_STRIP, 0, self.background_data.shape[0])
                 GL.glDisableVertexAttribArray(0)
                 GL.glDisableVertexAttribArray(1)
             finally:
