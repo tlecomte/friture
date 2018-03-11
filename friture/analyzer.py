@@ -28,7 +28,7 @@ import logging.handlers
 from PyQt5 import QtCore
 # specifically import from PyQt5.QtGui and QWidgets for startup time improvement :
 from PyQt5.QtWidgets import QMainWindow, QHBoxLayout, QApplication, QSplashScreen
-from PyQt5.QtGui import QPixmap
+from PyQt5.QtGui import QPixmap, QSurfaceFormat
 import appdirs
 
 # importing friture.exceptionhandler also installs a temporary exception hook
@@ -330,6 +330,15 @@ def main():
         pluginsPath = os.path.normpath(os.path.join(QApplication.applicationDirPath(), os.path.pardir, 'PlugIns'))
         logger.info("Adding the following to the Library paths: %s", pluginsPath)
         QApplication.addLibraryPath(pluginsPath)
+
+        # on macOS, OpenGL 2.1 does not work well
+        # request a 3.2 Core context instead
+        format = QSurfaceFormat()
+        format.setDepthBufferSize(24)
+        format.setStencilBufferSize(8)
+        format.setVersion(3, 2)
+        format.setProfile(QSurfaceFormat.CoreProfile)
+        QSurfaceFormat.setDefaultFormat(format)
 
     # Splash screen
     pixmap = QPixmap(":/images/splash.png")

@@ -104,25 +104,20 @@ class CurveItem:
 
         vbo.set_array(self.vertices_data)
 
-        shaders.glUseProgram(shader_program)
-
+        vbo.bind()
         try:
-            vbo.bind()
-            try:
-                GL.glEnableVertexAttribArray(0)
-                GL.glEnableVertexAttribArray(1)
-                stride = self.vertices_data.shape[-1]*sizeof(c_float)
-                vertex_offset = c_void_p(0 * sizeof(c_float))
-                color_offset  = c_void_p(3 * sizeof(c_float))
-                GL.glVertexAttribPointer(0, 3, GL.GL_FLOAT, GL.GL_FALSE, stride, vertex_offset)
-                GL.glVertexAttribPointer(1, 3, GL.GL_FLOAT, GL.GL_FALSE, stride, color_offset)
-                GL.glDrawArrays(GL.GL_LINES, 0, self.vertices_data.shape[0])
-                GL.glDisableVertexAttribArray(0)
-                GL.glDisableVertexAttribArray(1)
-            finally:
-                vbo.unbind()
+            GL.glEnableVertexAttribArray(0)
+            GL.glEnableVertexAttribArray(1)
+            stride = self.vertices_data.shape[-1]*sizeof(c_float)
+            vertex_offset = c_void_p(0 * sizeof(c_float))
+            color_offset  = c_void_p(3 * sizeof(c_float))
+            GL.glVertexAttribPointer(0, 3, GL.GL_FLOAT, GL.GL_FALSE, stride, vertex_offset)
+            GL.glVertexAttribPointer(1, 3, GL.GL_FLOAT, GL.GL_FALSE, stride, color_offset)
+            GL.glDrawArrays(GL.GL_LINES, 0, self.vertices_data.shape[0])
+            GL.glDisableVertexAttribArray(0)
+            GL.glDisableVertexAttribArray(1)
         finally:
-            shaders.glUseProgram(0)
+            vbo.unbind()
 
 
 class TimePlot(QtWidgets.QWidget):
