@@ -101,8 +101,8 @@ Write-Host "==========================================="
 # install a version of pefile that does not use the past library, which in turn imports too many things
 & pip install git+https://github.com/tlecomte/pefile.git@tlecomte-remove-past
 
-# install our fork of pyinstaller that lets python35.dll be signed
-& pip install -U git+https://github.com/tlecomte/pyinstaller.git@tlecomte-sign
+# install a recent pyinstaller with no need for mscvr*.dll, and that lets python35.dll be signed
+& pip install -U git+https://github.com/pyinstaller/pyinstaller.git@469f1fa19275e415110f783fd538ad46805edff4
 
 Write-Host ""
 Write-Host "==========================================="

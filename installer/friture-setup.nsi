@@ -107,8 +107,8 @@ Section "MainSection" SEC01
   SetOutPath "$INSTDIR\_sounddevice_data"
   File /r "${PROJECT_PATH}\dist\friture\_sounddevice_data\*"
 
-  SetOutPath "$INSTDIR\qt5_plugins"
-  File /r "${PROJECT_PATH}\dist\friture\qt5_plugins\*"
+  SetOutPath "$INSTDIR\PyQt5"
+  File /r "${PROJECT_PATH}\dist\friture\PyQt5\*"
 
   SetOutPath "$INSTDIR"
   File "${PROJECT_PATH}\dist\friture\base_library.zip"
