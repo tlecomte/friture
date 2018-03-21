@@ -253,6 +253,12 @@ class GlCanvasWidget(QtWidgets.QOpenGLWidget):
         fragment_shader_source = core_fragment_shader_source if self.is_core else legacy_fragment_shader_source
         quad_fragment_shader = shaders.compileShader(fragment_shader_source, GL.GL_FRAGMENT_SHADER)
 
+        if self.is_core:
+            # on OpenGL 3 core, create a vertex array object (on non-core, there is one default VAO)
+            self.vao = GL.glGenVertexArrays(1)
+            # VAO needs to be bound before the program can be compiled
+            GL.glBindVertexArray(self.vao)
+
         self.quad_shader = shaders.compileProgram(quad_vertex_shader, quad_fragment_shader)
 
         vertices = np.array(
@@ -271,10 +277,6 @@ class GlCanvasWidget(QtWidgets.QOpenGLWidget):
         self.ruler_vbo = vbo.VBO(vertices)
         self.grid_vbo = vbo.VBO(vertices)
         self.data_vbo = vbo.VBO(vertices)
-
-        if self.is_core:
-            # on OpenGL 3 core, create a vertex array object (on non-core, there is one default VAO)
-            self.vao = GL.glGenVertexArrays(1)
 
     def setfmax(self, fmax):
         self.fmax = fmax
