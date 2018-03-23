@@ -519,10 +519,7 @@ class GlCanvasWidget(QtWidgets.QOpenGLWidget):
 
             self.matrixNotSet = False
 
-        GL.glShadeModel(GL.GL_SMOOTH)  # for gradient rendering
-        # GL.glDepthFunc(GL.GL_LESS) # The Type Of Depth Test To Do
         GL.glDisable(GL.GL_DEPTH_TEST)  # we do 2D, we need no depth test !
-        # GL.glEnable(GL.GL_CULL_FACE)
 
     def drawBackground(self):
         if self.anyOpaqueItem:
