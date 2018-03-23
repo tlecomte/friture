@@ -19,7 +19,7 @@
 
 import logging
 
-from PyQt5 import QtCore
+from PyQt5 import QtCore, QtMultimedia
 import sounddevice
 from numpy import ndarray, int16, fromstring, vstack, iinfo, float64
 
@@ -187,6 +187,13 @@ class __AudioBackend(QtCore.QObject):
     # method
     # returns a list of input devices index, starting with the system default
     def get_input_devices(self):
+
+
+        print(QtMultimedia.QAudioDeviceInfo.defaultInputDevice().deviceName(), flush=True)
+
+        for i, device in enumerate(QtMultimedia.QAudioDeviceInfo.availableDevices(QtMultimedia.QAudio.AudioInput)):
+            print(i, device.deviceName(), flush=True)
+
         devices = sounddevice.query_devices()
 
         # early exit if there is no input device. Otherwise query_devices(kind='input') fails
