@@ -21,46 +21,13 @@ from PyQt5 import QtGui, QtWidgets
 from numpy import argmax
 import numpy
 from numpy.fft import rfft, irfft
-from .filter import decimate
+from .signal.decimate import decimate_multiple, decimate_multiple_filtic
 from friture import generated_filters
 from .ringbuffer import RingBuffer
 
 from friture.audiobackend import SAMPLING_RATE
 
 DEFAULT_DELAYRANGE = 1  # default delay range is 1 second
-
-
-def subsampler(Ndec, bdec, adec, x, zis):
-    x_dec = x
-
-    # FIXME problems when x is smaller than filter coeff
-
-    # do not run on empty arrays, otherwise bad artefacts on the output !!
-    if x.size == 0:
-        return x, zis
-
-    if zis is None:
-        for i in range(Ndec):
-            x_dec, zf = decimate(bdec, adec, x_dec)
-        return x_dec, None
-    else:
-        zfs = []
-        for i, zi in zip(list(range(Ndec)), zis):
-            x_dec, zf = decimate(bdec, adec, x_dec, zi=zi)
-            # zf can be reused to restart the filter
-            zfs += [zf]
-        return x_dec, zfs
-
-# build a proper array of zero initial conditions to start the subsampler
-
-
-def subsampler_filtic(Ndec, bdec, adec):
-    zfs = []
-    for i in range(Ndec):
-        l = max(len(bdec), len(adec)) - 1
-        zfs += [numpy.zeros(l)]
-    return zfs
-
 
 def generalized_cross_correlation(d0, d1):
     # substract the means
@@ -160,8 +127,8 @@ class Delay_Estimator_Widget(QtWidgets.QWidget):
         [self.bdec, self.adec] = generated_filters.PARAMS['dec']
         self.bdec = numpy.array(self.bdec)
         self.adec = numpy.array(self.adec)
-        self.zfs0 = subsampler_filtic(self.Ndec, self.bdec, self.adec)
-        self.zfs1 = subsampler_filtic(self.Ndec, self.bdec, self.adec)
+        self.zfs0 = decimate_multiple_filtic(self.Ndec, self.bdec, self.adec)
+        self.zfs1 = decimate_multiple_filtic(self.Ndec, self.bdec, self.adec)
 
         # ringbuffers for the subsampled data
         self.ringbuffer0 = RingBuffer()
@@ -193,8 +160,8 @@ class Delay_Estimator_Widget(QtWidgets.QWidget):
             x0 = floatdata[0, :]
             x1 = floatdata[1, :]
             # subsample them
-            x0_dec, self.zfs0 = subsampler(self.Ndec, self.bdec, self.adec, x0, self.zfs0)
-            x1_dec, self.zfs1 = subsampler(self.Ndec, self.bdec, self.adec, x1, self.zfs1)
+            x0_dec, self.zfs0 = decimate_multiple(self.Ndec, self.bdec, self.adec, x0, self.zfs0)
+            x1_dec, self.zfs1 = decimate_multiple(self.Ndec, self.bdec, self.adec, x1, self.zfs1)
             # push to a 1-second ring buffer
             x0_dec.shape = (1, x0_dec.size)
             x1_dec.shape = (1, x1_dec.size)

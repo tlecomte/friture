@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from numpy import arange, sqrt, zeros, array
 from .lfilter import pyx_lfilter_float64_1D
+from .signal.decimate import decimate
 
 NOCTAVE = 9
 
@@ -114,20 +115,7 @@ def octave_filter_bank_decimation(blow, alow, forward, feedback, x, zis):
 
     return y, dec, zfs
 
-
-def decimate(bdec, adec, x, zi):
-    if len(x) == 0:
-        raise Exception("Filter input is too small")
-
-    # could use a polyphase decimator here
-    x_dec, zf = pyx_lfilter_float64_1D(bdec, adec, x, zi)
-
-    x_dec = x_dec[::2]
-    return x_dec, zf
-
 # build a proper array of zero initial conditions to start the filters
-
-
 def octave_filter_bank_decimation_filtic(blow, alow, forward, feedback):
     bands_per_octave = len(forward)
     zfs = []

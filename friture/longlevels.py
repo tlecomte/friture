@@ -26,9 +26,7 @@ from friture.longlevels_settings import (LongLevels_Settings_Dialog,
                                          DEFAULT_LEVEL_MAX)
 from friture.audioproc import audioproc
 from friture.timeplot import TimePlot
-from .filter import decimate
-from friture import generated_filters
-from friture.exp_smoothing_conv import pyx_exp_smoothed_value
+from .signal.decimate import decimate
 from .ringbuffer import RingBuffer
 from .lfilter import pyx_lfilter_float64_1D
 

@@ -21,10 +21,9 @@ from numpy import argmax
 import numpy
 import numpy as np
 from numpy.fft import rfft, irfft, fft, ifft
-from friture.filter import decimate
 from friture import generated_filters
-from friture.ringbuffer import RingBuffer
-from friture.delay_estimator import subsampler, subsampler_filtic, DEFAULT_DELAYRANGE
+from friture.delay_estimator import DEFAULT_DELAYRANGE
+from friture.signal.decimate import decimate_multiple, decimate_multiple_filtic
 from scipy.io import wavfile
 import matplotlib.pyplot as plt
 
@@ -106,8 +105,8 @@ def main():
     Ndec = 2
     subsampled_sampling_rate = SAMPLING_RATE/2**(Ndec)
     [bdec, adec] = generated_filters.PARAMS['dec']
-    zfs0 = subsampler_filtic(Ndec, bdec, adec)
-    zfs1 = subsampler_filtic(Ndec, bdec, adec)
+    zfs0 = decimate_multiple_filtic(Ndec, bdec, adec)
+    zfs1 = decimate_multiple_filtic(Ndec, bdec, adec)
     
     delayrange_s = DEFAULT_DELAYRANGE # confidence range
 
@@ -116,9 +115,9 @@ def main():
     x1 = m
     #subsample them
     print("subsampling x0")
-    x0_dec, zfs0 = subsampler(Ndec, bdec, adec, x0, zfs0)
+    x0_dec, zfs0 = decimate_multiple(Ndec, bdec, adec, x0, zfs0)
     print("subsampling x1")
-    x1_dec, zfs1 = subsampler(Ndec, bdec, adec, x1, zfs1)
+    x1_dec, zfs1 = decimate_multiple(Ndec, bdec, adec, x1, zfs1)
 
     time = 2*delayrange_s
     length = time*subsampled_sampling_rate
