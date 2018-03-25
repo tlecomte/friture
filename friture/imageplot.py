@@ -22,8 +22,8 @@ from fractions import Fraction
 import numpy as np
 from friture.audiobackend import AudioBackend
 from friture.spectrogram_image import CanvasScaledSpectrogram
-from friture.online_linear_2D_resampler import Online_Linear_2D_resampler
-from friture.frequency_resampler import Frequency_Resampler
+from friture.signal.online_linear_2D_resampler import Online_Linear_2D_resampler
+from friture.signal.frequency_resampler import Frequency_Resampler
 from friture.plotting.scaleWidget import VerticalScaleWidget, HorizontalScaleWidget, ColorScaleWidget
 from friture.plotting.scaleDivision import ScaleDivision
 from friture.plotting.coordinateTransform import CoordinateTransform
