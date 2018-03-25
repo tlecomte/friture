@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2009 Timoth?Lecomte
+# Copyright (C) 2009 Timothée Lecomte
 
 # This file is part of Friture.
 #
@@ -18,46 +18,15 @@
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
 from PyQt5 import QtGui, QtWidgets
-from numpy import argmax
 import numpy
-from numpy.fft import rfft, irfft
-from .signal.decimate import decimate_multiple, decimate_multiple_filtic
-from friture import generated_filters
-from .ringbuffer import RingBuffer
 
-from friture.audiobackend import SAMPLING_RATE
+from friture import generated_filters
+from .audiobackend import SAMPLING_RATE
+from .ringbuffer import RingBuffer
+from .signal.decimate import decimate_multiple, decimate_multiple_filtic
+from .signal.correlation import generalized_cross_correlation
 
 DEFAULT_DELAYRANGE = 1  # default delay range is 1 second
-
-def generalized_cross_correlation(d0, d1):
-    # substract the means
-    # (in order to get a normalized cross-correlation at the end)
-    d0 -= d0.mean()
-    d1 -= d1.mean()
-
-    # Hann window to mitigate non-periodicity effects
-    window = numpy.hanning(len(d0))
-
-    # compute the cross-correlation
-    D0 = rfft(d0 * window)
-    D1 = rfft(d1 * window)
-    D0r = D0.conjugate()
-    G = D0r * D1
-    # G = (G==0.)*1e-30 + (G<>0.)*G
-    # W = 1. # frequency unweighted
-    # W = 1./numpy.abs(G) # "PHAT"
-    absG = numpy.abs(G)
-    m = max(absG)
-    W = 1. / (1e-10 * m + absG)
-    # D1r = D1.conjugate(); G0 = D0r*D0; G1 = D1r*D1; W = numpy.abs(G)/(G0*G1) # HB weighted
-    Xcorr = irfft(W * G)
-    # Xcorr_unweighted = irfft(G)
-    # numpy.save("d0.npy", d0)
-    # numpy.save("d1.npy", d1)
-    # numpy.save("Xcorr.npy", Xcorr)
-
-    return Xcorr
-
 
 class Delay_Estimator_Widget(QtWidgets.QWidget):
 
@@ -205,7 +174,7 @@ class Delay_Estimator_Widget(QtWidgets.QWidget):
                         smoothed_Xcorr = Xcorr
 
                     absXcorr = numpy.abs(smoothed_Xcorr)
-                    i = argmax(absXcorr)
+                    i = numpy.argmax(absXcorr)
 
                     # normalize
                     # Xcorr_max_norm = Xcorr_unweighted[i]/(d0.size*std0*std1)
