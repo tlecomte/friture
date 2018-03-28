@@ -363,6 +363,7 @@ def main():
         else:
             logger.info("command-line arguments (%s) not recognized", sys.argv[1:])
 
+    return_code = 0
     if profile == "python":
         import cProfile
         import pstats
@@ -372,8 +373,6 @@ def main():
         stats = pstats.Stats("friture.cprof")
         stats.strip_dirs().sort_stats('time').print_stats(20)
         stats.strip_dirs().sort_stats('cumulative').print_stats(20)
-
-        sys.exit(0)
     elif profile == "kcachegrind":
         import cProfile
         import lsprofcalltree
@@ -384,7 +383,11 @@ def main():
         k = lsprofcalltree.KCacheGrind(p)
         with open('cachegrind.out.00000', 'wb') as data:
             k.output(data)
-
-        sys.exit(0)
     else:
-        sys.exit(app.exec_())
+        return_code = app.exec_()
+
+    # explicitly delete the main windows instead of waiting for the interpreter shutdown
+    # tentative to prevent errors on exit on macos
+    del window
+
+    sys.exit(return_code)
