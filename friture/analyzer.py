@@ -368,7 +368,12 @@ def main():
         import cProfile
         import pstats
 
+        # friture.cprof can be visualized with SnakeViz
+        # http://jiffyclub.github.io/snakeviz/
+        # snakeviz friture.cprof
         cProfile.runctx('app.exec_()', globals(), locals(), filename="friture.cprof")
+
+        logger.info("Profile saved to '%s'", "friture.cprof")
 
         stats = pstats.Stats("friture.cprof")
         stats.strip_dirs().sort_stats('time').print_stats(20)
