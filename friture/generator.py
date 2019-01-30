@@ -147,44 +147,45 @@ class Generator_Widget(QtWidgets.QWidget):
         previous_stream = self.stream
         previous_device = self.device
 
-        error_message = ""
-
         self.logger.info("Trying to write to output device '%s'", device['name'])
 
         # first see if the format is supported by PortAudio
         try:
-            success = AudioBackend().is_output_format_supported(device, np.int16)
-        except Exception:
-            self.logger.exception("Format is not supported")
-            success = False
+            AudioBackend().is_output_format_supported(device, np.int16)
+        except sounddevice.PortAudioError as err:
+            self.on_device_change_error(previous_stream, previous_device, "Format is not supported: {0}".format(err))
+            return
 
-        if success:
-            try:
-                self.stream = AudioBackend().open_output_stream(device, self.audio_callback)
-                self.device = device
-                self.stream.start()
-                if self.state not in [STARTING, PLAYING]:
-                    self.stream.stop()
-                success = True
-            except OSError:
-                self.logger.exception("Failed to open output device")
-                success = False
-
-        if success:
-            self.logger.info("Success")
-            previous_stream.stop()
-        else:
-            if self.stream is not None:
+        try:
+            self.stream = AudioBackend().open_output_stream(device, self.audio_callback)
+            self.device = device
+            self.stream.start()
+            if self.state not in [STARTING, PLAYING]:
                 self.stream.stop()
-            # restore previous stream
-            self.stream = previous_stream
-            self.device = previous_device
+        except (sounddevice.PortAudioError, OSError) as err:
+            self.on_device_change_error(previous_stream, previous_device, "Failed to open output device: {0}".format(err))
+            return
 
-            # Note: the error message is a child of the settings dialog, so that
-            # that dialog remains on top when the error message is closed
-            error_message = QtWidgets.QErrorMessage(self.settings_dialog)
-            error_message.setWindowTitle("Output device error")
-            error_message.showMessage("Impossible to use the selected output device, reverting to the previous one. Reason is: " + error_message)
+        self.logger.info("Success")
+        previous_stream.stop()
+
+        self.settings_dialog.combobox_output_device.setCurrentIndex(AudioBackend().output_devices.index(self.device))
+
+    def on_device_change_error(self, previous_stream, previous_device, message):
+        self.logger.exception(message)
+
+        if self.stream is not None:
+            self.stream.stop()
+
+        # restore previous stream
+        self.stream = previous_stream
+        self.device = previous_device
+
+        # Note: the error message is a child of the settings dialog, so that
+        # that dialog remains on top when the error message is closed
+        error_message = QtWidgets.QErrorMessage(self.settings_dialog)
+        error_message.setWindowTitle("Output device error")
+        error_message.showMessage("Impossible to use the selected output device, reverting to the previous one. Reason is: " + message)
 
         self.settings_dialog.combobox_output_device.setCurrentIndex(AudioBackend().output_devices.index(self.device))
 
