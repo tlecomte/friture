@@ -327,19 +327,13 @@ class __AudioBackend(QtCore.QObject):
         return stream
 
     def is_output_format_supported(self, device, output_format):
-        try:
-            sounddevice.check_output_settings(
-                device=device['index'],
-                channels=device['max_output_channels'],
-                dtype=output_format,
-                samplerate=SAMPLING_RATE)
-
-            success = True
-        except Exception:
-            self.logger.exception("Format is not supported")
-            success = False
-
-        return success
+        # raise sounddevice.PortAudioError if the format is not supported
+        # the exception message contains the details, such as an invalid sample rate
+        sounddevice.check_output_settings(
+            device=device['index'],
+            channels=device['max_output_channels'],
+            dtype=output_format,
+            samplerate=SAMPLING_RATE)
 
     # method
     # return the index of the current input device in the input devices list
