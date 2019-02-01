@@ -26,6 +26,8 @@ artifacts:
     name: xref-friture
   - path: build/friture/graph-friture.dot
     name: graph-friture
+  - path: dist/friture.zip
+    name: friture
 deploy:
   provider: GitHub
   auth_token:
