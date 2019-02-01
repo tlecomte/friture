@@ -120,6 +120,12 @@ Write-Host "==========================================="
 
 Write-Host ""
 Write-Host "==========================================="
+Write-Host "Archiving the package as a zip file"
+Write-Host "==========================================="
+Compress-Archive -Path .\dist\friture\* -DestinationPath .\dist\friture.zip
+
+Write-Host ""
+Write-Host "==========================================="
 Write-Host "Building the NSIS installer"
 Write-Host "==========================================="
 
