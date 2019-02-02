@@ -29,6 +29,7 @@ else
     sudo apt-get update
     sudo apt-get install -y libportaudio0
 
+    pip install -U pyinstaller
 
     pyinstaller friture.spec -y --log-level=DEBUG
 
