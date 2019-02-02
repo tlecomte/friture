@@ -10,7 +10,6 @@ import os.path
 from pathlib import Path
 import numpy
 import friture  # for the version number
-import sounddevice # to find the libportaudio.dylib path
 
 py2exe_build = False
 py2app_build = False
@@ -133,6 +132,7 @@ elif py2app_build:
     # by default libportaudio.dylib is copied inside the pythonXXX.zip bundle,
     # but a library cannot be loaded from inside such a bundle
     # so copy it explicitely instead
+    import sounddevice
     base = os.path.dirname(sounddevice.__file__)
     libportaudio_path = os.path.join(base, "_sounddevice_data", "portaudio-binaries", "libportaudio.dylib")
 
