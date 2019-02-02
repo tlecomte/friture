@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -x
+
 source multibuild/common_utils.sh
 source multibuild/travis_steps.sh
 before_install
