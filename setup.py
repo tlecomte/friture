@@ -26,14 +26,12 @@ elif "py2app" in sys.argv:
 
 # see INSTALL file for details
 # to create a source package
-#       python setup.py sdist --formats=gztar,zip
-# to register a new release on PyPI
-#       python setup.py register
-# to upload the source files to PyPI after registering
-# Warning: the folder should be clean !
-#       python setup.py sdist --formats=gztar,zip upload
-# to create a bundled windows executable
-#       python setup.py py2exe
+#       python setup.py sdist --formats=gztar
+# to upload a new release to the test instance of PyPI
+#       twine upload --repository-url https://test.pypi.org/legacy/ dist/*
+# to upload the new release to PyPI
+# Warning: the 'dist' folder should be clean !
+#       twine upload dist/*
 
 # to test for pep8 issues:
 # pep8 --show-source --show-pep8 --max-line-length=170 friture
