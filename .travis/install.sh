@@ -26,6 +26,10 @@ if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
     du -hs $ARTIFACT_FILENAME
 else
     # Linux
+    sudo apt-get update
+    sudo apt-get install -y libportaudio0
+
+
     pyinstaller friture.spec -y --log-level=DEBUG
 
     ls -la dist

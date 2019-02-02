@@ -8,11 +8,6 @@ env:
   - MB_PYTHON_VERSION=3.5
 script:
   - ./.travis/install.sh
-addons:
-  apt:
-    update: true
-    packages:
-    - libportaudio0
 deploy:
   provider: releases
   draft: true
