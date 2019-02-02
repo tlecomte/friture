@@ -1,9 +1,10 @@
 matrix:
   include:
   - os: linux
+    language: python
     python: "3.5" # pin for Linux builds (on macos, the multibuild python is used instead)
   - os: osx
-language: python
+    language: generic
 env:
   - MB_PYTHON_VERSION=3.5
 script:
