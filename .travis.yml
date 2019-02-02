@@ -2,6 +2,8 @@ os:
   - linux
   - osx
 language: generic
+python: 
+  - "3.5" # pin for Linux builds (on macos, the multibuild python is used instead)
 env:
   - MB_PYTHON_VERSION=3.5
 script:
