@@ -29,7 +29,8 @@ else
     sudo apt-get update
     sudo apt-get install -y libportaudio0
 
-    pip install -U pyinstaller
+    # about pep517, see https://github.com/pypa/pip/issues/6163
+    pip3 install -U pyinstaller --no-use-pep517
 
     pyinstaller friture.spec -y --log-level=DEBUG
 
