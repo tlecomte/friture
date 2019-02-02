@@ -15,7 +15,7 @@ script:
   - virtualenv --python=python3 usr
   - ./usr/bin/pip3 install -r requirements.txt
   - ./usr/bin/python3 setup.py build_ext --inplace
-  - cat > usr/share/applications/mu.codewith.editor.desktop <<\EOF
+  - cat > usr/share/applications/friture.desktop <<\EOF
   - [Desktop Entry]
   - Type=Application
   - Name=Friture
