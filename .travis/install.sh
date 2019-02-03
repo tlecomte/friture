@@ -38,12 +38,15 @@ else
 
     pyinstaller friture.spec -y --log-level=DEBUG
 
-    ls -laR dist
+    export ARTIFACT_FILENAME=friture-$(python3 -c 'import friture; print(friture.__version__)')-$(date +'%Y%m%d').tar.gz
+    echo $ARTIFACT_FILENAME
+
+    tar -zcvf $ARTIFACT_FILENAME dist
+    du -hs $ARTIFACT_FILENAME
 
     wget -q https://github.com/AppImage/AppImages/raw/master/pkg2appimage -O ./pkg2appimage
     chmod a+x ./pkg2appimage
-    bash -ex pkg2appimage recipes/friture.yml
-
-    ls -la out
+    # bash -ex pkg2appimage recipes/friture.yml
+    # ls -la out
 fi
 
