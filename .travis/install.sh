@@ -38,7 +38,7 @@ else
 
     pyinstaller friture.spec -y --log-level=DEBUG
 
-    ls -la dist
+    ls -laR dist
 
     wget -q https://github.com/AppImage/AppImages/raw/master/pkg2appimage -O ./pkg2appimage
     chmod a+x ./pkg2appimage
