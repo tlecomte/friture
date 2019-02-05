@@ -7,7 +7,7 @@ import numpy as np
 from numpy.fft import fft, fftshift, fftfreq
 import time
 
-from friture.lfilter import pyx_lfilter_float64_1D
+from friture_extensions.lfilter import pyx_lfilter_float64_1D
 
 def pure_lfilter_float64_1D(b, a, x, zi):
     assert len(b.shape) == 1, "only 1D filters are allowed"

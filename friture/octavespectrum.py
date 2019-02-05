@@ -30,7 +30,7 @@ from friture.octavespectrum_settings import (OctaveSpectrum_Settings_Dialog,  # 
 from friture.filter import (octave_filter_bank_decimation, octave_frequencies,
                             octave_filter_bank_decimation_filtic, NOCTAVE)
 
-from friture.exp_smoothing_conv import pyx_exp_smoothed_value
+from friture_extensions.exp_smoothing_conv import pyx_exp_smoothed_value
 
 from friture import generated_filters
 

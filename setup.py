@@ -152,13 +152,13 @@ elif py2app_build:
 else:
     extra_options = dict()
 
-ext_modules = [Extension("friture.exp_smoothing_conv", ["friture/extension/exp_smoothing_conv.pyx"],
+ext_modules = [Extension("friture_extensions.exp_smoothing_conv", ["friture_extensions/exp_smoothing_conv.pyx"],
                          include_dirs=[numpy.get_include()]),
-               Extension("friture.linear_interp", ["friture/extension/linear_interp.pyx"],
+               Extension("friture_extensions.linear_interp", ["friture_extensions/linear_interp.pyx"],
                          include_dirs=[numpy.get_include()]),
-               Extension("friture.lookup_table", ["friture/extension/lookup_table.pyx"],
+               Extension("friture_extensions.lookup_table", ["friture_extensions/lookup_table.pyx"],
                          include_dirs=[numpy.get_include()]),
-               Extension("friture.lfilter", ["friture/extension/lfilter.pyx"],
+               Extension("friture_extensions.lfilter", ["friture_extensions/lfilter.pyx"],
                          include_dirs=[numpy.get_include()])]
 
 setup(name="friture",

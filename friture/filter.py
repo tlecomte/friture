@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from numpy import arange, sqrt, zeros, array
-from .lfilter import pyx_lfilter_float64_1D
+from friture_extensions.lfilter import pyx_lfilter_float64_1D
 from .signal.decimate import decimate
 
 NOCTAVE = 9

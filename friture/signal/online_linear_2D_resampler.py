@@ -8,7 +8,7 @@ Created on Sat Apr 21 16:12:12 2012
 import numpy as np
 
 from .scipy_resample import resample
-from ..linear_interp import pyx_linear_interp_2D
+from friture_extensions.linear_interp import pyx_linear_interp_2D
 
 
 class Online_Linear_2D_resampler:
