@@ -33,7 +33,7 @@ from friture.spectrum_settings import (Spectrum_Settings_Dialog,  # settings dia
 
 from friture.audiobackend import SAMPLING_RATE
 from friture.spectrumPlotWidget import SpectrumPlotWidget
-from friture.exp_smoothing_conv import pyx_exp_smoothed_value_numpy
+from friture_extensions.exp_smoothing_conv import pyx_exp_smoothed_value_numpy
 
 
 class Spectrum_Widget(QtWidgets.QWidget):

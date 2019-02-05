@@ -28,7 +28,7 @@ from friture.audioproc import audioproc
 from friture.timeplot import TimePlot
 from .signal.decimate import decimate
 from .ringbuffer import RingBuffer
-from .lfilter import pyx_lfilter_float64_1D
+from friture_extensions.lfilter import pyx_lfilter_float64_1D
 
 from friture.audiobackend import SAMPLING_RATE
 

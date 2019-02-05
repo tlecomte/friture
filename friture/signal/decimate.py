@@ -18,7 +18,7 @@
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
 import numpy
-from ..lfilter import pyx_lfilter_float64_1D
+from friture_extensions.lfilter import pyx_lfilter_float64_1D
 
 def decimate(bdec, adec, x, zi):
     if len(x) == 0:

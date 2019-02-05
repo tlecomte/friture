@@ -22,7 +22,7 @@ import logging
 import numpy
 from PyQt5 import QtCore, QtGui
 from friture.plotting import generated_cmrmap
-from friture.lookup_table import pyx_color_from_float_2D
+from friture_extensions.lookup_table import pyx_color_from_float_2D
 
 
 class CanvasScaledSpectrogram(QtCore.QObject):
