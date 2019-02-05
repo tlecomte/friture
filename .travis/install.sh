@@ -11,12 +11,11 @@ python3 -c 'import sys; print(sys.version)'
 
 pip3 install -r requirements.txt
 
+# py2app and pysinstaller need to have the extensions built explicitely
+python3 setup.py build_ext --inplace
+
 if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
-    # Macos
-
-    # py2app chokes when the extensions are not built explicitely
-    python3 setup.py build_ext --inplace
-
+    # Macos    
     pip3 install -U "py2app==0.14"
     python3 setup.py py2app
     # prepare a dmg out of friture.app
@@ -29,9 +28,6 @@ else
     # Linux
     sudo apt-get update
     sudo apt-get install -y libportaudio0
-
-    # try without the --inplace
-    python3 setup.py build_ext
 
     # about pep517, see https://github.com/pypa/pip/issues/6163
     pip3 install -U pyinstaller --no-use-pep517
