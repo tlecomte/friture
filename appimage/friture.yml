@@ -1,0 +1,15 @@
+# AppImage recipe for friture
+# takes the pyinstaller output and packages it as an AppImage
+
+app: friture
+
+ingredients:
+  dist: trusty
+  sources: []
+  packages: []
+
+script:
+  - echo $PWD
+  - cp ../../../appimage/friture.desktop .
+  - cp ../../../resources/images-src/window-icon.svg friture.svg
+  - cp -R ../../../dist/friture/* usr/bin/
