@@ -28,6 +28,7 @@ else
     # Linux
     sudo apt-get update
     sudo apt-get install -y libportaudio0
+    sudo apt-get install -y desktop-file-utils # for desktop-file-validate, used by pkg2appimage
 
     # about pep517, see https://github.com/pypa/pip/issues/6163
     pip3 install -U pyinstaller --no-use-pep517
