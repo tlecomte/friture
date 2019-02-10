@@ -5,6 +5,37 @@ import platform
 
 block_cipher = None
 
+# pyinstaller is conservative: it includes all Qt5 modules by default
+# to reduce our frozen image size, we exclude unused modules
+excludes = [
+        'PyQt5.QtDeclarative',
+        'PyQt5.QtHelp',
+        'PyQt5.QtMultimedia',
+        'PyQt5.QtNetwork',
+        'PyQt5.QtScript',
+        'PyQt5.QtScriptTools',
+        'PyQt5.QtSql',
+        'PyQt5.QtDesigner',
+        'PyQt5.QtTest',
+        'PyQt5.QtWebKit',
+        'PyQt5.QtXMLPatterns',
+        'PyQt5.QtCLucene',
+        'PyQt5.QtBluetooth',
+        'PyQt5.QtConcurrent',
+        'PyQt5.QtMultimediaWidgets',
+        'PyQt5.QtPositioning',
+        'PyQt5.QtQml',
+        'PyQt5.QtQuick',
+        'PyQt5.QtQuickWidgets',
+        'PyQt5.QtSensors',
+        'PyQt5.QtSerialPort',
+        'PyQt5.QtWebChannel',
+        'PyQt5.QtWebEngine',
+        'PyQt5.QtWebEngineCore',
+        'PyQt5.QtWebEngineWidgets',
+        'PyQt5.QtWebKitWidgets',
+        'PyQt5.QtWebSockets']
+
 if platform.system() == "Windows":
   sounddevice_data = collect_data_files("sounddevice", subdir="_sounddevice_data")
   libportaudio = [(file[0], "_sounddevice_data/portaudio-binaries") for file in sounddevice_data if "libportaudio" in file[0]]
@@ -31,12 +62,14 @@ a = Analysis(['main.py'],
              hiddenimports=[],
              hookspath=[],
              runtime_hooks=[],
-             excludes=[],
+             excludes=excludes,
              win_no_prefer_redirects=False,
              win_private_assemblies=False,
              cipher=block_cipher)
+
 pyz = PYZ(a.pure, a.zipped_data,
              cipher=block_cipher)
+
 exe = EXE(pyz,
           a.scripts,
           exclude_binaries=True,
@@ -46,6 +79,7 @@ exe = EXE(pyz,
           upx=False,
           console=False,
           icon="resources/images/friture.ico")
+
 coll = COLLECT(exe,
                a.binaries + binaries,
                a.zipfiles,
