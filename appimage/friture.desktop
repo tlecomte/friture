@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Friture
+Comment=Real-time visualization of live audio data
+Icon=friture
+Exec=usr/bin/friture
+Terminal=false
+Categories=AudioVideo;Audio;
+Keywords=audio;spectrum;spectrogram;
