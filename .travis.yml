@@ -9,7 +9,7 @@ matrix:
 env:
   - MB_PYTHON_VERSION=3.5
 script:
-  - ./.travis/install.sh
+  - source ./.travis/install.sh
 deploy:
   provider: releases
   draft: true
