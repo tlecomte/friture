@@ -5,6 +5,7 @@ fritureApp.controller('ReleasesCtrl', function ($scope, $http) {
     $scope.latest = data;
     $scope.windowsAsset = data.assets.filter(function(asset) { return asset.name.match(/.exe$/); })[0];
     $scope.macAsset = data.assets.filter(function(asset) { return asset.name.match(/.dmg$/); })[0];
+    $scope.linuxAsset = data.assets.filter(function(asset) { return asset.name.match(/.AppImage$/); })[0];
   });
 });
 
