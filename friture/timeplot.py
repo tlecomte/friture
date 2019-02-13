@@ -22,103 +22,12 @@ import logging
 
 from PyQt5 import Qt, QtGui, QtWidgets
 import numpy as np
+from friture.plotting.lineitem import LineItem
 from friture.plotting.scaleWidget import VerticalScaleWidget, HorizontalScaleWidget
 from friture.plotting.scaleDivision import ScaleDivision
 from friture.plotting.coordinateTransform import CoordinateTransform
 from friture.plotting.glCanvasWidget import GlCanvasWidget
 from friture.plotting.legendWidget import LegendWidget
-
-try:
-    from OpenGL import GL
-except ImportError:
-    app = QtWidgets.QApplication(sys.argv)
-    QtWidgets.QMessageBox.critical(None, "OpenGL hellogl",
-                                   "PyOpenGL must be installed to run this example.")
-    sys.exit(1)
-
-from OpenGL.GL import shaders
-from ctypes import sizeof, c_float, c_void_p, c_uint
-
-class CurveItem:
-
-    def __init__(self, *args):
-        self.n = 0
-        self.xMap = None
-        self.yMap = None
-        self.__color = Qt.QColor()
-        self.__title = ""
-        x = np.array([0., 1.])
-        y = np.array([0., 0.])
-        self.setData(x, y)
-
-    def setColor(self, color):
-        if self.__color != color:
-            self.__color = color
-
-            if self.n > 0:
-                Ones = np.ones(self.n)
-                r = self.color().red() / 255. * Ones
-                g = self.color().green() / 255. * Ones
-                b = self.color().blue() / 255. * Ones
-
-                self.vertices_data[0::2, 2:] = np.dstack((0*r, r, g, b))
-                self.vertices_data[1::2, 2:] = np.dstack((0*r, r, g, b))
-
-    def color(self):
-        return self.__color
-
-    def setData(self, x, y):
-        # make a copy so that pause works as expected
-        self.x = np.array(x)
-        self.y = np.array(y)
-
-        n = x.shape[0] - 1
-        if n != self.n:
-            self.n = n
-
-            Ones = np.ones(n)
-            r = self.color().red() / 255. * Ones
-            g = self.color().green() / 255. * Ones
-            b = self.color().blue() / 255. * Ones
-
-            # 2 vertices per segment * (3 coordinates + 3 color coordinates)
-            self.vertices_data = np.zeros((n*2, 6), dtype=np.float32)
-            self.vertices_data[0::2, 2:] = np.dstack((0*r, r, g, b))
-            self.vertices_data[1::2, 2:] = np.dstack((0*r, r, g, b))
-
-    def setTitle(self, title):
-        self.__title = title
-
-    def title(self):
-        return self.__title
-
-    def glDraw(self, xMap, yMap, rect, vbo, shader_program):
-        x = xMap.toScreen(self.x)
-        y = yMap.toScreen(self.y)
-
-        self.vertices_data[0::2, :2] = np.dstack((x[:-1], y[:-1]))
-        self.vertices_data[1::2, :2] = np.dstack((x[1:], y[1:]))
-
-        if self.vertices_data.size == 0:
-            return
-
-        vbo.set_array(self.vertices_data)
-
-        vbo.bind()
-        try:
-            GL.glEnableVertexAttribArray(0)
-            GL.glEnableVertexAttribArray(1)
-            stride = self.vertices_data.shape[-1]*sizeof(c_float)
-            vertex_offset = c_void_p(0 * sizeof(c_float))
-            color_offset  = c_void_p(3 * sizeof(c_float))
-            GL.glVertexAttribPointer(0, 3, GL.GL_FLOAT, GL.GL_FALSE, stride, vertex_offset)
-            GL.glVertexAttribPointer(1, 3, GL.GL_FLOAT, GL.GL_FALSE, stride, color_offset)
-            GL.glDrawArrays(GL.GL_LINES, 0, self.vertices_data.shape[0])
-            GL.glDisableVertexAttribArray(0)
-            GL.glDisableVertexAttribArray(1)
-        finally:
-            vbo.unbind()
-
 
 class TimePlot(QtWidgets.QWidget):
 
@@ -157,13 +66,13 @@ class TimePlot(QtWidgets.QWidget):
 
         self.needfullreplot = False
 
-        self.curve = CurveItem()
+        self.curve = LineItem()
         self.curve.setColor(QtGui.QColor(Qt.Qt.red))
         # gives a title to the curve for the legend
         self.curve.setTitle("Ch1")
         self.canvasWidget.attach(self.curve)
 
-        self.curve2 = CurveItem()
+        self.curve2 = LineItem()
         self.curve2.setColor(QtGui.QColor(Qt.Qt.blue))
         # gives a title to the curve for the legend
         self.curve2.setTitle("Ch2")
