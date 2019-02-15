@@ -4,6 +4,6 @@ PyOpenGL==3.1.0
 PyOpenGL-accelerate==3.1.0
 docutils==0.14
 numpy==1.13.3
-PyQt5==5.9.2
+PyQt5==5.12
 appdirs==1.4.3
 pyrr==0.9.2
