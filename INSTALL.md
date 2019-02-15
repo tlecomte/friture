@@ -23,7 +23,7 @@ sudo apt-get install -y git
 sudo apt-get install -y libportaudio0
 ```
 
-3. Install python 3.5 and related build tools (PyQt5 5.9.2 wheels for Linux are only available for Python 3.5+)
+3. Install python 3.5 and related build tools (appropriate PyQt5 wheels for Linux are only available for Python 3.5+)
 ```
 sudo apt-get install -y python3.5-dev
 ```
