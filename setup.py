@@ -55,8 +55,7 @@ dist_dir = os.path.join(parent_dir, 'friture-dist')
 # for pyOpenGL : http://www.jstump.com/blog/archive/2009/06/30/py2exe-and-pyopengl-3x-with-no-manual-tinkering/
 # + OpenGL_accelerate.formathandler that is imported by the Python/C
 # API so that py2exe/py2app does not detect it
-includes = ["sip",
-            "PyQt5.QtSvg",
+includes = ["PyQt5.QtSvg",
             "PyQt5.QtXml",
             "OpenGL.platform.win32",
             "OpenGL.arrays.ctypesarrays",
