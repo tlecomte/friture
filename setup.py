@@ -64,7 +64,8 @@ includes = ["PyQt5.QtSvg",
             "OpenGL.arrays.numbers",
             "OpenGL.arrays.strings",
             "OpenGL_accelerate.formathandler",
-            "_sounddevice_data"]
+            "_sounddevice_data",
+            "sip"]
 
 if py2exe_build:
     data_files = []
