@@ -2,7 +2,8 @@
 import sys
 
 # allow this script to be executed as a child of another script (lsprofcalltree, for example)
-sys.path.insert(0, '.')
+# (add at the end to favor system-installed packages)
+sys.path.append('.')
 
 from friture.analyzer import main
 
