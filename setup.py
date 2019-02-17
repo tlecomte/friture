@@ -2,13 +2,11 @@
 import sys
 from setuptools import setup
 from setuptools.extension import Extension
-from Cython.Build import cythonize
 from glob import glob
 import os
 from os.path import join, dirname  # for README content reading and py2exe fix
 import os.path
 from pathlib import Path
-import numpy
 import friture  # for the version number
 
 py2exe_build = False
@@ -115,6 +113,7 @@ if py2exe_build:
                      "msvcr*.dll"]
 
     if os.name == 'nt':
+        import numpy
         if 'CPATH' in os.environ:
             os.environ['CPATH'] = os.environ['CPATH'] + numpy.get_include()
         else:
@@ -152,14 +151,51 @@ elif py2app_build:
 else:
     extra_options = dict()
 
-ext_modules = [Extension("friture_extensions.exp_smoothing_conv", ["friture_extensions/exp_smoothing_conv.pyx"],
-                         include_dirs=[numpy.get_include()]),
-               Extension("friture_extensions.linear_interp", ["friture_extensions/linear_interp.pyx"],
-                         include_dirs=[numpy.get_include()]),
-               Extension("friture_extensions.lookup_table", ["friture_extensions/lookup_table.pyx"],
-                         include_dirs=[numpy.get_include()]),
-               Extension("friture_extensions.lfilter", ["friture_extensions/lfilter.pyx"],
-                         include_dirs=[numpy.get_include()])]
+# extensions
+ext_modules = [Extension("friture_extensions.exp_smoothing_conv",
+                         ["friture_extensions/exp_smoothing_conv.pyx"]),
+               Extension("friture_extensions.linear_interp",
+                         ["friture_extensions/linear_interp.pyx"]),
+               Extension("friture_extensions.lookup_table",
+                         ["friture_extensions/lookup_table.pyx"]),
+               Extension("friture_extensions.lfilter",
+                         ["friture_extensions/lfilter.pyx"])]
+
+# Friture runtime dependencies
+# these will be installed when calling 'pip install friture'
+# they are also retrieved by 'requirements.txt'
+install_requires = [
+    "sounddevice==0.3.10",
+    "PyOpenGL==3.1.0",
+    "PyOpenGL-accelerate==3.1.0",
+    "docutils==0.14",
+    "numpy==1.13.3",
+    "PyQt5==5.10.1",
+    "appdirs==1.4.3",
+    "pyrr==0.9.2",
+]
+
+# Cython and numpy are needed when running setup.py, to build extensions
+setup_requires=["numpy==1.13.3", "Cython==0.27.3"]
+
+# solve chicken-and-egg problem that setup.py needs to import Numpy to build the extensions,
+# but Numpy is not available until it is installed as a setup dependency
+# see: https://stackoverflow.com/a/54138355
+def custom_build_ext(parameters):
+    # delayed import (Cython build_ext is chosen when available)
+    from setuptools.command.build_ext import build_ext as _build_ext
+
+    # adjust include_dirs
+    class build_ext(_build_ext):
+        def finalize_options(self):
+            _build_ext.finalize_options(self)
+            # Prevent numpy from thinking it is still in its setup process:
+            __builtins__.__NUMPY_SETUP__ = False
+            # this import will only be called after numpy has been installed as a setup dependency:
+            import numpy
+            self.include_dirs.append(numpy.get_include())
+
+    return build_ext(parameters)
 
 setup(name="friture",
       version=friture.__version__,
@@ -189,7 +225,10 @@ setup(name="friture",
                 'friture.signal',
                 'friture_extensions'],
       scripts=['scripts/friture'],
-      ext_modules=cythonize(ext_modules),
+      ext_modules=ext_modules,
+      install_requires=install_requires,
+      setup_requires=setup_requires,
+      cmdclass={'build_ext' : custom_build_ext},
       **extra_options
       )
 
