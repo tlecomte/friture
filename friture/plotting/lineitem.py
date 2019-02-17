@@ -20,8 +20,6 @@
 from ctypes import c_float, c_uint, c_void_p, sizeof
 
 import numpy as np
-from OpenGL import GL
-from OpenGL.GL import shaders
 from PyQt5 import Qt
 
 
@@ -88,19 +86,21 @@ class LineItem:
         if self.vertices_data.size == 0:
             return
 
-        vbo.set_array(self.vertices_data)
+        vbo.write(self.vertices_data)
 
-        vbo.bind()
+        vbo.bind_to_uniform_block(0)
         try:
-            GL.glEnableVertexAttribArray(0)
-            GL.glEnableVertexAttribArray(1)
-            stride = self.vertices_data.shape[-1]*sizeof(c_float)
-            vertex_offset = c_void_p(0 * sizeof(c_float))
-            color_offset  = c_void_p(3 * sizeof(c_float))
-            GL.glVertexAttribPointer(0, 3, GL.GL_FLOAT, GL.GL_FALSE, stride, vertex_offset)
-            GL.glVertexAttribPointer(1, 3, GL.GL_FLOAT, GL.GL_FALSE, stride, color_offset)
-            GL.glDrawArrays(GL.GL_LINES, 0, self.vertices_data.shape[0])
-            GL.glDisableVertexAttribArray(0)
-            GL.glDisableVertexAttribArray(1)
+            pass
+            # TODO convert to real shader !!
+            # GL.glEnableVertexAttribArray(0)
+            # GL.glEnableVertexAttribArray(1)
+            # stride = self.vertices_data.shape[-1]*sizeof(c_float)
+            # vertex_offset = c_void_p(0 * sizeof(c_float))
+            # color_offset  = c_void_p(3 * sizeof(c_float))
+            # GL.glVertexAttribPointer(0, 3, GL.GL_FLOAT, GL.GL_FALSE, stride, vertex_offset)
+            # GL.glVertexAttribPointer(1, 3, GL.GL_FLOAT, GL.GL_FALSE, stride, color_offset)
+            # GL.glDrawArrays(GL.GL_LINES, 0, self.vertices_data.shape[0])
+            # GL.glDisableVertexAttribArray(0)
+            # GL.glDisableVertexAttribArray(1)
         finally:
-            vbo.unbind()
+            vbo.orphan()

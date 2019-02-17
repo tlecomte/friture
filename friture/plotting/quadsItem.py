@@ -17,18 +17,6 @@
 # You should have received a copy of the GNU General Public License
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
-import sys
-from PyQt5 import QtWidgets
-
-try:
-    from OpenGL import GL
-except ImportError:
-    app = QtWidgets.QApplication(sys.argv)
-    QtWidgets.QMessageBox.critical(None, "OpenGL hellogl",
-                                   "PyOpenGL must be installed to run this example.")
-    sys.exit(1)
-
-from OpenGL.GL import shaders
 from ctypes import c_float, c_uint, c_void_p, sizeof
 import numpy as np
 
@@ -183,22 +171,23 @@ class QuadsItem:
 
         self.prepareQuadData(x1, transformed_y, x2 - x1, baseline, r, g, b)
 
-        vbo.set_array(self.vertices_data)
+        vbo.write(self.vertices_data)
 
-        vbo.bind()
+        vbo.bind_to_uniform_block(0)
         try:
-            GL.glEnableVertexAttribArray(0)
-            GL.glEnableVertexAttribArray(1)
-            stride = self.vertices_data.shape[-1]*sizeof(c_float)
-            vertex_offset = c_void_p(0 * sizeof(c_float))
-            color_offset  = c_void_p(3 * sizeof(c_float))
-            GL.glVertexAttribPointer(0, 3, GL.GL_FLOAT, GL.GL_FALSE, stride, vertex_offset)
-            GL.glVertexAttribPointer(1, 3, GL.GL_FLOAT, GL.GL_FALSE, stride, color_offset)
-            GL.glDrawArrays(GL.GL_TRIANGLES, 0, self.vertices_data.shape[0])
-            GL.glDisableVertexAttribArray(0)
-            GL.glDisableVertexAttribArray(1)
+            pass
+            # GL.glEnableVertexAttribArray(0)
+            # GL.glEnableVertexAttribArray(1)
+            # stride = self.vertices_data.shape[-1]*sizeof(c_float)
+            # vertex_offset = c_void_p(0 * sizeof(c_float))
+            # color_offset  = c_void_p(3 * sizeof(c_float))
+            # GL.glVertexAttribPointer(0, 3, GL.GL_FLOAT, GL.GL_FALSE, stride, vertex_offset)
+            # GL.glVertexAttribPointer(1, 3, GL.GL_FLOAT, GL.GL_FALSE, stride, color_offset)
+            # GL.glDrawArrays(GL.GL_TRIANGLES, 0, self.vertices_data.shape[0])
+            # GL.glDisableVertexAttribArray(0)
+            # GL.glDisableVertexAttribArray(1)
         finally:
-            vbo.unbind()
+            vbo.orphan()
 
 
 def pre_tree_rebin(x1, x2):
