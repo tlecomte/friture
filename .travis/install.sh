@@ -9,6 +9,14 @@ before_install
 which python3
 python3 -c 'import sys; print(sys.version)'
 
+if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
+    # workaround for https://github.com/pypa/packaging-problems/issues/134
+    # build-time dependencies define in `setup_requires` are resolved
+    # on macOS Python with TLSv1, which is now disabled, so that fails
+    pip3 install numpy==1.13.3
+    pip3 install Cython==0.27.3
+fi
+
 pip3 install -r requirements.txt
 
 # py2app and pysinstaller need to have the extensions built explicitely
