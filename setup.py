@@ -144,7 +144,6 @@ elif py2app_build:
                       'dist_dir': dist_dir}
 
     extra_options = dict(
-        setup_requires=['py2app'],
         app=['main.py'],
         options={'py2app': py2app_options},
     )
@@ -194,6 +193,9 @@ install_requires = [
 
 # Cython and numpy are needed when running setup.py, to build extensions
 setup_requires=["numpy==1.13.3", "Cython==0.27.3"]
+
+if py2app_build:
+    setup_requires.append("py2app")
 
 setup(name="friture",
       version=friture.__version__,
