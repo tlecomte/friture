@@ -185,14 +185,14 @@ install_requires = [
     "PyOpenGL==3.1.0",
     "PyOpenGL-accelerate==3.1.0",
     "docutils==0.14",
-    "numpy==1.13.3",
+    "numpy==1.16.2",
     "PyQt5==5.10.1",
     "appdirs==1.4.3",
     "pyrr==0.9.2",
 ]
 
 # Cython and numpy are needed when running setup.py, to build extensions
-setup_requires=["numpy==1.13.3", "Cython==0.27.3"]
+setup_requires=["numpy==1.16.2", "Cython==0.27.3"]
 
 if py2app_build:
     setup_requires.append("py2app")
