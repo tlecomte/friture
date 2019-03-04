@@ -197,10 +197,13 @@ setup_requires=["numpy==1.16.2", "Cython==0.27.3"]
 if py2app_build:
     setup_requires.append("py2app")
 
+with open(join(dirname(__file__), 'README.rst')) as f:
+    long_description = f.read()
+
 setup(name="friture",
       version=friture.__version__,
       description='Real-time visualization of live audio data',
-      long_description=open(join(dirname(__file__), 'README.rst')).read(),
+      long_description=long_description,
       license="GNU GENERAL PUBLIC LICENSE",
       author='Timothée Lecomte',
       author_email='contact@friture.org',

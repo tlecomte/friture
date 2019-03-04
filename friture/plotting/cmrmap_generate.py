@@ -118,7 +118,6 @@ CMAP = numpy.array(json.loads(JSON_CMAP))
 
     path = os.path.dirname(__file__)
     fname = os.path.join(path, 'generated_cmrmap.py')
-    output = open(fname, 'w')
     with open(fname, 'w') as output:
         output.write(out)
 

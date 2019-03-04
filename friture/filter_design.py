@@ -204,7 +204,6 @@ PARAMS = json.loads(JSON_PARAMS)
 
     path = os.path.dirname(__file__)
     fname = os.path.join(path, 'generated_filters.py')
-    output = open(fname, 'w')
     with open(fname, 'w') as output:
         output.write(out)
 

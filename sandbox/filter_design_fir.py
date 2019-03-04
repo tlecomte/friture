@@ -191,12 +191,11 @@ def generate_filters_params():
 		[b, a, fi, flow, fhigh] = octave_filters(Nbands, BandsPerOctave)
 		params['nodec %d' %BandsPerOctave] = [b, a, fi, flow, fhigh]
 	
-	output = open('generated_filters.pkl', 'wb')
-	# Pickle dictionary using protocol 0.
-	pickle.dump(params, output)
-	# Pickle the list using the highest protocol available.
-	#pickle.dump(selfref_list, output, -1)
-	output.close()
+	with open('generated_filters.pkl', 'wb') as output:
+		# Pickle dictionary using protocol 0.
+		pickle.dump(params, output)
+		# Pickle the list using the highest protocol available.
+		#pickle.dump(selfref_list, output, -1)
 
 # main() is a test function
 def main():
