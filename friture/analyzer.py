@@ -301,7 +301,7 @@ def main():
 
     logger = logging.getLogger(__name__)
 
-    logger.info("Friture %s starting on %s (%s)", friture.__versionXXXX__, platform.system(), sys.platform)
+    logger.info("Friture %s starting on %s (%s)", friture.__version__, platform.system(), sys.platform)
 
     # make sure Qt loads the desktop OpenGL stack, rather than OpenGL ES or a software OpenGL
     # only the former option is compatible with the use of PyOpenGL

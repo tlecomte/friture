@@ -34,7 +34,7 @@ def fileexcepthook(exception_type, exception_value, traceback_object):
     exceptionText = "".join(traceback.format_exception(exception_type, exception_value, traceback_object))
     logger.critical("Unhandled exception: %s", exceptionText)
 
-    versionInfo="Friture " + friture.__versionXXXX__
+    versionInfo="Friture " + friture.__version__
     timeString = time.strftime("%Y-%m-%d, %H:%M:%S")
 
     # same as in analyzer.py
