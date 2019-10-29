@@ -27,20 +27,7 @@ if ($pipPath -eq $null)
 
 Write-Host "pip found in " $pipPath.Definition
 
-$nsisPath = Get-Command "makensis" -ErrorAction SilentlyContinue
-if ($nsisPath -eq $null)
-{
-    # try with the standard NSIS location
-    $env:Path += ";C:\Program Files (x86)\NSIS"
-
-    $nsisPath = Get-Command "makensis" -ErrorAction SilentlyContinue
-    if ((Get-Command "makensis" -ErrorAction SilentlyContinue) -eq $null)
-    {
-        throw "Unable to find makensis in PATH. Install NSIS using the official installer or using chocolatey."
-    }
-}
-
-Write-Host "makensis found in " $nsisPath.Definition
+Write-Host "WIX env var set to " $env:WIX
 
 Write-Host ""
 Write-Host "==========================================="
@@ -120,13 +107,38 @@ Write-Host "==========================================="
 
 Write-Host ""
 Write-Host "==========================================="
+Write-Host "Replace icudt53.dll with smaller version"
+Write-Host "==========================================="
+
+Copy-Item -Path "installer\icudt53.dll" -Destination "dist\friture\icudt53.dll"
+
+Write-Host ""
+Write-Host "==========================================="
 Write-Host "Archiving the package as a zip file"
 Write-Host "==========================================="
+
 Compress-Archive -Path .\dist\friture\* -DestinationPath .\dist\friture.zip
 
 Write-Host ""
 Write-Host "==========================================="
-Write-Host "Building the NSIS installer"
+Write-Host "Read version from file"
+Write-Host "==========================================="
+$initFileContent = Get-Content "friture/__init__.py"
+$version = $initFileContent | Select-String '__version__ = \"([\d\.]+)\"' | Foreach-Object {$_.Matches.Groups[1].Value} 
+
+Write-Host $version
+
+Write-Host ""
+Write-Host "==========================================="
+Write-Host "Build MSI with WiX"
 Write-Host "==========================================="
 
-& makensis.exe installer\friture-setup.nsi
+& "$env:WIX/bin/heat.exe" dir "dist/friture" -cg FritureFiles -gg -scom -sreg -sfrag -srd -dr INSTALLFOLDER -out "dist/FritureFilesFragment.wxs"
+& "$env:WIX/bin/candle.exe" installer/friture.wxs -dVersion="$version" -o dist/wixobj/
+& "$env:WIX/bin/candle.exe" dist/FritureFilesFragment.wxs -o dist/wixobj/
+& "$env:WIX/bin/light.exe" -ext WixUIExtension -cultures:en-us -b dist/friture dist/wixobj\*.wixobj -o "dist/friture-$version.msi"
+
+# Installer can be tested with:
+#    msiexec /i dist\friture-0.38.msi /l*v MyLogFile.txt
+# for uninstall:
+#    msiexec /x dist\friture-0.38.msi

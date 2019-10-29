@@ -20,7 +20,7 @@ install:
   - ps: ./winbuild.ps1
 build: false
 artifacts:
-  - path: installer/friture-*.exe
+  - path: dist/friture-*.msi
     name: friture-setup
   - path: build/friture/xref-friture.html
     name: xref-friture
