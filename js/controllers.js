@@ -3,7 +3,7 @@ var fritureApp = angular.module('fritureApp', []);
 fritureApp.controller('ReleasesCtrl', function ($scope, $http) {
   $http.get('https://api.github.com/repos/tlecomte/friture/releases/latest').success(function(data) {
     $scope.latest = data;
-    $scope.windowsAsset = data.assets.filter(function(asset) { return asset.name.match(/.exe$/); })[0];
+    $scope.windowsAsset = data.assets.filter(function(asset) { return asset.name.match(/.msi$/); })[0];
     $scope.macAsset = data.assets.filter(function(asset) { return asset.name.match(/.dmg$/); })[0];
     $scope.linuxAsset = data.assets.filter(function(asset) { return asset.name.match(/.AppImage$/); })[0];
   });
