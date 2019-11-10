@@ -14,8 +14,21 @@ except ImportError:
     sys.exit(1)
 
 from OpenGL.arrays import vbo
-from OpenGL.GL import shaders
 from ctypes import sizeof, c_float, c_void_p, c_uint
+
+def compileProgram(*shaders):
+    """Copied from the PyOpenGL codebase, as suggested in the PyOpenGL doc.
+    Does not call program.check_validate() because that fails on macos
+    because the framebuffer is not ready at initialization time"""
+    program = GL.glCreateProgram()
+    for shader in shaders:
+        GL.shaders.glAttachShader(program, shader)
+    program = GL.shaders.ShaderProgram( program )
+    GL.glLinkProgram(program)
+    program.check_linked()
+    for shader in shaders:
+        GL.glDeleteShader(shader)
+    return program
 
 class GlCanvasWidget(QtWidgets.QOpenGLWidget):
 
@@ -142,8 +155,6 @@ class GlCanvasWidget(QtWidgets.QOpenGLWidget):
                 profile_name,
                 renderableType_name)
 
-            vendor = ""
-
             self.logger.info(
                 "%s, %s, Version: %s, Shaders: %s, Extensions: %s",
                 self.tryGlGetString(GL.GL_VENDOR),
@@ -223,7 +234,7 @@ class GlCanvasWidget(QtWidgets.QOpenGLWidget):
             }"""
 
         vertex_shader_source = core_vertex_shader_source if self.is_core else legacy_vertex_shader_source
-        quad_vertex_shader = shaders.compileShader(vertex_shader_source, GL.GL_VERTEX_SHADER)
+        quad_vertex_shader = GL.shaders.compileShader(vertex_shader_source, GL.GL_VERTEX_SHADER)
 
         legacy_fragment_shader_source = """
             #version 110
@@ -251,7 +262,7 @@ class GlCanvasWidget(QtWidgets.QOpenGLWidget):
             }"""
 
         fragment_shader_source = core_fragment_shader_source if self.is_core else legacy_fragment_shader_source
-        quad_fragment_shader = shaders.compileShader(fragment_shader_source, GL.GL_FRAGMENT_SHADER)
+        quad_fragment_shader = GL.shaders.compileShader(fragment_shader_source, GL.GL_FRAGMENT_SHADER)
 
         if self.is_core:
             # on OpenGL 3 core, create a vertex array object (on non-core, there is one default VAO)
@@ -259,7 +270,7 @@ class GlCanvasWidget(QtWidgets.QOpenGLWidget):
             # VAO needs to be bound before the program can be compiled
             GL.glBindVertexArray(self.vao)
 
-        self.quad_shader = shaders.compileProgram(quad_vertex_shader, quad_fragment_shader)
+        self.quad_shader = compileProgram(quad_vertex_shader, quad_fragment_shader)
 
         vertices = np.array(
             [[ 0, 100, 0 ],
@@ -379,7 +390,7 @@ class GlCanvasWidget(QtWidgets.QOpenGLWidget):
         GL.glClearColor(1, 1, 1, 0)
         GL.glClear(GL.GL_COLOR_BUFFER_BIT)  # | GL.GL_DEPTH_BUFFER_BIT)
 
-        shaders.glUseProgram(self.quad_shader)
+        GL.glUseProgram(self.quad_shader)
 
         if self.is_core:
             # on OpenGL 3 core, create and bind a vertex array object (on non-core, there is one default VAO)
@@ -397,7 +408,7 @@ class GlCanvasWidget(QtWidgets.QOpenGLWidget):
             if self.is_core:
                 GL.glBindVertexArray(0)
 
-            shaders.glUseProgram(0)
+            GL.glUseProgram(0)
 
         painter = QtGui.QPainter(self)
         self.drawTrackerText(painter)
