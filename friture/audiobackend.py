@@ -29,6 +29,26 @@ FRAMES_PER_BUFFER = 512
 
 __audiobackendInstance = None
 
+# python-sounddevice (bindings to PortAudio)
+# > no device friendly name
+# > suffer from PortAudio bugs
+# > uses old PortAudio binaries
+
+# rtaudio
+# > better maintained than PortAudio
+# > no device friendly name
+# > no ios/android support
+
+# qtmultimedia
+# > shipped with Qt5
+# > no device friendly name
+# > supports iOS and android
+
+# python-soundcard
+# > not a lot of devs / users
+# > no android support
+# > provides device ids and friendly name
+
 def AudioBackend():
     global __audiobackendInstance
     if __audiobackendInstance is None:
@@ -376,25 +396,20 @@ class __AudioBackend(QtCore.QObject):
             self.xruns += 1
             self.underflow.emit()
 
-        intdata_all_channels = fromstring(in_data, int16)
+        intdata_all_channels = in_data
 
         int16info = iinfo(int16)
         norm_coeff = max(abs(int16info.min), int16info.max)
         floatdata_all_channels = intdata_all_channels.astype(float64) / float(norm_coeff)
 
         channel = self.get_current_first_channel()
-        nchannels = self.get_current_device_nchannels()
         if self.duo_input:
             channel_2 = self.get_current_second_channel()
 
-        if len(floatdata_all_channels) != frame_count*nchannels:
-            self.logger.error("Incoming data is not consistent with current channel settings.")
-            return
-
-        floatdata1 = floatdata_all_channels[channel::nchannels]
+        floatdata1 = floatdata_all_channels[:,channel]
 
         if self.duo_input:
-            floatdata2 = floatdata_all_channels[channel_2::nchannels]
+            floatdata2 = floatdata_all_channels[:,channel_2]
             floatdata = vstack((floatdata1, floatdata2))
         else:
             floatdata = floatdata1
