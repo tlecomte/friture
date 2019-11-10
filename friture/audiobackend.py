@@ -19,8 +19,8 @@
 
 import logging
 
-from PyQt5 import QtCore
 import sounddevice
+from PyQt5 import QtCore, QtMultimedia
 from numpy import ndarray, int16, fromstring, vstack, iinfo, float64
 
 # the sample rate below should be dynamic, taken from PyAudio/PortAudio
@@ -207,6 +207,19 @@ class __AudioBackend(QtCore.QObject):
     # method
     # returns a list of input devices index, starting with the system default
     def get_input_devices(self):
+        print("Input")
+        inputDevices = QtMultimedia.QAudioDeviceInfo.availableDevices(QtMultimedia.QAudio.AudioInput)
+        for d in inputDevices:
+            print(d.deviceName())
+        
+        print("Output")
+        outputDevices = QtMultimedia.QAudioDeviceInfo.availableDevices(QtMultimedia.QAudio.AudioOutput)
+        for d in outputDevices:
+            print(d.deviceName())
+
+        defaultInputDevice = QtMultimedia.QAudioDeviceInfo.defaultInputDevice()
+        print(defaultInputDevice.deviceName())
+
         devices = sounddevice.query_devices()
 
         # early exit if there is no input device. Otherwise query_devices(kind='input') fails
