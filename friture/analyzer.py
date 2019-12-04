@@ -102,6 +102,7 @@ class Friture(QMainWindow, ):
         # timer ticks
         self.display_timer.timeout.connect(self.dockmanager.canvasUpdate)
         self.display_timer.timeout.connect(self.level_widget.canvasUpdate)
+        self.display_timer.timeout.connect(AudioBackend().fetchAudioData)
 
         # toolbar clicks
         self.ui.actionStart.triggered.connect(self.timer_toggle)

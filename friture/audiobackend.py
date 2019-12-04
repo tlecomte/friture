@@ -18,10 +18,12 @@
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
+import math
 
 from PyQt5 import QtCore
 import sounddevice
-from numpy import ndarray, int16, fromstring, vstack, iinfo, float64
+import rtmixer
+from numpy import ndarray, vstack, int16, float64, float32, frombuffer, concatenate
 
 # the sample rate below should be dynamic, taken from PyAudio/PortAudio
 SAMPLING_RATE = 48000
@@ -33,21 +35,26 @@ __audiobackendInstance = None
 # > no device friendly name
 # > suffer from PortAudio bugs
 # > uses old PortAudio binaries
+# > sounddevice provides nice Python bindngs
+# > rtmixer provides nice C ringbuffer on top of sounddevice
 
 # rtaudio
 # > better maintained than PortAudio
 # > no device friendly name
 # > no ios/android support
+# > no nice Python bindings
 
 # qtmultimedia
 # > shipped with Qt5
 # > no device friendly name
 # > supports iOS and android
+# > opaque
 
 # python-soundcard
 # > not a lot of devs / users
 # > no android support
 # > provides device ids and friendly name
+# > doc, features are lacking
 
 def AudioBackend():
     global __audiobackendInstance
@@ -58,25 +65,7 @@ def AudioBackend():
 class __AudioBackend(QtCore.QObject):
 
     underflow = QtCore.pyqtSignal()
-    new_data_available_from_callback = QtCore.pyqtSignal(ndarray, int, float, bool)
     new_data_available = QtCore.pyqtSignal(ndarray, float, bool)
-
-    def callback(self, in_data, frame_count, time_info, status):
-        # do the minimum from here to prevent overflows, just pass the data to the main thread
-
-        if status:
-            self.logger.info(status)
-
-        # some API drivers in PortAudio do not return a valid inputBufferAdcTime (MME for example)
-        # so fallback to the current stream time in that case
-        if time_info.currentTime == 0. or time_info.inputBufferAdcTime == 0.:
-            input_time = self.get_stream_time()
-        elif time_info.inputBufferAdcTime == 0.:
-            input_time = time_info.currentTime
-        else:
-            input_time = time_info.inputBufferAdcTime
-
-        self.new_data_available_from_callback.emit(in_data, frame_count, input_time, status.input_overflow)
 
     def __init__(self):
         QtCore.QObject.__init__(self)
@@ -96,12 +85,15 @@ class __AudioBackend(QtCore.QObject):
         self.second_channel = None
 
         self.stream = None
+        self.ringBuffer = None
+        self.action = None
+        self.nchannels_max = 0
 
         # we will try to open all the input devices until one
         # works, starting by the default input device
         for device in self.input_devices:
             try:
-                self.stream = self.open_stream(device)
+                (self.stream, self.ringBuffer, self.action, self.nchannels_max) = self.open_stream(device)
                 self.stream.start()
                 self.device = device
                 self.logger.info("Success")
@@ -121,8 +113,6 @@ class __AudioBackend(QtCore.QObject):
         self.xruns = 0
 
         self.chunk_number = 0
-
-        self.new_data_available_from_callback.connect(self.handle_new_data)
 
         self.devices_with_timing_errors = []
 
@@ -268,12 +258,15 @@ class __AudioBackend(QtCore.QObject):
 
         # save current stream in case we need to restore it
         previous_stream = self.stream
+        previous_ringBuffer = self.ringBuffer
+        previous_action = self.action
+        previous_nchannels_max = self.nchannels_max
         previous_device = self.device
 
         self.logger.info("Trying to open input device #%d", index)
 
         try:
-            self.stream = self.open_stream(device)
+            (self.stream, self.ringBuffer, self.action, self.nchannels_max) = self.open_stream(device)
             self.device = device
             self.stream.start()
             success = True
@@ -284,6 +277,9 @@ class __AudioBackend(QtCore.QObject):
                 self.stream.stop()
             # restore previous stream
             self.stream = previous_stream
+            self.ringBuffer = previous_ringBuffer
+            self.action = previous_action
+            self.nchannels_max = previous_nchannels_max
             self.device = previous_device
 
         if success:
@@ -319,18 +315,32 @@ class __AudioBackend(QtCore.QObject):
 
         # by default we open the device stream with all the channels
         # (interleaved in the data buffer)
-        stream = sounddevice.InputStream(
-            samplerate=SAMPLING_RATE,
-            blocksize=FRAMES_PER_BUFFER,
+        stream = rtmixer.Recorder(
             device=device['index'],
-            channels = device['max_input_channels'],
-            dtype=int16,
-            callback=self.callback)
+            channels=device['max_input_channels'],
+            blocksize=FRAMES_PER_BUFFER,
+            #latency=latency,
+            samplerate=SAMPLING_RATE)
+
+        sampleSize = 4 # the sample size in bytes (float32)
+        nchannels_max = device['max_input_channels'] # the number of channels that we record
+        elementSize = nchannels_max * sampleSize
+
+        # arbitrary size to avoid overflows without using too much memory
+        ringbuggerSeconds = 3.
+
+        # The number of elements in the buffer (must be a power of 2)
+        ringbufferSize = 2**int(math.log2(ringbuggerSeconds * SAMPLING_RATE))
+
+        ringBuffer = rtmixer.RingBuffer(elementSize, ringbufferSize)
+        
+        # action can be used to read the count of input overflows
+        action = stream.record_ringbuffer(ringBuffer)
 
         lat_ms = 1000 * stream.latency
         self.logger.info("Device claims %d ms latency", lat_ms)
 
-        return stream
+        return (stream, ringBuffer, action, nchannels_max)
 
     # method
     def open_output_stream(self, device, callback):
@@ -390,34 +400,44 @@ class __AudioBackend(QtCore.QObject):
     def get_device_outputchannels_count(self, device):
         return device['max_output_channels']
 
-    def handle_new_data(self, in_data, frame_count, input_time, input_overflow):
-        if input_overflow:
-            self.logger.info("Stream overflow!")
-            self.xruns += 1
-            self.underflow.emit()
+    def fetchAudioData(self):
+        if self.action is None or self.ringBuffer is None:
+            return
 
-        intdata_all_channels = in_data
+        while self.ringBuffer.read_available >= FRAMES_PER_BUFFER:
+            read, buf1, buf2 = self.ringBuffer.get_read_buffers(FRAMES_PER_BUFFER)
+            assert read == FRAMES_PER_BUFFER
+            buffer1 = frombuffer(buf1, dtype='float32')
+            buffer2 = frombuffer(buf2, dtype='float32')
+            buffer = concatenate((buffer1, buffer2)).astype(float64)
+            buffer.shape = -1, self.nchannels_max
+            self.ringBuffer.advance_read_index(FRAMES_PER_BUFFER)
 
-        int16info = iinfo(int16)
-        norm_coeff = max(abs(int16info.min), int16info.max)
-        floatdata_all_channels = intdata_all_channels.astype(float64) / float(norm_coeff)
+            channel = self.get_current_first_channel()
+            if self.duo_input:
+                channel_2 = self.get_current_second_channel()
 
-        channel = self.get_current_first_channel()
-        if self.duo_input:
-            channel_2 = self.get_current_second_channel()
+            floatdata1 = buffer[:,channel]
 
-        floatdata1 = floatdata_all_channels[:,channel]
+            if self.duo_input:
+                floatdata2 = buffer[:,channel_2]
+                floatdata = vstack((floatdata1, floatdata2))
+            else:
+                floatdata = floatdata1
+                floatdata.shape = (1, floatdata.size)
 
-        if self.duo_input:
-            floatdata2 = floatdata_all_channels[:,channel_2]
-            floatdata = vstack((floatdata1, floatdata2))
-        else:
-            floatdata = floatdata1
-            floatdata.shape = (1, floatdata.size)
+            input_time = self.get_stream_time()
 
-        self.new_data_available.emit(floatdata, input_time, input_overflow)
+            input_overflows = self.action.stats.input_overflows
+            input_overflow = input_overflows > self.xruns
+            if input_overflow:
+                self.xruns = input_overflows
+                self.logger.info("Stream overflow!")
+                self.underflow.emit()
 
-        self.chunk_number += 1
+            self.new_data_available.emit(floatdata, input_time, input_overflow)
+
+            self.chunk_number += 1
 
     def set_single_input(self):
         self.duo_input = False
