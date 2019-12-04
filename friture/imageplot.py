@@ -121,8 +121,6 @@ class PlotImage:
             time_delay = time - self.last_data_time
             pixel_delay = rect.width() * time_delay / self.T
 
-            draw_delay = time - self.last_time
-
             self.last_time = time
 
             offset += pixel_delay
