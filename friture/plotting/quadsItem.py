@@ -149,21 +149,36 @@ class QuadsItem:
             y = tree_rebin(self.y, self.n, self.N)
             y_int = tree_rebin(self.y_int, self.n, self.N)
         else:
-            n = int(np.floor(1. / (x2[2] - x1[1])))
+            delta = x2[2] - x1[1]
+
+            n = int(np.floor(1. / delta)) if delta > 0. else 0
             if n > 1:
                 new_len = len(self.y) // n
                 rest = len(self.y) - new_len * n
 
-                new_y = self.y[:-rest]
-                new_y.shape = (new_len, n)
-                y = np.mean(new_y, axis=1)
+                if rest > 0:
+                    new_y = self.y[:-rest]
+                    new_y.shape = (new_len, n)
+                    y = np.mean(new_y, axis=1)
 
-                new_y_int = self.y_int[:-rest]
-                new_y_int.shape = (new_len, n)
-                y_int = np.mean(new_y_int, axis=1)
+                    new_y_int = self.y_int[:-rest]
+                    new_y_int.shape = (new_len, n)
+                    y_int = np.mean(new_y_int, axis=1)
 
-                x1 = x1[:-rest:n]
-                x2 = x2[n::n]
+                    x1 = x1[:-rest:n]
+                    x2 = x2[n::n]
+                else:
+                    new_y = self.y
+                    new_y.shape = (new_len, n)
+                    y = np.mean(new_y, axis=1)
+
+                    new_y_int = self.y_int
+                    new_y_int.shape = (new_len, n)
+                    y_int = np.mean(new_y_int, axis=1)
+
+                    x1 = x1[::n]
+                    x2 = x2[n::n]
+
             else:
                 y = self.y
                 y_int = self.y_int
