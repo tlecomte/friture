@@ -182,6 +182,7 @@ ext_modules = [LateIncludeExtension("friture_extensions.exp_smoothing_conv",
 # they are also retrieved by 'requirements.txt'
 install_requires = [
     "sounddevice==0.3.10",
+    "rtmixer==0.1.0",
     "PyOpenGL==3.1.0",
     "PyOpenGL-accelerate==3.1.0",
     "docutils==0.14",
