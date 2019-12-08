@@ -327,10 +327,10 @@ class __AudioBackend(QtCore.QObject):
         elementSize = nchannels_max * sampleSize
 
         # arbitrary size to avoid overflows without using too much memory
-        ringbuggerSeconds = 3.
+        ringbufferSeconds = 3.
 
         # The number of elements in the buffer (must be a power of 2)
-        ringbufferSize = 2**int(math.log2(ringbuggerSeconds * SAMPLING_RATE))
+        ringbufferSize = 2**int(math.log2(ringbufferSeconds * SAMPLING_RATE))
 
         ringBuffer = rtmixer.RingBuffer(elementSize, ringbufferSize)
         
