@@ -181,19 +181,19 @@ ext_modules = [LateIncludeExtension("friture_extensions.exp_smoothing_conv",
 # these will be installed when calling 'pip install friture'
 # they are also retrieved by 'requirements.txt'
 install_requires = [
-    "sounddevice==0.3.10",
+    "sounddevice==0.3.14",
     "rtmixer==0.1.0",
-    "PyOpenGL==3.1.0",
-    "PyOpenGL-accelerate==3.1.0",
-    "docutils==0.14",
-    "numpy==1.16.2",
-    "PyQt5==5.10.1",
+    "PyOpenGL==3.1.4",
+    "PyOpenGL-accelerate==3.1.4",
+    "docutils==0.15.2",
+    "numpy==1.17.4",
+    "PyQt5==5.13.2",
     "appdirs==1.4.3",
-    "pyrr==0.9.2",
+    "pyrr==0.10.3",
 ]
 
 # Cython and numpy are needed when running setup.py, to build extensions
-setup_requires=["numpy==1.16.2", "Cython==0.27.3"]
+setup_requires=["numpy==1.17.4", "Cython==0.29.14"]
 
 if py2app_build:
     setup_requires.append("py2app")
