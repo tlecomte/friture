@@ -86,4 +86,4 @@ coll = COLLECT(exe,
                a.datas,
                strip=False,
                upx=False,
-               name='friture')
+               name="friture.app" if platform.system() == "Darwin" else 'friture')
