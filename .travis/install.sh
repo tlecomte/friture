@@ -27,9 +27,9 @@ if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
 
     pip3 install -U pyinstaller
 
-    pyinstaller friture.spec -y --windowed --log-level=DEBUG
+    pyinstaller friture.spec -y --windowed
 
-    ls -la dist/friture.app/*
+    ls -la dist/*
 
     # prepare a dmg out of friture.app
     export ARTIFACT_FILENAME=friture-$(python3 -c 'import friture; print(friture.__version__)')-$(date +'%Y%m%d').dmg
