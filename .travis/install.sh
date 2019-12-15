@@ -27,15 +27,15 @@ if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
 
     pip3 install -U pyinstaller
 
-    pyinstaller friture.spec -y --log-level=DEBUG
+    pyinstaller friture.spec -y --windowed --log-level=DEBUG
 
-    ls -la dist/friture/*
+    ls -la dist/friture.app/*
 
     # prepare a dmg out of friture.app
     export ARTIFACT_FILENAME=friture-$(python3 -c 'import friture; print(friture.__version__)')-$(date +'%Y%m%d').dmg
     echo $ARTIFACT_FILENAME
-    hdiutil create $ARTIFACT_FILENAME -volname "Friture" -fs HFS+ -srcfolder ../friture-dist/
-    du -hs ../friture-dist/friture.app
+    hdiutil create $ARTIFACT_FILENAME -volname "Friture" -fs HFS+ -srcfolder dist/friture.app
+    du -hs dist/friture.app
     du -hs $ARTIFACT_FILENAME
 else
     # Linux
