@@ -1,7 +1,7 @@
 matrix:
   include:
   - os: linux
-    dist: trusty # use Ubuntu 14.04 LTS for maximum backward compatibility of the AppImage
+    dist: xenial # use Ubuntu 16.04 LTS will be the minimum required version for the AppImage
     language: python
     python: "3.5" # pin for Linux builds (on macos, the multibuild python is used instead)
   - os: osx
