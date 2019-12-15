@@ -86,4 +86,9 @@ coll = COLLECT(exe,
                a.datas,
                strip=False,
                upx=False,
-               name="friture.app" if platform.system() == "Darwin" else 'friture')
+               name='friture')
+
+app = BUNDLE(coll,
+         name='friture.app',
+         icon=None,
+         bundle_identifier=None)
