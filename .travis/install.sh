@@ -24,8 +24,13 @@ python3 setup.py build_ext --inplace
 
 if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
     # Macos    
-    pip3 install -U "py2app==0.19"
-    python3 setup.py py2app
+
+    pip3 install -U pyinstaller
+
+    pyinstaller friture.spec -y --log-level=DEBUG
+
+    ls -la dist/friture/*
+
     # prepare a dmg out of friture.app
     export ARTIFACT_FILENAME=friture-$(python3 -c 'import friture; print(friture.__version__)')-$(date +'%Y%m%d').dmg
     echo $ARTIFACT_FILENAME
