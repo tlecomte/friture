@@ -10,7 +10,7 @@ The following steps can be used to prepare a development environment for Friture
 
 Prerequisite: a 64 bits Linux installation (PyQt5 wheels for Linux are only available for 64 bits).
 
-This has been tested in a Virtualbox image for Ubuntu Trusty 14.04 LTS 64 bits from osboxes.org. The following custom settings have been set on the VM: increase video memory, enable 3d acceleration, enable audio input, install guest addition, add user to vboxsf (for file sharing with the host), keyboard layout setup.
+This has been tested in a Virtualbox image for Ubuntu Trusty 16.04 LTS 64 bits from osboxes.org. The following custom settings have been set on the VM: increase video memory, enable 3d acceleration, enable audio input, install guest addition, add user to vboxsf (for file sharing with the host), keyboard layout setup.
 
 1. Install git
 ```
@@ -20,7 +20,7 @@ sudo apt-get install -y git
 
 2. Install `portaudio` (used for audio IO in Friture)
 ```
-sudo apt-get install -y libportaudio0
+sudo apt-get install -y libportaudio2
 ```
 
 3. Install python 3.5 and related build tools (appropriate PyQt5 wheels for Linux are only available for Python 3.5+)
