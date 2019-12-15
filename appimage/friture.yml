@@ -4,7 +4,7 @@
 app: friture
 
 ingredients:
-  dist: trusty
+  dist: xenial
   sources: []
   packages: []
 
