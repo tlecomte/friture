@@ -27,7 +27,7 @@ if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
 
     pip3 install -U pyinstaller
 
-    pyinstaller friture.spec -y --windowed
+    pyinstaller friture.spec -y --onedir --windowed
 
     ls -la dist/*
 
