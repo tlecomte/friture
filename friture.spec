@@ -49,7 +49,7 @@ if platform.system() == "Windows":
   pathex = [os.path.join(x, 'PyQt5', 'Qt', 'bin') for x in getsitepackages()]
 
   # add vcruntime140.dll - PyInstaller excludes it by default because it thinks it comes from c:\Windows
-  binaries = [('vcruntime140.dll', 'C:\\Python35\\vcruntime140.dll', 'BINARY')]
+  binaries = [('vcruntime140.dll', 'C:\\Python36\\vcruntime140.dll', 'BINARY')]
 else:
   libportaudio = []
   pathex = []
@@ -87,3 +87,8 @@ coll = COLLECT(exe,
                strip=False,
                upx=False,
                name='friture')
+
+app = BUNDLE(coll,
+         name='friture.app',
+         icon=None,
+         bundle_identifier=None)

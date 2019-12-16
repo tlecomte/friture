@@ -25,6 +25,7 @@ buildenv/*
 venv/*
 tools/*
 friture.egg-info
+.eggs/
 
 ##################
 # IDE files
