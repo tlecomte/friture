@@ -19,7 +19,7 @@ fi
 
 pip3 install -r requirements.txt
 
-# py2app and pysinstaller need to have the extensions built explicitely
+# pysinstaller needs to have the extensions built explicitely
 python3 setup.py build_ext --inplace
 
 if [[ $TRAVIS_OS_NAME == 'osx' ]]; then

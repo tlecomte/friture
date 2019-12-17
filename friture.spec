@@ -51,7 +51,37 @@ excluded_binaries = [
         'Qt5WebSockets.dll',
         'Qt5WinExtras.dll',
         'Qt5Xml.dll',
-        'Qt5XmlPatterns.dll']
+        'Qt5XmlPatterns.dll',
+
+        # macos
+        'QtDeclarative.framework',
+        'QtHelp.framework',
+        'QtMultimedia.framework',
+        'QtNetwork.framework',
+        'QtScript.framework',
+        'QtScriptTools.framework',
+        'QtSql.framework',
+        'QtDesigner.framework',
+        'QtTest.framework',
+        'QtWebKit.framework',
+        'QtXMLPatterns.framework',
+        'QtCLucene.framework',
+        'QtBluetooth.framework',
+        'QtConcurrent.framework',
+        'QtMultimediaWidgets.framework',
+        'QtPositioning.framework',
+        'QtQml.framework',
+        'QtQuick.framework',
+        'QtQuickWidgets.framework',
+        'QtSensors.framework',
+        'QtSerialPort.framework',
+        'QtWebChannel.framework',
+        'QtWebEngine.framework',
+        'QtWebEngineCore.framework',
+        'QtWebEngineWidgets.framework',
+        'QtWebKitWidgets.framework',
+        'QtWebSockets.framework']
+
 
 if platform.system() == "Windows":
   sounddevice_data = collect_data_files("sounddevice", subdir="_sounddevice_data")
@@ -109,5 +139,5 @@ coll = COLLECT(exe,
 
 app = BUNDLE(coll,
          name='friture.app',
-         icon=None,
+         icon='resources/images/friture.icns',
          bundle_identifier=None)
