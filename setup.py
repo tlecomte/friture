@@ -4,22 +4,10 @@ from setuptools import setup
 from setuptools.extension import Extension
 from glob import glob
 import os
-from os.path import join, dirname  # for README content reading and py2exe fix
+from os.path import join, dirname  # for README content reading
 import os.path
 from pathlib import Path
 import friture  # for the version number
-
-py2exe_build = False
-py2app_build = False
-
-if "py2exe" in sys.argv:
-    try:
-        import py2exe
-        py2exe_build = True
-    except ImportError:
-        print("Cannot find py2exe")
-elif "py2app" in sys.argv:
-    py2app_build = True
 
 # see INSTALL file for details
 # to create a source package
@@ -38,7 +26,7 @@ elif "py2app" in sys.argv:
 
 # NOTE: by default scipy.interpolate.__init__.py and scipy.signal.__init__.py
 # import all of their submodules
-# To decrease the py2exe distributions dramatically, these import lines can
+# To decrease the package distributions dramatically, these import lines can
 # be commented out !
 
 # icudt53.dll is also huge but needed for Qt
@@ -48,107 +36,6 @@ elif "py2app" in sys.argv:
 
 parent_dir = str(Path(os.getcwd()).parent)
 dist_dir = os.path.join(parent_dir, 'friture-dist')
-
-# manually include python libraries that py2exe/py2app fails to detect
-# for pyOpenGL : http://www.jstump.com/blog/archive/2009/06/30/py2exe-and-pyopengl-3x-with-no-manual-tinkering/
-# + OpenGL_accelerate.formathandler that is imported by the Python/C
-# API so that py2exe/py2app does not detect it
-includes = ["PyQt5.QtSvg",
-            "PyQt5.QtXml",
-            "OpenGL.platform.win32",
-            "OpenGL.arrays.ctypesarrays",
-            "OpenGL.arrays.numpymodule",
-            "OpenGL.arrays.lists",
-            "OpenGL.arrays.numbers",
-            "OpenGL.arrays.strings",
-            "OpenGL_accelerate.formathandler",
-            "_sounddevice_data",
-            "sip"]
-
-if py2exe_build:
-    data_files = []
-    excludes = []
-    dll_excludes = []
-
-    # find path to PyQt5 module dir
-    import PyQt5
-    pyqt5_path = os.path.abspath(PyQt5.__file__)
-    pyqt5_dir = os.path.dirname(pyqt5_path)
-
-    # include the Qt SVG plugin to render the icons, and the Qt Windows platform plugin
-    svg_plugin = os.path.join(pyqt5_dir, "plugins", "imageformats", "qsvg.dll")
-    windows_plugin = os.path.join(pyqt5_dir, "plugins", "platforms", "qwindows.dll")
-    data_files += [("imageformats", [svg_plugin]),
-                   ("platforms", [windows_plugin])]
-
-    # exclude some python libraries that py2exe includes by error
-    excludes += ["matplotlib", "_ssl", "Tkconstants", "Tkinter", "tcl", "email", "pyreadline", "nose",
-                 "doctest", "pdb", "pydoc", "_hashlib", "bz2", "httplib", "cookielib", "cookielib", "urllib", "urllib2", "Image",
-                 "pywin", "optparse", "zipfile", "calendar", "compiler",
-                 "_imaging", "_ssl", "sqlite3", "PIL", "IPython", "tornado", "zmq", "numpy.core._dotblas"]
-    # Note: unittest, inspect are needed by numpy
-    # exclude dlls that py2exe includes by error
-    # failure to exclude these dlls will prevent the executable to be run under XP for example
-    dll_excludes += ["powrprof.dll",
-                     "msvcp90.dll",
-                     "winnsi.dll",
-                     "nsi.dll",
-                     "iphlpapi.dll",
-                     "WTSAPI32.dll",
-                     "API-MS-Win-Core-ErrorHandling-L1-1-0.dll",
-                     "API-MS-Win-Core-Misc-L1-1-0.dll",
-                     "API-MS-Win-Core-ProcessThreads-L1-1-0.dll",
-                     "API-MS-Win-Core-File-L1-1-0.dll",
-                     "API-MS-Win-Core-Handle-L1-1-0.dll",
-                     "API-MS-Win-Core-Profile-L1-1-0.dll",
-                     "API-MS-Win-Core-IO-L1-1-0.dll",
-                     "API-MS-Win-Core-String-L1-1-0.dll",
-                     "API-MS-Win-Core-Interlocked-L1-1-0.dll",
-                     "API-MS-Win-Core-SysInfo-L1-1-0.dll",
-                     "API-MS-Win-Security-Base-L1-1-0.dll",
-                     "API-MS-Win-Core-LocalRegistry-L1-1-0.dll",
-                     "SETUPAPI.dll",
-                     "PSAPI.dll",
-                     "msvcp*.dll",
-                     "msvcr*.dll"]
-
-    if os.name == 'nt':
-        import numpy
-        if 'CPATH' in os.environ:
-            os.environ['CPATH'] = os.environ['CPATH'] + numpy.get_include()
-        else:
-            os.environ['CPATH'] = numpy.get_include()
-
-    extra_options = dict(
-        windows=[{"script": 'main.py',
-                  "icon_resources": [(1, "resources/images/friture.ico")],
-                  "dest_base": "friture"}],
-        options={"py2exe": {"includes": includes, "excludes": excludes, "dll_excludes": dll_excludes}},
-        data_files=data_files,
-    )
-
-elif py2app_build:
-    # by default libportaudio.dylib is copied inside the pythonXXX.zip bundle,
-    # but a library cannot be loaded from inside such a bundle
-    # so copy it explicitely instead
-    import sounddevice
-    base = os.path.dirname(sounddevice.__file__)
-    libportaudio_path = os.path.join(base, "_sounddevice_data", "portaudio-binaries", "libportaudio.dylib")
-
-    # prevent a py2app self-referencing loop by moving the bdist and dist folders out of the current directory
-    # see https://stackoverflow.com/questions/7701255/py2app-ioerror-errno-63-file-name-too-long
-    py2app_options = {'includes': includes,
-                      'iconfile': 'resources/images/friture.icns',
-                      'frameworks': [libportaudio_path],
-                      'bdist_base': os.path.join(parent_dir, 'friture-build'),
-                      'dist_dir': dist_dir}
-
-    extra_options = dict(
-        app=['main.py'],
-        options={'py2app': py2app_options},
-    )
-else:
-    extra_options = dict()
 
 # solve chicken-and-egg problem that setup.py needs to import Numpy to build the extensions,
 # but Numpy is not available until it is installed as a setup dependency
@@ -195,9 +82,6 @@ install_requires = [
 # Cython and numpy are needed when running setup.py, to build extensions
 setup_requires=["numpy==1.17.4", "Cython==0.29.14"]
 
-if py2app_build:
-    setup_requires.append("py2app")
-
 with open(join(dirname(__file__), 'README.rst')) as f:
     long_description = f.read()
 
@@ -231,54 +115,4 @@ setup(name="friture",
       scripts=['scripts/friture'],
       ext_modules=ext_modules,
       install_requires=install_requires,
-      setup_requires=setup_requires,
-      **extra_options
-      )
-
-# py2exe (0.9.2.2 at least on Python 3.4) does not seem to respect the dll_excludes option
-# so we manually remove them from the dist directory
-if py2exe_build:
-    for filenamePattern in dll_excludes:
-        path = join("dist", filenamePattern)
-        for filename in glob(path):
-            print("Remove %s that py2exe should have excluded." % (filename))
-            os.remove(filename)
-
-# py2app does not respect the dylib_excludes option
-# so we manually remove the unused Qt frameworks
-if py2app_build:
-    print('*** Removing unused Qt frameworks ***')
-    framework_dir = os.path.join(dist_dir, "friture.app/Contents/Resources/lib/python{0}.{1}/PyQt5/Qt/lib".format(sys.version_info.major, sys.version_info.minor))
-    frameworks = [
-        'QtDeclarative.framework',
-        'QtHelp.framework',
-        'QtMultimedia.framework',
-        'QtNetwork.framework',
-        'QtScript.framework',
-        'QtScriptTools.framework',
-        'QtSql.framework',
-        'QtDesigner.framework',
-        'QtTest.framework',
-        'QtWebKit.framework',
-        'QtXMLPatterns.framework',
-        'QtCLucene.framework',
-        'QtBluetooth.framework',
-        'QtConcurrent.framework',
-        'QtMultimediaWidgets.framework',
-        'QtPositioning.framework',
-        'QtQml.framework',
-        'QtQuick.framework',
-        'QtQuickWidgets.framework',
-        'QtSensors.framework',
-        'QtSerialPort.framework',
-        'QtWebChannel.framework',
-        'QtWebEngine.framework',
-        'QtWebEngineCore.framework',
-        'QtWebEngineWidgets.framework',
-        'QtWebKitWidgets.framework',
-        'QtWebSockets.framework']
-
-    for framework in frameworks:
-        for root, dirs, files in os.walk(os.path.join(framework_dir, framework)):
-            for file in files:
-                os.remove(os.path.join(root, file))
+      setup_requires=setup_requires)

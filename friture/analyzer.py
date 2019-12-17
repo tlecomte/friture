@@ -296,11 +296,11 @@ def main():
     rootLogger.addHandler(fileHandler)
 
     if hasattr(sys, "frozen"):
-        # redirect stdout and stderr to the logger if this is a py2app or pyinstaller bundle
+        # redirect stdout and stderr to the logger if this is a pyinstaller bundle
         sys.stdout = StreamToLogger(logging.getLogger('STDOUT'), logging.INFO)
         sys.stderr = StreamToLogger(logging.getLogger('STDERR'), logging.ERROR)
     else:
-        # log to console if this is not a py2app or pyinstaller bundle
+        # log to console if this is not a pyinstaller bundle
         console = logging.StreamHandler()
         console.setLevel(logging.DEBUG)
         console.setFormatter(formatter)
@@ -336,7 +336,7 @@ def main():
 
     if platform.system() == "Darwin":
         logger.info("Applying Mac OS-specific setup")
-        # help the py2app-packaged application find the Qt plugins (imageformats and platforms)
+        # help the packaged application find the Qt plugins (imageformats and platforms)
         pluginsPath = os.path.normpath(os.path.join(QApplication.applicationDirPath(), os.path.pardir, 'PlugIns'))
         logger.info("Adding the following to the Library paths: %s", pluginsPath)
         QApplication.addLibraryPath(pluginsPath)

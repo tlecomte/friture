@@ -36,6 +36,53 @@ excludes = [
         'PyQt5.QtWebKitWidgets',
         'PyQt5.QtWebSockets']
 
+excluded_binaries = [
+        'Qt5DBus.dll',
+        'Qt5Location.dll',
+        'Qt5Network.dll',
+        'Qt5NetworkAuth.dll',
+        'Qt5Nfc.dll',
+        'Qt5Positioning.dll',
+        'Qt5PositioningQuick.dll',
+        'Qt5PrintSupport.dll',
+        'Qt5Qml.dll',
+        'Qt5Quick.dll',
+        'Qt5RemoteObjects.dll',
+        'Qt5WebSockets.dll',
+        'Qt5WinExtras.dll',
+        'Qt5Xml.dll',
+        'Qt5XmlPatterns.dll',
+
+        # macos
+        'QtDeclarative.framework',
+        'QtHelp.framework',
+        'QtMultimedia.framework',
+        'QtNetwork.framework',
+        'QtScript.framework',
+        'QtScriptTools.framework',
+        'QtSql.framework',
+        'QtDesigner.framework',
+        'QtTest.framework',
+        'QtWebKit.framework',
+        'QtXMLPatterns.framework',
+        'QtCLucene.framework',
+        'QtBluetooth.framework',
+        'QtConcurrent.framework',
+        'QtMultimediaWidgets.framework',
+        'QtPositioning.framework',
+        'QtQml.framework',
+        'QtQuick.framework',
+        'QtQuickWidgets.framework',
+        'QtSensors.framework',
+        'QtSerialPort.framework',
+        'QtWebChannel.framework',
+        'QtWebEngine.framework',
+        'QtWebEngineCore.framework',
+        'QtWebEngineWidgets.framework',
+        'QtWebKitWidgets.framework',
+        'QtWebSockets.framework']
+
+
 if platform.system() == "Windows":
   sounddevice_data = collect_data_files("sounddevice", subdir="_sounddevice_data")
   libportaudio = [(file[0], "_sounddevice_data/portaudio-binaries") for file in sounddevice_data if "libportaudio" in file[0]]
@@ -67,6 +114,8 @@ a = Analysis(['main.py'],
              win_private_assemblies=False,
              cipher=block_cipher)
 
+a.binaries = TOC([x for x in a.binaries if x[0] not in excluded_binaries])
+
 pyz = PYZ(a.pure, a.zipped_data,
              cipher=block_cipher)
 
@@ -90,5 +139,5 @@ coll = COLLECT(exe,
 
 app = BUNDLE(coll,
          name='friture.app',
-         icon=None,
+         icon='resources/images/friture.icns',
          bundle_identifier=None)
