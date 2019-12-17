@@ -36,6 +36,23 @@ excludes = [
         'PyQt5.QtWebKitWidgets',
         'PyQt5.QtWebSockets']
 
+excluded_binaries = [
+        'Qt5DBus.dll',
+        'Qt5Location.dll',
+        'Qt5Network.dll',
+        'Qt5NetworkAuth.dll',
+        'Qt5Nfc.dll',
+        'Qt5Positioning.dll',
+        'Qt5PositioningQuick.dll',
+        'Qt5PrintSupport.dll',
+        'Qt5Qml.dll',
+        'Qt5Quick.dll',
+        'Qt5RemoteObjects.dll',
+        'Qt5WebSockets.dll',
+        'Qt5WinExtras.dll',
+        'Qt5Xml.dll',
+        'Qt5XmlPatterns.dll']
+
 if platform.system() == "Windows":
   sounddevice_data = collect_data_files("sounddevice", subdir="_sounddevice_data")
   libportaudio = [(file[0], "_sounddevice_data/portaudio-binaries") for file in sounddevice_data if "libportaudio" in file[0]]
@@ -66,6 +83,8 @@ a = Analysis(['main.py'],
              win_no_prefer_redirects=False,
              win_private_assemblies=False,
              cipher=block_cipher)
+
+a.binaries = TOC([x for x in a.binaries if x[0] not in excluded_binaries])
 
 pyz = PYZ(a.pure, a.zipped_data,
              cipher=block_cipher)
