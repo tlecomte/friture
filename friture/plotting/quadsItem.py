@@ -166,18 +166,18 @@ class QuadsItem:
                     y_int = np.mean(new_y_int, axis=1)
 
                     x1 = x1[:-rest:n]
-                    x2 = x2[n::n]
+                    x2 = x2[n-1::n]
                 else:
-                    new_y = self.y
+                    new_y = self.y.copy()
                     new_y.shape = (new_len, n)
                     y = np.mean(new_y, axis=1)
 
-                    new_y_int = self.y_int
+                    new_y_int = self.y_int.copy()
                     new_y_int.shape = (new_len, n)
                     y_int = np.mean(new_y_int, axis=1)
 
                     x1 = x1[::n]
-                    x2 = x2[n::n]
+                    x2 = x2[n-1::n]
 
             else:
                 y = self.y
