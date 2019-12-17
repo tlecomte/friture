@@ -77,7 +77,7 @@ exe = EXE(pyz,
           debug=False,
           strip=False,
           upx=False,
-          console=False,
+          #console=False,
           icon="resources/images/friture.ico")
 
 coll = COLLECT(exe,
