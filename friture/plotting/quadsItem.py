@@ -82,47 +82,59 @@ class QuadsItem:
         if self.vertices_data.shape != (n*6, 6):
             self.vertices_data = np.zeros((n*6, 6), dtype=np.float32)
 
-        self.vertices_data[0::6, 0::6] = x[:, np.newaxis]
-        self.vertices_data[0::6, 1::6] = (y + h)[:, np.newaxis]
-        self.vertices_data[0::6, 2::6] = 0*x[:, np.newaxis]
-        self.vertices_data[0::6, 3::6] = r[:, np.newaxis]
-        self.vertices_data[0::6, 4::6] = g[:, np.newaxis]
-        self.vertices_data[0::6, 5::6] = b[:, np.newaxis]
+        x_newaxis = x[:, np.newaxis]
+        y_newaxis = y[:, np.newaxis]
 
-        self.vertices_data[1::6, 0::6] = (x + w)[:, np.newaxis]
-        self.vertices_data[1::6, 1::6] = (y + h)[:, np.newaxis]
-        self.vertices_data[1::6, 2::6] = 0*x[:, np.newaxis]
-        self.vertices_data[1::6, 3::6] = r[:, np.newaxis]
-        self.vertices_data[1::6, 4::6] = g[:, np.newaxis]
-        self.vertices_data[1::6, 5::6] = b[:, np.newaxis]
+        w_newaxis = w[:, np.newaxis]
+        h_newaxis = h[:, np.newaxis]
 
-        self.vertices_data[2::6, 0::6] = x[:, np.newaxis]
-        self.vertices_data[2::6, 1::6] = y[:, np.newaxis]
-        self.vertices_data[2::6, 2::6] = 0*x[:, np.newaxis]
-        self.vertices_data[2::6, 3::6] = r[:, np.newaxis]
-        self.vertices_data[2::6, 4::6] = g[:, np.newaxis]
-        self.vertices_data[2::6, 5::6] = b[:, np.newaxis]
+        r_newaxis = r[:, np.newaxis]
+        g_newaxis = g[:, np.newaxis]
+        b_newaxis = b[:, np.newaxis]
 
-        self.vertices_data[3::6, 0::6] = x[:, np.newaxis]
-        self.vertices_data[3::6, 1::6] = y[:, np.newaxis]
-        self.vertices_data[3::6, 2::6] = 0*x[:, np.newaxis]
-        self.vertices_data[3::6, 3::6] = r[:, np.newaxis]
-        self.vertices_data[3::6, 4::6] = g[:, np.newaxis]
-        self.vertices_data[3::6, 5::6] = b[:, np.newaxis]
+        zero_newaxis = 0*x[:, np.newaxis]
 
-        self.vertices_data[4::6, 0::6] = (x + w)[:, np.newaxis]
-        self.vertices_data[4::6, 1::6] = y[:, np.newaxis]
-        self.vertices_data[4::6, 2::6] = 0*x[:, np.newaxis]
-        self.vertices_data[4::6, 3::6] = r[:, np.newaxis]
-        self.vertices_data[4::6, 4::6] = g[:, np.newaxis]
-        self.vertices_data[4::6, 5::6] = b[:, np.newaxis]
+        self.vertices_data[0::6, 0::6] = x_newaxis
+        self.vertices_data[0::6, 1::6] = y_newaxis + h_newaxis
+        self.vertices_data[0::6, 2::6] = zero_newaxis
+        self.vertices_data[0::6, 3::6] = r_newaxis
+        self.vertices_data[0::6, 4::6] = g_newaxis
+        self.vertices_data[0::6, 5::6] = b_newaxis
 
-        self.vertices_data[5::6, 0::6] = (x + w)[:, np.newaxis]
-        self.vertices_data[5::6, 1::6] = (y + h)[:, np.newaxis]
-        self.vertices_data[5::6, 2::6] = 0*x[:, np.newaxis]
-        self.vertices_data[5::6, 3::6] = r[:, np.newaxis]
-        self.vertices_data[5::6, 4::6] = g[:, np.newaxis]
-        self.vertices_data[5::6, 5::6] = b[:, np.newaxis]
+        self.vertices_data[1::6, 0::6] = x_newaxis + w_newaxis
+        self.vertices_data[1::6, 1::6] = y_newaxis + h_newaxis
+        self.vertices_data[1::6, 2::6] = zero_newaxis
+        self.vertices_data[1::6, 3::6] = r_newaxis
+        self.vertices_data[1::6, 4::6] = g_newaxis
+        self.vertices_data[1::6, 5::6] = b_newaxis
+
+        self.vertices_data[2::6, 0::6] = x_newaxis
+        self.vertices_data[2::6, 1::6] = y_newaxis
+        self.vertices_data[2::6, 2::6] = zero_newaxis
+        self.vertices_data[2::6, 3::6] = r_newaxis
+        self.vertices_data[2::6, 4::6] = g_newaxis
+        self.vertices_data[2::6, 5::6] = b_newaxis
+
+        self.vertices_data[3::6, 0::6] = x_newaxis
+        self.vertices_data[3::6, 1::6] = y_newaxis
+        self.vertices_data[3::6, 2::6] = zero_newaxis
+        self.vertices_data[3::6, 3::6] = r_newaxis
+        self.vertices_data[3::6, 4::6] = g_newaxis
+        self.vertices_data[3::6, 5::6] = b_newaxis
+
+        self.vertices_data[4::6, 0::6] = x_newaxis + w_newaxis
+        self.vertices_data[4::6, 1::6] = y_newaxis
+        self.vertices_data[4::6, 2::6] = zero_newaxis
+        self.vertices_data[4::6, 3::6] = r_newaxis
+        self.vertices_data[4::6, 4::6] = g_newaxis
+        self.vertices_data[4::6, 5::6] = b_newaxis
+
+        self.vertices_data[5::6, 0::6] = x_newaxis + w_newaxis
+        self.vertices_data[5::6, 1::6] = y_newaxis + h_newaxis
+        self.vertices_data[5::6, 2::6] = zero_newaxis
+        self.vertices_data[5::6, 3::6] = r_newaxis
+        self.vertices_data[5::6, 4::6] = g_newaxis
+        self.vertices_data[5::6, 5::6] = b_newaxis
 
     def transformUpdate(self):
         self.need_transform = True
