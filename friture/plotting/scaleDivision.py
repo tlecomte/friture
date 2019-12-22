@@ -144,7 +144,7 @@ class ScaleDivision(object):
         if self.log:
             ticks = []
 
-            standardLogTicks = [2, 4, 6, 8]
+            standardLogTicks = [2, 3, 4, 5, 6, 7, 8, 9]
 
             for a in standardLogTicks:
                 if a * majorTicks[0] / 10. >= trueMin:
