@@ -161,7 +161,7 @@ class SpectrumPlotWidget(QtWidgets.QWidget):
         if not self.paused:
             self.canvasWidget.setfmax(fmax)
 
-            M = max(y)
+            M = np.max(y)
             m = self.verticalScaleTransform.coord_min
             y_int = (y-m)/(np.abs(M-m)+1e-3)
 
