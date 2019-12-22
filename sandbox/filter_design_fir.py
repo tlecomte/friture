@@ -2,7 +2,7 @@
 from numpy import pi, exp, arange, cos, sin, sqrt, zeros, ones, log, arange
 # the three following lines are a workaround for a bug with scipy and py2exe
 # together. See http://www.pyinstaller.org/ticket/83 for reference.
-from scipy.misc import factorial
+from scipy.special import factorial
 import scipy
 scipy.factorial = factorial
 
