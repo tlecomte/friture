@@ -29,6 +29,10 @@ class CoordinateTransform(object):
 
         self.coord_min = coord_min
         self.coord_max = coord_max
+        self.coord_clipped_min = max(1e-20, self.coord_min)
+        self.coord_clipped_max = max(self.coord_clipped_min, self.coord_max)
+        self.coord_ratio_log = np.log10(self.coord_clipped_max / self.coord_clipped_min)
+
         self.length = length
         self.startBorder = startBorder
         self.endBorder = endBorder
@@ -37,6 +41,9 @@ class CoordinateTransform(object):
     def setRange(self, coord_min, coord_max):
         self.coord_min = coord_min
         self.coord_max = coord_max
+        self.coord_clipped_min = max(1e-20, self.coord_min)
+        self.coord_clipped_max = max(self.coord_clipped_min, self.coord_max)
+        self.coord_ratio_log = np.log10(self.coord_clipped_max / self.coord_clipped_min)
 
     def setLength(self, length):
         self.length = length
@@ -53,14 +60,11 @@ class CoordinateTransform(object):
 
     def toScreen(self, x):
         if self.log:
-            logMin = max(1e-20, self.coord_min)
-            logMax = max(logMin, self.coord_max)
-
-            if logMin == logMax:
+            if self.coord_clipped_min == self.coord_clipped_max:
                 return self.startBorder + 0. * x  # keep x type (this can produce a RunTimeWarning if x contains inf)
 
             x = (x < 1e-20) * 1e-20 + (x >= 1e-20) * x
-            return (np.log10(x / logMin)) * (self.length - self.startBorder - self.endBorder) / np.log10(logMax / logMin) + self.startBorder
+            return (np.log10(x / self.coord_clipped_min)) * (self.length - self.startBorder - self.endBorder) / self.coord_ratio_log + self.startBorder
         else:
             if self.coord_max == self.coord_min:
                 return self.startBorder + 0. * x  # keep x type (this can produce a RunTimeWarning if x contains inf)
@@ -72,6 +76,6 @@ class CoordinateTransform(object):
             return self.coord_min + 0. * x  # keep x type (this can produce a RunTimeWarning if x contains inf)
 
         if self.log:
-            return 10 ** ((x - self.startBorder) * np.log10(self.coord_max / self.coord_min) / (self.length - self.startBorder - self.endBorder)) * self.coord_min
+            return 10 ** ((x - self.startBorder) * self.coord_ratio_log / (self.length - self.startBorder - self.endBorder)) * self.coord_min
         else:
             return (x - self.startBorder) * (self.coord_max - self.coord_min) / (self.length - self.startBorder - self.endBorder) + self.coord_min
