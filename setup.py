@@ -24,19 +24,6 @@ import friture  # for the version number
 # to fix pep8 issues automatically (replace -d by -i if the changes are fine):
 # autopep8 --max-line-length=170 -d -r friture
 
-# NOTE: by default scipy.interpolate.__init__.py and scipy.signal.__init__.py
-# import all of their submodules
-# To decrease the package distributions dramatically, these import lines can
-# be commented out !
-
-# icudt53.dll is also huge but needed for Qt
-# A stripped down version is available here:
-# https://forum.qt.io/topic/37891/minimal-icudt51-dll-icudt52-dll-and-icudt53-dll
-# http://qlcplus.sourceforge.net/icudt53.dll
-
-parent_dir = str(Path(os.getcwd()).parent)
-dist_dir = os.path.join(parent_dir, 'friture-dist')
-
 # solve chicken-and-egg problem that setup.py needs to import Numpy to build the extensions,
 # but Numpy is not available until it is installed as a setup dependency
 # see: https://stackoverflow.com/a/54128391
