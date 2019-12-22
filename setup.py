@@ -1,12 +1,7 @@
 # -*- coding: utf-8 -*-
-import sys
 from setuptools import setup
 from setuptools.extension import Extension
-from glob import glob
-import os
 from os.path import join, dirname  # for README content reading
-import os.path
-from pathlib import Path
 import friture  # for the version number
 
 # see INSTALL file for details
@@ -102,4 +97,6 @@ setup(name="friture",
       scripts=['scripts/friture'],
       ext_modules=ext_modules,
       install_requires=install_requires,
-      setup_requires=setup_requires)
+      setup_requires=setup_requires,
+      data_files = [('share/applications', ['appimage/friture.desktop'])],
+)
