@@ -3,7 +3,7 @@ Some details about profiling possibilities
 
 First option (cProfile and gprof2dot)
 -------------------------------------
-python -m cProfile -o output.pstats ./friture.py
+python -m cProfile -o output.pstats ./main.py
 scripts/gprof2dot.py -f pstats output.pstats -n 0.1 -e 0.02| dot -Tpng -o output2.png
 
 Second option (cProfile and pstats)
@@ -12,8 +12,11 @@ Second option (cProfile and pstats)
 
 Third option (cProfile, convert to kcachegrind)
 ------------------------------------------------------------------
-python scripts/lsprofcalltree.py friture.py
-kcachegrind
+
+pip install pyprof2calltree
+python -m cProfile -o friture.cprof ./main.py
+pyprof2calltree -i .\friture.cprof
+kcachegrind/qcachegrind
 
 Fourth option (sysprof system-wide profiler on Linux)
 ----------------------------------------------------
