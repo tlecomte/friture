@@ -52,6 +52,7 @@ SMOOTH_DISPLAY_TIMER_PERIOD_MS = 10
 # (and text painting is costly)
 SLOW_TIMER_PERIOD_MS = 1000
 
+
 class Friture(QMainWindow, ):
 
     def __init__(self):
@@ -175,7 +176,7 @@ class Friture(QMainWindow, ):
     def migrateSettings(self):
         settings = QtCore.QSettings("Friture", "Friture")
 
-        #1. move the central widget to a normal dock
+        # 1. move the central widget to a normal dock
         if settings.contains("CentralWidget/type"):
             settings.beginGroup("CentralWidget")
             centralWidgetKeys = settings.allKeys()
@@ -183,18 +184,18 @@ class Friture(QMainWindow, ):
             settings.endGroup()
 
             if not settings.contains("Docks/central/type"):
-                #write them to a new dock instead
+                # write them to a new dock instead
                 for key, value in children.items():
                     settings.setValue("Docks/central/" + key, value)
 
-                #add the new dock name to dockNames
+                # add the new dock name to dockNames
                 docknames = settings.value("Docks/dockNames", [])
                 docknames = ["central"] + docknames
                 settings.setValue("Docks/dockNames", docknames)
 
             settings.remove("CentralWidget")
 
-        #2. remove any level widget
+        # 2. remove any level widget
         if settings.contains("Docks/dockNames"):
             docknames = settings.value("Docks/dockNames")
             newDockNames = []
@@ -240,6 +241,7 @@ class Friture(QMainWindow, ):
             AudioBackend().restart()
             self.dockmanager.restart()
 
+
 def qt_message_handler(mode, context, message):
     logger = logging.getLogger(__name__)
     if mode == QtCore.QtInfoMsg:
@@ -253,10 +255,12 @@ def qt_message_handler(mode, context, message):
     else:
         logger.debug(message)
 
+
 class StreamToLogger(object):
     """
     Fake file-like stream object that redirects writes to a logger instance.
     """
+
     def __init__(self, logger, log_level=logging.INFO):
         self.logger = logger
         self.log_level = log_level
@@ -268,6 +272,7 @@ class StreamToLogger(object):
 
     def flush(self):
         pass
+
 
 def main():
     # make the Python warnings go to Friture logger

@@ -230,10 +230,10 @@ class octave_filters():
         if bandsperoctave == 1:
             # with 1 band per octave, we would need the "R3.33" Renard series, but it does not exist.
             # However, that is not really a problem, since the numbers simply round up.
-            self.f_nominal = [  "%.1fk"%(f/1000) if f>= 10000
-                                else "%.2fk"%(f/1000) if f>= 1000
-                                else "%d"%(f)
-                                for f in self.fi]
+            self.f_nominal = ["%.1fk" % (f/1000) if f >= 10000
+                              else "%.2fk" % (f/1000) if f >= 1000
+                              else "%d" % (f)
+                              for f in self.fi]
         else:
             # with more than 1 band per octave, use the preferred numbers from the Renard series
             if bandsperoctave == 3:

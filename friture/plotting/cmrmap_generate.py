@@ -78,6 +78,7 @@ def compute_colors(N):
 
     return cmap
 
+
 def generate_cmrmap():
     import os
     import json

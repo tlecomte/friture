@@ -52,7 +52,7 @@ aboutText = """
        sounddevice.__version__,
        sounddevice.get_portaudio_version()[1],
        numpy.__version__,
-       #Cython.__version__, #this pulls the whole Cython, makes PyInstaller think it needs all the dependencies, even IPython!
+       # Cython.__version__, #this pulls the whole Cython, makes PyInstaller think it needs all the dependencies, even IPython!
        OpenGL.__version__)
 
 

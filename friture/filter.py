@@ -81,6 +81,7 @@ def octave_filter_bank(forward, feedback, x, zis=None):
 # does approximately the same thing as the low-pass component of the highest band-pass
 # filter for the octave
 
+
 def octave_filter_bank_decimation(blow, alow, forward, feedback, x, zis):
     # This function filters the waveform x with the array of filters
     # specified by the forward and feedback parameters. Each row
@@ -115,8 +116,9 @@ def octave_filter_bank_decimation(blow, alow, forward, feedback, x, zis):
 
     return y, dec, zfs
 
-# build a proper array of zero initial conditions to start the filters
+
 def octave_filter_bank_decimation_filtic(blow, alow, forward, feedback):
+    '''build a proper array of zero initial conditions to start the filters.'''
     bands_per_octave = len(forward)
     zfs = []
 

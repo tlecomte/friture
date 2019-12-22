@@ -7,6 +7,7 @@
 #
 # WARNING! All changes made in this file will be lost!
 
+from . import friture_rc
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 
@@ -85,5 +86,3 @@ class Ui_Settings_Dialog(object):
         self.radioButton_duo.setText(_translate("Settings_Dialog", "Two channels"))
         self.groupBox_first.setTitle(_translate("Settings_Dialog", "First channel"))
         self.groupBox_second.setTitle(_translate("Settings_Dialog", "Second channel"))
-
-from . import friture_rc

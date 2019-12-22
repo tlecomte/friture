@@ -20,6 +20,7 @@
 import numpy
 from numpy.fft import rfft, irfft
 
+
 def generalized_cross_correlation(d0, d1):
     # substract the means
     # (in order to get a normalized cross-correlation at the end)
@@ -36,7 +37,7 @@ def generalized_cross_correlation(d0, d1):
     G = D0r * D1
     absG = numpy.abs(G)
     m = max(absG)
-    W = 1. / (1e-10 * m + absG) # weight for a normalized "PHAT" cross-correlation
+    W = 1. / (1e-10 * m + absG)  # weight for a normalized "PHAT" cross-correlation
     Xcorr = irfft(W * G)
 
     return Xcorr

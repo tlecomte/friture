@@ -16,6 +16,7 @@ except ImportError:
 from OpenGL.arrays import vbo
 from ctypes import sizeof, c_float, c_void_p, c_uint
 
+
 def compileProgram(*shaders):
     """Copied from the PyOpenGL codebase, as suggested in the PyOpenGL doc.
     Does not call program.check_validate() because that fails on macos
@@ -23,12 +24,13 @@ def compileProgram(*shaders):
     program = GL.glCreateProgram()
     for shader in shaders:
         GL.shaders.glAttachShader(program, shader)
-    program = GL.shaders.ShaderProgram( program )
+    program = GL.shaders.ShaderProgram(program)
     GL.glLinkProgram(program)
     program.check_linked()
     for shader in shaders:
         GL.glDeleteShader(shader)
     return program
+
 
 class GlCanvasWidget(QtWidgets.QOpenGLWidget):
 
@@ -162,7 +164,7 @@ class GlCanvasWidget(QtWidgets.QOpenGLWidget):
                 self.tryGlGetString(GL.GL_VERSION),
                 self.tryGlGetString(GL.GL_SHADING_LANGUAGE_VERSION),
                 self.tryGlGetIntegerv(GL.GL_NUM_EXTENSIONS)
-                )
+            )
         except Exception:
             self.logger.exception("Failed to log the OpenGL info")
 
@@ -273,9 +275,9 @@ class GlCanvasWidget(QtWidgets.QOpenGLWidget):
         self.quad_shader = compileProgram(quad_vertex_shader, quad_fragment_shader)
 
         vertices = np.array(
-            [[ 0, 100, 0 ],
-             [ 100, 100, 0],
-             [ 100, 0, 0 ],
+            [[0, 100, 0],
+             [100, 100, 0],
+             [100, 0, 0],
              [200, 200, 0],
              [200, 400, 0],
              [400, 400, 0],
@@ -311,7 +313,7 @@ class GlCanvasWidget(QtWidgets.QOpenGLWidget):
         h = self.height()
 
         # given the usual aspect ratio of the canvas, the vertical minor ticks would make it look crowded
-        num_lines = len(self.xMajorTick) + len(self.xMinorTick) + len(self.yMajorTick) #+ len(self.yMinorTick)
+        num_lines = len(self.xMajorTick) + len(self.xMinorTick) + len(self.yMajorTick)  # + len(self.yMinorTick)
         num_lines *= 2
 
         self.grid_data = np.zeros((num_lines, 6), dtype=np.float32)
@@ -320,19 +322,19 @@ class GlCanvasWidget(QtWidgets.QOpenGLWidget):
 
         color = QtGui.QColor(Qt.Qt.gray)
         for x in self.xMajorTick:
-            self.grid_data[i,   :] = [x, 0, 0, color.redF(), color.greenF(), color.blueF()]
+            self.grid_data[i, :] = [x, 0, 0, color.redF(), color.greenF(), color.blueF()]
             self.grid_data[i+1, :] = [x, h, 0, color.redF(), color.greenF(), color.blueF()]
             i += 2
 
         color = QtGui.QColor(Qt.Qt.lightGray)
         for x in self.xMinorTick:
-            self.grid_data[i,   :] = [x, 0, 0, color.redF(), color.greenF(), color.blueF()]
+            self.grid_data[i, :] = [x, 0, 0, color.redF(), color.greenF(), color.blueF()]
             self.grid_data[i+1, :] = [x, h, 0, color.redF(), color.greenF(), color.blueF()]
             i += 2
 
         color = QtGui.QColor(Qt.Qt.gray)
         for y in self.yMajorTick:
-            self.grid_data[i,   :] = [0, y, 0, color.redF(), color.greenF(), color.blueF()]
+            self.grid_data[i, :] = [0, y, 0, color.redF(), color.greenF(), color.blueF()]
             self.grid_data[i+1, :] = [w, y, 0, color.redF(), color.greenF(), color.blueF()]
             i += 2
 
@@ -382,7 +384,7 @@ class GlCanvasWidget(QtWidgets.QOpenGLWidget):
 
     def paintGL(self):
         if self.quad_shader is None:
-            return # not yet initiliazed
+            return  # not yet initiliazed
 
         self.clearErrors()
 
@@ -545,7 +547,7 @@ class GlCanvasWidget(QtWidgets.QOpenGLWidget):
             GL.glEnableVertexAttribArray(1)
             stride = self.background_data.shape[1]*sizeof(c_float)
             vertex_offset = c_void_p(0 * sizeof(c_float))
-            color_offset  = c_void_p(3 * sizeof(c_float))
+            color_offset = c_void_p(3 * sizeof(c_float))
             GL.glVertexAttribPointer(0, 3, GL.GL_FLOAT, GL.GL_FALSE, stride, vertex_offset)
             GL.glVertexAttribPointer(1, 3, GL.GL_FLOAT, GL.GL_FALSE, stride, color_offset)
             GL.glDrawArrays(GL.GL_TRIANGLE_STRIP, 0, self.background_data.shape[0])
@@ -567,7 +569,7 @@ class GlCanvasWidget(QtWidgets.QOpenGLWidget):
             GL.glEnableVertexAttribArray(1)
             stride = self.grid_data.shape[1]*sizeof(c_float)
             vertex_offset = c_void_p(0 * sizeof(c_float))
-            color_offset  = c_void_p(3 * sizeof(c_float))
+            color_offset = c_void_p(3 * sizeof(c_float))
             GL.glVertexAttribPointer(0, 3, GL.GL_FLOAT, GL.GL_FALSE, stride, vertex_offset)
             GL.glVertexAttribPointer(1, 3, GL.GL_FLOAT, GL.GL_FALSE, stride, color_offset)
             GL.glDrawArrays(GL.GL_LINES, 0, self.grid_data.shape[0])
@@ -583,7 +585,7 @@ class GlCanvasWidget(QtWidgets.QOpenGLWidget):
             GL.glEnableVertexAttribArray(1)
             stride = self.border_data.shape[1]*sizeof(c_float)
             vertex_offset = c_void_p(0 * sizeof(c_float))
-            color_offset  = c_void_p(3 * sizeof(c_float))
+            color_offset = c_void_p(3 * sizeof(c_float))
             GL.glVertexAttribPointer(0, 3, GL.GL_FLOAT, GL.GL_FALSE, stride, vertex_offset)
             GL.glVertexAttribPointer(1, 3, GL.GL_FLOAT, GL.GL_FALSE, stride, color_offset)
             GL.glDrawArrays(GL.GL_LINE_STRIP, 0, self.border_data.shape[0])
@@ -612,7 +614,7 @@ class GlCanvasWidget(QtWidgets.QOpenGLWidget):
                 GL.glEnableVertexAttribArray(1)
                 stride = self.ruler_data.shape[1]*sizeof(c_float)
                 vertex_offset = c_void_p(0 * sizeof(c_float))
-                color_offset  = c_void_p(3 * sizeof(c_float))
+                color_offset = c_void_p(3 * sizeof(c_float))
                 GL.glVertexAttribPointer(0, 3, GL.GL_FLOAT, GL.GL_FALSE, stride, vertex_offset)
                 GL.glVertexAttribPointer(1, 3, GL.GL_FLOAT, GL.GL_FALSE, stride, color_offset)
                 GL.glDrawArrays(GL.GL_LINES, 0, self.ruler_data.shape[0])

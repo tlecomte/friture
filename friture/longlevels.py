@@ -39,9 +39,11 @@ LEVEL_TEXT_LABEL_PERIOD_MS = 1000
 
 LEVEL_TEXT_LABEL_STEPS = LEVEL_TEXT_LABEL_PERIOD_MS / SMOOTH_DISPLAY_TIMER_PERIOD_MS
 
-def gauss(n=11,sigma=1):
-    r = range(-int(n/2),int(n/2)+1)
+
+def gauss(n=11, sigma=1):
+    r = range(-int(n/2), int(n/2)+1)
     return [1 / (sigma * np.sqrt(2*np.pi)) * np.exp(-float(x)**2/(2*sigma**2)) for x in r]
+
 
 class Subsampler:
     def __init__(self, Ndec):
@@ -82,6 +84,7 @@ class Subsampler:
 
         return x_dec
 
+
 class LongLevelWidget(QtWidgets.QWidget):
 
     def __init__(self, parent=None):
@@ -111,7 +114,7 @@ class LongLevelWidget(QtWidgets.QWidget):
         # initialize the class instance that will do the fft
         self.proc = audioproc()
 
-        self.level = None # 1e-30
+        self.level = None  # 1e-30
         self.level_rms = -200.
 
         self.two_channels = False
@@ -120,7 +123,7 @@ class LongLevelWidget(QtWidgets.QWidget):
 
         self.old_index = 0
 
-        #self.response_time = 60. # 1 minute
+        # self.response_time = 60. # 1 minute
         self.response_time = 20.
 
         # how many times we should decimate to end up with 100 points in the kernel
@@ -189,7 +192,7 @@ class LongLevelWidget(QtWidgets.QWidget):
 
             levels = self.ringbuffer.data(self.length_samples)
 
-            self.PlotZoneUp.setdata(self.time/60., levels[0,:])
+            self.PlotZoneUp.setdata(self.time/60., levels[0, :])
 
     # method
     def canvasUpdate(self):

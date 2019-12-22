@@ -20,6 +20,7 @@
 import numpy
 from friture_extensions.lfilter import pyx_lfilter_float64_1D
 
+
 def decimate(bdec, adec, x, zi):
     if len(x) == 0:
         raise Exception("Filter input is too small")
@@ -30,8 +31,9 @@ def decimate(bdec, adec, x, zi):
     x_dec = x_dec[::2]
     return x_dec, zf
 
-# decimate 'Ndec' times
+
 def decimate_multiple(Ndec, bdec, adec, x, zis):
+    '''decimate Ndec times'''
     x_dec = x
 
     # FIXME problems when x is smaller than filter coeff
@@ -52,8 +54,9 @@ def decimate_multiple(Ndec, bdec, adec, x, zis):
             zfs += [zf]
         return x_dec, zfs
 
-# build a proper array of zero initial conditions to start the subsampler
+
 def decimate_multiple_filtic(Ndec, bdec, adec):
+    '''build a proper array of zero initial conditions to start the subsampler'''
     zfs = []
     for i in range(Ndec):
         l = max(len(bdec), len(adec)) - 1

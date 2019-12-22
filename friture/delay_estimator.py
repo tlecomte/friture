@@ -28,6 +28,7 @@ from .signal.correlation import generalized_cross_correlation
 
 DEFAULT_DELAYRANGE = 1  # default delay range is 1 second
 
+
 class Delay_Estimator_Widget(QtWidgets.QWidget):
 
     def __init__(self, parent=None):

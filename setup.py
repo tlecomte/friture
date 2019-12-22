@@ -14,7 +14,7 @@ import friture  # for the version number
 #       twine upload dist/*
 
 # to test for pep8 issues:
-# pep8 --show-source --show-pep8 --max-line-length=170 friture
+# pycodestyle --show-source --show-pep8 --max-line-length=170 friture
 
 # to fix pep8 issues automatically (replace -d by -i if the changes are fine):
 # autopep8 --max-line-length=170 -d -r friture

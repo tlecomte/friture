@@ -24,7 +24,7 @@ from friture.controlbar import ControlBar
 
 class Dock(QtWidgets.QWidget):
 
-    def __init__(self, parent, name, widgetId = None):
+    def __init__(self, parent, name, widgetId=None):
         super().__init__(parent)
 
         self.dockmanager = parent.dockmanager
@@ -42,9 +42,9 @@ class Dock(QtWidgets.QWidget):
         self.layout = QtWidgets.QVBoxLayout(self)
         self.layout.addWidget(self.control_bar)
         self.layout.setContentsMargins(0, 0, 0, 0)
-        #self.dockwidget.setLayout(self.layout)
+        # self.dockwidget.setLayout(self.layout)
 
-        #self.setWidget(self.dockwidget)
+        # self.setWidget(self.dockwidget)
 
         self.audiowidget = None
         self.widget_select(widgetId)

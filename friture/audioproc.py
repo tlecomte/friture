@@ -23,6 +23,7 @@ from numpy import linspace, log2, floor, log10, cos, arange, pi
 from numpy.fft import rfft
 from friture.audiobackend import SAMPLING_RATE
 
+
 class audioproc():
 
     def __init__(self):

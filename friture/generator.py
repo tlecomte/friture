@@ -286,7 +286,7 @@ class Generator_Widget(QtWidgets.QWidget):
         self.t += N / float(SAMPLING_RATE)
 
         # data copy
-        out_data[:]  = intdata
+        out_data[:] = intdata
 
     def canvasUpdate(self):
         return

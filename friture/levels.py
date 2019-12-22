@@ -228,7 +228,7 @@ class Levels_Widget(QtWidgets.QWidget):
                 self.label_rms.setText("1: %s\n2: %s" % (string_rms, string_rms_2))
                 self.label_peak.setText("1: %s\n2: %s" % (string_peak, string_peak_2))
 
-        self.i = self.i%LEVEL_TEXT_LABEL_STEPS
+        self.i = self.i % LEVEL_TEXT_LABEL_STEPS
 
         # prevent re-layout
         self.label_rms.setMinimumWidth(self.label_rms.width())

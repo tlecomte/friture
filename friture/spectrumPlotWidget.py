@@ -17,6 +17,7 @@ PEAK_DECAY_RATE = 1.0 - 3E-6
 # Number of cycles the peak stays on hold before fall-off.
 PEAK_FALLOFF_COUNT = 32  # default : 16
 
+
 class SpectrumPlotWidget(QtWidgets.QWidget):
 
     def __init__(self, parent):
@@ -50,16 +51,16 @@ class SpectrumPlotWidget(QtWidgets.QWidget):
         self.canvasWidget.setTrackerFormatter(lambda x, y: "%d Hz, %.1f dB" % (x, y))
         self.canvasWidget.resized.connect(self.canvasResized)
 
-        r_peak = lambda p: 1. + 0.*p
-        g_peak = lambda p: 1. - p
-        b_peak = lambda p: 1. - p
+        def r_peak(p): return 1. + 0.*p
+        def g_peak(p): return 1. - p
+        def b_peak(p): return 1. - p
 
         self.peakQuadsItem = QuadsItem(r_peak, g_peak, b_peak)
         self.canvasWidget.attach(self.peakQuadsItem)
 
-        r_signal = lambda p: 0.*p
-        g_signal = lambda p: 0.3 + 0.5*p
-        b_signal = lambda p: 0.*p
+        def r_signal(p): return 0.*p
+        def g_signal(p): return 0.3 + 0.5*p
+        def b_signal(p): return 0.*p
 
         self.quadsItem = QuadsItem(r_signal, g_signal, b_signal)
         self.canvasWidget.attach(self.quadsItem)

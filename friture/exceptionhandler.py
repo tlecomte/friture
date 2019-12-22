@@ -28,13 +28,14 @@ import appdirs
 from PyQt5 import QtCore
 from PyQt5.QtWidgets import QMessageBox, QApplication
 
+
 def fileexcepthook(exception_type, exception_value, traceback_object):
     logger = logging.getLogger(__name__)
 
     exceptionText = "".join(traceback.format_exception(exception_type, exception_value, traceback_object))
     logger.critical("Unhandled exception: %s", exceptionText)
 
-    versionInfo="Friture " + friture.__version__
+    versionInfo = "Friture " + friture.__version__
     timeString = time.strftime("%Y-%m-%d, %H:%M:%S")
 
     # same as in analyzer.py
@@ -57,16 +58,17 @@ def fileexcepthook(exception_type, exception_value, traceback_object):
         """<h3>Error details</h3>""" % \
         (email, email, logFileName, logDir, logDir)
 
-    msg = notice + timeString + ' (%s)' % versionInfo + '<br>' + exceptionText.replace("\r\n", "\n").replace("\n", "<br>").replace(" ",'&nbsp;')
+    msg = notice + timeString + ' (%s)' % versionInfo + '<br>' + exceptionText.replace("\r\n", "\n").replace("\n", "<br>").replace(" ", '&nbsp;')
 
     return msg
+
 
 def errorBox(message):
     logger = logging.getLogger(__name__)
 
     try:
         if QApplication.instance() is None:
-            app = QApplication(sys.argv) # assignment is needed to keep the application alive
+            app = QApplication(sys.argv)  # assignment is needed to keep the application alive
 
         errorbox = QMessageBox()
         errorbox.setWindowTitle("Friture error occured")
@@ -74,19 +76,21 @@ def errorBox(message):
         errorbox.setTextFormat(QtCore.Qt.RichText)
         errorbox.setStandardButtons(QMessageBox.Abort)
 
-        continueButton = errorbox.addButton("Ignore and try to continue", QMessageBox.RejectRole);
+        continueButton = errorbox.addButton("Ignore and try to continue", QMessageBox.RejectRole)
 
         ret = errorbox.exec_()
 
         if ret == QMessageBox.Abort:
-           sys.exit(1)
+            sys.exit(1)
         else:
             logger.info("Try to continue")
     except Exception:
         logger.exception("Failed to display the error box")
 
+
 def excepthook(exception_type, exception_value, traceback_object):
     gui_message = fileexcepthook(exception_type, exception_value, traceback_object)
     errorBox(gui_message)
+
 
 sys.excepthook = excepthook

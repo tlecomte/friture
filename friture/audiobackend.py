@@ -56,11 +56,13 @@ __audiobackendInstance = None
 # > provides device ids and friendly name
 # > doc, features are lacking
 
+
 def AudioBackend():
     global __audiobackendInstance
     if __audiobackendInstance is None:
         __audiobackendInstance = __AudioBackend()
     return __audiobackendInstance
+
 
 class __AudioBackend(QtCore.QObject):
 
@@ -319,11 +321,11 @@ class __AudioBackend(QtCore.QObject):
             device=device['index'],
             channels=device['max_input_channels'],
             blocksize=FRAMES_PER_BUFFER,
-            #latency=latency,
+            # latency=latency,
             samplerate=SAMPLING_RATE)
 
-        sampleSize = 4 # the sample size in bytes (float32)
-        nchannels_max = device['max_input_channels'] # the number of channels that we record
+        sampleSize = 4  # the sample size in bytes (float32)
+        nchannels_max = device['max_input_channels']  # the number of channels that we record
         elementSize = nchannels_max * sampleSize
 
         # arbitrary size to avoid overflows without using too much memory
@@ -333,7 +335,7 @@ class __AudioBackend(QtCore.QObject):
         ringbufferSize = 2**int(math.log2(ringbufferSeconds * SAMPLING_RATE))
 
         ringBuffer = rtmixer.RingBuffer(elementSize, ringbufferSize)
-        
+
         # action can be used to read the count of input overflows
         action = stream.record_ringbuffer(ringBuffer)
 
@@ -350,7 +352,7 @@ class __AudioBackend(QtCore.QObject):
             samplerate=SAMPLING_RATE,
             blocksize=FRAMES_PER_BUFFER,
             device=device['index'],
-            channels = device['max_output_channels'],
+            channels=device['max_output_channels'],
             dtype=int16,
             callback=callback)
 
@@ -417,10 +419,10 @@ class __AudioBackend(QtCore.QObject):
             if self.duo_input:
                 channel_2 = self.get_current_second_channel()
 
-            floatdata1 = buffer[:,channel]
+            floatdata1 = buffer[:, channel]
 
             if self.duo_input:
-                floatdata2 = buffer[:,channel_2]
+                floatdata2 = buffer[:, channel_2]
                 floatdata = vstack((floatdata1, floatdata2))
             else:
                 floatdata = floatdata1

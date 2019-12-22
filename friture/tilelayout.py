@@ -21,6 +21,7 @@ import math
 from PyQt5.QtCore import QPoint, QRect, QSize, Qt
 from PyQt5.QtWidgets import QLayout, QSizePolicy
 
+
 class TileLayout(QLayout):
     def __init__(self, parent=None, margin=0, spacing=-1):
         super(TileLayout, self).__init__(parent)
@@ -106,10 +107,10 @@ class TileLayout(QLayout):
                 break
 
         rowCount -= m
-        columnCount-= n
+        columnCount -= n
 
         # produce a dictionary: key = line index, value = column count
-        lines = {rowIndex:columnCount for rowIndex in range(rowCount)}
+        lines = {rowIndex: columnCount for rowIndex in range(rowCount)}
 
         # split the overflow over the lines
         overflow = rowCount*columnCount - len(self.itemList)
@@ -165,5 +166,3 @@ class TileLayout(QLayout):
 
 # how to decide how many rows we need?
 # -> a threshold based on G
-
-

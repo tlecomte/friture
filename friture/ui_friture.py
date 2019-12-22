@@ -7,6 +7,7 @@
 #
 # WARNING! All changes made in this file will be lost!
 
+from . import friture_rc
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 
@@ -70,5 +71,3 @@ class Ui_MainWindow(object):
         self.actionAbout.setText(_translate("MainWindow", "About Friture"))
         self.actionNew_dock.setText(_translate("MainWindow", "New dock"))
         self.actionNew_dock.setToolTip(_translate("MainWindow", "Add a new dock to Friture window"))
-
-from . import friture_rc
