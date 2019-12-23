@@ -1,7 +1,9 @@
 # -*- mode: python -*-
 
-from PyInstaller.utils.hooks import collect_data_files
+import os
 import platform
+
+from PyInstaller.utils.hooks import collect_data_files
 
 block_cipher = None
 
@@ -83,14 +85,21 @@ excluded_binaries = [
         'QtWebSockets.framework']
 
 
-if platform.system() == "Windows":
+# the manual bundling of libportaudio can be removed once the following PyInstaller MR is released:
+# https://github.com/pyinstaller/pyinstaller/pull/4498
+# (pyinstaller>3.5)
+if platform.system() == "Windows" or platform.system() == "Darwin":
   sounddevice_data = collect_data_files("sounddevice", subdir="_sounddevice_data")
-  libportaudio = [(file[0], "_sounddevice_data/portaudio-binaries") for file in sounddevice_data if "libportaudio" in file[0]]
+  libportaudio = [(f[0], os.path.join("_sounddevice_data", "portaudio-binaries")) for f in sounddevice_data if "libportaudio" in f[0]]
 
   print(libportaudio)
   if len(libportaudio) != 1:
-    raise ValueError('libportaudio dll could not be found')
+    raise ValueError('libportaudio could not be found')
+else:
+  libportaudio = []
 
+
+if platform.system() == "Windows":
   # workaround for PyInstaller that does not look where the new PyQt5 official wheels put the Qt dlls
   from PyInstaller.compat import getsitepackages
   pathex = [os.path.join(x, 'PyQt5', 'Qt', 'bin') for x in getsitepackages()]
@@ -98,7 +107,6 @@ if platform.system() == "Windows":
   # add vcruntime140.dll - PyInstaller excludes it by default because it thinks it comes from c:\Windows
   binaries = [('vcruntime140.dll', 'C:\\Python36\\vcruntime140.dll', 'BINARY')]
 else:
-  libportaudio = []
   pathex = []
   binaries = []
 
