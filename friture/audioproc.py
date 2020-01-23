@@ -43,9 +43,6 @@ class audioproc():
     def analyzelive(self, samples):
         samples = self.decimate(samples)
 
-        # uncomment the following to disable the decimation altogether
-        # decimation = 1
-
         # FFT for a linear transformation in frequency scale
         fft = rfft(samples * self.window)
         spectrum = self.norm_square(fft)
@@ -60,9 +57,9 @@ class audioproc():
         if self.decimation > 1:
             samples.shape = len(samples) // self.decimation, self.decimation
             # the full way
-            # samples = samples.mean(axis=1)
-            # the simplest way
-            samples = samples[:, 0]
+            samples = samples.mean(axis=1)
+            # the fastest way
+            # samples = samples[:, 0]
         return samples
 
     def set_fftsize(self, fft_size):
