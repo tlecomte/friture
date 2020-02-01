@@ -105,7 +105,7 @@ class audioproc():
     def update_freq_cache(self):
         if len(self.freq) != self.fft_size / (2 * self.decimation) + 1:
             self.logger.info("audioproc: updating self.freq cache")
-            self.freq = linspace(0, SAMPLING_RATE / (2 * self.decimation), self.fft_size / (2 * self.decimation) + 1)
+            self.freq = linspace(0, SAMPLING_RATE / (2 * self.decimation), int(self.fft_size / (2 * self.decimation) + 1))
 
             # compute psychoacoustic weighting. See http://en.wikipedia.org/wiki/A-weighting
             f = self.freq
