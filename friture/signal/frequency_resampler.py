@@ -22,6 +22,11 @@ import logging
 
 import numpy as np
 
+def hz2mel(f):
+    return 2595 * np.log10(1 + f / 700)
+
+def mel2hz(m):
+    return 700 * (10 ** (m / 2595) - 1)
 
 class Frequency_Resampler:
 
@@ -29,6 +34,7 @@ class Frequency_Resampler:
         self.logger = logging.getLogger(__name__)
 
         self.logfreqscale = logfreqscale  # 0: linear
+        self.melfreqscale = True  # 0: linear
         self.minfreq = minfreq
         self.maxfreq = maxfreq
         self.nsamples = nsamples
@@ -41,12 +47,15 @@ class Frequency_Resampler:
         self.update_xscale()
 
     def update_xscale(self):
-        if self.logfreqscale == 2:
-            self.xscaled = np.logspace(np.log2(self.minfreq), np.log2(self.maxfreq), self.nsamples, base=2.0)
-        elif self.logfreqscale == 1:
-            self.xscaled = np.logspace(np.log10(self.minfreq), np.log10(self.maxfreq), self.nsamples)
+        if self.melfreqscale:
+            self.xscaled = mel2hz(np.linspace(hz2mel(self.minfreq), hz2mel(self.maxfreq), self.nsamples))
         else:
-            self.xscaled = np.linspace(self.minfreq, self.maxfreq, self.nsamples)
+            if self.logfreqscale == 2:
+                self.xscaled = np.logspace(np.log2(self.minfreq), np.log2(self.maxfreq), self.nsamples, base=2.0)
+            elif self.logfreqscale == 1:
+                self.xscaled = np.logspace(np.log10(self.minfreq), np.log10(self.maxfreq), self.nsamples)
+            else:
+                self.xscaled = np.linspace(self.minfreq, self.maxfreq, self.nsamples)
 
     def setnsamples(self, nsamples):
         if self.nsamples != nsamples:
@@ -58,6 +67,12 @@ class Frequency_Resampler:
         if logfreqscale != self.logfreqscale:
             self.logger.info("freq scale changed to %f", logfreqscale)
             self.logfreqscale = logfreqscale
+            self.update_xscale()
+
+    def setmelfreqscale(self, melfreqscale):
+        if melfreqscale != self.melfreqscale:
+            self.logger.info("freq scale changed to mel (%s)", "true" if melfreqscale else "false")
+            self.melfreqscale = melfreqscale
             self.update_xscale()
 
     def process(self, freq, data):
