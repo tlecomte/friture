@@ -24,7 +24,7 @@ from friture.audiobackend import SAMPLING_RATE
 
 # shared with spectrum_settings.py
 DEFAULT_FFT_SIZE = 8  # 8192 points
-DEFAULT_FREQ_SCALE = 1  # log10
+DEFAULT_FREQ_SCALE = 2  # Mel
 DEFAULT_MAXFREQ = 20000
 DEFAULT_MINFREQ = 20
 DEFAULT_SPEC_MIN = -100
@@ -70,6 +70,7 @@ class Spectrum_Settings_Dialog(QtWidgets.QDialog):
         self.comboBox_freqscale.setObjectName("comboBox_freqscale")
         self.comboBox_freqscale.addItem("Linear")
         self.comboBox_freqscale.addItem("Logarithmic")
+        self.comboBox_freqscale.addItem("Mel")
         self.comboBox_freqscale.setCurrentIndex(DEFAULT_FREQ_SCALE)
 
         self.spinBox_minfreq = QtWidgets.QSpinBox(self)
@@ -165,10 +166,12 @@ class Spectrum_Settings_Dialog(QtWidgets.QDialog):
     # slot
     def freqscalechanged(self, index):
         self.logger.info("freq_scale slot %d", index)
-        if index == 1:
-            self.parent().PlotZoneSpect.setlogfreqscale()
-        else:
+        if index == 0:
             self.parent().PlotZoneSpect.setlinfreqscale()
+        elif index == 1:
+            self.parent().PlotZoneSpect.setlogfreqscale()
+        elif index == 2:
+            self.parent().PlotZoneSpect.setmelfreqscale()
 
     # slot
     def responsetimechanged(self, index):

@@ -74,7 +74,7 @@ class Spectrogram_Widget(QtWidgets.QWidget):
         self.overlap_frac = Fraction(3, 4)
         self.dT_s = self.fft_size * (1. - self.overlap) / float(SAMPLING_RATE)
 
-        self.PlotZoneImage.setlog10freqscale()  # DEFAULT_FREQ_SCALE = 1 #log10
+        self.PlotZoneImage.setmelfreqscale()  # DEFAULT_FREQ_SCALE = 2 # Mel
         self.PlotZoneImage.setfreqrange(self.minfreq, self.maxfreq)
         self.PlotZoneImage.setspecrange(self.spec_min, self.spec_max)
         self.PlotZoneImage.setweighting(self.weighting)

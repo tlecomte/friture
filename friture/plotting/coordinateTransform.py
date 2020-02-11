@@ -21,6 +21,15 @@ import numpy as np
 
 # transforms between screen coordinates and plot coordinates
 
+LIN=0
+LOG=1
+MEL=2
+
+def hz2mel(f):
+    return 2595 * np.log10(1 + f / 700)
+
+def mel2hz(m):
+    return 700 * (10 ** (m / 2595) - 1)
 
 class CoordinateTransform(object):
 
@@ -32,11 +41,13 @@ class CoordinateTransform(object):
         self.coord_clipped_min = max(1e-20, self.coord_min)
         self.coord_clipped_max = max(self.coord_clipped_min, self.coord_max)
         self.coord_ratio_log = np.log10(self.coord_clipped_max / self.coord_clipped_min)
+        self.coord_mel_min = hz2mel(coord_min)
+        self.coord_mel_max = hz2mel(coord_max)
 
         self.length = length
         self.startBorder = startBorder
         self.endBorder = endBorder
-        self.log = False
+        self.type = LIN
 
     def setRange(self, coord_min, coord_max):
         self.coord_min = coord_min
@@ -44,6 +55,8 @@ class CoordinateTransform(object):
         self.coord_clipped_min = max(1e-20, self.coord_min)
         self.coord_clipped_max = max(self.coord_clipped_min, self.coord_max)
         self.coord_ratio_log = np.log10(self.coord_clipped_max / self.coord_clipped_min)
+        self.coord_mel_min = hz2mel(coord_min)
+        self.coord_mel_max = hz2mel(coord_max)
 
     def setLength(self, length):
         self.length = length
@@ -53,29 +66,39 @@ class CoordinateTransform(object):
         self.endBorder = end
 
     def setLinear(self):
-        self.log = False
+        self.type = LIN
 
     def setLogarithmic(self):
-        self.log = True
+        self.type = LOG
+
+    def setMel(self):
+        self.type = MEL
 
     def toScreen(self, x):
-        if self.log:
+        if self.type == LOG:
             if self.coord_clipped_min == self.coord_clipped_max:
                 return self.startBorder + 0. * x  # keep x type (this can produce a RunTimeWarning if x contains inf)
 
             x = (x < 1e-20) * 1e-20 + (x >= 1e-20) * x
             return (np.log10(x / self.coord_clipped_min)) * (self.length - self.startBorder - self.endBorder) / self.coord_ratio_log + self.startBorder
-        else:
+        elif self.type == LIN:
             if self.coord_max == self.coord_min:
                 return self.startBorder + 0. * x  # keep x type (this can produce a RunTimeWarning if x contains inf)
 
             return (x - self.coord_min) * (self.length - self.startBorder - self.endBorder) / (self.coord_max - self.coord_min) + self.startBorder
+        elif self.type == MEL:
+            if self.coord_max == self.coord_min:
+                return self.startBorder + 0. * x
+
+            return (hz2mel(x) - self.coord_mel_min) * (self.length - self.startBorder - self.endBorder) / (self.coord_mel_max - self.coord_mel_min) + self.startBorder
 
     def toPlot(self, x):
         if self.length == self.startBorder + self.endBorder:
             return self.coord_min + 0. * x  # keep x type (this can produce a RunTimeWarning if x contains inf)
 
-        if self.log:
+        if self.type == LOG:
             return 10 ** ((x - self.startBorder) * self.coord_ratio_log / (self.length - self.startBorder - self.endBorder)) * self.coord_min
-        else:
+        elif self.type == LIN:
             return (x - self.startBorder) * (self.coord_max - self.coord_min) / (self.length - self.startBorder - self.endBorder) + self.coord_min
+        elif self.type == MEL:
+            return mel2hz((x - self.startBorder) * (self.coord_mel_max - self.coord_mel_min) / (self.length - self.startBorder - self.endBorder)) + self.coord_mel_min

@@ -24,7 +24,7 @@ from friture.audiobackend import SAMPLING_RATE
 
 # shared with spectrogram.py
 DEFAULT_FFT_SIZE = 7  # 4096 points
-DEFAULT_FREQ_SCALE = 1  # log10
+DEFAULT_FREQ_SCALE = 2  # Mel
 DEFAULT_MAXFREQ = SAMPLING_RATE / 2
 DEFAULT_MINFREQ = 20
 DEFAULT_SPEC_MIN = -140
@@ -70,6 +70,7 @@ class Spectrogram_Settings_Dialog(QtWidgets.QDialog):
         self.comboBox_freqscale.setObjectName("comboBox_freqscale")
         self.comboBox_freqscale.addItem("Linear")
         self.comboBox_freqscale.addItem("Logarithmic")
+        self.comboBox_freqscale.addItem("Mel")
         self.comboBox_freqscale.setCurrentIndex(DEFAULT_FREQ_SCALE)
 
         self.spinBox_minfreq = QtWidgets.QSpinBox(self)
@@ -143,6 +144,8 @@ class Spectrogram_Settings_Dialog(QtWidgets.QDialog):
         self.logger.info("freq_scale slot %d", index)
         if index == 1:
             self.parent().PlotZoneImage.setlog10freqscale()
+        elif index == 2:
+            self.parent().PlotZoneImage.setmelfreqscale()
         else:
             self.parent().PlotZoneImage.setlinfreqscale()
 

@@ -158,6 +158,9 @@ class PlotImage:
 
     def setlogfreqscale(self, logfreqscale):
         self.frequency_resampler.setlogfreqscale(logfreqscale)
+    
+    def setmelfreqscale(self, melfreqscale):
+        self.frequency_resampler.setmelfreqscale(melfreqscale)
 
     def erase(self):
         self.canvasscaledspectrogram.erase()
@@ -265,6 +268,7 @@ class ImagePlot(QtWidgets.QWidget):
         self.plotImage.erase()
         self.logfreqscale = 0
         self.plotImage.setlogfreqscale(False)
+        self.plotImage.setmelfreqscale(False)
 
         self.verticalScaleTransform.setLinear()
         self.verticalScaleDivision.setLinear()
@@ -279,11 +283,25 @@ class ImagePlot(QtWidgets.QWidget):
         self.plotImage.erase()
         self.logfreqscale = 1
         self.plotImage.setlogfreqscale(True)
+        self.plotImage.setmelfreqscale(False)
 
         self.verticalScaleTransform.setLogarithmic()
         self.verticalScaleDivision.setLogarithmic()
 
         # notify that sizeHint has changed (this should be done with a signal emitted from the scale division to the scale bar)
+        self.verticalScale.scaleBar.updateGeometry()
+
+        self.needfullreplot = True
+        self.update()
+
+    def setmelfreqscale(self):
+        self.plotImage.erase()
+        self.melfreqscale = True
+        self.plotImage.setmelfreqscale(True)
+
+        self.verticalScaleTransform.setMel()
+        self.verticalScaleDivision.setMel()
+
         self.verticalScale.scaleBar.updateGeometry()
 
         self.needfullreplot = True

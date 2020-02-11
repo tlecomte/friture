@@ -60,6 +60,9 @@ def roundWithPrecision(x, prec):
 
     return candidates[i]
 
+LIN=0
+LOG=1
+MEL=2
 
 # takes min/max of the scale, and returns appropriate ticks (selected for proper number, rounding)
 class ScaleDivision(object):
@@ -73,7 +76,7 @@ class ScaleDivision(object):
 
         self.labelLength = 1
 
-        self.log = False
+        self.log = LIN
 
     def set_properties(self, scale_min, scale_max, length):
         self.scale_min = scale_min
@@ -88,10 +91,13 @@ class ScaleDivision(object):
         self.length = length
 
     def setLinear(self):
-        self.log = False
+        self.log = LIN
 
     def setLogarithmic(self):
-        self.log = True
+        self.log = LOG
+
+    def setMel(self):
+        self.log = MEL
 
     def majorTicks(self):
 
@@ -99,7 +105,7 @@ class ScaleDivision(object):
         trueMin = min(self.scale_min, self.scale_max)
         trueMax = max(self.scale_min, self.scale_max)
 
-        if self.log:
+        if self.log == LOG:
             if trueMin <= 0.:
                 trueMin = 1e-20
                 trueMax = max(trueMax, trueMin)
@@ -111,7 +117,13 @@ class ScaleDivision(object):
             trueMaxLog10Floor = int(numpy.floor(trueMaxLog10))
 
             ticks = [10 ** i for i in range(trueMinLog10Ceil, trueMaxLog10Floor + 1)]
-        else:
+        elif self.log == MEL:
+            div = 500
+            minTick = int(trueMin / div)
+            maxTick = int(trueMax / div)
+
+            ticks = [div * i for i in range(minTick, maxTick + 1)]
+        elif self.log == LIN:
             base_interval = rang / 6.
 
             approx_interval_prec = numberPrecision(base_interval)
@@ -141,7 +153,7 @@ class ScaleDivision(object):
         trueMin = min(self.scale_min, self.scale_max)
         trueMax = max(self.scale_min, self.scale_max)
 
-        if self.log:
+        if self.log == LOG:
             ticks = []
 
             standardLogTicks = [2, 3, 4, 5, 6, 7, 8, 9]
@@ -155,7 +167,15 @@ class ScaleDivision(object):
             for a in standardLogTicks:
                 if a * majorTicks[-1] <= trueMax:
                     ticks.append(a * majorTicks[-1])
-        else:
+        elif self.log == MEL:
+            div = 100
+
+            x = int(trueMin / div) * div
+            ticks = []
+            while x <= trueMax:
+                ticks.append(x)
+                x += div
+        elif self.log == LIN:
             majorTickInterval = self.majorTickInterval
 
             majorTickIntervalDecimal = Decimal(majorTickInterval)

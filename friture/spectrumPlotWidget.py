@@ -88,6 +88,13 @@ class SpectrumPlotWidget(QtWidgets.QWidget):
         self.needtransform = True
         self.draw()
 
+    def setmelfreqscale(self):
+        self.horizontalScaleTransform.setMel()
+        self.horizontalScaleDivision.setMel()
+
+        self.needtransform = True
+        self.draw()
+
     def setfreqrange(self, minfreq, maxfreq):
         self.xmin = minfreq
         self.xmax = maxfreq
