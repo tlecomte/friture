@@ -19,7 +19,7 @@
 
 import logging
 
-from numpy import linspace, log2, floor, log10, cos, arange, pi
+from numpy import linspace, log10, cos, arange, pi
 from numpy.fft import rfft
 from friture.audiobackend import SAMPLING_RATE
 
@@ -34,18 +34,12 @@ class audioproc():
         self.B = 0. * self.freq
         self.C = 0. * self.freq
         self.maxfreq = 1.
-        self.decimation = 1
         self.window = arange(0, 1)
         self.size_sq = 1.
 
         self.fft_size = 10
 
     def analyzelive(self, samples):
-        samples = self.decimate(samples)
-
-        # uncomment the following to disable the decimation altogether
-        # decimation = 1
-
         # FFT for a linear transformation in frequency scale
         fft = rfft(samples * self.window)
         spectrum = self.norm_square(fft)
@@ -54,16 +48,6 @@ class audioproc():
 
     def norm_square(self, fft):
         return (fft*fft.conjugate()).real / self.size_sq
-
-    def decimate(self, samples):
-        # first we remove as much points as possible
-        if self.decimation > 1:
-            samples.shape = len(samples) // self.decimation, self.decimation
-            # the full way
-            # samples = samples.mean(axis=1)
-            # the simplest way
-            samples = samples[:, 0]
-        return samples
 
     def set_fftsize(self, fft_size):
         if fft_size != self.fft_size:
@@ -75,17 +59,10 @@ class audioproc():
     def set_maxfreq(self, maxfreq):
         if maxfreq != self.maxfreq:
             self.maxfreq = maxfreq
-            decimation = SAMPLING_RATE / (2 * maxfreq)
-            self.decimation = int(2 ** (floor(log2(decimation))))
-
-            if self.decimation < 1:
-                self.decimation = 1
 
             self.update_freq_cache()
             self.update_window()
             self.update_size()
-
-        self.logger.info("audioproc: will decimate %d times", self.decimation)
 
     def get_freq_scale(self):
         return self.freq
@@ -94,19 +71,19 @@ class audioproc():
         return self.A, self.B, self.C
 
     def update_size(self):
-        self.size_sq = float(self.fft_size / self.decimation) ** 2
+        self.size_sq = float(self.fft_size) ** 2
 
     def update_window(self):
-        N = self.fft_size / self.decimation
+        N = self.fft_size
         n = arange(0, N)
         # Hann window : better frequency resolution than the rectangular window
         self.window = 0.5 * (1. - cos(2 * pi * n / (N - 1)))
         self.logger.info("audioproc: updating window")
 
     def update_freq_cache(self):
-        if len(self.freq) != self.fft_size / (2 * self.decimation) + 1:
+        if len(self.freq) != self.fft_size / 2 + 1:
             self.logger.info("audioproc: updating self.freq cache")
-            self.freq = linspace(0, SAMPLING_RATE // (2 * self.decimation), self.fft_size // (2 * self.decimation) + 1)
+            self.freq = linspace(0, SAMPLING_RATE // 2, self.fft_size // 2 + 1)
 
             # compute psychoacoustic weighting. See http://en.wikipedia.org/wiki/A-weighting
             f = self.freq
