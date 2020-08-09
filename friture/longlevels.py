@@ -23,7 +23,9 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 import numpy as np
 from friture.longlevels_settings import (LongLevels_Settings_Dialog,
                                          DEFAULT_LEVEL_MIN,
-                                         DEFAULT_LEVEL_MAX)
+                                         DEFAULT_LEVEL_MAX,
+                                         DEFAULT_MAXTIME,
+                                         DEFAULT_RESPONSE_TIME)
 from friture.audioproc import audioproc
 from friture.timeplot import TimePlot
 from .signal.decimate import decimate
@@ -97,8 +99,8 @@ class LongLevelWidget(QtWidgets.QWidget):
         self.PlotZoneUp = TimePlot(self)
         self.PlotZoneUp.setObjectName("PlotZoneUp")
         self.PlotZoneUp.setverticaltitle("Level (dB FS RMS)")
-        self.PlotZoneUp.sethorizontaltitle("Time (min)")
-        self.PlotZoneUp.setTrackerFormatter(lambda x, y: "%.3g min, %.3g" % (x, y))
+        self.PlotZoneUp.sethorizontaltitle("Time (sec)")
+        self.PlotZoneUp.setTrackerFormatter(lambda x, y: "%.3g sec, %.3g" % (x, y))
 
         self.level_min = DEFAULT_LEVEL_MIN
         self.level_max = DEFAULT_LEVEL_MAX
@@ -123,24 +125,9 @@ class LongLevelWidget(QtWidgets.QWidget):
 
         self.old_index = 0
 
-        # self.response_time = 60. # 1 minute
-        self.response_time = 20.
-
-        # how many times we should decimate to end up with 100 points in the kernel
-        self.Ndec = int(max(0, np.floor((np.log2(self.response_time * SAMPLING_RATE/100.)))))
-
-        Ngauss = 4
-        self.b = np.array(gauss(10*Ngauss+1, 2.*Ngauss))
-        self.a = np.zeros(self.b.shape)
-        self.a[0] = 1.
-        self.zf = np.zeros(max(len(self.b), len(self.a)) - 1)
-
-        self.subsampled_sampling_rate = SAMPLING_RATE / 2 ** (self.Ndec)
-        self.subsampler = Subsampler(self.Ndec)
-
-        self.length_seconds = 60.*10
-        # actually this should be linked to the pixel width of the plot area
-        self.length_samples = int(self.length_seconds * self.subsampled_sampling_rate)
+        #Set the initial timespan and response time
+        self.length_seconds = DEFAULT_MAXTIME
+        self.setresptime(DEFAULT_RESPONSE_TIME)
 
         # ringbuffer for the subsampled data
         self.ringbuffer = RingBuffer()
@@ -192,7 +179,7 @@ class LongLevelWidget(QtWidgets.QWidget):
 
             levels = self.ringbuffer.data(self.length_samples)
 
-            self.PlotZoneUp.setdata(self.time/60., levels[0, :])
+            self.PlotZoneUp.setdata(self.time/1., levels[0, :])
 
     # method
     def canvasUpdate(self):
@@ -206,6 +193,28 @@ class LongLevelWidget(QtWidgets.QWidget):
     def setmax(self, value):
         self.level_max = value
         self.PlotZoneUp.setverticalrange(self.level_min, self.level_max)
+
+    def setduration(self, value):
+        self.length_seconds = value
+        self.length_samples = int(self.length_seconds * self.subsampled_sampling_rate)
+        self.PlotZoneUp.settimerange(0., self.length_seconds)
+
+    def setresptime(self, value):
+        self.response_time = value
+        # how many times we should decimate to end up with 100 points in the kernel
+        self.Ndec = int(max(0, np.floor((np.log2(self.response_time * SAMPLING_RATE/100.)))))
+
+        Ngauss = 4
+        self.b = np.array(gauss(10*Ngauss+1, 2.*Ngauss))
+        self.a = np.zeros(self.b.shape)
+        self.a[0] = 1.
+        self.zf = np.zeros(max(len(self.b), len(self.a)) - 1)
+
+        self.subsampled_sampling_rate = SAMPLING_RATE / 2 ** (self.Ndec)
+        self.subsampler = Subsampler(self.Ndec)
+
+        if self.length_seconds: 
+            self.setduration(self.length_seconds)
 
     # slot
     def settings_called(self, checked):
