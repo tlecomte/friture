@@ -84,21 +84,6 @@ excluded_binaries = [
         'QtWebKitWidgets.framework',
         'QtWebSockets.framework']
 
-
-# the manual bundling of libportaudio can be removed once the following PyInstaller MR is released:
-# https://github.com/pyinstaller/pyinstaller/pull/4498
-# (pyinstaller>3.5)
-if platform.system() == "Windows" or platform.system() == "Darwin":
-  sounddevice_data = collect_data_files("sounddevice", subdir="_sounddevice_data")
-  libportaudio = [(f[0], os.path.join("_sounddevice_data", "portaudio-binaries")) for f in sounddevice_data if "libportaudio" in f[0]]
-
-  print(libportaudio)
-  if len(libportaudio) != 1:
-    raise ValueError('libportaudio could not be found')
-else:
-  libportaudio = []
-
-
 if platform.system() == "Windows":
   # workaround for PyInstaller that does not look where the new PyQt5 official wheels put the Qt dlls
   from PyInstaller.compat import getsitepackages
@@ -113,7 +98,7 @@ else:
 a = Analysis(['main.py'],
              pathex=pathex,
              binaries=None,
-             datas=libportaudio,
+             datas=[],
              hiddenimports=[],
              hookspath=[],
              runtime_hooks=[],
