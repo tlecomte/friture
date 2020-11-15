@@ -3,11 +3,11 @@ matrix:
   - os: linux
     dist: xenial # use Ubuntu 16.04 LTS will be the minimum required version for the AppImage
     language: python
-    python: "3.6" # pin for Linux builds (on macos, the multibuild python is used instead)
+    python: "3.8" # pin for Linux builds (on macos, the multibuild python is used instead)
   - os: osx
     language: generic
 env:
-  - MB_PYTHON_VERSION=3.6
+  - MB_PYTHON_VERSION=3.8
 script:
   - source ./.travis/install.sh
 deploy:
