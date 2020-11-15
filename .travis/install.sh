@@ -13,8 +13,8 @@ if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
     # workaround for https://github.com/pypa/packaging-problems/issues/134
     # build-time dependencies define in `setup_requires` are resolved
     # on macOS Python with TLSv1, which is now disabled, so that fails
-    pip3 install numpy==1.16.2
-    pip3 install Cython==0.27.3
+    pip3 install numpy==1.19.3
+    pip3 install Cython==0.29.21
 fi
 
 pip3 install -r requirements.txt
@@ -25,7 +25,7 @@ python3 setup.py build_ext --inplace
 if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
     # Macos    
 
-    pip3 install -U pyinstaller==3.5
+    pip3 install -U pyinstaller==4.0
 
     pyinstaller friture.spec -y --onedir --windowed
 
@@ -43,8 +43,7 @@ else
     sudo apt-get install -y libportaudio2
     sudo apt-get install -y desktop-file-utils # for desktop-file-validate, used by pkg2appimage
 
-    # about pep517, see https://github.com/pypa/pip/issues/6163
-    pip3 install -U pyinstaller==3.5 --no-use-pep517
+    pip3 install -U pyinstaller==4.0
 
     pyinstaller friture.spec -y --log-level=DEBUG
 
