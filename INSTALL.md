@@ -23,9 +23,9 @@ sudo apt-get install -y git
 sudo apt-get install -y libportaudio2
 ```
 
-3. Install python 3.6 and related build tools (appropriate PyQt5 wheels for Linux are only available for Python 3.6+)
+3. Install python 3.8 and related build tools
 ```
-sudo apt-get install -y python3.6-dev
+sudo apt-get install -y python3.8-dev
 ```
 
 4. Clone the repository
@@ -43,30 +43,30 @@ git checkout origin/<branchName>
 6. Update `pip`, `setuptools` and `virtualenv`
 
 ```
-sudo python3.6 -m pip install --upgrade pip
-sudo pip3.6 install --upgrade setuptools
-sudo pip3.6 install --upgrade virtualenv
+sudo python3.8 -m pip install --upgrade pip
+sudo pip3.8 install --upgrade setuptools
+sudo pip3.8 install --upgrade virtualenv
 ```
 
 7. Create a virtualenv and activate it
 ```
-virtualenv  -p /usr/bin/python3.6 buildenv
+virtualenv  -p /usr/bin/python3.8 buildenv
 source ./buildenv/bin/activate
 ```
 
 8. Install Friture requirements (PyQt5, etc.)
 ```
-pip3.6 install -r requirements.txt
+pip3.8 install -r requirements.txt
 ```
 
 9. Build Cython extensions
 ```
-python3.6 setup.py build_ext --inplace
+python3.8 setup.py build_ext --inplace
 ```
 
 10. Run Friture
 ```
-python3.6 main.py
+python3.8 main.py
 ```
 
 ## Running Friture from source on Windows
