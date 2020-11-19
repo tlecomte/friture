@@ -2,10 +2,6 @@
 
 set -x
 
-source multibuild/common_utils.sh
-source multibuild/travis_steps.sh
-before_install
-
 which python3
 python3 -c 'import sys; print(sys.version)'
 
