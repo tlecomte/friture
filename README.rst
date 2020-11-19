@@ -2,11 +2,8 @@
 Friture
 =======
 
-.. image:: https://travis-ci.org/tlecomte/friture.svg?branch=master
-    :target: https://travis-ci.org/tlecomte/friture
-
-.. image:: https://ci.appveyor.com/api/projects/status/github/tlecomte/friture?branch=master&svg=true
-    :target: https://ci.appveyor.com/project/tlecomte/friture
+.. image:: https://github.com/tlecomte/friture/workflows/build/badge.svg
+    :target: https://github.com/tlecomte/friture/actions
 
 **Friture** is an application to visualize and analyze live audio data in real-time.
 
