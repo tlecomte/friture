@@ -1,0 +1,49 @@
+name: windows
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: windows-2019
+    strategy:
+      matrix:
+        python-version: [3.8]
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Display Python version
+      run: python -c "import sys; print(sys.version)"
+
+    - name: Inspect Build Environment
+      shell: powershell
+      run: Write-Host $env:PATH
+
+    - name: Build
+      shell: powershell
+      run: ./winbuild.ps1
+
+    - uses: actions/upload-artifact@v2
+      with:
+        name: friture-msi
+        path: dist/friture-*.msi
+
+    - uses: actions/upload-artifact@v2
+      with:
+        name: friture-import-xref
+        path: build/friture/xref-friture.html
+
+    - uses: actions/upload-artifact@v2
+      with:
+        name: friture-import-graph
+        path: build/friture/graph-friture.dot
+
+    - uses: actions/upload-artifact@v2
+      with:
+        name: friture-zip
+        path: dist/friture.zip
