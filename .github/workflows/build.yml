@@ -34,24 +34,28 @@ jobs:
       with:
         name: friture-msi
         path: dist/friture-*.msi
+        if-no-files-found: error
 
     - name: Upload friture zip
       uses: actions/upload-artifact@v2
       with:
         name: friture-zip
         path: dist/friture.zip
+        if-no-files-found: error
 
     - name: Upload import xref
       uses: actions/upload-artifact@v2
       with:
         name: friture-import-xref
         path: build/friture/xref-friture.html
+        if-no-files-found: error
 
     - name: Upload import graph
       uses: actions/upload-artifact@v2
       with:
         name: friture-import-graph
         path: build/friture/graph-friture.dot
+        if-no-files-found: error
 
   build-linux:
     runs-on: ubuntu-16.04
@@ -79,6 +83,7 @@ jobs:
       with:
         name: friture-appImage
         path: friture*.AppImage
+        if-no-files-found: error
 
   build-macos:
     runs-on: macos-10.15
@@ -106,6 +111,7 @@ jobs:
       with:
         name: friture-dmg
         path: friture*.dmg
+        if-no-files-found: error
 
   release:
     name: Create release and upload artifacts
@@ -118,6 +124,9 @@ jobs:
       - name: Download all workflow run artifacts
         uses: actions/download-artifact@v2
 
+      - name: Display structure of downloaded files
+        run: ls -R
+
       - name: Release
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/') # Limit releases to pushes to tags
@@ -126,8 +135,8 @@ jobs:
           prerelease: false
           fail_on_unmatched_files: true
           files: |
-            friture*.msi
-            friture*.dmg
-            friture*.AppImage
+            **/friture*.msi
+            **/friture*.dmg
+            **/friture*.AppImage
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
