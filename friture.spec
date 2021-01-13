@@ -133,4 +133,5 @@ coll = COLLECT(exe,
 app = BUNDLE(coll,
          name='friture.app',
          icon='resources/images/friture.icns',
-         bundle_identifier=None)
+         bundle_identifier=None,
+         info_plist={'NSMicrophoneUsageDescription': 'Friture reads from the audio inputs to show visualizations'})
