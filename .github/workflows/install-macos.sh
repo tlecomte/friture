@@ -10,7 +10,7 @@ pip3 install -r requirements.txt
 # pyinstaller needs to have the extensions built explicitely
 python3 setup.py build_ext --inplace
 
-pip3 install -U pyinstaller==4.1
+pip3 install -U pyinstaller==4.2
 
 pyinstaller friture.spec -y --onedir --windowed
 
