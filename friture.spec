@@ -84,23 +84,18 @@ excluded_binaries = [
         'QtWebKitWidgets.framework',
         'QtWebSockets.framework']
 
+pathex = []
 if platform.system() == "Windows":
   # workaround for PyInstaller that does not look where the new PyQt5 official wheels put the Qt dlls
   from PyInstaller.compat import getsitepackages
-  pathex = [os.path.join(x, 'PyQt5', 'Qt', 'bin') for x in getsitepackages()]
-
-  # add vcruntime140.dll - PyInstaller excludes it by default because it thinks it comes from c:\Windows
-  binaries = [('vcruntime140.dll', 'C:\\Python39\\vcruntime140.dll', 'BINARY')]
-else:
-  pathex = []
-  binaries = []
+  pathex += [os.path.join(x, 'PyQt5', 'Qt', 'bin') for x in getsitepackages()]
 
 a = Analysis(['main.py'],
              pathex=pathex,
-             binaries=None,
+             binaries=[],
              datas=[],
              hiddenimports=[],
-             hookspath=[],
+             hookspath=["installer/pyinstaller-hooks"], # our custom hooks for python-sounddevice
              runtime_hooks=[],
              excludes=excludes,
              win_no_prefer_redirects=False,
@@ -123,7 +118,7 @@ exe = EXE(pyz,
           icon="resources/images/friture.ico")
 
 coll = COLLECT(exe,
-               a.binaries + binaries,
+               a.binaries,
                a.zipfiles,
                a.datas,
                strip=False,
