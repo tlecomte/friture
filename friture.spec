@@ -3,6 +3,7 @@
 import os
 import platform
 
+import friture  # for the version number
 from PyInstaller.utils.hooks import collect_data_files
 
 block_cipher = None
@@ -128,5 +129,6 @@ coll = COLLECT(exe,
 app = BUNDLE(coll,
          name='friture.app',
          icon='resources/images/friture.icns',
-         bundle_identifier=None,
+         bundle_identifier="org.silentgain.friture",
+         version=friture.__version__,
          info_plist={'NSMicrophoneUsageDescription': 'Friture reads from the audio inputs to show visualizations'})
