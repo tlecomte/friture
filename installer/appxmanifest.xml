@@ -23,7 +23,7 @@ https://docs.microsoft.com/en-us/windows/msix/package/create-app-package-with-ma
     xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities">
     <Identity
         Name="53504SilentGain.Friture"
-        Version="0.43.0.0"
+        Version="0.44.0.0"
         Publisher="CN=74EE87F8-B2A0-400A-A66A-377F7F4E3BBE"
         ProcessorArchitecture="x86" />
     <Properties>
