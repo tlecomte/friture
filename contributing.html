@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+    "https://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<html xmlns="https://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 
@@ -22,12 +22,12 @@
 
     <!--Bootstrap stuff-->
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!--<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">-->
+    <!--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">-->
     <!-- Bootstrap theme from https://bootswatch.com/darkly/ -->
     <link rel="stylesheet" href="css/bootstrap.min.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
 </head>
 
 <body>
@@ -49,7 +49,7 @@
         </div>
     </nav>
 
-    <a href="http://github.com/tlecomte/friture">
+    <a href="https://github.com/tlecomte/friture">
         <img style="position: absolute; top: 0; right: 0; border: 0;" src="images/forkme_right_darkblue_121621.png" alt="Fork me on GitHub" />
     </a>
 
@@ -75,27 +75,26 @@
         <p>Friture is free and open-source, licensed under the <a href="https://github.com/tlecomte/friture/blob/master/COPYING.txt">GPLv3+</a>.</p>
 
         <h2>Continous integration and deployment</h2>
-        <p>Friture Github repository is linked with the <a href="https://travis-ci.org/tlecomte/friture">Travis-CI</a> and <a href="https://ci.appveyor.com/project/tlecomte/friture">Appveyor</a> continuous integration services, which respectively package Friture for OS X and Windows. Packages are automatically pushed to <a href="https://github.com/tlecomte/friture/releases">GitHub releases</a> each time a tag is added on the repository.</p>
+        <p>Friture builds are automated with <a href="https://github.com/tlecomte/friture/actions">Github Actions</a>. Packages are automatically pushed to <a href="https://github.com/tlecomte/friture/releases">GitHub releases</a> each time a tag is added on the repository.</p>
 
         <h2>Links</h2>
-        <p>Friture is registered in the <a href="http://pypi.python.org/pypi?:action=display&name=friture">Python Package Index</a></p>
-        <p>Its codebase is analyzed by <a href="http://www.ohloh.net/p/friture">ohloh.net</a>.</p>
+        <p>Friture is registered in the <a href="https://pypi.org/project/friture/">Python Package Index</a></p>
 
         <h2>Design</h2>
-        <p>Friture is mostly written in the <a href="http://www.python.org">Python</a> programming language.
+        <p>Friture is mostly written in the <a href="https://www.python.org">Python</a> programming language.
         <p>Additionally, Friture uses the following libraries:</p>
         <ul>
-        <li><a href="http://www.portaudio.com/">PortAudio</a> for cross-platform audio capture
-        (using the <a href="http://people.csail.mit.edu/hubert/pyaudio/">Pyaudio</a> Python bindings),</li>
-        <li><a href="http://numpy.scipy.org/">Numpy</a> and <a href="http://www.scipy.org/">Scipy</a>
+        <li><a href="https://github.com/PortAudio/portaudio">PortAudio</a> for cross-platform audio capture
+        (using the <a href="https://github.com/spatialaudio/python-sounddevice/">sounddevice</a> Python bindings),</li>
+        <li><a href="https://numpy.org/">Numpy</a> and <a href="https://www.scipy.org/">Scipy</a>
         for digital processing on the audio data,</li>
-        <li><a href="http://www.qt.io/">Qt5</a> for the graphical user interface (using the <a href="http://www.riverbankcomputing.co.uk/">PyQt5</a> Python bindings),</li>
+        <li><a href="https://www.qt.io/">Qt5</a> for the graphical user interface (using the <a href="https://www.riverbankcomputing.co.uk/">PyQt5</a> Python bindings),</li>
         </ul>
         <p>Where performance is critical, some computing operations are specifically written in
-        <a href="http://cython.org">Cython</a>, a programming language that provides
+        <a href="https://cython.org">Cython</a>, a programming language that provides
         C-extensions for Python.</p>
 
-        <p>Most graphical operations (apart from simple widgets and general application design) are performed with <a href="http://www.opengl.org">OpenGL</a> (using the <a href="http://pyopengl.sourceforge.net">PyOpenGL</a> Python bindings).</p>
+        <p>Most graphical operations (apart from simple widgets and general application design) are performed with <a href="https://www.opengl.org">OpenGL</a> (using the <a href="http://pyopengl.sourceforge.net">PyOpenGL</a> Python bindings).</p>
 
         <p>Internally, Friture is designed around a 25-ms timer that periodically allows the various widgets to update their contents for a smooth visual result. Meanwhile, the PortAudio system invokes a callback that pushes the fresh audio data to a ringbuffer that can be accessed by the widgets.</p>
     </div>
