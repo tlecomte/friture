@@ -131,4 +131,7 @@ app = BUNDLE(coll,
          icon='resources/images/friture.icns',
          bundle_identifier="org.silentgain.friture",
          version=friture.__version__,
-         info_plist={'NSMicrophoneUsageDescription': 'Friture reads from the audio inputs to show visualizations'})
+         info_plist={
+            'NSMicrophoneUsageDescription': 'Friture reads from the audio inputs to show visualizations',
+            'CFBundleVersion': friture.__version__
+         })
