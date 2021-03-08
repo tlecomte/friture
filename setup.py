@@ -56,7 +56,7 @@ install_requires = [
     "PyOpenGL-accelerate==3.1.5",
     "docutils==0.16",
     "numpy==1.19.3",
-    "PyQt5==5.15.1",
+    "PyQt5==5.15.3",
     "appdirs==1.4.4",
     "pyrr==0.10.3",
 ]
