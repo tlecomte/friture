@@ -18,18 +18,11 @@
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
 import sys
-from PyQt5 import QtWidgets
-
-try:
-    from OpenGL import GL
-except ImportError:
-    app = QtWidgets.QApplication(sys.argv)
-    QtWidgets.QMessageBox.critical(None, "OpenGL hellogl",
-                                   "PyOpenGL must be installed to run this example.")
-    sys.exit(1)
-
-from OpenGL.GL import shaders
 from ctypes import c_float, c_uint, c_void_p, sizeof
+
+from PyQt5 import QtWidgets
+from OpenGL import GL
+from OpenGL.GL import shaders
 import numpy as np
 
 
