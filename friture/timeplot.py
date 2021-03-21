@@ -19,26 +19,18 @@
 
 import sys
 import logging
+from ctypes import sizeof, c_float, c_void_p, c_uint
 
 from PyQt5 import Qt, QtGui, QtWidgets
 import numpy as np
+from OpenGL import GL
+from OpenGL.GL import shaders
+
 from friture.plotting.scaleWidget import VerticalScaleWidget, HorizontalScaleWidget
 from friture.plotting.scaleDivision import ScaleDivision
 from friture.plotting.coordinateTransform import CoordinateTransform
 from friture.plotting.glCanvasWidget import GlCanvasWidget
 from friture.plotting.legendWidget import LegendWidget
-
-try:
-    from OpenGL import GL
-except ImportError:
-    app = QtWidgets.QApplication(sys.argv)
-    QtWidgets.QMessageBox.critical(None, "OpenGL hellogl",
-                                   "PyOpenGL must be installed to run this example.")
-    sys.exit(1)
-
-from OpenGL.GL import shaders
-from ctypes import sizeof, c_float, c_void_p, c_uint
-
 
 class CurveItem:
 

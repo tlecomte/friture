@@ -1,21 +1,12 @@
 import sys
 import logging
+from ctypes import sizeof, c_float, c_void_p, c_uint
 
 from PyQt5 import QtCore, QtGui, Qt, QtWidgets
 import numpy as np
 import pyrr
-
-try:
-    from OpenGL import GL
-except ImportError:
-    app = QtWidgets.QApplication(sys.argv)
-    QtWidgets.QMessageBox.critical(None, "OpenGL hellogl",
-                                   "PyOpenGL must be installed to run this example.")
-    sys.exit(1)
-
+from OpenGL import GL
 from OpenGL.arrays import vbo
-from ctypes import sizeof, c_float, c_void_p, c_uint
-
 
 def compileProgram(*shaders):
     """Copied from the PyOpenGL codebase, as suggested in the PyOpenGL doc.

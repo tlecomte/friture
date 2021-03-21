@@ -26,6 +26,7 @@ venv/*
 tools/*
 friture.egg-info
 .eggs/
+*.appx
 
 ##################
 # IDE files
