@@ -55,14 +55,14 @@ install_requires = [
     "PyOpenGL==3.1.5",
     "PyOpenGL-accelerate==3.1.5",
     "docutils==0.16",
-    "numpy==1.19.3",
+    "numpy==1.20.3",
     "PyQt5==5.15.3",
     "appdirs==1.4.4",
     "pyrr==0.10.3",
 ]
 
 # Cython and numpy are needed when running setup.py, to build extensions
-setup_requires=["numpy==1.19.3", "Cython==0.29.21"]
+setup_requires=["numpy==1.20.3", "Cython==0.29.21"]
 
 with open(join(dirname(__file__), 'README.rst')) as f:
     long_description = f.read()
