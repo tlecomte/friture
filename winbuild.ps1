@@ -85,7 +85,7 @@ Write-Host "==========================================="
 Write-Host "Installing pyinstaller"
 Write-Host "==========================================="
 
-& pip install -U pyinstaller==4.2
+& pip install -U pyinstaller==4.4
 
 Write-Host ""
 Write-Host "==========================================="
