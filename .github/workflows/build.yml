@@ -25,9 +25,19 @@ jobs:
       shell: powershell
       run: Write-Host $env:PATH
 
+    - name: Enable Visual Studio Developer Command Prompt
+      uses: ilammy/msvc-dev-cmd@v1
+
     - name: Build
       shell: powershell
       run: ./winbuild.ps1
+
+    - name: Upload friture appx
+      uses: actions/upload-artifact@v2
+      with:
+        name: friture-appx
+        path: dist/friture-*.appx
+        if-no-files-found: error
 
     - name: Upload friture msi
       uses: actions/upload-artifact@v2

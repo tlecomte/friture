@@ -31,7 +31,7 @@ https://docs.microsoft.com/en-us/windows/msix/package/create-app-package-with-ma
         <PublisherDisplayName>Silent Gain</PublisherDisplayName>
         <Description>Friture is an application to visualize and analyze live audio data in real-time.</Description>
         <!-- TODO: proper png assets with scales -->
-        <Logo>resources\images\friture.iconset\icon_512x512.png</Logo>
+        <Logo>icon_512x512.png</Logo>
     </Properties>
     <Resources>
         <Resource Language="en-us" />
@@ -46,8 +46,8 @@ https://docs.microsoft.com/en-us/windows/msix/package/create-app-package-with-ma
         <Application Id="Friture" Executable="friture.exe" EntryPoint="Windows.FullTrustApplication">
             <uap:VisualElements DisplayName="Friture"
                                 Description="Friture is an application to visualize and analyze live audio data in real-time."
-                                Square150x150Logo="resources\images\friture.iconset\icon_512x512.png"
-                                Square44x44Logo="resources\images\friture.iconset\icon_512x512.png"
+                                Square150x150Logo="icon_512x512.png"
+                                Square44x44Logo="icon_512x512.png"
                                 BackgroundColor="transparent" />
         </Application>
     </Applications>

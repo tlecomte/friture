@@ -142,3 +142,21 @@ Write-Host "==========================================="
 #    msiexec /i dist\friture-0.38.msi /l*v MyLogFile.txt
 # for uninstall:
 #    msiexec /x dist\friture-0.38.msi
+
+Write-Host ""
+Write-Host "==========================================="
+Write-Host "Build appx package"
+Write-Host "==========================================="
+
+Copy-Item -Path .\dist\friture -Destination .\dist\friture-appx -Recurse
+Copy-Item -Path resources\images\friture.iconset\icon_512x512.png -Destination .\dist\friture-appx\icon_512x512.png
+
+# apply version to appxmanifest.xml and save it to the dist folder
+$xml = [xml](Get-Content .\installer\appxmanifest.xml)
+$ns = New-Object System.Xml.XmlNamespaceManager($xml.NameTable)
+$ns.AddNamespace("ns", $xml.DocumentElement.NamespaceURI)
+$package = $xml.SelectSingleNode("//ns:Package", $ns)
+$package.Identity.Version = "$version.0.0"
+$xml.Save(".\dist\friture-appx\appxmanifest.xml")
+
+MakeAppx pack /v /d .\dist\friture-appx /p ".\dist\friture-$version.appx"
