@@ -5,8 +5,10 @@ app: friture
 
 ingredients:
   dist: xenial
-  sources: []
-  packages: []
+  sources:
+    - deb http://us.archive.ubuntu.com/ubuntu/ xenial main universe
+  packages:
+    - libportaudio2
 
 script:
   - echo $PWD

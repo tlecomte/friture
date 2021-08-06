@@ -3,6 +3,7 @@
 import os
 import platform
 
+import friture  # for the version number
 from PyInstaller.utils.hooks import collect_data_files
 
 block_cipher = None
@@ -84,38 +85,18 @@ excluded_binaries = [
         'QtWebKitWidgets.framework',
         'QtWebSockets.framework']
 
-
-# the manual bundling of libportaudio can be removed once the following PyInstaller MR is released:
-# https://github.com/pyinstaller/pyinstaller/pull/4498
-# (pyinstaller>3.5)
-if platform.system() == "Windows" or platform.system() == "Darwin":
-  sounddevice_data = collect_data_files("sounddevice", subdir="_sounddevice_data")
-  libportaudio = [(f[0], os.path.join("_sounddevice_data", "portaudio-binaries")) for f in sounddevice_data if "libportaudio" in f[0]]
-
-  print(libportaudio)
-  if len(libportaudio) != 1:
-    raise ValueError('libportaudio could not be found')
-else:
-  libportaudio = []
-
-
+pathex = []
 if platform.system() == "Windows":
   # workaround for PyInstaller that does not look where the new PyQt5 official wheels put the Qt dlls
   from PyInstaller.compat import getsitepackages
-  pathex = [os.path.join(x, 'PyQt5', 'Qt', 'bin') for x in getsitepackages()]
-
-  # add vcruntime140.dll - PyInstaller excludes it by default because it thinks it comes from c:\Windows
-  binaries = [('vcruntime140.dll', 'C:\\Python36\\vcruntime140.dll', 'BINARY')]
-else:
-  pathex = []
-  binaries = []
+  pathex += [os.path.join(x, 'PyQt5', 'Qt', 'bin') for x in getsitepackages()]
 
 a = Analysis(['main.py'],
              pathex=pathex,
-             binaries=None,
-             datas=libportaudio,
+             binaries=[],
+             datas=[],
              hiddenimports=[],
-             hookspath=[],
+             hookspath=["installer/pyinstaller-hooks"], # our custom hooks for python-sounddevice
              runtime_hooks=[],
              excludes=excludes,
              win_no_prefer_redirects=False,
@@ -138,7 +119,7 @@ exe = EXE(pyz,
           icon="resources/images/friture.ico")
 
 coll = COLLECT(exe,
-               a.binaries + binaries,
+               a.binaries,
                a.zipfiles,
                a.datas,
                strip=False,
@@ -148,4 +129,9 @@ coll = COLLECT(exe,
 app = BUNDLE(coll,
          name='friture.app',
          icon='resources/images/friture.icns',
-         bundle_identifier=None)
+         bundle_identifier="org.silentgain.friture",
+         version=friture.__version__,
+         info_plist={
+            'NSMicrophoneUsageDescription': 'Friture reads from the audio inputs to show visualizations',
+            'CFBundleVersion': friture.__version__
+         })

@@ -23,7 +23,8 @@ import math
 from PyQt5 import QtCore
 import sounddevice
 import rtmixer
-from numpy import ndarray, vstack, int16, float64, float32, frombuffer, concatenate
+from numpy import ndarray, vstack, int8, int16, float64, float32, frombuffer, concatenate
+import numpy as np
 
 # the sample rate below should be dynamic, taken from PyAudio/PortAudio
 SAMPLING_RATE = 48000
@@ -81,6 +82,8 @@ class __AudioBackend(QtCore.QObject):
         # look for devices
         self.input_devices = self.get_input_devices()
         self.output_devices = self.get_output_devices()
+
+        self.logger.info(f"Found {len(self.input_devices)} input devices and {len(self.output_devices)} output devices")
 
         self.device = None
         self.first_channel = None
@@ -313,6 +316,8 @@ class __AudioBackend(QtCore.QObject):
 
     # method
     def open_stream(self, device):
+        self.log_supported_input_formats(device)
+
         self.logger.info("Opening the stream for device '%s'", device['name'])
 
         # by default we open the device stream with all the channels
@@ -343,6 +348,26 @@ class __AudioBackend(QtCore.QObject):
         self.logger.info("Device claims %d ms latency", lat_ms)
 
         return (stream, ringBuffer, action, nchannels_max)
+
+    def log_supported_input_formats(self, device):
+        samplerates = [22050, 44100, 48000, 96000]
+        dtypes = [float32, int16, int8]
+        supported_formats = []
+        for samplerate in samplerates:
+            for dtype in dtypes:
+                try:
+                    sounddevice.check_input_settings(
+                        device=device['index'],
+                        channels=device['max_input_channels'],
+                        dtype=dtype,
+                        extra_settings=None,
+                        samplerate=samplerate)
+                    supported_formats += [f"{samplerate} Hz, {np.dtype(dtype).name}"]
+                except Exception:
+                    pass # check_input_settings throws when the format is not supported
+
+        api = sounddevice.query_hostapis(device['hostapi'])['name']
+        self.logger.info(f"Supported formats for '{device['name']}' on '{api}': {supported_formats}")
 
     # method
     def open_output_stream(self, device, callback):

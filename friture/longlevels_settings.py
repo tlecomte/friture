@@ -20,11 +20,11 @@
 from PyQt5 import QtWidgets
 from friture.audiobackend import SAMPLING_RATE
 
-#DEFAULT_MAXTIME = 20000
+DEFAULT_MAXTIME = 600
 #DEFAULT_MINTIME = 20
 DEFAULT_LEVEL_MIN = -70
 DEFAULT_LEVEL_MAX = -20
-#DEFAULT_RESPONSE_TIME = 0.025
+DEFAULT_RESPONSE_TIME = 20
 #DEFAULT_RESPONSE_TIME_INDEX = 0
 
 
@@ -53,18 +53,41 @@ class LongLevels_Settings_Dialog(QtWidgets.QDialog):
         self.spinBox_specmax.setObjectName("longlevels_specmax")
         self.spinBox_specmax.setSuffix(" dB")
 
+        self.spinBox_resptime = QtWidgets.QSpinBox(self)
+        self.spinBox_resptime.setKeyboardTracking(False)
+        self.spinBox_resptime.setMinimum(1)
+        self.spinBox_resptime.setMaximum(20)
+        self.spinBox_resptime.setProperty("value", DEFAULT_RESPONSE_TIME)
+        self.spinBox_resptime.setObjectName("longlevels_resptime")
+        self.spinBox_resptime.setSuffix(" sec")
+
+        self.spinBox_timemax = QtWidgets.QSpinBox(self)
+        self.spinBox_timemax.setKeyboardTracking(False)
+        self.spinBox_timemax.setMinimum(5)
+        self.spinBox_timemax.setMaximum(3600)
+        self.spinBox_timemax.setProperty("value", DEFAULT_MAXTIME)
+        self.spinBox_timemax.setObjectName("longlevels_timemax")
+        self.spinBox_timemax.setSuffix(" sec")
+
+
         self.formLayout.addRow("Max:", self.spinBox_specmax)
         self.formLayout.addRow("Min:", self.spinBox_specmin)
+        self.formLayout.addRow("Response Time", self.spinBox_resptime)
+        self.formLayout.addRow("Time Range:", self.spinBox_timemax)
 
         self.setLayout(self.formLayout)
 
         self.spinBox_specmin.valueChanged.connect(self.parent().setmin)
         self.spinBox_specmax.valueChanged.connect(self.parent().setmax)
+        self.spinBox_resptime.valueChanged.connect(self.parent().setresptime)
+        self.spinBox_timemax.valueChanged.connect(self.parent().setduration)
 
     # method
     def saveState(self, settings):
         settings.setValue("Min", self.spinBox_specmin.value())
         settings.setValue("Max", self.spinBox_specmax.value())
+        settings.setValue("RespTime", self.spinBox_resptime.value())
+        settings.setValue("TimeMax", self.spinBox_timemax.value())
 
     # method
     def restoreState(self, settings):
@@ -72,3 +95,7 @@ class LongLevels_Settings_Dialog(QtWidgets.QDialog):
         self.spinBox_specmin.setValue(colorMin)
         colorMax = settings.value("Max", DEFAULT_LEVEL_MAX, type=int)
         self.spinBox_specmax.setValue(colorMax)
+        resptime = settings.value("RespTime", DEFAULT_RESPONSE_TIME, type=int)
+        self.spinBox_resptime.setValue(resptime)
+        timemax = settings.value("TimeMax", DEFAULT_MAXTIME, type=int)
+        self.spinBox_timemax.setValue(timemax)

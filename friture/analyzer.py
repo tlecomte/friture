@@ -197,7 +197,9 @@ class Friture(QMainWindow, ):
 
         # 2. remove any level widget
         if settings.contains("Docks/dockNames"):
-            docknames = settings.value("Docks/dockNames")
+            docknames = settings.value("Docks/dockNames", [])
+            if docknames == None:
+            	docknames = []
             newDockNames = []
             for dockname in docknames:
                 widgetType = settings.value("Docks/" + dockname + "/type", 0, type=int)

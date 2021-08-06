@@ -26,6 +26,7 @@ venv/*
 tools/*
 friture.egg-info
 .eggs/
+*.appx
 
 ##################
 # IDE files
@@ -37,3 +38,5 @@ friture.egg-info
 Notepad++
 .idea
 .vscode
+
+.mypy_cache

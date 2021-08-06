@@ -28,14 +28,7 @@ import sys
 import math
 
 from PyQt4 import QtCore, QtGui, QtOpenGL
-
-try:
-    from OpenGL import GL
-except ImportError:
-    app = QtGui.QApplication(sys.argv)
-    QtGui.QMessageBox.critical(None, "OpenGL 2dpainting",
-            "PyOpenGL must be installed to run this example.")
-    sys.exit(1)
+from OpenGL import GL
 
 class GLWidget(QtOpenGL.QGLWidget):
     def __init__(self, parent):
