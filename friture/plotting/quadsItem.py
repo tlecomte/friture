@@ -25,6 +25,7 @@ from OpenGL import GL
 from OpenGL.GL import shaders
 import numpy as np
 
+import friture.plotting.frequency_scales as fscales
 
 class QuadsItem:
 
@@ -138,7 +139,7 @@ class QuadsItem:
             self.transformed_x1 = xMap.toScreen(self.x1)
             self.transformed_x2 = xMap.toScreen(self.x2)
 
-            if xMap.type != 0:
+            if xMap.scale != fscales.Linear:
                 self.transformed_x1, self.transformed_x2, n = pre_tree_rebin(self.transformed_x1, self.transformed_x2)
                 self.n = [0] + n
                 self.N = 0
@@ -151,7 +152,7 @@ class QuadsItem:
         x1 = self.transformed_x1
         x2 = self.transformed_x2
 
-        if xMap.type != 0:
+        if xMap.scale != fscales.Linear:
             y = tree_rebin(self.y, self.n, self.N)
             y_int = tree_rebin(self.y_int, self.n, self.N)
         else:

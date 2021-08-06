@@ -21,20 +21,14 @@
 import logging
 
 import numpy as np
-
-def hz2mel(f):
-    return 2595 * np.log10(1 + f / 700)
-
-def mel2hz(m):
-    return 700 * (10 ** (m / 2595) - 1)
+import friture.plotting.frequency_scales as fscales
 
 class Frequency_Resampler:
 
-    def __init__(self, logfreqscale=0, minfreq=20., maxfreq=20000., nsamples=1):
+    def __init__(self, scale=fscales.Linear, minfreq=20., maxfreq=20000., nsamples=1):
         self.logger = logging.getLogger(__name__)
 
-        self.logfreqscale = logfreqscale  # 0: linear
-        self.melfreqscale = True  # 0: linear
+        self.scale = scale 
         self.minfreq = minfreq
         self.maxfreq = maxfreq
         self.nsamples = nsamples
@@ -47,32 +41,18 @@ class Frequency_Resampler:
         self.update_xscale()
 
     def update_xscale(self):
-        if self.melfreqscale:
-            self.xscaled = mel2hz(np.linspace(hz2mel(self.minfreq), hz2mel(self.maxfreq), self.nsamples))
-        else:
-            if self.logfreqscale == 2:
-                self.xscaled = np.logspace(np.log2(self.minfreq), np.log2(self.maxfreq), self.nsamples, base=2.0)
-            elif self.logfreqscale == 1:
-                self.xscaled = np.logspace(np.log10(self.minfreq), np.log10(self.maxfreq), self.nsamples)
-            else:
-                self.xscaled = np.linspace(self.minfreq, self.maxfreq, self.nsamples)
-
+        self.xscaled = self.scale.inverse(np.linspace(self.scale.transform(self.minfreq), self.scale.transform(self.maxfreq), self.nsamples))
+        
     def setnsamples(self, nsamples):
         if self.nsamples != nsamples:
             self.nsamples = nsamples
             self.update_xscale()
             self.logger.info("nsamples changed, now: %d", nsamples)
 
-    def setlogfreqscale(self, logfreqscale):
-        if logfreqscale != self.logfreqscale:
-            self.logger.info("freq scale changed to %f", logfreqscale)
-            self.logfreqscale = logfreqscale
-            self.update_xscale()
-
-    def setmelfreqscale(self, melfreqscale):
-        if melfreqscale != self.melfreqscale:
-            self.logger.info("freq scale changed to mel (%s)", "true" if melfreqscale else "false")
-            self.melfreqscale = melfreqscale
+    def setfreqscale(self, scale):
+        if scale != self.scale:
+            self.logger.info("freq scale changed to %s", scale.NAME)
+            self.scale = scale
             self.update_xscale()
 
     def process(self, freq, data):

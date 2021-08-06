@@ -21,6 +21,7 @@ import logging
 
 from PyQt5 import QtWidgets
 from friture.audiobackend import SAMPLING_RATE
+import friture.plotting.frequency_scales as fscales
 
 # shared with spectrogram.py
 DEFAULT_FFT_SIZE = 7  # 4096 points
@@ -68,9 +69,8 @@ class Spectrogram_Settings_Dialog(QtWidgets.QDialog):
 
         self.comboBox_freqscale = QtWidgets.QComboBox(self)
         self.comboBox_freqscale.setObjectName("comboBox_freqscale")
-        self.comboBox_freqscale.addItem("Linear")
-        self.comboBox_freqscale.addItem("Logarithmic")
-        self.comboBox_freqscale.addItem("Mel")
+        for scale in fscales.ALL:
+            self.comboBox_freqscale.addItem(scale.NAME)
         self.comboBox_freqscale.setCurrentIndex(DEFAULT_FREQ_SCALE)
 
         self.spinBox_minfreq = QtWidgets.QSpinBox(self)
@@ -141,14 +141,9 @@ class Spectrogram_Settings_Dialog(QtWidgets.QDialog):
 
     # slot
     def freqscalechanged(self, index):
-        self.logger.info("freq_scale slot %d", index)
-        if index == 1:
-            self.parent().PlotZoneImage.setlog10freqscale()
-        elif index == 2:
-            self.parent().PlotZoneImage.setmelfreqscale()
-        else:
-            self.parent().PlotZoneImage.setlinfreqscale()
-
+        self.logger.info("freq_scale slot %d %s", index, fscales.ALL[index])
+        self.parent().PlotZoneImage.setfreqscale(fscales.ALL[index])
+        
     # method
     def saveState(self, settings):
         settings.setValue("timeRange", self.doubleSpinBox_timerange.value())
