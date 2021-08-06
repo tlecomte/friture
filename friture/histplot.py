@@ -24,6 +24,7 @@ from friture.plotting.scaleWidget import VerticalScaleWidget, HorizontalScaleWid
 from friture.plotting.scaleDivision import ScaleDivision
 from friture.plotting.coordinateTransform import CoordinateTransform
 from friture.plotting.canvasWidget import CanvasWidget
+import friture.plotting.frequency_scales as fscales
 
 # The peak decay rates (magic goes here :).
 PEAK_DECAY_RATE = 1.0 - 3E-6
@@ -319,8 +320,8 @@ class HistPlot(QtWidgets.QWidget):
 
         self.needfullreplot = False
 
-        self.horizontalScaleTransform.setLogarithmic()
-        self.horizontalScaleDivision.setLogarithmic()
+        self.horizontalScaleTransform.setScale(fscales.Logarithmic)
+        self.horizontalScaleDivision.setScale(fscales.Logarithmic)
 
         # insert an additional plot item for the peak bar
         self.bar_peak = HistogramPeakBarItem()

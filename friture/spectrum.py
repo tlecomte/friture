@@ -30,6 +30,7 @@ from friture.spectrum_settings import (Spectrum_Settings_Dialog,  # settings dia
                                        DEFAULT_WEIGHTING,
                                        DEFAULT_RESPONSE_TIME,
                                        DEFAULT_SHOW_FREQ_LABELS)
+import friture.plotting.frequency_scales as fscales
 
 from friture.audiobackend import SAMPLING_RATE
 from friture.spectrumPlotWidget import SpectrumPlotWidget
@@ -75,7 +76,7 @@ class Spectrum_Widget(QtWidgets.QWidget):
         # set kernel and parameters for the smoothing filter
         self.setresponsetime(self.response_time)
 
-        self.PlotZoneSpect.setlogfreqscale()  # DEFAULT_FREQ_SCALE = 1 #log10
+        self.PlotZoneSpect.setfreqscale(fscales.Logarithmic)
         self.PlotZoneSpect.setfreqrange(self.minfreq, self.maxfreq)
         self.PlotZoneSpect.setspecrange(self.spec_min, self.spec_max)
         self.PlotZoneSpect.setweighting(self.weighting)

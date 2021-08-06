@@ -32,6 +32,7 @@ from friture.spectrogram_settings import (Spectrogram_Settings_Dialog,  # settin
                                           DEFAULT_SPEC_MAX,
                                           DEFAULT_TIMERANGE,
                                           DEFAULT_WEIGHTING)
+import friture.plotting.frequency_scales as fscales
 
 from friture.audiobackend import SAMPLING_RATE, FRAMES_PER_BUFFER, AudioBackend
 from fractions import Fraction
@@ -74,7 +75,7 @@ class Spectrogram_Widget(QtWidgets.QWidget):
         self.overlap_frac = Fraction(3, 4)
         self.dT_s = self.fft_size * (1. - self.overlap) / float(SAMPLING_RATE)
 
-        self.PlotZoneImage.setmelfreqscale()  # DEFAULT_FREQ_SCALE = 2 # Mel
+        self.PlotZoneImage.setfreqscale(fscales.Mel)
         self.PlotZoneImage.setfreqrange(self.minfreq, self.maxfreq)
         self.PlotZoneImage.setspecrange(self.spec_min, self.spec_max)
         self.PlotZoneImage.setweighting(self.weighting)
