@@ -42,6 +42,8 @@ from friture.audiobuffer import AudioBuffer  # audio ring buffer class
 from friture.audiobackend import AudioBackend  # audio backend class
 from friture.dockmanager import DockManager
 from friture.tilelayout import TileLayout
+from friture.level_view_model import LevelViewModel
+from friture.level_data import LevelData
 from friture.levels import Levels_Widget
 from friture.store import GetStore, Store
 from friture.scope_data import Scope_Data
@@ -78,6 +80,8 @@ class Friture(QMainWindow, ):
         qmlRegisterType(ScaleDivision, 'Friture', 1, 0, 'ScaleDivision')
         qmlRegisterType(CoordinateTransform, 'Friture', 1, 0, 'CoordinateTransform')
         qmlRegisterType(Scope_Data, 'Friture', 1, 0, 'ScopeData')
+        qmlRegisterType(LevelData, 'Friture', 1, 0, 'LevelData')
+        qmlRegisterType(LevelViewModel, 'Friture', 1, 0, 'LevelViewModel')
         qmlRegisterType(Curve, 'Friture', 1, 0, 'Curve')
         qmlRegisterSingletonType(Store, 'Friture', 1, 0, 'Store', lambda engine, script_engine: GetStore())
 
@@ -103,7 +107,7 @@ class Friture(QMainWindow, ):
         self.about_dialog = About_Dialog(self, self.slow_timer)
         self.settings_dialog = Settings_Dialog(self)
 
-        self.level_widget = Levels_Widget(self)
+        self.level_widget = Levels_Widget(self, self.qml_engine)
         self.level_widget.set_buffer(self.audiobuffer)
         self.audiobuffer.new_data_available.connect(self.level_widget.handle_new_data)
 

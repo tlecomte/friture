@@ -35,7 +35,7 @@ DEFAULT_TIMERANGE = 2 * SMOOTH_DISPLAY_TIMER_PERIOD_MS
 
 class Scope_Widget(QtWidgets.QWidget):
 
-    def __init__(self, parent):
+    def __init__(self, parent, engine):
         super().__init__(parent)
 
         self.audiobuffer = None
@@ -54,7 +54,6 @@ class Scope_Widget(QtWidgets.QWidget):
 
         CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
         filename = os.path.join(CURRENT_DIR, "Scope.qml")
-        engine = self.parent().parent().qml_engine
 
         self.quickWindow = QQuickWindow()
         component = QQmlComponent(engine, QtCore.QUrl.fromLocalFile(filename))

@@ -47,7 +47,7 @@ class DockManager(QtCore.QObject):
         else:
             index = max(dockindexes) + 1
         name = "Dock %d" % index
-        new_dock = Dock(self.parent(), name)
+        new_dock = Dock(self.parent(), name, self.parent().qml_engine)
         #self.parent().addDockWidget(QtCore.Qt.TopDockWidgetArea, new_dock)
         self.parent().centralLayout.addWidget(new_dock)
 
@@ -74,14 +74,14 @@ class DockManager(QtCore.QObject):
             for name in docknames:
                 settings.beginGroup(name)
                 widgetId = settings.value("type", 0, type=int)
-                dock = Dock(self.parent(), name, widgetId)
+                dock = Dock(self.parent(), name, self.parent().qml_engine, widgetId)
                 dock.restoreState(settings)
                 settings.endGroup()
                 self.parent().centralLayout.addWidget(dock)
                 self.docks.append(dock)
         else:
             self.logger.info("First launch, display a default set of docks")
-            self.docks = [Dock(self.parent(), "Dock %d" % (i), widgetId=widget_type) for i, widget_type in enumerate(DEFAULT_DOCKS)]
+            self.docks = [Dock(self.parent(), "Dock %d" % (i), self.parent().qml_engine, widgetId=widget_type) for i, widget_type in enumerate(DEFAULT_DOCKS)]
             for dock in self.docks:
                 #self.parent().addDockWidget(QtCore.Qt.TopDockWidgetArea, dock)
                 self.parent().centralLayout.addWidget(dock)
