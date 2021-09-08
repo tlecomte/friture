@@ -46,7 +46,12 @@ class Dock(QtWidgets.QWidget):
 
         # self.setWidget(self.dockwidget)
 
+        self.widgetId = None
         self.audiowidget = None
+
+        if widgetId is None:
+            widgetId = widgetIds()[0]
+
         self.widget_select(widgetId)
 
     # note that by default the closeEvent is accepted, no need to do it explicitely
@@ -65,6 +70,9 @@ class Dock(QtWidgets.QWidget):
 
     # slot
     def widget_select(self, widgetId):
+        if self.widgetId == widgetId:
+            return
+
         if self.audiowidget is not None:
             self.audiowidget.close()
             self.audiowidget.deleteLater()
@@ -105,6 +113,4 @@ class Dock(QtWidgets.QWidget):
 
     # method
     def restoreState(self, settings):
-        widgetId = settings.value("type", 0, type=int)
-        self.widget_select(widgetId)
         self.audiowidget.restoreState(settings)

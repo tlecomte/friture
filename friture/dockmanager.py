@@ -70,12 +70,15 @@ class DockManager(QtCore.QObject):
         if settings.contains("dockNames"):
             docknames = settings.value("dockNames", [])
             # list of docks
-            self.docks = [Dock(self.parent(), name) for name in docknames]
-            for dock in self.docks:
-                self.parent().centralLayout.addWidget(dock)
-                settings.beginGroup(dock.objectName())
+            self.docks = []
+            for name in docknames:
+                settings.beginGroup(name)
+                widgetId = settings.value("type", 0, type=int)
+                dock = Dock(self.parent(), name, widgetId)
                 dock.restoreState(settings)
                 settings.endGroup()
+                self.parent().centralLayout.addWidget(dock)
+                self.docks.append(dock)
         else:
             self.logger.info("First launch, display a default set of docks")
             self.docks = [Dock(self.parent(), "Dock %d" % (i), widgetId=widget_type) for i, widget_type in enumerate(DEFAULT_DOCKS)]
