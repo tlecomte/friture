@@ -11,9 +11,20 @@ Rectangle {
     property var stateId
     property LevelViewModel level_view_model: Store.dock_states[stateId]  
 
-    width: peakValues.width
     anchors.top: parent.top
     anchors.bottom: parent.bottom
+
+    // make width dependent on the text labels
+    // but do not bind directly to their widths
+    // to avoid frequent costly resizes
+    //due to level changes or variations in the width of the font characters
+    width: 2 + fontMetrics.boundingRect(level_view_model.two_channels ? "2: -88.8" : "-88:8").width
+
+    FontMetrics {
+        id: fontMetrics
+        font.pointSize: 14
+        font.bold: true
+    }
 
     ColumnLayout {
         id: levelColumnLayout
@@ -22,8 +33,6 @@ Rectangle {
         anchors.top: parent.top
         anchors.bottom: parent.bottom
 
-        width: levelLayout.width
-
         Text {
             id: peakValues
             text: level_view_model.two_channels ? "1: " + level_to_text(level_view_model.level_data_slow.level_max) + "\n2: " + level_to_text(level_view_model.level_data_slow_2.level_max) : level_to_text(level_view_model.level_data_slow.level_max)
@@ -31,9 +40,7 @@ Rectangle {
             font.bold: true
             verticalAlignment: Text.AlignBottom
             horizontalAlignment: Text.AlignRight
-            Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
-            Layout.bottomMargin: 6
-            height: contentHeight
+            Layout.alignment: Qt.AlignBottom | Qt.AlignRight
         }
 
         Text {
@@ -42,7 +49,6 @@ Rectangle {
             verticalAlignment: Text.AlignTop
             horizontalAlignment: Text.AlignRight
             Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
-            height: contentHeight
         }
 
         Text {
@@ -53,7 +59,6 @@ Rectangle {
             verticalAlignment: Text.AlignBottom
             horizontalAlignment: Text.AlignRight
             Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
-            height: contentHeight
         }
 
         Text {
@@ -62,7 +67,6 @@ Rectangle {
             verticalAlignment: Text.AlignTop
             horizontalAlignment: Text.AlignRight
             Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
-            height: contentHeight
         }
 
         LevelsMeter {
