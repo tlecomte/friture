@@ -17,14 +17,21 @@
 # You should have received a copy of the GNU General Public License
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt5 import QtWidgets
+import os
+
+from PyQt5.QtQuick import QQuickWindow
+from PyQt5 import QtCore, QtWidgets
+from PyQt5.QtQml import QQmlComponent
+
 from numpy import log10, where, sign, arange, zeros
-from friture.timeplot import TimePlot
+
+from friture.store import GetStore
+from friture.plotting.numpy_interop import arrays_to_qpolygon
 from friture.audiobackend import SAMPLING_RATE
+from friture.scope_data import Scope_Data
 
 SMOOTH_DISPLAY_TIMER_PERIOD_MS = 25
 DEFAULT_TIMERANGE = 2 * SMOOTH_DISPLAY_TIMER_PERIOD_MS
-
 
 class Scope_Widget(QtWidgets.QWidget):
 
@@ -33,16 +40,37 @@ class Scope_Widget(QtWidgets.QWidget):
 
         self.audiobuffer = None
 
+        store = GetStore()
+        self._scope_data = Scope_Data(store)
+        store._dock_states.append(self._scope_data)
+        state_id = len(store._dock_states) - 1
+
+        self._scope_data.curve.name = "Ch1"
+        self._scope_data.curve_2.name = "Ch2"
+
         self.setObjectName("Scope_Widget")
         self.gridLayout = QtWidgets.QGridLayout(self)
         self.gridLayout.setObjectName("gridLayout")
-        self.PlotZoneUp = TimePlot(self)
-        self.PlotZoneUp.setObjectName("PlotZoneUp")
-        self.gridLayout.addWidget(self.PlotZoneUp, 0, 0, 1, 1)
+
+        CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
+        filename = os.path.join(CURRENT_DIR, "Scope.qml")
+        engine = self.parent().parent().qml_engine
+
+        self.quickWindow = QQuickWindow()
+        component = QQmlComponent(engine, QtCore.QUrl.fromLocalFile(filename))
+        engineContext = engine.rootContext()
+        initialProperties = {"parent": self.quickWindow.contentItem(), "stateId": state_id }
+        qmlObject = component.createWithInitialProperties(initialProperties, engineContext)
+        qmlObject.setParent(self.quickWindow)
+
+        self.quickWidget = QtWidgets.QWidget.createWindowContainer(self.quickWindow, self)
+        self.quickWidget.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+
+        self.gridLayout.addWidget(self.quickWidget, 0, 0, 1, 1)
 
         self.settings_dialog = Scope_Settings_Dialog(self)
 
-        self.timerange = DEFAULT_TIMERANGE
+        self.set_timerange(DEFAULT_TIMERANGE)
 
         self.time = zeros(10)
         self.y = zeros(10)
@@ -61,6 +89,8 @@ class Scope_Widget(QtWidgets.QWidget):
         twoChannels = False
         if floatdata.shape[0] > 1:
             twoChannels = True
+
+        self._scope_data.two_channels = twoChannels
 
         # trigger on the first channel only
         triggerdata = floatdata[0, :]
@@ -100,24 +130,29 @@ class Scope_Widget(QtWidgets.QWidget):
 
         self.time = (arange(len(self.y)) - datarange // 2) / float(SAMPLING_RATE)
 
+        scaled_t = (self.time * 1e3 + self.timerange/2.) / self.timerange
+        scaled_y = 1. - (self.y + 1) / 2.
+        self._scope_data.curve.data_polygon = arrays_to_qpolygon(scaled_t, scaled_y)
+
         if self.y2 is not None:
-            self.PlotZoneUp.setdataTwoChannels(self.time*1e3, self.y, self.y2)
-        else:
-            self.PlotZoneUp.setdata(self.time*1e3, self.y)
+            scaled_y2 = 1. - (self.y2 + 1) / 2.
+            self._scope_data.curve_2.data_polygon = arrays_to_qpolygon(scaled_t, scaled_y2)
 
     # method
     def canvasUpdate(self):
         return
 
     def pause(self):
-        self.PlotZoneUp.pause()
+        return
 
     def restart(self):
-        self.PlotZoneUp.restart()
+        return
 
     # slot
     def set_timerange(self, timerange):
         self.timerange = timerange
+        self._scope_data.horizontal_coordinate_transform.setRange(-self.timerange/2., self.timerange/2.)
+        self._scope_data.horizontal_scale_division.setRange(-self.timerange/2., self.timerange/2.)
 
     # slot
     def settings_called(self, checked):

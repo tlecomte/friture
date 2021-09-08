@@ -29,6 +29,7 @@ from PyQt5 import QtCore
 # specifically import from PyQt5.QtGui and QWidgets for startup time improvement :
 from PyQt5.QtWidgets import QMainWindow, QHBoxLayout, QApplication, QSplashScreen
 from PyQt5.QtGui import QPixmap, QSurfaceFormat
+from PyQt5.QtQml import QQmlApplicationEngine, qmlRegisterSingletonType, qmlRegisterType
 import appdirs
 
 # importing friture.exceptionhandler also installs a temporary exception hook
@@ -42,6 +43,11 @@ from friture.audiobackend import AudioBackend  # audio backend class
 from friture.dockmanager import DockManager
 from friture.tilelayout import TileLayout
 from friture.levels import Levels_Widget
+from friture.store import GetStore, Store
+from friture.scope_data import Scope_Data
+from friture.curve import Curve
+from friture.plotting.coordinateTransform import CoordinateTransform
+from friture.plotting.scaleDivision import ScaleDivision
 
 # the display timer could be made faster when the processing
 # power allows it, firing down to every 10 ms
@@ -63,6 +69,17 @@ class Friture(QMainWindow, ):
         # exception hook that logs to console, file, and display a message box
         self.errorDialogOpened = False
         sys.excepthook = self.excepthook
+
+        #engine = QQmlEngine()
+        self.qml_engine = QQmlApplicationEngine()
+
+        # Register the ScaleDivision type.  Its URI is 'ScaleDivision', it's v1.0 and the type
+        # will be called 'Person' in QML.
+        qmlRegisterType(ScaleDivision, 'Friture', 1, 0, 'ScaleDivision')
+        qmlRegisterType(CoordinateTransform, 'Friture', 1, 0, 'CoordinateTransform')
+        qmlRegisterType(Scope_Data, 'Friture', 1, 0, 'ScopeData')
+        qmlRegisterType(Curve, 'Friture', 1, 0, 'Curve')
+        qmlRegisterSingletonType(Store, 'Friture', 1, 0, 'Store', lambda engine, script_engine: GetStore())
 
         # Setup the user interface
         self.ui = Ui_MainWindow()

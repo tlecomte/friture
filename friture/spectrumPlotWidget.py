@@ -35,13 +35,13 @@ class SpectrumPlotWidget(QtWidgets.QWidget):
         self.peak_int = zeros((3,))
         self.peak_decay = ones((3,)) * PEAK_DECAY_RATE
 
-        self.verticalScaleDivision = ScaleDivision(0, 1, 100)
+        self.verticalScaleDivision = ScaleDivision(0, 1)
         self.verticalScaleTransform = CoordinateTransform(0, 1, 100, 0, 0)
 
         self.verticalScale = VerticalScaleWidget(self, self.verticalScaleDivision, self.verticalScaleTransform)
         self.verticalScale.setTitle("PSD (dB)")
 
-        self.horizontalScaleDivision = ScaleDivision(0, 22000, 100)
+        self.horizontalScaleDivision = ScaleDivision(0, 22000)
         self.horizontalScaleTransform = CoordinateTransform(0, 22000, 100, 0, 0)
 
         self.horizontalScale = HorizontalScaleWidget(self, self.horizontalScaleDivision, self.horizontalScaleTransform)
@@ -166,14 +166,12 @@ class SpectrumPlotWidget(QtWidgets.QWidget):
 
     def draw(self):
         if self.needtransform:
-            self.verticalScaleDivision.setLength(self.canvasWidget.height())
             self.verticalScaleTransform.setLength(self.canvasWidget.height())
             startBorder, endBorder = self.verticalScale.spacingBorders()
             self.verticalScaleTransform.setBorders(startBorder, endBorder)
 
             self.verticalScale.update()
 
-            self.horizontalScaleDivision.setLength(self.canvasWidget.width())
             self.horizontalScaleTransform.setLength(self.canvasWidget.width())
             startBorder, endBorder = self.horizontalScale.spacingBorders()
             self.horizontalScaleTransform.setBorders(startBorder, endBorder)

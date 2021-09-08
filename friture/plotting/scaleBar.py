@@ -1,5 +1,5 @@
 from PyQt5 import QtGui, QtCore, QtWidgets
-from friture.plotting.scaleDivision import numberPrecision
+from friture.plotting.frequency_scales import numberPrecision
 from friture.plotting import generated_cmrmap
 
 # A widget canvas with a baseline, ticks and tick labels

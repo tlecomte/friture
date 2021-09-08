@@ -120,13 +120,13 @@ class TimePlot(QtWidgets.QWidget):
 
         self.logger = logging.getLogger(__name__)
 
-        self.verticalScaleDivision = ScaleDivision(-1, 1, 100)
+        self.verticalScaleDivision = ScaleDivision(-1., 1.)
         self.verticalScaleTransform = CoordinateTransform(-1, 1, 100, 0, 0)
 
         self.verticalScale = VerticalScaleWidget(self, self.verticalScaleDivision, self.verticalScaleTransform)
         self.verticalScale.setTitle("Signal")
 
-        self.horizontalScaleDivision = ScaleDivision(-1, 1, 100)
+        self.horizontalScaleDivision = ScaleDivision(-1., 1.)
         self.horizontalScaleTransform = CoordinateTransform(-1, 1, 100, 0, 0)
 
         self.horizontalScale = HorizontalScaleWidget(self, self.horizontalScaleDivision, self.horizontalScaleTransform)
@@ -212,14 +212,12 @@ class TimePlot(QtWidgets.QWidget):
         if self.needfullreplot:
             self.needfullreplot = False
 
-            self.verticalScaleDivision.setLength(self.canvasWidget.height())
             self.verticalScaleTransform.setLength(self.canvasWidget.height())
             startBorder, endBorder = self.verticalScale.spacingBorders()
             self.verticalScaleTransform.setBorders(startBorder, endBorder)
 
             self.verticalScale.update()
 
-            self.horizontalScaleDivision.setLength(self.canvasWidget.width())
             self.horizontalScaleTransform.setLength(self.canvasWidget.width())
             startBorder, endBorder = self.horizontalScale.spacingBorders()
             self.horizontalScaleTransform.setBorders(startBorder, endBorder)
