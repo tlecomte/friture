@@ -21,15 +21,16 @@
 
 import os
 from PyQt5 import QtCore, QtWidgets
-from PyQt5.QtQuickWidgets import QQuickWidget
-
-from PyQt5.QtCore import pyqtProperty
+from PyQt5.QtQml import QQmlComponent
+from PyQt5.QtQuick import QQuickWindow
 import numpy as np
+
+from friture.store import GetStore
 from friture.levels_settings import Levels_Settings_Dialog  # settings dialog
 from friture.audioproc import audioproc
-
+from friture.level_view_model import LevelViewModel
+from friture.iec import dB_to_IEC
 from friture_extensions.exp_smoothing_conv import pyx_exp_smoothed_value
-
 from friture.audiobackend import SAMPLING_RATE
 
 SMOOTH_DISPLAY_TIMER_PERIOD_MS = 25
@@ -37,162 +38,32 @@ LEVEL_TEXT_LABEL_PERIOD_MS = 250
 
 LEVEL_TEXT_LABEL_STEPS = LEVEL_TEXT_LABEL_PERIOD_MS / SMOOTH_DISPLAY_TIMER_PERIOD_MS
 
-PEAK_DECAY_RATE = (1.0 - 3E-6/500.)
-# Number of cycles the peak stays on hold before fall-off.
-PEAK_FALLOFF = 32
-
-def dB_to_IEC(dB):
-    if dB < -70.0:
-        return 0.0
-    elif dB < -60.0:
-        return (dB + 70.0) * 0.0025
-    elif dB < -50.0:
-        return (dB + 60.0) * 0.005 + 0.025
-    elif dB < -40.0:
-        return (dB + 50.0) * 0.0075 + 0.075
-    elif dB < -30.0:
-        return (dB + 40.0) * 0.015 + 0.15
-    elif dB < -20.0:
-        return (dB + 30.0) * 0.02 + 0.3
-    else:  # if dB < 0.0
-        return (dB + 20.0) * 0.025 + 0.5
-
-class LevelData(QtCore.QObject):
-    level_rms_changed = QtCore.pyqtSignal(float)
-    level_max_changed = QtCore.pyqtSignal(float)
-
-    def __init__(self, parent=None):
-        super().__init__(parent)
-
-        self._level_rms = -30.
-        self._level_max = -30.
-
-    @pyqtProperty(float, notify=level_rms_changed)
-    def level_rms(self):
-        return self._level_rms
-    
-    @pyqtProperty(float, notify=level_rms_changed)
-    def level_rms_iec(self):
-        return dB_to_IEC(self._level_rms)
-    
-    @level_rms.setter
-    def level_rms(self, level_rms):
-        if self._level_rms != level_rms:
-            self._level_rms = level_rms
-            self.level_rms_changed.emit(level_rms)
-
-    @pyqtProperty(float, notify=level_max_changed)
-    def level_max(self):
-        return self._level_max
-
-    @pyqtProperty(float, notify=level_max_changed)
-    def level_max_iec(self):
-        return dB_to_IEC(self._level_max)
-    
-    @level_max.setter
-    def level_max(self, level_max):
-        if self._level_max != level_max:
-            self._level_max = level_max
-            self.level_max_changed.emit(level_max)
-
-class BallisticPeak(QtCore.QObject):
-    peak_changed = QtCore.pyqtSignal(float)
-
-    def __init__(self, parent=None):
-        super().__init__(parent)
-
-        self._peak_iec = 0
-        self._peak_hold_counter = 0
-        self._peak_decay_factor = PEAK_DECAY_RATE
-
-    @pyqtProperty(float, notify=peak_changed)
-    def peak_iec(self):
-        return self._peak_iec
-    
-    @peak_iec.setter
-    def peak_iec(self, peak_iec):
-
-        # peak-hold-then-decay mechanism
-        if peak_iec > self._peak_iec:
-            # follow the peak
-            new_peak_iec = peak_iec
-            self._peak_hold_counter = 0  # reset the hold
-            self._peak_decay_factor = PEAK_DECAY_RATE
-        elif self._peak_hold_counter + 1 <= PEAK_FALLOFF:
-            # hold
-            new_peak_iec = self._peak_iec
-            self._peak_hold_counter += 1
-        else:
-            # decay
-            new_peak_iec = self._peak_decay_factor * float(self._peak_iec)
-            if new_peak_iec < peak_iec:
-                new_peak_iec = peak_iec
-                self._peak_hold_counter = 0  # reset the hold
-                self._peak_decay_factor = PEAK_DECAY_RATE
-            else:
-                self._peak_decay_factor *= self._peak_decay_factor
-
-        if self._peak_iec != new_peak_iec:
-            self._peak_iec = new_peak_iec
-            self.peak_changed.emit(new_peak_iec)
-
-class LevelSettings(QtCore.QObject):
-    two_channels_changed = QtCore.pyqtSignal(bool)
-
-    def __init__(self, parent=None):
-        super().__init__(parent)
-
-        self._two_channels = False
-
-    @pyqtProperty(bool, notify=two_channels_changed)
-    def two_channels(self):
-        return self._two_channels
-    
-    @two_channels.setter
-    def two_channels(self, two_channels):
-        if self._two_channels != two_channels:
-            self._two_channels = two_channels
-            self.two_channels_changed.emit(two_channels)
-
 class Levels_Widget(QtWidgets.QWidget):
 
-    def __init__(self, parent=None):
+    def __init__(self, parent, engine):
         super().__init__(parent)
         self.setObjectName("Levels_Widget")
 
         self.gridLayout = QtWidgets.QVBoxLayout(self)
         self.gridLayout.setObjectName("gridLayout")
 
-        self.level_data = LevelData(self)
-        self.level_data_2 = LevelData(self)
-        self.level_data_slow = LevelData(self)
-        self.level_data_slow_2 = LevelData(self)
-        self.level_data_ballistic = BallisticPeak(self)
-        self.level_data_ballistic_2 = BallisticPeak(self)
-        self.level_settings = LevelSettings(self)
+        self.level_view_model = LevelViewModel(self)
+        store = GetStore()
+        store._dock_states.append(self.level_view_model)
+        state_id = len(store._dock_states) - 1
 
         CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
-        filename = os.path.join(CURRENT_DIR, "LevelsText.qml")
-        self.quickWidgetText = QQuickWidget(self)
-        self.quickWidgetText.setResizeMode(QQuickWidget.SizeViewToRootObject)
-        rootContext = self.quickWidgetText.engine().rootContext()
-        rootContext.setContextProperty("level_settings", self.level_settings)
-        rootContext.setContextProperty("level_data_slow", self.level_data_slow)
-        rootContext.setContextProperty("level_data_slow_2", self.level_data_slow_2)
-        self.quickWidgetText.setSource(QtCore.QUrl.fromLocalFile(filename))
-        self.gridLayout.addWidget(self.quickWidgetText)
+        filename = os.path.join(CURRENT_DIR, "Levels.qml")
+        self.quickWindow = QQuickWindow()
+        component = QQmlComponent(engine, QtCore.QUrl.fromLocalFile(filename))
+        engineContext = engine.rootContext()
+        initialProperties = {"parent": self.quickWindow.contentItem(), "stateId": state_id }
+        self.qmlObject = component.createWithInitialProperties(initialProperties, engineContext)
+        self.qmlObject.setParent(self.quickWindow)
+        self.qmlObject.widthChanged.connect(self.onWidthChanged)
 
-        filename = os.path.join(CURRENT_DIR, "LevelsMeter.qml")
-        self.quickWidget = QQuickWidget(self)
-        self.quickWidget.setResizeMode(QQuickWidget.SizeRootObjectToView)
-        rootContext = self.quickWidget.engine().rootContext()
-        rootContext.setContextProperty("level_settings", self.level_settings)
-        rootContext.setContextProperty("level_data", self.level_data)
-        rootContext.setContextProperty("level_data_2", self.level_data_2)
-        rootContext.setContextProperty("level_data_ballistic", self.level_data_ballistic)
-        rootContext.setContextProperty("level_data_ballistic_2", self.level_data_ballistic_2)
-        self.quickWidget.setSource(QtCore.QUrl.fromLocalFile(filename))
-        self.quickWidget.setSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Expanding)
+        self.quickWidget = QtWidgets.QWidget.createWindowContainer(self.quickWindow, self)
+        self.quickWidget.setSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Expanding)       
         self.gridLayout.addWidget(self.quickWidget)
 
         self.audiobuffer = None
@@ -231,6 +102,9 @@ class Levels_Widget(QtWidgets.QWidget):
 
         self.i = 0
 
+    def onWidthChanged(self):
+        self.quickWidget.setFixedWidth(self.qmlObject.width())
+
     # method
     def set_buffer(self, buffer):
         self.audiobuffer = buffer
@@ -238,10 +112,10 @@ class Levels_Widget(QtWidgets.QWidget):
     def handle_new_data(self, floatdata):
         if floatdata.shape[0] > 1 and not self.two_channels:
             self.two_channels = True
-            self.level_settings.two_channels = True
+            self.level_view_model.two_channels = True
         elif floatdata.shape[0] == 1 and self.two_channels:
             self.two_channels = False
-            self.level_settings.two_channels = False
+            self.level_view_model.two_channels = False
 
         # first channel
         y1 = floatdata[0, :]
@@ -259,9 +133,9 @@ class Levels_Widget(QtWidgets.QWidget):
         value_rms = pyx_exp_smoothed_value(self.kernel, self.alpha, y1 ** 2, self.old_rms)
         self.old_rms = value_rms
 
-        self.level_data.level_rms = 10. * np.log10(value_rms + 0. * 1e-80)
-        self.level_data.level_max = 20. * np.log10(self.old_max + 0. * 1e-80)
-        self.level_data_ballistic.peak_iec = dB_to_IEC(max(self.level_data.level_max, self.level_data.level_rms))
+        self.level_view_model.level_data.level_rms = 10. * np.log10(value_rms + 0. * 1e-80)
+        self.level_view_model.level_data.level_max = 20. * np.log10(self.old_max + 0. * 1e-80)
+        self.level_view_model.level_data_ballistic.peak_iec = dB_to_IEC(max(self.level_view_model.level_data.level_max, self.level_view_model.level_data.level_rms))
 
         if self.two_channels:
             # second channel
@@ -280,9 +154,9 @@ class Levels_Widget(QtWidgets.QWidget):
             value_rms = pyx_exp_smoothed_value(self.kernel, self.alpha, y2 ** 2, self.old_rms_2)
             self.old_rms_2 = value_rms
 
-            self.level_data_2.level_rms = 10. * np.log10(value_rms + 0. * 1e-80)
-            self.level_data_2.level_max = 20. * np.log10(self.old_max_2 + 0. * 1e-80)
-            self.level_data_ballistic_2.peak_iec = dB_to_IEC(max(self.level_data_2.level_max, self.level_data_2.level_rms))
+            self.level_view_model.level_data_2.level_rms = 10. * np.log10(value_rms + 0. * 1e-80)
+            self.level_view_model.level_data_2.level_max = 20. * np.log10(self.old_max_2 + 0. * 1e-80)
+            self.level_view_model.level_data_ballistic_2.peak_iec = dB_to_IEC(max(self.level_view_model.level_data_2.level_max, self.level_view_model.level_data_2.level_rms))
 
     # method
     def canvasUpdate(self):
@@ -292,12 +166,12 @@ class Levels_Widget(QtWidgets.QWidget):
         self.i += 1
 
         if self.i == LEVEL_TEXT_LABEL_STEPS:
-            self.level_data_slow.level_rms = self.level_data.level_rms
-            self.level_data_slow.level_max = self.level_data.level_max
+            self.level_view_model.level_data_slow.level_rms = self.level_view_model.level_data.level_rms
+            self.level_view_model.level_data_slow.level_max = self.level_view_model.level_data.level_max
 
             if self.two_channels:
-                self.level_data_slow_2.level_rms = self.level_data_2.level_rms
-                self.level_data_slow_2.level_max = self.level_data_2.level_max
+                self.level_view_model.level_data_slow_2.level_rms = self.level_view_model.level_data_2.level_rms
+                self.level_view_model.level_data_slow_2.level_max = self.level_view_model.level_data_2.level_max
  
         self.i = self.i % LEVEL_TEXT_LABEL_STEPS
 

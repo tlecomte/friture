@@ -24,7 +24,7 @@ from friture.controlbar import ControlBar
 
 class Dock(QtWidgets.QWidget):
 
-    def __init__(self, parent, name, widgetId=None):
+    def __init__(self, parent, name, qml_engine, widgetId=None):
         super().__init__(parent)
 
         self.dockmanager = parent.dockmanager
@@ -48,6 +48,7 @@ class Dock(QtWidgets.QWidget):
 
         self.widgetId = None
         self.audiowidget = None
+        self.qml_engine = qml_engine
 
         if widgetId is None:
             widgetId = widgetIds()[0]
@@ -81,7 +82,12 @@ class Dock(QtWidgets.QWidget):
             widgetId = widgetIds()[0]
 
         self.widgetId = widgetId
-        self.audiowidget = getWidgetById(widgetId)["Class"](self)
+
+        try:
+            self.audiowidget = getWidgetById(widgetId)["Class"](self, self.qml_engine)
+        except:
+            self.audiowidget = getWidgetById(widgetId)["Class"](self)
+
         self.audiowidget.set_buffer(self.audiobuffer)
         self.audiobuffer.new_data_available.connect(self.audiowidget.handle_new_data)
 
