@@ -17,12 +17,15 @@
 # You should have received a copy of the GNU General Public License
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
+from PyQt5 import QtCore
+from PyQt5.QtCore import pyqtSlot
 import numpy as np
 import friture.plotting.frequency_scales as fscales 
 
 # transforms between screen coordinates and plot coordinates
 
-class CoordinateTransform(object):
+
+class CoordinateTransform(QtCore.QObject):
 
     def __init__(self, coord_min, coord_max, length, startBorder, endBorder):
         super(CoordinateTransform, self).__init__()
@@ -55,6 +58,7 @@ class CoordinateTransform(object):
     def setScale(self, scale):
         self.scale = scale
 
+    @pyqtSlot(float, result=float)
     def toScreen(self, x):
         if self.scale is fscales.Logarithmic:
             if self.coord_clipped_min == self.coord_clipped_max:
@@ -72,6 +76,7 @@ class CoordinateTransform(object):
 
             return (trans_x - trans_min) * (self.length - self.startBorder - self.endBorder) / (trans_max - trans_min) + self.startBorder
 
+    @pyqtSlot(float, result=float)
     def toPlot(self, x):
         if self.length == self.startBorder + self.endBorder:
             return self.coord_min + 0. * x  # keep x type (this can produce a RunTimeWarning if x contains inf)

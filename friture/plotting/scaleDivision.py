@@ -17,36 +17,43 @@
 # You should have received a copy of the GNU General Public License
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
+from PyQt5 import QtCore
+from PyQt5.QtCore import pyqtProperty
+from PyQt5.QtQml import QQmlListProperty
+
 import friture.plotting.frequency_scales as fscales
 
-from friture.plotting.frequency_scales import numberPrecision, ceilWithPrecision, floorWithPrecision
+class Tick(QtCore.QObject):
+    def __init__(self, value, logical_value, parent=None):
+        super().__init__(parent)
+        self._value = value
+        self._logical_value = logical_value
+    
+    @pyqtProperty(float, constant = True)
+    def value(self):
+        return self._value
+
+    @pyqtProperty(float, constant = True)
+    def logicalValue(self):
+        return self._logical_value
 
 # takes min/max of the scale, and returns appropriate ticks (selected for proper number, rounding)
-class ScaleDivision(object):
+class ScaleDivision(QtCore.QObject):
+    logical_major_ticks_changed = QtCore.pyqtSignal()
+    logical_minor_ticks_changed = QtCore.pyqtSignal()
 
-    def __init__(self, scale_min, scale_max, length):
+    def __init__(self, scale_min, scale_max, parent=None):
+        super().__init__(parent)
+
         self.scale_min = scale_min
         self.scale_max = scale_max
-        self.length = length
-
-        self.labelLength = 1
-
         self.scale = fscales.Linear
-        self._update_ticks()
-
-    def set_properties(self, scale_min, scale_max, length):
-        self.scale_min = scale_min
-        self.scale_max = scale_max
-        self.length = length
         self._update_ticks()
 
     def setRange(self, scale_min, scale_max):
         self.scale_min = scale_min
         self.scale_max = scale_max
         self._update_ticks()
-
-    def setLength(self, length):
-        self.length = length
 
     def setScale(self, scale):
         self.scale = scale
@@ -58,5 +65,20 @@ class ScaleDivision(object):
     def minorTicks(self):
         return self.minor_ticks
 
+    @pyqtProperty(QQmlListProperty, notify=logical_major_ticks_changed)
+    def logicalMajorTicks(self):
+        return QQmlListProperty(Tick, self, self._logical_major_ticks)
+
+    @pyqtProperty(QQmlListProperty, notify=logical_minor_ticks_changed)
+    def logicalMinorTicks(self):
+        return QQmlListProperty(Tick, self, self._logical_minor_ticks)
+
     def _update_ticks(self):
         self.major_ticks, self.minor_ticks = self.scale.ticks(self.scale_min, self.scale_max)
+
+        trueMin = min(self.scale_min, self.scale_max)
+        trueMax = max(self.scale_min, self.scale_max)
+        self._logical_major_ticks = [Tick(tick, (tick - trueMin) / (trueMax - trueMin)) for tick in self.major_ticks]
+        self._logical_minor_ticks = [Tick(tick, (tick - trueMin) / (trueMax - trueMin)) for tick in self.minor_ticks]
+        self.logical_major_ticks_changed.emit()
+        self.logical_minor_ticks_changed.emit()

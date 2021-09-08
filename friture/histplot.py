@@ -294,13 +294,13 @@ class HistPlot(QtWidgets.QWidget):
     def __init__(self, parent):
         super(HistPlot, self).__init__()
 
-        self.verticalScaleDivision = ScaleDivision(-140, 0, 100)
+        self.verticalScaleDivision = ScaleDivision(-140, 0)
         self.verticalScaleTransform = CoordinateTransform(-140, 0, 100, 0, 0)
 
         self.verticalScale = VerticalScaleWidget(self, self.verticalScaleDivision, self.verticalScaleTransform)
         self.verticalScale.setTitle("PSD (dB A)")
 
-        self.horizontalScaleDivision = ScaleDivision(44, 22000, 100)
+        self.horizontalScaleDivision = ScaleDivision(44, 22000)
         self.horizontalScaleTransform = CoordinateTransform(44, 22000, 100, 0, 0)
 
         self.horizontalScale = HorizontalScaleWidget(self, self.horizontalScaleDivision, self.horizontalScaleTransform)
@@ -350,7 +350,6 @@ class HistPlot(QtWidgets.QWidget):
         if self.needfullreplot:
             self.needfullreplot = False
 
-            self.verticalScaleDivision.setLength(self.canvasWidget.height())
             self.verticalScaleTransform.setLength(self.canvasWidget.height())
 
             start_border, end_border = self.verticalScale.spacingBorders()
@@ -358,7 +357,6 @@ class HistPlot(QtWidgets.QWidget):
 
             self.verticalScale.update()
 
-            self.horizontalScaleDivision.setLength(self.canvasWidget.width())
             self.horizontalScaleTransform.setLength(self.canvasWidget.width())
 
             start_border, end_border = self.horizontalScale.spacingBorders()

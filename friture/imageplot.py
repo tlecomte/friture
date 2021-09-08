@@ -176,20 +176,20 @@ class ImagePlot(QtWidgets.QWidget):
     def __init__(self, parent):
         super(ImagePlot, self).__init__(parent)
 
-        self.verticalScaleDivision = ScaleDivision(20, 20000, 100)
+        self.verticalScaleDivision = ScaleDivision(20, 20000)
         self.verticalScaleTransform = CoordinateTransform(20, 20000, 100, 0, 0)
 
         self.verticalScale = VerticalScaleWidget(self, self.verticalScaleDivision, self.verticalScaleTransform)
         self.verticalScale.setTitle("Frequency (Hz)")
         self.verticalScale.scaleBar.setTickFormatter(tickFormatter)
 
-        self.horizontalScaleDivision = ScaleDivision(0, 10, 100)
+        self.horizontalScaleDivision = ScaleDivision(0, 10)
         self.horizontalScaleTransform = CoordinateTransform(0, 10, 100, 0, 0)
 
         self.horizontalScale = HorizontalScaleWidget(self, self.horizontalScaleDivision, self.horizontalScaleTransform)
         self.horizontalScale.setTitle("Time (s)")
 
-        self.colorScaleDivision = ScaleDivision(-140, 0, 100)
+        self.colorScaleDivision = ScaleDivision(-140, 0)
         self.colorScaleTransform = CoordinateTransform(-140, 0, 100, 0, 0)
 
         self.colorScale = ColorScaleWidget(self, self.colorScaleDivision, self.colorScaleTransform)
@@ -228,19 +228,16 @@ class ImagePlot(QtWidgets.QWidget):
         if self.needfullreplot:
             self.needfullreplot = False
 
-            self.verticalScaleDivision.setLength(self.canvasWidget.height())
             self.verticalScaleTransform.setLength(self.canvasWidget.height())
 
             self.verticalScale.update()
 
-            self.horizontalScaleDivision.setLength(self.canvasWidget.width())
             self.horizontalScaleTransform.setLength(self.canvasWidget.width())
             startBorder, endBorder = self.horizontalScale.spacingBorders()
             self.horizontalScaleTransform.setBorders(startBorder, endBorder)
 
             self.horizontalScale.update()
 
-            self.colorScaleDivision.setLength(self.canvasWidget.height())
             self.colorScaleTransform.setLength(self.canvasWidget.height())
             startBorder, endBorder = self.colorScale.spacingBorders()
             self.colorScaleTransform.setBorders(startBorder, endBorder)
