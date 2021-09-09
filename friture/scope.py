@@ -19,14 +19,12 @@
 
 import os
 
-from PyQt5.QtQuick import QQuickWindow
 from PyQt5 import QtCore, QtWidgets
-from PyQt5.QtQml import QQmlComponent
+from PyQt5.QtQuickWidgets import QQuickWidget
 
 from numpy import log10, where, sign, arange, zeros
 
 from friture.store import GetStore
-from friture.plotting.numpy_interop import arrays_to_qpolygon
 from friture.audiobackend import SAMPLING_RATE
 from friture.scope_data import Scope_Data
 
@@ -55,15 +53,10 @@ class Scope_Widget(QtWidgets.QWidget):
         CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
         filename = os.path.join(CURRENT_DIR, "Scope.qml")
 
-        self.quickWindow = QQuickWindow()
-        component = QQmlComponent(engine, QtCore.QUrl.fromLocalFile(filename))
-        engineContext = engine.rootContext()
-        initialProperties = {"parent": self.quickWindow.contentItem(), "stateId": state_id }
-        qmlObject = component.createWithInitialProperties(initialProperties, engineContext)
-        qmlObject.setParent(self.quickWindow)
-
-        self.quickWidget = QtWidgets.QWidget.createWindowContainer(self.quickWindow, self)
-        self.quickWidget.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        self.quickWidget = QQuickWidget(engine, self)
+        self.quickWidget.setSource(QtCore.QUrl.fromLocalFile(filename))
+        self.quickWidget.setResizeMode(QQuickWidget.SizeRootObjectToView)
+        self.quickWidget.rootObject().setProperty("stateId", state_id)
 
         self.gridLayout.addWidget(self.quickWidget, 0, 0, 1, 1)
 
@@ -131,11 +124,11 @@ class Scope_Widget(QtWidgets.QWidget):
 
         scaled_t = (self.time * 1e3 + self.timerange/2.) / self.timerange
         scaled_y = 1. - (self.y + 1) / 2.
-        self._scope_data.curve.data_polygon = arrays_to_qpolygon(scaled_t, scaled_y)
+        self._scope_data.curve.setData(scaled_t, scaled_y)
 
         if self.y2 is not None:
             scaled_y2 = 1. - (self.y2 + 1) / 2.
-            self._scope_data.curve_2.data_polygon = arrays_to_qpolygon(scaled_t, scaled_y2)
+            self._scope_data.curve_2.setData(scaled_t, scaled_y2)
 
     # method
     def canvasUpdate(self):
