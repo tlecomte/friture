@@ -35,6 +35,7 @@ Rectangle {
 
         Text {
             id: peakValues
+            textFormat: Text.PlainText
             text: level_view_model.two_channels ? "1: " + level_to_text(level_view_model.level_data_slow.level_max) + "\n2: " + level_to_text(level_view_model.level_data_slow_2.level_max) : level_to_text(level_view_model.level_data_slow.level_max)
             font.pointSize: 14
             font.bold: true
@@ -45,6 +46,7 @@ Rectangle {
 
         Text {
             id: peakLegend
+            textFormat: Text.PlainText
             text: "dB FS\nPeak"
             verticalAlignment: Text.AlignTop
             horizontalAlignment: Text.AlignRight
@@ -53,6 +55,7 @@ Rectangle {
 
         Text {
             id: rmsValues
+            textFormat: Text.PlainText
             text: level_view_model.two_channels ? "1: " + level_to_text(level_view_model.level_data_slow.level_rms) + "\n2: " + level_to_text(level_view_model.level_data_slow_2.level_rms) : level_to_text(level_view_model.level_data_slow.level_rms)
             font.pointSize: 14
             font.bold: true
@@ -63,6 +66,7 @@ Rectangle {
 
         Text {
             id: rmsLegend
+            textFormat: Text.PlainText
             text: "dB FS\nRMS"
             verticalAlignment: Text.AlignTop
             horizontalAlignment: Text.AlignRight
