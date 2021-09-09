@@ -48,6 +48,7 @@ from friture.levels import Levels_Widget
 from friture.store import GetStore, Store
 from friture.scope_data import Scope_Data
 from friture.curve import Curve
+from friture.plotCurve import PlotCurve
 from friture.plotting.coordinateTransform import CoordinateTransform
 from friture.plotting.scaleDivision import ScaleDivision
 
@@ -83,6 +84,7 @@ class Friture(QMainWindow, ):
         qmlRegisterType(LevelData, 'Friture', 1, 0, 'LevelData')
         qmlRegisterType(LevelViewModel, 'Friture', 1, 0, 'LevelViewModel')
         qmlRegisterType(Curve, 'Friture', 1, 0, 'Curve')
+        qmlRegisterType(PlotCurve, 'Friture', 1, 0, 'PlotCurve')
         qmlRegisterSingletonType(Store, 'Friture', 1, 0, 'Store', lambda engine, script_engine: GetStore())
 
         # Setup the user interface

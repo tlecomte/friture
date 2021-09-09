@@ -25,31 +25,17 @@ Item {
         horizontal_scale_division: scopePlotArea.horizontal_scale_division
     }
 
-    Shape {
+    PlotCurve {
         anchors.fill: parent
-        id: scopeShape
+        color: "red"
+        curve: curve1
+    }
 
-        ShapePath {
-            strokeWidth: 1
-            strokeColor: "red"
-            fillColor: "transparent"
-            scale: Qt.size(scopeShape.width, scopeShape.height)
-            PathPolyline {
-                id: ppl
-                path: curve1.data_polygon
-            }
-        }
-
-        ShapePath {
-            strokeWidth: two_channels ? 1 : -1
-            strokeColor: "blue"
-            fillColor: "transparent"
-            scale: Qt.size(scopeShape.width, scopeShape.height)
-            PathPolyline {
-                id: ppl_2
-                path: curve2.data_polygon
-            }
-        }
+    PlotCurve {
+        visible: two_channels
+        anchors.fill: parent
+        color: "blue"
+        curve: curve2
     }
 
     Rectangle {

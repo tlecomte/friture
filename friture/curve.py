@@ -19,27 +19,29 @@
 
 from PyQt5 import QtCore
 from PyQt5.QtCore import pyqtProperty
-from PyQt5.QtGui import QPolygonF
+import numpy
 
 class Curve(QtCore.QObject):
-    data_polygon_changed = QtCore.pyqtSignal(QPolygonF)
+    data_changed = QtCore.pyqtSignal()
     name_changed = QtCore.pyqtSignal(str)
 
     def __init__(self, parent=None):
         super().__init__(parent)
 
-        self._data_polygon = QPolygonF()
         self._name = ""
+        self._x_array = numpy.array([0])
+        self._y_array = numpy.array([0])
+
+    def setData(self, x_array, y_array):
+        self._x_array = x_array
+        self._y_array = y_array
+        self.data_changed.emit()
     
-    @pyqtProperty(QPolygonF, notify=data_polygon_changed)
-    def data_polygon(self):
-        return self._data_polygon
-    
-    @data_polygon.setter
-    def data_polygon(self, p):
-        if self._data_polygon != p:
-            self._data_polygon = p
-            self.data_polygon_changed.emit(p)
+    def x_array(self):
+        return self._x_array
+
+    def y_array(self):
+        return self._y_array
     
     @pyqtProperty(str, notify=name_changed)
     def name(self):

@@ -11,7 +11,11 @@ Rectangle {
     color: myPalette.window
 
     property var stateId
-    property ScopeData scopedata: Store.dock_states[stateId]  
+    property ScopeData scopedata: stateId >= 0 ? Store.dock_states[stateId] : defaultScopeData
+
+    ScopeData {
+        id: defaultScopeData
+    }
 
     GridLayout {
         anchors.fill: parent
