@@ -17,9 +17,9 @@
 # You should have received a copy of the GNU General Public License
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
+import logging
 
-from PyQt5 import QtCore, QtWidgets
+from PyQt5 import QtWidgets
 from PyQt5.QtQuickWidgets import QQuickWidget
 
 from numpy import log10, where, sign, arange, zeros
@@ -27,6 +27,7 @@ from numpy import log10, where, sign, arange, zeros
 from friture.store import GetStore
 from friture.audiobackend import SAMPLING_RATE
 from friture.scope_data import Scope_Data
+from friture.qml_tools import qml_url, raise_if_error
 
 SMOOTH_DISPLAY_TIMER_PERIOD_MS = 25
 DEFAULT_TIMERANGE = 2 * SMOOTH_DISPLAY_TIMER_PERIOD_MS
@@ -35,6 +36,8 @@ class Scope_Widget(QtWidgets.QWidget):
 
     def __init__(self, parent, engine):
         super().__init__(parent)
+
+        self.logger = logging.getLogger(__name__)
 
         self.audiobuffer = None
 
@@ -50,12 +53,13 @@ class Scope_Widget(QtWidgets.QWidget):
         self.gridLayout = QtWidgets.QGridLayout(self)
         self.gridLayout.setObjectName("gridLayout")
 
-        CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
-        filename = os.path.join(CURRENT_DIR, "Scope.qml")
-
         self.quickWidget = QQuickWidget(engine, self)
-        self.quickWidget.setSource(QtCore.QUrl.fromLocalFile(filename))
+        self.quickWidget.statusChanged.connect(self.on_status_changed)
         self.quickWidget.setResizeMode(QQuickWidget.SizeRootObjectToView)
+        self.quickWidget.setSource(qml_url("Scope.qml"))
+        
+        raise_if_error(self.quickWidget)
+
         self.quickWidget.rootObject().setProperty("stateId", state_id)
 
         self.gridLayout.addWidget(self.quickWidget, 0, 0, 1, 1)
@@ -67,6 +71,11 @@ class Scope_Widget(QtWidgets.QWidget):
         self.time = zeros(10)
         self.y = zeros(10)
         self.y2 = zeros(10)
+
+    def on_status_changed(self, status):
+        if status == QQuickWidget.Error:
+            for error in self.quickWidget.errors():
+                self.logger.error("QML error: " + error.toString())
 
     # method
     def set_buffer(self, buffer):

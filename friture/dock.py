@@ -85,7 +85,7 @@ class Dock(QtWidgets.QWidget):
 
         try:
             self.audiowidget = getWidgetById(widgetId)["Class"](self, self.qml_engine)
-        except:
+        except TypeError:
             self.audiowidget = getWidgetById(widgetId)["Class"](self)
 
         self.audiowidget.set_buffer(self.audiobuffer)

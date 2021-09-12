@@ -19,8 +19,7 @@
 
 """Level widget that displays peak and RMS levels for 1 or 2 ports."""
 
-import os
-from PyQt5 import QtCore, QtWidgets
+from PyQt5 import QtWidgets
 from PyQt5.QtQml import QQmlComponent
 from PyQt5.QtQuick import QQuickWindow
 import numpy as np
@@ -32,6 +31,7 @@ from friture.level_view_model import LevelViewModel
 from friture.iec import dB_to_IEC
 from friture_extensions.exp_smoothing_conv import pyx_exp_smoothed_value
 from friture.audiobackend import SAMPLING_RATE
+from friture.qml_tools import qml_url, raise_if_error
 
 SMOOTH_DISPLAY_TIMER_PERIOD_MS = 25
 LEVEL_TEXT_LABEL_PERIOD_MS = 250
@@ -52,10 +52,10 @@ class Levels_Widget(QtWidgets.QWidget):
         store._dock_states.append(self.level_view_model)
         state_id = len(store._dock_states) - 1
 
-        CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
-        filename = os.path.join(CURRENT_DIR, "Levels.qml")
         self.quickWindow = QQuickWindow()
-        component = QQmlComponent(engine, QtCore.QUrl.fromLocalFile(filename))
+        component = QQmlComponent(engine, qml_url("Levels.qml"))
+        raise_if_error(component)
+
         engineContext = engine.rootContext()
         initialProperties = {"parent": self.quickWindow.contentItem(), "stateId": state_id }
         self.qmlObject = component.createWithInitialProperties(initialProperties, engineContext)

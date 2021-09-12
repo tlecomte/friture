@@ -11,10 +11,8 @@ block_cipher = None
 # pyinstaller is conservative: it includes all Qt5 modules by default
 # to reduce our frozen image size, we exclude unused modules
 excludes = [
-        'PyQt5.QtDeclarative',
         'PyQt5.QtHelp',
         'PyQt5.QtMultimedia',
-        'PyQt5.QtNetwork',
         'PyQt5.QtScript',
         'PyQt5.QtScriptTools',
         'PyQt5.QtSql',
@@ -27,9 +25,6 @@ excludes = [
         'PyQt5.QtConcurrent',
         'PyQt5.QtMultimediaWidgets',
         'PyQt5.QtPositioning',
-        'PyQt5.QtQml',
-        'PyQt5.QtQuick',
-        'PyQt5.QtQuickWidgets',
         'PyQt5.QtSensors',
         'PyQt5.QtSerialPort',
         'PyQt5.QtWebChannel',
@@ -40,27 +35,22 @@ excludes = [
         'PyQt5.QtWebSockets']
 
 excluded_binaries = [
+        'Qt5Bluetooth.dll',
         'Qt5DBus.dll',
         'Qt5Location.dll',
-        'Qt5Network.dll',
-        'Qt5NetworkAuth.dll',
         'Qt5Nfc.dll',
         'Qt5Positioning.dll',
         'Qt5PositioningQuick.dll',
         'Qt5PrintSupport.dll',
-        'Qt5Qml.dll',
-        'Qt5Quick.dll',
         'Qt5RemoteObjects.dll',
         'Qt5WebSockets.dll',
         'Qt5WinExtras.dll',
         'Qt5Xml.dll',
         'Qt5XmlPatterns.dll',
 
-        # macos
-        'QtDeclarative.framework',
+        # # macos
         'QtHelp.framework',
         'QtMultimedia.framework',
-        'QtNetwork.framework',
         'QtScript.framework',
         'QtScriptTools.framework',
         'QtSql.framework',
@@ -73,9 +63,6 @@ excluded_binaries = [
         'QtConcurrent.framework',
         'QtMultimediaWidgets.framework',
         'QtPositioning.framework',
-        'QtQml.framework',
-        'QtQuick.framework',
-        'QtQuickWidgets.framework',
         'QtSensors.framework',
         'QtSerialPort.framework',
         'QtWebChannel.framework',
@@ -83,7 +70,8 @@ excluded_binaries = [
         'QtWebEngineCore.framework',
         'QtWebEngineWidgets.framework',
         'QtWebKitWidgets.framework',
-        'QtWebSockets.framework']
+        'QtWebSockets.framework'
+        ]
 
 pathex = []
 if platform.system() == "Windows":
@@ -94,7 +82,7 @@ if platform.system() == "Windows":
 a = Analysis(['main.py'],
              pathex=pathex,
              binaries=[],
-             datas=[],
+             datas= [('friture/*.qml', '.' ), ('friture/*.js', '.' )],
              hiddenimports=[],
              hookspath=["installer/pyinstaller-hooks"], # our custom hooks for python-sounddevice
              runtime_hooks=[],
