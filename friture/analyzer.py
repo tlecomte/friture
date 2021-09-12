@@ -51,6 +51,7 @@ from friture.curve import Curve
 from friture.plotCurve import PlotCurve
 from friture.plotting.coordinateTransform import CoordinateTransform
 from friture.plotting.scaleDivision import ScaleDivision
+from friture.qml_tools import qml_url
 
 # the display timer could be made faster when the processing
 # power allows it, firing down to every 10 ms
@@ -346,6 +347,8 @@ def main():
     # make sure Qt loads the desktop OpenGL stack, rather than OpenGL ES or a software OpenGL
     # only the former option is compatible with the use of PyOpenGL
     QtCore.QCoreApplication.setAttribute(QtCore.Qt.AA_UseDesktopOpenGL)
+
+    logger.info("QML path: %s", qml_url(""))
 
     if platform.system() == "Windows":
         logger.info("Applying Windows-specific setup")
