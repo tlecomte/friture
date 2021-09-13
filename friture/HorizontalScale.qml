@@ -14,6 +14,25 @@ Item {
     property int majorTickLength: 8
     property int minorTickLength: 4
 
+    property double rightOverflow: getRightOverflow(horizontal_scale_division.logicalMajorTicks, xscaleColumn.width)
+
+    function getRightOverflow(majorTicks, totalWidth) {
+        if (majorTicks.length == 0) {
+            return 0.
+        }
+
+        var lastMajorTick = majorTicks[majorTicks.length - 1]
+        var textWidth = fontMetrics.boundingRect(lastMajorTick.value).width;
+        var tickPos = lastMajorTick.logicalValue * totalWidth
+        var rightPos = tickPos + textWidth / 2
+        var rightOverflow = Math.max(0., rightPos - totalWidth)
+        return rightOverflow
+    }
+
+    FontMetrics {
+        id: fontMetrics
+    }
+
     Shape {
         anchors.left: parent.left
         anchors.right: parent.right
