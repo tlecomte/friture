@@ -156,8 +156,7 @@ class Scope_Widget(QtWidgets.QWidget):
     # slot
     def set_timerange(self, timerange):
         self.timerange = timerange
-        self._scope_data.horizontal_axis.coordinate_transform.setRange(-self.timerange/2., self.timerange/2.)
-        self._scope_data.horizontal_axis.scale_division.setRange(-self.timerange/2., self.timerange/2.)
+        self._scope_data.horizontal_axis.setRange(-self.timerange/2., self.timerange/2.)
 
     # slot
     def settings_called(self, checked):
