@@ -31,7 +31,7 @@ Rectangle {
             Layout.column: 2
 
             // spacer so that the labels of the vertical scale are not clipped
-            height: fontMetrics.ascent
+            implicitHeight: fontMetrics.ascent
         }
 
         Item {
@@ -40,14 +40,15 @@ Rectangle {
 
             // width vs. height: childrenRect doesn't take transformations into account.
             // https://bugreports.qt-project.org/browse/QTBUG-38953
-            width: childrenRect.height
-            height: childrenRect.width
+            implicitWidth: verticalAxisLabel.height
+            implicitHeight: verticalAxisLabel.width
 
             Text {
-                
-                text: "Signal"
-                transformOrigin: Item.Bottom
+                id: verticalAxisLabel
+                text: scopedata.vertical_axis.name
+                transformOrigin: Item.Center
                 rotation: -90
+                anchors.centerIn: parent
             }
         }
 
@@ -72,6 +73,8 @@ Rectangle {
             curve1: scopedata.curve
             curve2: scopedata.curve_2
             two_channels: scopedata.two_channels
+            vertical_axis: scopedata.vertical_axis
+            horizontal_axis: scopedata.horizontal_axis
         }
 
         Legend {
@@ -95,7 +98,7 @@ Rectangle {
         Text {
             Layout.row: 3
             Layout.column: 2
-            text: "Time (ms)"
+            text: scopedata.horizontal_axis.name
             horizontalAlignment: Text.AlignHCenter
             Layout.fillWidth: true
         }

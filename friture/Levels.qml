@@ -18,7 +18,7 @@ Rectangle {
     // but do not bind directly to their widths
     // to avoid frequent costly resizes
     //due to level changes or variations in the width of the font characters
-    width: 2 + fontMetrics.boundingRect(level_view_model.two_channels ? "2: -88.8" : "-88:8").width
+    implicitWidth: 2 + fontMetrics.boundingRect(level_view_model.two_channels ? "2: -88.8" : "-88:8").width
 
     FontMetrics {
         id: fontMetrics

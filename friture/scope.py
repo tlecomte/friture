@@ -48,6 +48,10 @@ class Scope_Widget(QtWidgets.QWidget):
 
         self._scope_data.curve.name = "Ch1"
         self._scope_data.curve_2.name = "Ch2"
+        self._scope_data.vertical_axis.name = "Signal"
+        self._scope_data.vertical_axis.setTrackerFormatter(lambda x: "%#.3g" % (x))
+        self._scope_data.horizontal_axis.name = "Time (ms)"
+        self._scope_data.horizontal_axis.setTrackerFormatter(lambda x: "%#.3g ms" % (x))
 
         self.setObjectName("Scope_Widget")
         self.gridLayout = QtWidgets.QGridLayout(self)

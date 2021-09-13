@@ -29,7 +29,7 @@ class Tick(QtCore.QObject):
         self._value = value
         self._logical_value = logical_value
     
-    @pyqtProperty(float, constant = True)
+    @pyqtProperty(str, constant = True)
     def value(self):
         return self._value
 
@@ -78,7 +78,16 @@ class ScaleDivision(QtCore.QObject):
 
         trueMin = min(self.scale_min, self.scale_max)
         trueMax = max(self.scale_min, self.scale_max)
-        self._logical_major_ticks = [Tick(tick, (tick - trueMin) / (trueMax - trueMin)) for tick in self.major_ticks]
-        self._logical_minor_ticks = [Tick(tick, (tick - trueMin) / (trueMax - trueMin)) for tick in self.minor_ticks]
+
+        if len(self.major_ticks) < 2:
+            interval = 0
+        else:
+            interval = self.major_ticks[1] - self.major_ticks[0]
+        precision = fscales.numberPrecision(interval)
+        digits = max(0, int(-precision))
+
+        self._logical_major_ticks = [Tick('{0:.{1}f}'.format(tick, digits), (tick - trueMin) / (trueMax - trueMin)) for tick in self.major_ticks]
         self.logical_major_ticks_changed.emit()
+
+        self._logical_minor_ticks = [Tick(tick, (tick - trueMin) / (trueMax - trueMin)) for tick in self.minor_ticks]
         self.logical_minor_ticks_changed.emit()

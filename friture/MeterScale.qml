@@ -5,10 +5,7 @@ import "iec.js" as IECFunctions
 
 Item {
     id: meterScale
-    width: 16
-    Layout.minimumWidth: 16
-    Layout.preferredWidth: 16
-    Layout.maximumWidth: 16
+    implicitWidth: 16
 
     required property int topOffset
     required property bool twoChannels
@@ -31,7 +28,7 @@ Item {
         model: scaleModel
 
         Item {
-            width: 16
+            implicitWidth: 16
             x: 0
             y: pathY(dB)
 

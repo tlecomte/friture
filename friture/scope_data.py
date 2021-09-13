@@ -17,10 +17,11 @@
 # You should have received a copy of the GNU General Public License
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
-from friture.curve import Curve
 from PyQt5 import QtCore
 from PyQt5.QtCore import pyqtProperty
 
+from friture.axis import Axis
+from friture.curve import Curve
 from friture.plotting.coordinateTransform import CoordinateTransform
 from friture.plotting.scaleDivision import ScaleDivision
 
@@ -37,6 +38,8 @@ class Scope_Data(QtCore.QObject):
         self._vertical_scale_division = ScaleDivision(-1., 1.)
         self._horizontal_coordinate_transform = CoordinateTransform(-1, 1, 1., 0, 0)
         self._vertical_coordinate_transform = CoordinateTransform(-1, 1, 1., 0, 0)
+        self._horizontal_axis = Axis()
+        self._vertical_axis = Axis()
 
     @pyqtProperty(Curve, constant = True)
     def curve(self):
@@ -71,3 +74,11 @@ class Scope_Data(QtCore.QObject):
     @pyqtProperty(CoordinateTransform, constant=True)
     def vertical_coordinate_transform(self):
         return self._vertical_coordinate_transform
+
+    @pyqtProperty(Axis, constant=True)
+    def horizontal_axis(self):
+        return self._horizontal_axis
+
+    @pyqtProperty(Axis, constant=True)
+    def vertical_axis(self):
+        return self._vertical_axis

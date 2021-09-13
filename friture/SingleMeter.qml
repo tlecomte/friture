@@ -5,10 +5,7 @@ import "iec.js" as IECFunctions
 
 Rectangle {
     color: "black"
-    width: 16
-    Layout.minimumWidth: 16
-    Layout.preferredWidth: 16
-    Layout.maximumWidth: 16
+    implicitWidth: 16
 
     required property double levelMax
     required property double levelRms
@@ -32,14 +29,14 @@ Rectangle {
     }
 
     Item {
-        width: parent.width
-        height: IECFunctions.dB_to_IEC(levelMax) * (parent.height - topOffset)
+        implicitWidth: parent.width
+        implicitHeight: IECFunctions.dB_to_IEC(levelMax) * (parent.height - topOffset)
         anchors.bottom: parent.bottom
         clip: true
 
         Rectangle {
-            width: parent.width
-            height: parent.parent.height
+            implicitWidth: parent.width
+            implicitHeight: parent.parent.height
             anchors.bottom: parent.bottom
 
             // this item must be static so that the gradient is not permanently redrawn
@@ -48,14 +45,14 @@ Rectangle {
     }
 
     Item {
-        width: parent.width
-        height: IECFunctions.dB_to_IEC(levelRms) * (parent.height - topOffset)
+        implicitWidth: parent.width
+        implicitHeight: IECFunctions.dB_to_IEC(levelRms) * (parent.height - topOffset)
         anchors.bottom: parent.bottom
         clip: true
 
         Rectangle {
-            width: parent.width
-            height: parent.parent.height
+            implicitWidth: parent.width
+            implicitHeight: parent.parent.height
             anchors.bottom: parent.bottom
 
             // this item must be static so that the gradient is not permanently redrawn

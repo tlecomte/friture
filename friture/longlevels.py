@@ -19,7 +19,10 @@
 
 """Level widget that displays RMS level history."""
 
-from PyQt5 import QtCore, QtGui, QtWidgets
+
+import logging
+from PyQt5 import QtWidgets
+from PyQt5.QtQuickWidgets import QQuickWidget
 import numpy as np
 from friture.longlevels_settings import (LongLevels_Settings_Dialog,
                                          DEFAULT_LEVEL_MIN,
@@ -27,10 +30,12 @@ from friture.longlevels_settings import (LongLevels_Settings_Dialog,
                                          DEFAULT_MAXTIME,
                                          DEFAULT_RESPONSE_TIME)
 from friture.audioproc import audioproc
-from friture.timeplot import TimePlot
 from .signal.decimate import decimate
 from .ringbuffer import RingBuffer
 from friture_extensions.lfilter import pyx_lfilter_float64_1D
+from friture.scope_data import Scope_Data
+from friture.store import GetStore
+from friture.qml_tools import qml_url, raise_if_error
 
 from friture.audiobackend import SAMPLING_RATE
 
@@ -89,24 +94,45 @@ class Subsampler:
 
 class LongLevelWidget(QtWidgets.QWidget):
 
-    def __init__(self, parent=None):
+    def __init__(self, parent, engine):
         super().__init__(parent)
+
+        self.logger = logging.getLogger(__name__)
+
         self.setObjectName("LongLevels_Widget")
+
+        store = GetStore()
+        self._long_levels_data = Scope_Data(store)
+        store._dock_states.append(self._long_levels_data)
+        state_id = len(store._dock_states) - 1
+
+        self._long_levels_data.curve.name = "Ch1"
+        self._long_levels_data.curve_2.name = "Ch2"
+        self._long_levels_data.vertical_axis.name = "Level (dB FS RMS)"
+        self._long_levels_data.vertical_axis.setTrackerFormatter(lambda x: "%#.3g dB" % (x))
+        self._long_levels_data.horizontal_axis.name = "Time (sec)"
+        self._long_levels_data.horizontal_axis.setTrackerFormatter(lambda x: "%#.3g sec" % (x))
 
         self.setObjectName("Scope_Widget")
         self.gridLayout = QtWidgets.QGridLayout(self)
         self.gridLayout.setObjectName("gridLayout")
-        self.PlotZoneUp = TimePlot(self)
-        self.PlotZoneUp.setObjectName("PlotZoneUp")
-        self.PlotZoneUp.setverticaltitle("Level (dB FS RMS)")
-        self.PlotZoneUp.sethorizontaltitle("Time (sec)")
-        self.PlotZoneUp.setTrackerFormatter(lambda x, y: "%.3g sec, %.3g" % (x, y))
+
+        self.quickWidget = QQuickWidget(engine, self)
+        self.quickWidget.statusChanged.connect(self.on_status_changed)
+        self.quickWidget.setResizeMode(QQuickWidget.SizeRootObjectToView)
+        self.quickWidget.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        self.quickWidget.setSource(qml_url("Scope.qml"))
+        
+        raise_if_error(self.quickWidget)
+
+        self.quickWidget.rootObject().setProperty("stateId", state_id)
+
+        self.gridLayout.addWidget(self.quickWidget, 0, 0, 1, 1)
 
         self.level_min = DEFAULT_LEVEL_MIN
         self.level_max = DEFAULT_LEVEL_MAX
-        self.PlotZoneUp.setverticalrange(self.level_min, self.level_max)
-
-        self.gridLayout.addWidget(self.PlotZoneUp, 0, 0, 1, 1)
+        self._long_levels_data.vertical_scale_division.setRange(self.level_min, self.level_max)
+        self._long_levels_data.vertical_coordinate_transform.setRange(self.level_min, self.level_max)
 
         self.audiobuffer = None
 
@@ -179,7 +205,14 @@ class LongLevelWidget(QtWidgets.QWidget):
 
             levels = self.ringbuffer.data(self.length_samples)
 
-            self.PlotZoneUp.setdata(self.time/1., levels[0, :])
+            scaled_t = self.time / self.length_seconds
+            scaled_y = np.clip(1. - (levels[0, :] - self.level_min) / (self.level_max - self.level_min), 0., 1.)
+            self._long_levels_data.curve.setData(scaled_t, scaled_y)
+
+    def on_status_changed(self, status):
+        if status == QQuickWidget.Error:
+            for error in self.quickWidget.errors():
+                self.logger.error("QML error: " + error.toString())
 
     # method
     def canvasUpdate(self):
@@ -188,16 +221,20 @@ class LongLevelWidget(QtWidgets.QWidget):
 
     def setmin(self, value):
         self.level_min = value
-        self.PlotZoneUp.setverticalrange(self.level_min, self.level_max)
+        self._long_levels_data.vertical_scale_division.setRange(self.level_min, self.level_max)
+        self._long_levels_data.vertical_coordinate_transform.setRange(self.level_min, self.level_max)
+        
 
     def setmax(self, value):
         self.level_max = value
-        self.PlotZoneUp.setverticalrange(self.level_min, self.level_max)
+        self._long_levels_data.vertical_scale_division.setRange(self.level_min, self.level_max)
+        self._long_levels_data.vertical_coordinate_transform.setRange(self.level_min, self.level_max)
 
     def setduration(self, value):
         self.length_seconds = value
         self.length_samples = int(self.length_seconds * self.subsampled_sampling_rate)
-        self.PlotZoneUp.settimerange(0., self.length_seconds)
+        self._long_levels_data.horizontal_scale_division.setRange(0., self.length_seconds)
+        self._long_levels_data.horizontal_coordinate_transform.setRange(0., self.length_seconds)
 
     def setresptime(self, value):
         self.response_time = value
