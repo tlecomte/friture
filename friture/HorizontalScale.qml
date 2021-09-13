@@ -9,12 +9,12 @@ Item {
 
     implicitHeight: childrenRect.height
 
-    required property ScaleDivision horizontal_scale_division
+    required property ScaleDivision scale_division
 
     property int majorTickLength: 8
     property int minorTickLength: 4
 
-    property double rightOverflow: getRightOverflow(horizontal_scale_division.logicalMajorTicks, xscaleColumn.width)
+    property double rightOverflow: getRightOverflow(scale_division.logicalMajorTicks, xscaleColumn.width)
 
     function getRightOverflow(majorTicks, totalWidth) {
         if (majorTicks.length == 0) {
@@ -49,7 +49,7 @@ Item {
 
     // QML docs discourage the use of multiple Shape objects. But the Repeater cannot be used inside Shape.
     Repeater {
-        model: xscaleColumn.horizontal_scale_division.logicalMajorTicks
+        model: xscaleColumn.scale_division.logicalMajorTicks
 
         Item {
             x: modelData.logicalValue * xscaleColumn.width
@@ -80,7 +80,7 @@ Item {
 
     // QML docs discourage the use of multiple Shape objects. But the Repeater cannot be used inside Shape.
     Repeater {
-        model: xscaleColumn.horizontal_scale_division.logicalMinorTicks
+        model: xscaleColumn.scale_division.logicalMinorTicks
 
         Item {
             x: modelData.logicalValue * xscaleColumn.width

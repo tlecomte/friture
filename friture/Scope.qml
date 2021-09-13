@@ -55,7 +55,7 @@ Rectangle {
             Layout.column: 1
             Layout.fillHeight: true
 
-            vertical_scale_division: scopedata.vertical_scale_division
+            scale_division: scopedata.vertical_axis.scale_division
         }
 
         ScopePlotArea {
@@ -64,10 +64,10 @@ Rectangle {
             Layout.fillHeight: true
             Layout.fillWidth: true
 
-            vertical_scale_division: scopedata.vertical_scale_division
-            horizontal_scale_division: scopedata.horizontal_scale_division
-            vertical_coordinate_transform: scopedata.vertical_coordinate_transform
-            horizontal_coordinate_transform: scopedata.horizontal_coordinate_transform
+            vertical_scale_division: scopedata.vertical_axis.scale_division
+            horizontal_scale_division: scopedata.horizontal_axis.scale_division
+            vertical_coordinate_transform: scopedata.vertical_axis.coordinate_transform
+            horizontal_coordinate_transform: scopedata.horizontal_axis.coordinate_transform
             curve1: scopedata.curve
             curve2: scopedata.curve_2
             two_channels: scopedata.two_channels
@@ -101,7 +101,7 @@ Rectangle {
             Layout.column: 2
             Layout.fillWidth: true
 
-            horizontal_scale_division: scopedata.horizontal_scale_division
+            scale_division: scopedata.horizontal_axis.scale_division
         }
 
         Text {
