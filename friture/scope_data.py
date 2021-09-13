@@ -22,8 +22,6 @@ from PyQt5.QtCore import pyqtProperty
 
 from friture.axis import Axis
 from friture.curve import Curve
-from friture.plotting.coordinateTransform import CoordinateTransform
-from friture.plotting.scaleDivision import ScaleDivision
 
 class Scope_Data(QtCore.QObject):
     two_channels_changed = QtCore.pyqtSignal(bool)
@@ -34,10 +32,6 @@ class Scope_Data(QtCore.QObject):
         self._two_channels = False
         self._curve = Curve()
         self._curve_2 = Curve()
-        self._horizontal_scale_division = ScaleDivision(-1., 1.)
-        self._vertical_scale_division = ScaleDivision(-1., 1.)
-        self._horizontal_coordinate_transform = CoordinateTransform(-1, 1, 1., 0, 0)
-        self._vertical_coordinate_transform = CoordinateTransform(-1, 1, 1., 0, 0)
         self._horizontal_axis = Axis()
         self._vertical_axis = Axis()
 
@@ -58,22 +52,6 @@ class Scope_Data(QtCore.QObject):
         if self._two_channels != two_channels:
             self._two_channels = two_channels
             self.two_channels_changed.emit(two_channels)
-
-    @pyqtProperty(ScaleDivision, constant=True)
-    def horizontal_scale_division(self):
-        return self._horizontal_scale_division
-
-    @pyqtProperty(ScaleDivision, constant=True)
-    def vertical_scale_division(self):
-        return self._vertical_scale_division
-    
-    @pyqtProperty(CoordinateTransform, constant=True)
-    def horizontal_coordinate_transform(self):
-        return self._horizontal_coordinate_transform
-
-    @pyqtProperty(CoordinateTransform, constant=True)
-    def vertical_coordinate_transform(self):
-        return self._vertical_coordinate_transform
 
     @pyqtProperty(Axis, constant=True)
     def horizontal_axis(self):

@@ -23,8 +23,8 @@ Item {
     PlotGrid {
         anchors.fill: parent
 
-        vertical_scale_division: scopePlotArea.vertical_scale_division
-        horizontal_scale_division: scopePlotArea.horizontal_scale_division
+        vertical_scale_division: scopePlotArea.vertical_axis.scale_division
+        horizontal_scale_division: scopePlotArea.horizontal_axis.scale_division
     }
 
     PlotCurve {

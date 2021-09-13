@@ -7,12 +7,12 @@ import Friture 1.0
 Item {
     id: yscaleColumn
 
-    required property ScaleDivision vertical_scale_division
+    required property ScaleDivision scale_division
 
     readonly property int majorTickLength: 8
     readonly property int minorTickLength: 4
 
-    property int tickLabelMaxWidth: maxTextWidth(vertical_scale_division.logicalMajorTicks)
+    property int tickLabelMaxWidth: maxTextWidth(scale_division.logicalMajorTicks)
 
     implicitWidth: tickLabelMaxWidth + 1 + majorTickLength
 
@@ -48,7 +48,7 @@ Item {
 
     // QML docs discourage the use of multiple Shape objects. But the Repeater cannot be used inside Shape.
     Repeater {
-        model: vertical_scale_division.logicalMajorTicks
+        model: scale_division.logicalMajorTicks
 
         Item {
             anchors.right: yscaleColumn.right
@@ -76,7 +76,7 @@ Item {
 
         // QML docs discourage the use of multiple Shape objects. But the Repeater cannot be used inside Shape.
         Repeater {
-            model: vertical_scale_division.logicalMajorTicks
+            model: scale_division.logicalMajorTicks
 
             Item {
                 implicitWidth: tickLabelMaxWidth
@@ -96,7 +96,7 @@ Item {
 
     // QML docs discourage the use of multiple Shape objects. But the Repeater cannot be used inside Shape.
     Repeater {
-        model: vertical_scale_division.logicalMinorTicks
+        model: scale_division.logicalMinorTicks
 
         Item {
             y: (1. - modelData.logicalValue) * yscaleColumn.height
