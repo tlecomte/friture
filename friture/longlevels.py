@@ -131,8 +131,7 @@ class LongLevelWidget(QtWidgets.QWidget):
 
         self.level_min = DEFAULT_LEVEL_MIN
         self.level_max = DEFAULT_LEVEL_MAX
-        self._long_levels_data.vertical_axis.scale_division.setRange(self.level_min, self.level_max)
-        self._long_levels_data.vertical_axis.coordinate_transform.setRange(self.level_min, self.level_max)
+        self._long_levels_data.vertical_axis.setRange(self.level_min, self.level_max)
 
         self.audiobuffer = None
 
@@ -221,20 +220,16 @@ class LongLevelWidget(QtWidgets.QWidget):
 
     def setmin(self, value):
         self.level_min = value
-        self._long_levels_data.vertical_axis.scale_division.setRange(self.level_min, self.level_max)
-        self._long_levels_data.vertical_axis.coordinate_transform.setRange(self.level_min, self.level_max)
+        self._long_levels_data.vertical_axis.setRange(self.level_min, self.level_max)
         
-
     def setmax(self, value):
         self.level_max = value
-        self._long_levels_data.vertical_axis.scale_division.setRange(self.level_min, self.level_max)
-        self._long_levels_data.vertical_axis.coordinate_transform.setRange(self.level_min, self.level_max)
+        self._long_levels_data.vertical_axis.setRange(self.level_min, self.level_max)
 
     def setduration(self, value):
         self.length_seconds = value
         self.length_samples = int(self.length_seconds * self.subsampled_sampling_rate)
-        self._long_levels_data.horizontal_axis.scale_division.setRange(0., self.length_seconds)
-        self._long_levels_data.horizontal_axis.coordinate_transform.setRange(0., self.length_seconds)
+        self._long_levels_data.horizontal_axis.setRange(0., self.length_seconds)
 
     def setresptime(self, value):
         self.response_time = value

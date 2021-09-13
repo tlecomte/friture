@@ -32,6 +32,10 @@ class Axis(QtCore.QObject):
     @pyqtSlot(float, result=str)
     def formatTracker(self, value):
         return self._formatter(value)
+
+    def setRange(self, scale_min, scale_max):
+        self._scale_division.setRange(scale_min, scale_max)
+        self._coordinate_transform.setRange(scale_min, scale_max)
     
     @pyqtProperty(ScaleDivision, constant=True)
     def scale_division(self):
