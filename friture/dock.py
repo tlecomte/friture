@@ -17,6 +17,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
+from inspect import signature
+
 from PyQt5 import QtWidgets
 from friture.widgetdict import getWidgetById, widgetIds
 from friture.controlbar import ControlBar
@@ -83,10 +85,11 @@ class Dock(QtWidgets.QWidget):
 
         self.widgetId = widgetId
 
-        try:
-            self.audiowidget = getWidgetById(widgetId)["Class"](self, self.qml_engine)
-        except TypeError:
-            self.audiowidget = getWidgetById(widgetId)["Class"](self)
+        constructor = getWidgetById(widgetId)["Class"]
+        if len(signature(constructor).parameters) == 2:
+            self.audiowidget = constructor(self, self.qml_engine)
+        else:
+            self.audiowidget = constructor(self)
 
         self.audiowidget.set_buffer(self.audiobuffer)
         self.audiobuffer.new_data_available.connect(self.audiowidget.handle_new_data)
