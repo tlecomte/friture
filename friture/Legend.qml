@@ -6,7 +6,7 @@ Item {
     required property Curve curve1
     required property Curve curve2
 
-    width: childrenRect.width
+    implicitWidth: childrenRect.width
     
     Column {
         padding: 4
@@ -14,8 +14,8 @@ Item {
         Row {
             spacing: 4
             Shape {
-                width: 20
-                height: 1
+                implicitWidth: 20
+                implicitHeight: 1
                 anchors.verticalCenter: curve1legend.verticalCenter
                 ShapePath {
                     strokeWidth: 1
@@ -27,16 +27,14 @@ Item {
             Text {
                 id: curve1legend
                 text: curve1.name
-                width: contentWidth
-                height: contentHeight
             }
         }
         
         Row {
             spacing: 4
             Shape {
-                width: 20
-                height: 1
+                implicitWidth: 20
+                implicitHeight: 1
                 anchors.verticalCenter: curve2legend.verticalCenter
                 ShapePath {
                     strokeWidth: 1
@@ -48,8 +46,6 @@ Item {
             Text {    
                 id: curve2legend
                 text: curve2.name
-                width: contentWidth
-                height: contentHeight
             }
         }
     }

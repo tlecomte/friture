@@ -7,7 +7,7 @@ import Friture 1.0
 Item {
     id: xscaleColumn
 
-    height: childrenRect.height
+    implicitHeight: childrenRect.height
 
     required property ScaleDivision horizontal_scale_division
 
@@ -35,7 +35,7 @@ Item {
         Item {
             x: modelData.logicalValue * xscaleColumn.width
             y: 0
-            height: childrenRect.height
+            implicitHeight: childrenRect.height
 
             Shape {
                 ShapePath {
@@ -55,7 +55,6 @@ Item {
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignTop
                 y: majorTickLength + 1
-                height: contentHeight
             }
         }
     }

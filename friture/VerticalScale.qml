@@ -9,17 +9,17 @@ Item {
 
     required property ScaleDivision vertical_scale_division
 
-    width: tickLabelMaxWidth + 1 + majorTickLength
-
-    property int majorTickLength: 8
-    property int minorTickLength: 4
+    readonly property int majorTickLength: 8
+    readonly property int minorTickLength: 4
 
     property int tickLabelMaxWidth: maxTextWidth(vertical_scale_division.logicalMajorTicks)
+
+    implicitWidth: maxTextWidth(vertical_scale_division.logicalMajorTicks) + 1 + majorTickLength
 
     function maxTextWidth(majorTicks) {
         var maxWidth = 0
         for (var i = 0; i < majorTicks.length; i++) {
-            var textWidth = fontMetrics.boundingRect(majorTicks[i].value.toFixed(1)).width;
+            var textWidth = fontMetrics.boundingRect(majorTicks[i].value).width;
             if (textWidth > maxWidth) {
                 maxWidth = textWidth;
             }
@@ -50,7 +50,7 @@ Item {
 
         Item {
             anchors.right: yscaleColumn.right
-            width: 1 + majorTickLength
+            implicitWidth: 1 + majorTickLength
 
             y: (1. - modelData.logicalValue) * yscaleColumn.height
 
@@ -77,16 +77,15 @@ Item {
             model: vertical_scale_division.logicalMajorTicks
 
             Item {
-                width: tickLabelMaxWidth
+                implicitWidth: tickLabelMaxWidth
                 y: (1. - modelData.logicalValue) * yscaleColumn.height
 
                 Text {
                     id: tickLabel
-                    text: modelData.value.toFixed(1)
+                    text: modelData.value
                     anchors.verticalCenter: parent.verticalCenter
+                    anchors.right: parent.right
                     verticalAlignment: Text.AlignVCenter
-
-                    width: tickLabelMaxWidth
                     horizontalAlignment: Text.AlignRight
                 }
             }

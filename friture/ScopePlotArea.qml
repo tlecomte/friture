@@ -13,6 +13,8 @@ Item {
     required property Curve curve1
     required property Curve curve2
     required property bool two_channels
+    required property Axis vertical_axis
+    required property Axis horizontal_axis
 
     PlotBackground {
         anchors.fill: parent
@@ -62,8 +64,8 @@ Item {
         {
             x: Math.min(crosshair.posX + 4, scopePlotArea.width - width)
             y: Math.max(crosshair.posY - mouseText.contentHeight - 4, 0)
-            width: mouseText.contentWidth
-            height: mouseText.contentHeight
+            implicitWidth: mouseText.contentWidth
+            implicitHeight: mouseText.contentHeight
             color: "white"
 
             Text {
@@ -72,7 +74,7 @@ Item {
                 property double dataX: scopePlotArea.horizontal_coordinate_transform.toPlot(crosshair.relativePosX)
                 property double dataY: scopePlotArea.vertical_coordinate_transform.toPlot(1. - crosshair.relativePosY)
 
-                text: dataX.toFixed(1)  + " ms, " + dataY.toFixed(3)
+                text: scopePlotArea.horizontal_axis.formatTracker(dataX)  + ", " + scopePlotArea.vertical_axis.formatTracker(dataY)
             }
         }
 
