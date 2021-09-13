@@ -6,10 +6,6 @@ import Friture 1.0
 Item {
     id: scopePlotArea
 
-    required property ScaleDivision vertical_scale_division
-    required property ScaleDivision horizontal_scale_division
-    required property CoordinateTransform vertical_coordinate_transform
-    required property CoordinateTransform horizontal_coordinate_transform
     required property Curve curve1
     required property Curve curve2
     required property bool two_channels
@@ -71,8 +67,8 @@ Item {
             Text {
                 id: mouseText
 
-                property double dataX: scopePlotArea.horizontal_coordinate_transform.toPlot(crosshair.relativePosX)
-                property double dataY: scopePlotArea.vertical_coordinate_transform.toPlot(1. - crosshair.relativePosY)
+                property double dataX: scopePlotArea.horizontal_axis.coordinate_transform.toPlot(crosshair.relativePosX)
+                property double dataY: scopePlotArea.vertical_axis.coordinate_transform.toPlot(1. - crosshair.relativePosY)
 
                 text: scopePlotArea.horizontal_axis.formatTracker(dataX)  + ", " + scopePlotArea.vertical_axis.formatTracker(dataY)
             }
