@@ -14,7 +14,9 @@ Item {
 
     property int tickLabelMaxWidth: maxTextWidth(vertical_scale_division.logicalMajorTicks)
 
-    implicitWidth: maxTextWidth(vertical_scale_division.logicalMajorTicks) + 1 + majorTickLength
+    implicitWidth: tickLabelMaxWidth + 1 + majorTickLength
+
+    property double topOverflow: fontMetrics.height / 2
 
     function maxTextWidth(majorTicks) {
         var maxWidth = 0

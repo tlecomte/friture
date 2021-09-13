@@ -22,16 +22,13 @@ Rectangle {
         rowSpacing: 2
         columnSpacing: 2
 
-        FontMetrics {
-            id: fontMetrics
-        }
-
         Item {
             Layout.row: 0
             Layout.column: 2
 
             // spacer so that the labels of the vertical scale are not clipped
-            implicitHeight: fontMetrics.ascent
+            implicitHeight: verticalScale.topOverflow
+            Layout.maximumHeight: implicitHeight
         }
 
         Item {
@@ -53,6 +50,7 @@ Rectangle {
         }
 
         VerticalScale {
+            id: verticalScale
             Layout.row: 1
             Layout.column: 1
             Layout.fillHeight: true
@@ -77,9 +75,19 @@ Rectangle {
             horizontal_axis: scopedata.horizontal_axis
         }
 
-        Legend {
+        Item {
             Layout.row: 1
             Layout.column: 3
+
+            // spacer so that the last label of the horizontal scale is not clipped
+            Layout.maximumWidth: implicitWidth
+            implicitWidth: Math.max(0., horizontalScale.rightOverflow - (scopedata.two_channels ? legend.width : 0.))
+        }
+
+        Legend {
+            id: legend
+            Layout.row: 1
+            Layout.column: 4
             Layout.alignment: Qt.AlignTop | Qt.AlignLeft
             visible: scopedata.two_channels
 
@@ -88,6 +96,7 @@ Rectangle {
         }
 
         HorizontalScale {
+            id: horizontalScale
             Layout.row: 2
             Layout.column: 2
             Layout.fillWidth: true
