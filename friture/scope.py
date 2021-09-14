@@ -27,6 +27,7 @@ from numpy import log10, where, sign, arange, zeros
 from friture.store import GetStore
 from friture.audiobackend import SAMPLING_RATE
 from friture.scope_data import Scope_Data
+from friture.curve import Curve
 from friture.qml_tools import qml_url, raise_if_error
 
 SMOOTH_DISPLAY_TIMER_PERIOD_MS = 25
@@ -46,8 +47,13 @@ class Scope_Widget(QtWidgets.QWidget):
         store._dock_states.append(self._scope_data)
         state_id = len(store._dock_states) - 1
 
-        self._scope_data.curve.name = "Ch1"
-        self._scope_data.curve_2.name = "Ch2"
+        self._curve = Curve()
+        self._curve.name = "Ch1"
+        self._scope_data.add_plot_item(self._curve)
+
+        self._curve_2 = Curve()
+        self._curve_2.name = "Ch2"
+
         self._scope_data.vertical_axis.name = "Signal"
         self._scope_data.vertical_axis.setTrackerFormatter(lambda x: "%#.3g" % (x))
         self._scope_data.horizontal_axis.name = "Time (ms)"
@@ -97,6 +103,11 @@ class Scope_Widget(QtWidgets.QWidget):
 
         self._scope_data.two_channels = twoChannels
 
+        if twoChannels and len(self._scope_data.plot_items) == 1:
+            self._scope_data.add_plot_item(self._curve_2)
+        elif not twoChannels and len(self._scope_data.plot_items) == 2:
+            self._scope_data.remove_plot_item(self._curve_2)
+
         # trigger on the first channel only
         triggerdata = floatdata[0, :]
         # trigger on half of the waveform
@@ -137,11 +148,11 @@ class Scope_Widget(QtWidgets.QWidget):
 
         scaled_t = (self.time * 1e3 + self.timerange/2.) / self.timerange
         scaled_y = 1. - (self.y + 1) / 2.
-        self._scope_data.curve.setData(scaled_t, scaled_y)
+        self._curve.setData(scaled_t, scaled_y)
 
         if self.y2 is not None:
             scaled_y2 = 1. - (self.y2 + 1) / 2.
-            self._scope_data.curve_2.setData(scaled_t, scaled_y2)
+            self._curve_2.setData(scaled_t, scaled_y2)
 
     # method
     def canvasUpdate(self):

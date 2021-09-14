@@ -6,11 +6,10 @@ import Friture 1.0
 Item {
     id: scopePlotArea
 
-    required property Curve curve1
-    required property Curve curve2
-    required property bool two_channels
     required property Axis vertical_axis
     required property Axis horizontal_axis
+
+    default property alias content: plotItemPlaceholder.children
 
     PlotBackground {
         anchors.fill: parent
@@ -23,17 +22,9 @@ Item {
         horizontal_scale_division: scopePlotArea.horizontal_axis.scale_division
     }
 
-    PlotCurve {
+    Item {
+        id: plotItemPlaceholder
         anchors.fill: parent
-        color: "red"
-        curve: curve1
-    }
-
-    PlotCurve {
-        visible: two_channels
-        anchors.fill: parent
-        color: "blue"
-        curve: curve2
     }
 
     Rectangle {

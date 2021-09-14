@@ -34,6 +34,7 @@ from .signal.decimate import decimate
 from .ringbuffer import RingBuffer
 from friture_extensions.lfilter import pyx_lfilter_float64_1D
 from friture.scope_data import Scope_Data
+from friture.curve import Curve
 from friture.store import GetStore
 from friture.qml_tools import qml_url, raise_if_error
 
@@ -106,8 +107,10 @@ class LongLevelWidget(QtWidgets.QWidget):
         store._dock_states.append(self._long_levels_data)
         state_id = len(store._dock_states) - 1
 
-        self._long_levels_data.curve.name = "Ch1"
-        self._long_levels_data.curve_2.name = "Ch2"
+        self._curve = Curve()
+        self._curve.name = "Ch1"
+        self._long_levels_data.add_plot_item(self._curve)
+
         self._long_levels_data.vertical_axis.name = "Level (dB FS RMS)"
         self._long_levels_data.vertical_axis.setTrackerFormatter(lambda x: "%#.3g dB" % (x))
         self._long_levels_data.horizontal_axis.name = "Time (sec)"
@@ -206,7 +209,7 @@ class LongLevelWidget(QtWidgets.QWidget):
 
             scaled_t = self.time / self.length_seconds
             scaled_y = np.clip(1. - (levels[0, :] - self.level_min) / (self.level_max - self.level_min), 0., 1.)
-            self._long_levels_data.curve.setData(scaled_t, scaled_y)
+            self._curve.setData(scaled_t, scaled_y)
 
     def on_status_changed(self, status):
         if status == QQuickWidget.Error:

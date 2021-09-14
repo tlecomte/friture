@@ -1,51 +1,37 @@
 import QtQuick 2.15
 import QtQuick.Shapes 1.15
 import Friture 1.0
+import "plotItemColors.js" as PlotItemColors
 
 Item {
-    required property Curve curve1
-    required property Curve curve2
+    required property ScopeData scopedata
 
     implicitWidth: childrenRect.width
     
     Column {
         padding: 4
         spacing: 4
-        Row {
-            spacing: 4
-            Shape {
-                implicitWidth: 20
-                implicitHeight: 1
-                anchors.verticalCenter: curve1legend.verticalCenter
-                ShapePath {
-                    strokeWidth: 1
-                    strokeColor: "red"
-                    fillColor: "transparent"
-                    PathLine { x: 20; y: 0 }
+
+        Repeater {
+            model: scopedata.plot_items
+
+            Row {
+                spacing: 4
+                Shape {
+                    implicitWidth: 20
+                    implicitHeight: 1
+                    anchors.verticalCenter: curve1legend.verticalCenter
+                    ShapePath {
+                        strokeWidth: 1
+                        strokeColor: PlotItemColors.color(index)
+                        fillColor: "transparent"
+                        PathLine { x: 20; y: 0 }
+                    }
                 }
-            }
-            Text {
-                id: curve1legend
-                text: curve1.name
-            }
-        }
-        
-        Row {
-            spacing: 4
-            Shape {
-                implicitWidth: 20
-                implicitHeight: 1
-                anchors.verticalCenter: curve2legend.verticalCenter
-                ShapePath {
-                    strokeWidth: 1
-                    strokeColor: "blue"
-                    fillColor: "transparent"
-                    PathLine { x: 20; y: 0 }
+                Text {
+                    id: curve1legend
+                    text: modelData.name
                 }
-            }
-            Text {    
-                id: curve2legend
-                text: curve2.name
             }
         }
     }
