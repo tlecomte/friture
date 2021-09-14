@@ -25,13 +25,11 @@ from friture.axis import Axis
 from friture.curve import Curve
 
 class Scope_Data(QtCore.QObject):
-    two_channels_changed = QtCore.pyqtSignal(bool)
     plot_items_changed = QtCore.pyqtSignal()
 
     def __init__(self, parent=None):
         super().__init__(parent)
 
-        self._two_channels = False
         self._plot_items = []
         self._horizontal_axis = Axis()
         self._vertical_axis = Axis()
@@ -47,16 +45,6 @@ class Scope_Data(QtCore.QObject):
     def remove_plot_item(self, plot_item):
         self._plot_items.remove(plot_item)
         self.plot_items_changed.emit()
-
-    @pyqtProperty(bool, notify=two_channels_changed)
-    def two_channels(self):
-        return self._two_channels
-    
-    @two_channels.setter
-    def two_channels(self, two_channels):
-        if self._two_channels != two_channels:
-            self._two_channels = two_channels
-            self.two_channels_changed.emit(two_channels)
 
     @pyqtProperty(Axis, constant=True)
     def horizontal_axis(self):

@@ -76,7 +76,7 @@ Rectangle {
 
             // spacer so that the last label of the horizontal scale is not clipped
             Layout.maximumWidth: implicitWidth
-            implicitWidth: Math.max(0., horizontalScale.rightOverflow - (scopedata.two_channels ? legend.width : 0.))
+            implicitWidth: Math.max(0., horizontalScale.rightOverflow - (legend.visible ? legend.width : 0.))
         }
 
         Legend {
@@ -84,7 +84,7 @@ Rectangle {
             Layout.row: 1
             Layout.column: 4
             Layout.alignment: Qt.AlignTop | Qt.AlignLeft
-            visible: scopedata.two_channels
+            visible: scopedata.plot_items.length > 1
 
             scopedata: plot.scopedata
         }

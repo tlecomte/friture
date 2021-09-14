@@ -101,8 +101,6 @@ class Scope_Widget(QtWidgets.QWidget):
         if floatdata.shape[0] > 1:
             twoChannels = True
 
-        self._scope_data.two_channels = twoChannels
-
         if twoChannels and len(self._scope_data.plot_items) == 1:
             self._scope_data.add_plot_item(self._curve_2)
         elif not twoChannels and len(self._scope_data.plot_items) == 2:
