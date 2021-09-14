@@ -19,29 +19,34 @@
 
 from PyQt5 import QtCore
 from PyQt5.QtCore import pyqtProperty
+from PyQt5.QtQml import QQmlListProperty
 
 from friture.axis import Axis
 from friture.curve import Curve
 
 class Scope_Data(QtCore.QObject):
     two_channels_changed = QtCore.pyqtSignal(bool)
+    plot_items_changed = QtCore.pyqtSignal()
 
     def __init__(self, parent=None):
         super().__init__(parent)
 
         self._two_channels = False
-        self._curve = Curve()
-        self._curve_2 = Curve()
+        self._plot_items = []
         self._horizontal_axis = Axis()
         self._vertical_axis = Axis()
 
-    @pyqtProperty(Curve, constant = True)
-    def curve(self):
-        return self._curve
+    @pyqtProperty(QQmlListProperty, notify=plot_items_changed)
+    def plot_items(self):
+        return QQmlListProperty(Curve, self, self._plot_items)
     
-    @pyqtProperty(Curve, constant = True)
-    def curve_2(self):
-        return self._curve_2
+    def add_plot_item(self, plot_item):
+        self._plot_items.append(plot_item)
+        self.plot_items_changed.emit()
+
+    def remove_plot_item(self, plot_item):
+        self._plot_items.remove(plot_item)
+        self.plot_items_changed.emit()
 
     @pyqtProperty(bool, notify=two_channels_changed)
     def two_channels(self):
