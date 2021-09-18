@@ -230,8 +230,6 @@ class ImagePlot(QtWidgets.QWidget):
 
             self.verticalScaleDivision.setLength(self.canvasWidget.height())
             self.verticalScaleTransform.setLength(self.canvasWidget.height())
-            startBorder, endBorder = self.verticalScale.spacingBorders()
-            self.verticalScaleTransform.setBorders(startBorder, endBorder)
 
             self.verticalScale.update()
 
