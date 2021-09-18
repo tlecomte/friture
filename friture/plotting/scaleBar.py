@@ -88,8 +88,9 @@ class VerticalScaleBar(QtWidgets.QWidget):
             # for vertical scale we invert the coordinates
             y = self.height() - self.coordinateTransform.toScreen(tick)
             painter.drawLine(xt, y, xb, y)
-            tick_string = self.tickFormatter(tick, digits)
-            painter.drawText(le - fm.width(tick_string), y + lh / 2 - 2, tick_string)
+            if self.coordinateTransform.startBorder < y < self.coordinateTransform.length - self.coordinateTransform.endBorder:
+                tick_string = self.tickFormatter(tick, digits)
+                painter.drawText(le - fm.width(tick_string), y + lh / 2 - 2, tick_string)
 
         for tick in self.scaleDivision.minorTicks():
             # for vertical scale we invert the coordinates
