@@ -22,6 +22,7 @@ from PyQt5.QtCore import pyqtProperty
 from PyQt5.QtQml import QQmlListProperty
 
 import friture.plotting.frequency_scales as fscales
+from friture.plotting.coordinateTransform import CoordinateTransform
 
 class Tick(QtCore.QObject):
     def __init__(self, value, logical_value, parent=None):
@@ -48,15 +49,18 @@ class ScaleDivision(QtCore.QObject):
         self.scale_min = scale_min
         self.scale_max = scale_max
         self.scale = fscales.Linear
+        self._logical_coordinate_transform = CoordinateTransform(scale_min, scale_max, 1., 0., 0.)
         self._update_ticks()
 
     def setRange(self, scale_min, scale_max):
         self.scale_min = scale_min
         self.scale_max = scale_max
+        self._logical_coordinate_transform.setRange(scale_min, scale_max)
         self._update_ticks()
 
     def setScale(self, scale):
         self.scale = scale
+        self._logical_coordinate_transform.setScale(scale)
         self._update_ticks()
 
     def majorTicks(self):
@@ -76,9 +80,6 @@ class ScaleDivision(QtCore.QObject):
     def _update_ticks(self):
         self.major_ticks, self.minor_ticks = self.scale.ticks(self.scale_min, self.scale_max)
 
-        trueMin = min(self.scale_min, self.scale_max)
-        trueMax = max(self.scale_min, self.scale_max)
-
         if len(self.major_ticks) < 2:
             interval = 0
         else:
@@ -86,8 +87,18 @@ class ScaleDivision(QtCore.QObject):
         precision = fscales.numberPrecision(interval)
         digits = max(0, int(-precision))
 
-        self._logical_major_ticks = [Tick('{0:.{1}f}'.format(tick, digits), (tick - trueMin) / (trueMax - trueMin)) for tick in self.major_ticks]
+        def buildTick(tick):
+            value = '{0:.{1}f}'.format(tick, digits)
+            logical_value = self._logical_coordinate_transform.toScreen(tick)
+            return Tick(value, logical_value)
+
+        self._logical_major_ticks = list(map(buildTick, self.major_ticks))
         self.logical_major_ticks_changed.emit()
 
-        self._logical_minor_ticks = [Tick(tick, (tick - trueMin) / (trueMax - trueMin)) for tick in self.minor_ticks]
+        def buildTick(tick):
+            value = tick
+            logical_value = self._logical_coordinate_transform.toScreen(tick)
+            return Tick(value, logical_value)
+
+        self._logical_minor_ticks = list(map(buildTick, self.minor_ticks))
         self.logical_minor_ticks_changed.emit()
