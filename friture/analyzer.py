@@ -379,15 +379,6 @@ def main():
         logger.info("Adding the following to the Library paths: %s", pluginsPath)
         QApplication.addLibraryPath(pluginsPath)
 
-        # on macOS, OpenGL 2.1 does not work well
-        # request a 3.2 Core context instead
-        format = QSurfaceFormat()
-        format.setDepthBufferSize(24)
-        format.setStencilBufferSize(8)
-        format.setVersion(3, 2)
-        format.setProfile(QSurfaceFormat.CoreProfile)
-        QSurfaceFormat.setDefaultFormat(format)
-
     # Splash screen
     pixmap = QPixmap(":/images/splash.png")
     splash = QSplashScreen(pixmap)
