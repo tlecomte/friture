@@ -5,18 +5,35 @@ import QtQuick.Shapes 1.15
 import Friture 1.0
 import "plotItemColors.js" as PlotItemColors
 
-Plot {
+Item {
+    id: container
     property var stateId
-    visible: stateId >= 0
-    scopedata: stateId >= 0 ? Store.dock_states[stateId] : Qt.createQmlObject('import Friture 1.0; ScopeData {}', this, "defaultScopeData");
 
-    Repeater {
-        model: scopedata.plot_items
+    // delay the load of the Plot until stateId has been set
+    Loader {
+        id: loader
+        anchors.fill: parent
+    }
 
-        PlotCurve {
-            anchors.fill: parent
-            color: PlotItemColors.color(index)
-            curve: modelData
+    onStateIdChanged: {
+        console.log("stateId changed: " + stateId)
+        loader.sourceComponent = plotComponent
+    }
+
+    Component {
+        id: plotComponent
+        Plot {
+            scopedata: Store.dock_states[container.stateId]
+
+            Repeater {
+                model: scopedata.plot_items
+
+                PlotCurve {
+                    anchors.fill: parent
+                    color: PlotItemColors.color(index)
+                    curve: modelData
+                }
+            }
         }
     }
 }
