@@ -353,10 +353,6 @@ def main():
 
     logger.info("Friture %s starting on %s (%s)", friture.__version__, platform.system(), sys.platform)
 
-    # make sure Qt loads the desktop OpenGL stack, rather than OpenGL ES or a software OpenGL
-    # only the former option is compatible with the use of PyOpenGL
-    QtCore.QCoreApplication.setAttribute(QtCore.Qt.AA_UseDesktopOpenGL)
-
     logger.info("QML path: %s", qml_url(""))
 
     if platform.system() == "Windows":
