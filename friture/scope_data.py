@@ -25,6 +25,7 @@ from friture.axis import Axis
 from friture.curve import Curve
 
 class Scope_Data(QtCore.QObject):
+    show_legend_changed = QtCore.pyqtSignal(bool) 
     plot_items_changed = QtCore.pyqtSignal()
 
     def __init__(self, parent=None):
@@ -33,13 +34,19 @@ class Scope_Data(QtCore.QObject):
         self._plot_items = []
         self._horizontal_axis = Axis()
         self._vertical_axis = Axis()
+        self._show_legend = True
 
     @pyqtProperty(QQmlListProperty, notify=plot_items_changed)
     def plot_items(self):
         return QQmlListProperty(Curve, self, self._plot_items)
     
+    def insert_plot_item(self, index, plot_item):
+        self._plot_items.insert(index, plot_item)
+        self.plot_items_changed.emit()
+    
     def add_plot_item(self, plot_item):
         self._plot_items.append(plot_item)
+        plot_item.setParent(self) # take ownership
         self.plot_items_changed.emit()
 
     def remove_plot_item(self, plot_item):
@@ -53,3 +60,13 @@ class Scope_Data(QtCore.QObject):
     @pyqtProperty(Axis, constant=True)
     def vertical_axis(self):
         return self._vertical_axis
+    
+    @pyqtProperty(bool, notify=show_legend_changed)
+    def show_legend(self):
+        return self._show_legend
+    
+    @show_legend.setter
+    def show_legend(self, show_legend):
+        if self._show_legend != show_legend:
+            self._show_legend = show_legend
+            self.show_legend_changed.emit(show_legend)

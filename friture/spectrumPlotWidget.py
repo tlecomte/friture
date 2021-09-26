@@ -1,32 +1,58 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from PyQt5 import QtWidgets
-from friture.audiobackend import SAMPLING_RATE
-from friture.plotting.scaleWidget import VerticalScaleWidget, HorizontalScaleWidget
-from friture.plotting.scaleDivision import ScaleDivision
-from friture.plotting.coordinateTransform import CoordinateTransform
-from friture.plotting.glCanvasWidget import GlCanvasWidget
-from friture.plotting.quadsItem import QuadsItem
+from enum import Enum
+import logging
 
-from numpy import zeros, ones, log10, array
+from PyQt5 import QtWidgets
+from PyQt5.QtQuickWidgets import QQuickWidget
+
+from numpy import zeros, ones, log10
 import numpy as np
+
+from friture.audiobackend import SAMPLING_RATE
+from friture.plotting.coordinateTransform import CoordinateTransform
+from friture.spectrum_data import Spectrum_Data
+from friture.filled_curve import CurveType, FilledCurve
+from friture.store import GetStore
+from friture.qml_tools import qml_url, raise_if_error
 
 # The peak decay rates (magic goes here :).
 PEAK_DECAY_RATE = 1.0 - 3E-6
 # Number of cycles the peak stays on hold before fall-off.
 PEAK_FALLOFF_COUNT = 32  # default : 16
 
+class Baseline(Enum):
+    PLOT_BOTTOM = 1,
+    DATA_ZERO = 2
 
 class SpectrumPlotWidget(QtWidgets.QWidget):
 
-    def __init__(self, parent):
+    def __init__(self, parent, engine):
         super(SpectrumPlotWidget, self).__init__(parent)
 
-        self.x1 = array([0.1, 0.5, 1.])
-        self.x2 = array([0.5, 1., 2.])
+        self.logger = logging.getLogger(__name__)
 
-        self.needtransform = False
+        store = GetStore()
+        self._spectrum_data = Spectrum_Data(store)
+        store._dock_states.append(self._spectrum_data)
+        state_id = len(store._dock_states) - 1
+
+        self._curve_signal = FilledCurve(CurveType.SIGNAL)
+        self._spectrum_data.add_plot_item(self._curve_signal)
+
+        self._curve_peak = FilledCurve(CurveType.PEEK)
+
+        self._spectrum_data.show_legend = False
+        self._spectrum_data.vertical_axis.name = "PSD (dB)"
+        self._spectrum_data.vertical_axis.setTrackerFormatter(lambda x: "%.1f dB" % (x))
+        self._spectrum_data.horizontal_axis.name = "Frequency (Hz)"
+        self._spectrum_data.horizontal_axis.setTrackerFormatter(lambda x: "%.0f Hz" % (x))
+
+        self._spectrum_data.vertical_axis.setRange(0, 1)
+        self._spectrum_data.horizontal_axis.setRange(0, 22000)
+
+        self._baseline = Baseline.PLOT_BOTTOM
 
         self.paused = False
 
@@ -35,77 +61,50 @@ class SpectrumPlotWidget(QtWidgets.QWidget):
         self.peak_int = zeros((3,))
         self.peak_decay = ones((3,)) * PEAK_DECAY_RATE
 
-        self.verticalScaleDivision = ScaleDivision(0, 1)
-        self.verticalScaleTransform = CoordinateTransform(0, 1, 100, 0, 0)
+        self.normVerticalScaleTransform = CoordinateTransform(0, 1, 1, 0, 0)
+        self.normHorizontalScaleTransform = CoordinateTransform(0, 22000, 1, 0, 0)
 
-        self.verticalScale = VerticalScaleWidget(self, self.verticalScaleDivision, self.verticalScaleTransform)
-        self.verticalScale.setTitle("PSD (dB)")
-
-        self.horizontalScaleDivision = ScaleDivision(0, 22000)
-        self.horizontalScaleTransform = CoordinateTransform(0, 22000, 100, 0, 0)
-
-        self.horizontalScale = HorizontalScaleWidget(self, self.horizontalScaleDivision, self.horizontalScaleTransform)
-        self.horizontalScale.setTitle("Frequency (Hz)")
-
-        self.canvasWidget = GlCanvasWidget(self, self.verticalScaleTransform, self.horizontalScaleTransform)
-        self.canvasWidget.setTrackerFormatter(lambda x, y: "%d Hz, %.1f dB" % (x, y))
-        self.canvasWidget.resized.connect(self.canvasResized)
-
-        def r_peak(p): return 1. + 0.*p
-        def g_peak(p): return 1. - p
-        def b_peak(p): return 1. - p
-
-        self.peakQuadsItem = QuadsItem(r_peak, g_peak, b_peak)
-        self.canvasWidget.attach(self.peakQuadsItem)
-
-        def r_signal(p): return 0.*p
-        def g_signal(p): return 0.3 + 0.5*p
-        def b_signal(p): return 0.*p
-
-        self.quadsItem = QuadsItem(r_signal, g_signal, b_signal)
-        self.canvasWidget.attach(self.quadsItem)
-
-        plotLayout = QtWidgets.QGridLayout()
+        plotLayout = QtWidgets.QGridLayout(self)
         plotLayout.setSpacing(0)
         plotLayout.setContentsMargins(0, 0, 0, 0)
-        plotLayout.addWidget(self.verticalScale, 0, 0)
-        plotLayout.addWidget(self.canvasWidget, 0, 1)
-        plotLayout.addWidget(self.horizontalScale, 1, 1)
+
+        self.quickWidget = QQuickWidget(engine, self)
+        self.quickWidget.statusChanged.connect(self.on_status_changed)
+        self.quickWidget.setResizeMode(QQuickWidget.SizeRootObjectToView)
+        self.quickWidget.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        self.quickWidget.setSource(qml_url("Spectrum.qml"))
+        
+        raise_if_error(self.quickWidget)
+
+        self.quickWidget.rootObject().setProperty("stateId", state_id)
+
+        plotLayout.addWidget(self.quickWidget)
 
         self.setLayout(plotLayout)
 
-    def setfreqscale(self, scale):
-        self.horizontalScaleTransform.setScale(scale)
-        self.horizontalScaleDivision.setScale(scale)
+    def on_status_changed(self, status):
+        if status == QQuickWidget.Error:
+            for error in self.quickWidget.errors():
+                self.logger.error("QML error: " + error.toString())
 
-        self.needtransform = True
-        self.draw()
+    def setfreqscale(self, scale):
+        self.normHorizontalScaleTransform.setScale(scale)
+        self._spectrum_data.horizontal_axis.scale_division.setScale(scale)
+        self._spectrum_data.horizontal_axis.coordinate_transform.setScale(scale)
 
     def setfreqrange(self, minfreq, maxfreq):
         self.xmin = minfreq
         self.xmax = maxfreq
 
-        self.horizontalScaleTransform.setRange(minfreq, maxfreq)
-        self.horizontalScaleDivision.setRange(minfreq, maxfreq)
-
-        # notify that sizeHint has changed (this should be done with a signal emitted from the scale division to the scale bar)
-        self.horizontalScale.scaleBar.updateGeometry()
-
-        self.needtransform = True
-        self.draw()
+        self._spectrum_data.horizontal_axis.setRange(minfreq, maxfreq)
+        self.normHorizontalScaleTransform.setRange(minfreq, maxfreq)
 
     def setspecrange(self, spec_min, spec_max):
         if spec_min > spec_max:
             spec_min, spec_max = spec_max, spec_min
 
-        self.verticalScaleTransform.setRange(spec_min, spec_max)
-        self.verticalScaleDivision.setRange(spec_min, spec_max)
-
-        # notify that sizeHint has changed (this should be done with a signal emitted from the scale division to the scale bar)
-        self.verticalScale.scaleBar.updateGeometry()
-
-        self.needtransform = True
-        self.draw()
+        self._spectrum_data.vertical_axis.setRange(spec_min, spec_max)
+        self.normVerticalScaleTransform.setRange(spec_min, spec_max)
 
     def setweighting(self, weighting):
         if weighting is 0:
@@ -117,93 +116,69 @@ class SpectrumPlotWidget(QtWidgets.QWidget):
         else:
             title = "PSD (dB C)"
 
-        self.verticalScale.setTitle(title)
-        self.needtransform = True
-        self.draw()
+        self._spectrum_data.vertical_axis.name = title
 
     def setShowFreqLabel(self, showFreqLabel):
-        self.canvasWidget.setShowFreqLabel(showFreqLabel)
+        self._spectrum_data.showFrequencyTracker = showFreqLabel
 
     def set_peaks_enabled(self, enabled):
         self.peaks_enabled = enabled
 
-        self.canvasWidget.detachAll()
         if enabled:
-            self.canvasWidget.attach(self.peakQuadsItem)
-        self.canvasWidget.attach(self.quadsItem)
+            self._spectrum_data.insert_plot_item(0, self._curve_peak)
+        else:
+            self._spectrum_data.remove_plot_item(self._curve_peak)
 
     def set_baseline_displayUnits(self, baseline):
-        self.quadsItem.set_baseline_displayUnits(baseline)
+        self._baseline = Baseline.PLOT_BOTTOM
 
     def set_baseline_dataUnits(self, baseline):
-        self.quadsItem.set_baseline_dataUnits(baseline)
+        self._baseline = Baseline.DATA_ZERO
 
     def setdata(self, x, y, fmax):
-        x1 = zeros(x.shape)
-        x2 = zeros(x.shape)
-        x1[0] = 1e-10
-        x1[1:] = (x[1:] + x[:-1]) / 2.
-        x2[:-1] = x1[1:]
-        x2[-1] = float(SAMPLING_RATE / 2)
-
-        if len(x1) != len(self.x1):
-            self.needtransform = True
-            self.x1 = x1
-            self.x2 = x2
-
         if not self.paused:
-            self.canvasWidget.setfmax(fmax)
+            if fmax < 2e2:
+                text = "%.1f Hz" % (fmax)
+            else:
+                text = "%d Hz" % (np.rint(fmax))
+            self._spectrum_data.setFmax(text, self.normHorizontalScaleTransform.toScreen(fmax))
 
             M = np.max(y)
-            m = self.verticalScaleTransform.coord_min
+            m = self.normVerticalScaleTransform.coord_min
             y_int = (y-m)/(np.abs(M-m)+1e-3)
 
-            self.quadsItem.setData(x1, x2, y, y_int)
+            x_left = zeros(x.shape)
+            x_right = zeros(x.shape)
+            x_left[0] = 1e-10
+            x_left[1:] = (x[1:] + x[:-1]) / 2.
+            x_right[:-1] = x_left[1:]
+            x_right[-1] = float(SAMPLING_RATE / 2)
+            scaled_x_left = self.normHorizontalScaleTransform.toScreen(x_left)
+            scaled_x_right = self.normHorizontalScaleTransform.toScreen(x_right)
+
+            baseline = 1. if self._baseline == Baseline.PLOT_BOTTOM else (1. - self.normVerticalScaleTransform.toScreen(0.))
+
+            scaled_y = 1. - self.normVerticalScaleTransform.toScreen(y)
+            z = y_int
+            self._curve_signal.setData(scaled_x_left, scaled_x_right, scaled_y, z, baseline)
 
             if self.peaks_enabled:
                 self.compute_peaks(y)
-                self.peakQuadsItem.setData(x1, x2, self.peak, self.peak_int)
+                scaled_peak = 1. - self.normVerticalScaleTransform.toScreen(self.peak)
+                z_peak = self.peak_int
+                self._curve_peak.setData(scaled_x_left, scaled_x_right, scaled_peak, z_peak, baseline)
 
     def draw(self):
-        if self.needtransform:
-            self.verticalScaleTransform.setLength(self.canvasWidget.height())
-            startBorder, endBorder = self.verticalScale.spacingBorders()
-            self.verticalScaleTransform.setBorders(startBorder, endBorder)
-
-            self.verticalScale.update()
-
-            self.horizontalScaleTransform.setLength(self.canvasWidget.width())
-            startBorder, endBorder = self.horizontalScale.spacingBorders()
-            self.horizontalScaleTransform.setBorders(startBorder, endBorder)
-
-            self.horizontalScale.update()
-
-            self.canvasWidget.setGrid(array(self.horizontalScaleDivision.majorTicks()),
-                                      array(self.horizontalScaleDivision.minorTicks()),
-                                      array(self.verticalScaleDivision.majorTicks()),
-                                      array(self.verticalScaleDivision.minorTicks()))
-
-            self.quadsItem.transformUpdate()
-            self.peakQuadsItem.transformUpdate()
-
-            self.needtransform = False
+        return
 
     def pause(self):
         self.paused = True
-        self.canvasWidget.pause()
 
     def restart(self):
         self.paused = False
-        self.canvasWidget.restart()
-
-    # redraw when the widget is resized to update coordinates transformations
-    # QOpenGlWidget does not like that we override resizeEvent
-    def canvasResized(self, canvasWidth, canvasHeight):
-        self.needtransform = True
-        self.draw()
 
     def canvasUpdate(self):
-        self.canvasWidget.update()
+        return
 
     def compute_peaks(self, y):
         if len(self.peak) != len(y):

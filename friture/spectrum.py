@@ -39,7 +39,7 @@ from friture_extensions.exp_smoothing_conv import pyx_exp_smoothed_value_numpy
 
 class Spectrum_Widget(QtWidgets.QWidget):
 
-    def __init__(self, parent):
+    def __init__(self, parent, engine):
         super().__init__(parent)
 
         self.audiobuffer = None
@@ -47,7 +47,7 @@ class Spectrum_Widget(QtWidgets.QWidget):
         self.setObjectName("Spectrum_Widget")
         self.gridLayout = QtWidgets.QGridLayout(self)
         self.gridLayout.setObjectName("gridLayout")
-        self.PlotZoneSpect = SpectrumPlotWidget(self)
+        self.PlotZoneSpect = SpectrumPlotWidget(self, engine)
         self.PlotZoneSpect.setObjectName("PlotZoneSpect")
         self.gridLayout.addWidget(self.PlotZoneSpect, 0, 0, 1, 1)
 

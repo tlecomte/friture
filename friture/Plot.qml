@@ -84,7 +84,7 @@ Rectangle {
             Layout.row: 1
             Layout.column: 4
             Layout.alignment: Qt.AlignTop | Qt.AlignLeft
-            visible: scopedata.plot_items.length > 1
+            visible: scopedata.show_legend && scopedata.plot_items.length > 1
 
             scopedata: plot.scopedata
         }

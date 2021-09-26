@@ -51,7 +51,10 @@ from friture.axis import Axis
 from friture.curve import Curve
 from friture.plotCurve import PlotCurve
 from friture.plotting.coordinateTransform import CoordinateTransform
-from friture.plotting.scaleDivision import ScaleDivision
+from friture.plotting.scaleDivision import ScaleDivision, Tick
+from friture.spectrum_data import Spectrum_Data
+from friture.plotFilledCurve import PlotFilledCurve
+from friture.filled_curve import FilledCurve
 from friture.qml_tools import qml_url
 
 # the display timer could be made faster when the processing
@@ -83,11 +86,15 @@ class Friture(QMainWindow, ):
         qmlRegisterType(ScaleDivision, 'Friture', 1, 0, 'ScaleDivision')
         qmlRegisterType(CoordinateTransform, 'Friture', 1, 0, 'CoordinateTransform')
         qmlRegisterType(Scope_Data, 'Friture', 1, 0, 'ScopeData')
+        qmlRegisterType(Spectrum_Data, 'Friture', 1, 0, 'SpectrumData')
         qmlRegisterType(LevelData, 'Friture', 1, 0, 'LevelData')
         qmlRegisterType(LevelViewModel, 'Friture', 1, 0, 'LevelViewModel')
         qmlRegisterType(Axis, 'Friture', 1, 0, 'Axis')
         qmlRegisterType(Curve, 'Friture', 1, 0, 'Curve')
+        qmlRegisterType(FilledCurve, 'Friture', 1, 0, 'FilledCurve')
         qmlRegisterType(PlotCurve, 'Friture', 1, 0, 'PlotCurve')
+        qmlRegisterType(PlotFilledCurve, 'Friture', 1, 0, 'PlotFilledCurve')
+        qmlRegisterType(Tick, 'Friture', 1, 0, 'Tick')
         qmlRegisterSingletonType(Store, 'Friture', 1, 0, 'Store', lambda engine, script_engine: GetStore())
 
         # Setup the user interface
