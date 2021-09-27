@@ -60,11 +60,13 @@ class Levels_Widget(QtWidgets.QWidget):
         initialProperties = {"parent": self.quickWindow.contentItem(), "stateId": state_id }
         self.qmlObject = component.createWithInitialProperties(initialProperties, engineContext)
         self.qmlObject.setParent(self.quickWindow)
-        self.qmlObject.widthChanged.connect(self.onWidthChanged)
 
         self.quickWidget = QtWidgets.QWidget.createWindowContainer(self.quickWindow, self)
         self.quickWidget.setSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Expanding)       
         self.gridLayout.addWidget(self.quickWidget)
+
+        self.qmlObject.widthChanged.connect(self.onWidthChanged)
+        self.onWidthChanged()
 
         self.audiobuffer = None
 

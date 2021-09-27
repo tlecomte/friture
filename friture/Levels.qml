@@ -30,8 +30,7 @@ Rectangle {
         id: levelColumnLayout
         spacing: 6
 
-        anchors.top: parent.top
-        anchors.bottom: parent.bottom
+        anchors.fill: parent
 
         Text {
             id: peakValues
