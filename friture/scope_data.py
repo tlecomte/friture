@@ -32,8 +32,8 @@ class Scope_Data(QtCore.QObject):
         super().__init__(parent)
 
         self._plot_items = []
-        self._horizontal_axis = Axis()
-        self._vertical_axis = Axis()
+        self._horizontal_axis = Axis(self)
+        self._vertical_axis = Axis(self)
         self._show_legend = True
 
     @pyqtProperty(QQmlListProperty, notify=plot_items_changed)
