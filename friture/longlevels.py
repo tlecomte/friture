@@ -119,9 +119,10 @@ class LongLevelWidget(QtWidgets.QWidget):
         self.setObjectName("Scope_Widget")
         self.gridLayout = QtWidgets.QGridLayout(self)
         self.gridLayout.setObjectName("gridLayout")
+        self.gridLayout.setContentsMargins(2, 2, 2, 2)
 
         self.quickWidget = QQuickWidget(engine, self)
-        #self.quickWidget.statusChanged.connect(self.on_status_changed)
+        self.quickWidget.statusChanged.connect(self.on_status_changed)
         self.quickWidget.setResizeMode(QQuickWidget.SizeRootObjectToView)
         self.quickWidget.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         self.quickWidget.setSource(qml_url("Scope.qml"))

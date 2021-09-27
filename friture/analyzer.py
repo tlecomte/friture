@@ -28,8 +28,8 @@ import logging.handlers
 from PyQt5 import QtCore
 # specifically import from PyQt5.QtGui and QWidgets for startup time improvement :
 from PyQt5.QtWidgets import QMainWindow, QHBoxLayout, QApplication, QSplashScreen
-from PyQt5.QtGui import QPixmap, QSurfaceFormat
-from PyQt5.QtQml import QQmlApplicationEngine, qmlRegisterSingletonType, qmlRegisterType
+from PyQt5.QtGui import QPixmap
+from PyQt5.QtQml import QQmlEngine, qmlRegisterSingletonType, qmlRegisterType
 import appdirs
 
 # importing friture.exceptionhandler also installs a temporary exception hook
@@ -72,14 +72,20 @@ class Friture(QMainWindow, ):
     def __init__(self):
         QMainWindow.__init__(self)
 
-        self.logger = logging.getLogger(__name__)
+        self.logger = logging.getLogger(__name__)        
 
         # exception hook that logs to console, file, and display a message box
         self.errorDialogOpened = False
         sys.excepthook = self.excepthook
+        
+        store = GetStore()
 
-        #engine = QQmlEngine()
-        self.qml_engine = QQmlApplicationEngine()
+        # set the store as the parent of the QML engine
+        # so that the store outlives the engine
+        # otherwise the store gets destroyed before the engine
+        # which refreshes the QML bindings to undefined values
+        # and QML errors are raised
+        self.qml_engine = QQmlEngine(store)
 
         # Register the ScaleDivision type.  Its URI is 'ScaleDivision', it's v1.0 and the type
         # will be called 'Person' in QML.

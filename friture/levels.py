@@ -47,24 +47,26 @@ class Levels_Widget(QtWidgets.QWidget):
         self.gridLayout = QtWidgets.QVBoxLayout(self)
         self.gridLayout.setObjectName("gridLayout")
 
-        self.level_view_model = LevelViewModel(self)
         store = GetStore()
+        self.level_view_model = LevelViewModel(store)
         store._dock_states.append(self.level_view_model)
         state_id = len(store._dock_states) - 1
 
         self.quickWindow = QQuickWindow()
-        component = QQmlComponent(engine, qml_url("Levels.qml"))
+        component = QQmlComponent(engine, qml_url("Levels.qml"), self)
         raise_if_error(component)
 
         engineContext = engine.rootContext()
         initialProperties = {"parent": self.quickWindow.contentItem(), "stateId": state_id }
         self.qmlObject = component.createWithInitialProperties(initialProperties, engineContext)
         self.qmlObject.setParent(self.quickWindow)
-        self.qmlObject.widthChanged.connect(self.onWidthChanged)
 
         self.quickWidget = QtWidgets.QWidget.createWindowContainer(self.quickWindow, self)
         self.quickWidget.setSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Expanding)       
         self.gridLayout.addWidget(self.quickWidget)
+
+        self.qmlObject.widthChanged.connect(self.onWidthChanged)
+        self.onWidthChanged()
 
         self.audiobuffer = None
 

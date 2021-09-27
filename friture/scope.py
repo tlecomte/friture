@@ -62,6 +62,7 @@ class Scope_Widget(QtWidgets.QWidget):
         self.setObjectName("Scope_Widget")
         self.gridLayout = QtWidgets.QGridLayout(self)
         self.gridLayout.setObjectName("gridLayout")
+        self.gridLayout.setContentsMargins(2, 2, 2, 2)
 
         self.quickWidget = QQuickWidget(engine, self)
         self.quickWidget.statusChanged.connect(self.on_status_changed)
@@ -72,7 +73,7 @@ class Scope_Widget(QtWidgets.QWidget):
 
         self.quickWidget.rootObject().setProperty("stateId", state_id)
 
-        self.gridLayout.addWidget(self.quickWidget, 0, 0, 1, 1)
+        self.gridLayout.addWidget(self.quickWidget)
 
         self.settings_dialog = Scope_Settings_Dialog(self)
 

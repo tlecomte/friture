@@ -27,8 +27,8 @@ import friture.plotting.frequency_scales as fscales
 
 class CoordinateTransform(QtCore.QObject):
 
-    def __init__(self, coord_min, coord_max, length, startBorder, endBorder):
-        super(CoordinateTransform, self).__init__()
+    def __init__(self, coord_min, coord_max, length, startBorder, endBorder, parent=None):
+        super(CoordinateTransform, self).__init__(parent)
 
         self.coord_min = coord_min
         self.coord_max = coord_max

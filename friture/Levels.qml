@@ -11,8 +11,8 @@ Rectangle {
     property var stateId
     property LevelViewModel level_view_model: Store.dock_states[stateId]  
 
-    anchors.top: parent.top
-    anchors.bottom: parent.bottom
+    // parent here will be unset on exit
+    height: parent ? parent.height : 0
 
     // make width dependent on the text labels
     // but do not bind directly to their widths
@@ -30,8 +30,7 @@ Rectangle {
         id: levelColumnLayout
         spacing: 6
 
-        anchors.top: parent.top
-        anchors.bottom: parent.bottom
+        anchors.fill: parent
 
         Text {
             id: peakValues
