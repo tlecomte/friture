@@ -77,7 +77,7 @@ class Spectrum_Widget(QtWidgets.QWidget):
         # set kernel and parameters for the smoothing filter
         self.setresponsetime(self.response_time)
 
-        self.PlotZoneSpect.setfreqscale(fscales.Logarithmic)
+        self.PlotZoneSpect.setfreqscale(fscales.Mel) # matches DEFAULT_FREQ_SCALE = 2 #Mel
         self.PlotZoneSpect.setfreqrange(self.minfreq, self.maxfreq)
         self.PlotZoneSpect.setspecrange(self.spec_min, self.spec_max)
         self.PlotZoneSpect.setweighting(self.weighting)
