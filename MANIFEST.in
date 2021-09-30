@@ -4,3 +4,5 @@ include PROFILING.txt
 include README.rst
 include TODO.txt
 include friture.py
+recursive-include friture *.qml
+recursive-include friture *.js

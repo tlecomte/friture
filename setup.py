@@ -96,5 +96,6 @@ setup(name="friture",
       ext_modules=ext_modules,
       install_requires=install_requires,
       setup_requires=setup_requires,
+      include_package_data=True,
       data_files = [('share/applications', ['appimage/friture.desktop'])],
 )
