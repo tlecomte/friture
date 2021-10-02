@@ -15,3 +15,8 @@ script:
   - cp ../../../appimage/friture.desktop .
   - cp ../../../resources/images-src/window-icon.svg friture.svg
   - cp -R ../../../dist/friture/* usr/bin/
+  # adjust LD_LIBRARY_PATH so that ctypes.find_library finds portaudio
+  - echo '#!/bin/bash
+  - HERE="$(dirname "$(readlink -f "${0}")")"
+  - export LD_LIBRARY_PATH="$HERE/usr/lib/x86_64-linux-gnu":$LD_LIBRARY_PATH
+  - "$HERE/usr/bin/friture" "$@" | cat' > AppRun
