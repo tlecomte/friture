@@ -4,9 +4,9 @@
 app: friture
 
 ingredients:
-  dist: xenial
+  dist: bionic
   sources:
-    - deb http://us.archive.ubuntu.com/ubuntu/ xenial main universe
+    - deb http://us.archive.ubuntu.com/ubuntu/ bionic main universe
   packages:
     - libportaudio2
 
