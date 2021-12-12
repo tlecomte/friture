@@ -107,11 +107,11 @@ class SpectrumPlotWidget(QtWidgets.QWidget):
         self.normVerticalScaleTransform.setRange(spec_min, spec_max)
 
     def setweighting(self, weighting):
-        if weighting is 0:
+        if weighting == 0:
             title = "PSD (dB)"
-        elif weighting is 1:
+        elif weighting == 1:
             title = "PSD (dB A)"
-        elif weighting is 2:
+        elif weighting == 2:
             title = "PSD (dB B)"
         else:
             title = "PSD (dB C)"

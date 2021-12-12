@@ -239,11 +239,11 @@ class Spectrum_Widget(QtWidgets.QWidget):
 
     def update_weighting(self):
         A, B, C = self.proc.get_freq_weighting()
-        if self.weighting is 0:
+        if self.weighting == 0:
             self.w = zeros(A.shape)
-        elif self.weighting is 1:
+        elif self.weighting == 1:
             self.w = A
-        elif self.weighting is 2:
+        elif self.weighting == 2:
             self.w = B
         else:
             self.w = C
