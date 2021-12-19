@@ -38,5 +38,6 @@ friture.egg-info
 Notepad++
 .idea
 .vscode
+.qt_for_python
 
 .mypy_cache

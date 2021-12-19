@@ -116,11 +116,11 @@ class OctaveSpectrum_Widget(QtWidgets.QWidget):
 
         sp = array(sp)
 
-        if self.weighting is 0:
+        if self.weighting == 0:
             w = 0.
-        elif self.weighting is 1:
+        elif self.weighting == 1:
             w = self.filters.A
-        elif self.weighting is 2:
+        elif self.weighting == 2:
             w = self.filters.B
         else:
             w = self.filters.C
