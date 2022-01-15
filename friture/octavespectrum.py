@@ -18,8 +18,10 @@
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
 from PyQt5 import QtWidgets
-from numpy import log10, array, arange, where
+from numpy import log10, array, arange
+
 from friture.histplot import HistPlot
+from friture.octavefilters import Octave_Filters
 from friture.octavespectrum_settings import (OctaveSpectrum_Settings_Dialog,  # settings dialog
                                              DEFAULT_SPEC_MIN,
                                              DEFAULT_SPEC_MAX,
@@ -27,16 +29,11 @@ from friture.octavespectrum_settings import (OctaveSpectrum_Settings_Dialog,  # 
                                              DEFAULT_BANDSPEROCTAVE,
                                              DEFAULT_RESPONSE_TIME)
 
-from friture.filter import (octave_filter_bank_decimation, octave_frequencies,
-                            octave_filter_bank_decimation_filtic, NOCTAVE)
+from friture.filter import NOCTAVE
 
 from friture_extensions.exp_smoothing_conv import pyx_exp_smoothed_value
 
-from friture import generated_filters
-
 from friture.audiobackend import SAMPLING_RATE
-
-import friture.renard as renard
 
 SMOOTH_DISPLAY_TIMER_PERIOD_MS = 25
 
@@ -63,7 +60,7 @@ class OctaveSpectrum_Widget(QtWidgets.QWidget):
         self.PlotZoneSpect.setspecrange(self.spec_min, self.spec_max)
         self.PlotZoneSpect.setweighting(self.weighting)
 
-        self.filters = octave_filters(DEFAULT_BANDSPEROCTAVE)
+        self.filters = Octave_Filters(DEFAULT_BANDSPEROCTAVE)
         self.dispbuffers = [0] * DEFAULT_BANDSPEROCTAVE * NOCTAVE
 
         # set kernel and parameters for the smoothing filter
@@ -81,12 +78,6 @@ class OctaveSpectrum_Widget(QtWidgets.QWidget):
         for alpha, N in zip(alphas, Ns):
             kernels += [(1. - alpha) ** arange(N - 1, -1, -1)]
         return kernels
-
-    def get_kernel(self, kernel, N):
-        return
-
-    def get_conv(self, kernel, data):
-        return kernel * data
 
     def exp_smoothed_value(self, kernel, alpha, data, previous):
         N = len(data)
@@ -181,86 +172,3 @@ class OctaveSpectrum_Widget(QtWidgets.QWidget):
 
     def restoreState(self, settings):
         self.settings_dialog.restoreState(settings)
-
-
-class octave_filters():
-
-    def __init__(self, bandsperoctave):
-        [self.bdec, self.adec] = generated_filters.PARAMS['dec']
-
-        self.bdec = array(self.bdec)
-        self.adec = array(self.adec)
-
-        self.setbandsperoctave(bandsperoctave)
-
-    def filter(self, floatdata):
-        y, dec, zfs = octave_filter_bank_decimation(self.bdec, self.adec,
-                                                    self.boct, self.aoct,
-                                                    floatdata, zis=self.zfs)
-
-        self.zfs = zfs
-
-        return y, dec
-
-    def get_decs(self):
-        decs = [2 ** j for j in range(0, NOCTAVE)[::-1] for i in range(0, self.bandsperoctave)]
-
-        return decs
-
-    def setbandsperoctave(self, bandsperoctave):
-        self.bandsperoctave = bandsperoctave
-        self.nbands = NOCTAVE * self.bandsperoctave
-        self.fi, self.flow, self.fhigh = octave_frequencies(self.nbands, self.bandsperoctave)
-        [self.boct, self.aoct, fi, flow, fhigh] = generated_filters.PARAMS['%d' % bandsperoctave]
-
-        self.boct = [array(f) for f in self.boct]
-        self.aoct = [array(f) for f in self.aoct]
-
-        # [self.b_nodec, self.a_nodec, fi, fl, fh] = octave_filters(self.nbands, self.bandsperoctave)
-
-        f = self.fi
-        Rc = 12200. ** 2 * f ** 2 / ((f ** 2 + 20.6 ** 2) * (f ** 2 + 12200. ** 2))
-        Rb = 12200. ** 2 * f ** 3 / ((f ** 2 + 20.6 ** 2) * (f ** 2 + 12200. ** 2) * ((f ** 2 + 158.5 ** 2) ** 0.5))
-        Ra = 12200. ** 2 * f ** 4 / ((f ** 2 + 20.6 ** 2) * (f ** 2 + 12200. ** 2) * ((f ** 2 + 107.7 ** 2) ** 0.5) * ((f ** 2 + 737.9 ** 2) ** 0.5))
-        self.C = 0.06 + 20. * log10(Rc)
-        self.B = 0.17 + 20. * log10(Rb)
-        self.A = 2.0 + 20. * log10(Ra)
-        self.zfs = octave_filter_bank_decimation_filtic(self.bdec, self.adec, self.boct, self.aoct)
-
-        if bandsperoctave == 1:
-            # with 1 band per octave, we would need the "R3.33" Renard series, but it does not exist.
-            # However, that is not really a problem, since the numbers simply round up.
-            self.f_nominal = ["%.1fk" % (f/1000) if f >= 10000
-                              else "%.2fk" % (f/1000) if f >= 1000
-                              else "%d" % (f)
-                              for f in self.fi]
-        else:
-            # with more than 1 band per octave, use the preferred numbers from the Renard series
-            if bandsperoctave == 3:
-                basis = renard.R10
-            elif bandsperoctave == 6:
-                basis = renard.R20
-            elif bandsperoctave == 12:
-                basis = renard.R40
-            elif bandsperoctave == 24:
-                basis = renard.R80
-            else:
-                raise Exception("Unknown bandsperoctave: %d" % (bandsperoctave))
-
-            # search the index of 1 kHz, the reference
-            i = where(self.fi == 1000.)[0][0]
-
-            # build the frequency scale
-            self.f_nominal = []
-
-            k = 0
-            while len(self.f_nominal) < len(self.fi) - i:
-                self.f_nominal += ["{0:.{width}f}k".format(10 ** k * f, width=2 - k) for f in basis]
-                k += 1
-            self.f_nominal = self.f_nominal[:len(self.fi) - i]
-
-            k = 0
-            while len(self.f_nominal) < len(self.fi):
-                self.f_nominal = ["%d" % (10 ** (2 - k) * f) for f in basis] + self.f_nominal
-                k += 1
-            self.f_nominal = self.f_nominal[-len(self.fi):]
