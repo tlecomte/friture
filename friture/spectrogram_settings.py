@@ -75,7 +75,7 @@ class Spectrogram_Settings_Dialog(QtWidgets.QDialog):
 
         self.spinBox_minfreq = QtWidgets.QSpinBox(self)
         self.spinBox_minfreq.setMinimum(20)
-        self.spinBox_minfreq.setMaximum(SAMPLING_RATE / 2)
+        self.spinBox_minfreq.setMaximum(SAMPLING_RATE // 2)
         self.spinBox_minfreq.setSingleStep(10)
         self.spinBox_minfreq.setValue(DEFAULT_MINFREQ)
         self.spinBox_minfreq.setObjectName("spinBox_minfreq")
@@ -83,7 +83,7 @@ class Spectrogram_Settings_Dialog(QtWidgets.QDialog):
 
         self.spinBox_maxfreq = QtWidgets.QSpinBox(self)
         self.spinBox_maxfreq.setMinimum(20)
-        self.spinBox_maxfreq.setMaximum(SAMPLING_RATE / 2)
+        self.spinBox_maxfreq.setMaximum(SAMPLING_RATE // 2)
         self.spinBox_maxfreq.setSingleStep(1000)
         self.spinBox_maxfreq.setProperty("value", DEFAULT_MAXFREQ)
         self.spinBox_maxfreq.setObjectName("spinBox_maxfreq")

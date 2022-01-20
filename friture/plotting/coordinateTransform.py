@@ -58,25 +58,31 @@ class CoordinateTransform(QtCore.QObject):
     def setScale(self, scale):
         self.scale = scale
 
-    @pyqtSlot(float, result=float)
+    @pyqtSlot(float, result=int)
     def toScreen(self, x):
         if self.scale is fscales.Logarithmic:
             if self.coord_clipped_min == self.coord_clipped_max:
-                return self.startBorder + 0. * x  # keep x type (this can produce a RunTimeWarning if x contains inf)
+                return int(self.startBorder + 0. * x)  # keep x type (this can produce a RunTimeWarning if x contains inf)
 
             x = (x < 1e-20) * 1e-20 + (x >= 1e-20) * x
-            return (np.log10(x / self.coord_clipped_min)) * (self.length - self.startBorder - self.endBorder) / self.coord_ratio_log + self.startBorder
+            return int((np.log10(x / self.coord_clipped_min))
+                       * (self.length - self.startBorder - self.endBorder)
+                       / self.coord_ratio_log
+                       + self.startBorder)
         else:
             if self.coord_max == self.coord_min:
-                return self.startBorder + 0. * x  # keep x type (this can produce a RunTimeWarning if x contains inf)
+                return int(self.startBorder + 0. * x)  # keep x type (this can produce a RunTimeWarning if x contains inf)
             
             trans_x = self.scale.transform(x)
             trans_min = self.scale.transform(self.coord_min)
             trans_max = self.scale.transform(self.coord_max)
 
-            return (trans_x - trans_min) * (self.length - self.startBorder - self.endBorder) / (trans_max - trans_min) + self.startBorder
+            return int((trans_x - trans_min)
+                       * (self.length - self.startBorder - self.endBorder)
+                       / (trans_max - trans_min)
+                       + self.startBorder)
 
-    @pyqtSlot(float, result=float)
+    @pyqtSlot(int, result=float)
     def toPlot(self, x):
         if self.length == self.startBorder + self.endBorder:
             return self.coord_min + 0. * x  # keep x type (this can produce a RunTimeWarning if x contains inf)

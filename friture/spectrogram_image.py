@@ -61,7 +61,7 @@ class CanvasScaledSpectrogram(QtCore.QObject):
 
     # resize the pixmap and update the offsets accordingly
     def resize(self, width, height):
-        oldWidth = self.pixmap.width() / 2
+        oldWidth = int(self.pixmap.width() / 2)
         if width != oldWidth:
             self.offset = (self.offset % oldWidth) * width / oldWidth
             self.offset = self.offset % width  # to handle negative values
@@ -69,17 +69,17 @@ class CanvasScaledSpectrogram(QtCore.QObject):
         self.pixmap = self.pixmap.scaled(2 * width, height, QtCore.Qt.IgnoreAspectRatio, QtCore.Qt.SmoothTransformation)
 
     def setcanvas_height(self, canvas_height):
-        if self.canvas_height != canvas_height:
-            self.canvas_height = canvas_height
+        if self.canvas_height != int(canvas_height):
+            self.canvas_height = int(canvas_height)
             self.resize(self.canvas_width, self.canvas_height)
-            self.logger.info("Spectrogram image: canvas_height changed, now: %d", canvas_height)
+            self.logger.info("Spectrogram image: canvas_height changed, now: %d", int(canvas_height))
 
     def setcanvas_width(self, canvas_width):
-        if self.canvas_width != canvas_width:
-            self.canvas_width = canvas_width
+        if self.canvas_width != int(canvas_width):
+            self.canvas_width = int(canvas_width)
             self.resize(self.canvas_width, self.canvas_height)
-            self.canvasWidthChanged.emit(canvas_width)
-            self.logger.info("Spectrogram image: canvas_width changed, now: %d", canvas_width)
+            self.canvasWidthChanged.emit(int(canvas_width))
+            self.logger.info("Spectrogram image: canvas_width changed, now: %d", int(canvas_width))
 
     def addPixelAdvance(self, pixel_advance):
         self.time_offset += pixel_advance
@@ -148,7 +148,9 @@ class CanvasScaledSpectrogram(QtCore.QObject):
         self.colors = numpy.zeros((cmap.shape[0]), dtype=numpy.uint32)
 
         for i in range(cmap.shape[0]):
-            self.colors[i] = QtGui.QColor(cmap[i, 0] * 255, cmap[i, 1] * 255, cmap[i, 2] * 255).rgb()
+            self.colors[i] = QtGui.QColor(int(cmap[i, 0] * 255),
+                                          int(cmap[i, 1] * 255),
+                                          int(cmap[i, 2] * 255)).rgb()
 
     def color_from_float(self, v):
         # clip in [0..1] before using the fast lookup function
