@@ -105,7 +105,7 @@ class Levels_Widget(QtWidgets.QWidget):
         self.i = 0
 
     def onWidthChanged(self):
-        self.quickWidget.setFixedWidth(self.qmlObject.width())
+        self.quickWidget.setFixedWidth(int(self.qmlObject.width()))
 
     # method
     def set_buffer(self, buffer):

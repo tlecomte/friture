@@ -20,7 +20,7 @@
 from PyQt5 import QtCore
 from PyQt5.QtCore import pyqtSlot
 import numpy as np
-import friture.plotting.frequency_scales as fscales 
+import friture.plotting.frequency_scales as fscales
 
 # transforms between screen coordinates and plot coordinates
 
@@ -65,16 +65,22 @@ class CoordinateTransform(QtCore.QObject):
                 return self.startBorder + 0. * x  # keep x type (this can produce a RunTimeWarning if x contains inf)
 
             x = (x < 1e-20) * 1e-20 + (x >= 1e-20) * x
-            return (np.log10(x / self.coord_clipped_min)) * (self.length - self.startBorder - self.endBorder) / self.coord_ratio_log + self.startBorder
+            return (np.log10(x / self.coord_clipped_min)
+                    * (self.length - self.startBorder - self.endBorder)
+                    / self.coord_ratio_log
+                    + self.startBorder)
         else:
             if self.coord_max == self.coord_min:
                 return self.startBorder + 0. * x  # keep x type (this can produce a RunTimeWarning if x contains inf)
-            
+
             trans_x = self.scale.transform(x)
             trans_min = self.scale.transform(self.coord_min)
             trans_max = self.scale.transform(self.coord_max)
 
-            return (trans_x - trans_min) * (self.length - self.startBorder - self.endBorder) / (trans_max - trans_min) + self.startBorder
+            return ((trans_x - trans_min)
+                    * (self.length - self.startBorder - self.endBorder)
+                    / (trans_max - trans_min)
+                    + self.startBorder)
 
     @pyqtSlot(float, result=float)
     def toPlot(self, x):

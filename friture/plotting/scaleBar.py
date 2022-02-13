@@ -63,13 +63,13 @@ class VerticalScaleBar(QtWidgets.QWidget):
 
         # base line
         xb = self.width() - self.borderOffset
-        y0 = self.coordinateTransform.toScreen(self.coordinateTransform.coord_min)
-        y1 = self.coordinateTransform.toScreen(self.coordinateTransform.coord_max)
+        y0 = int(self.coordinateTransform.toScreen(self.coordinateTransform.coord_min))
+        y1 = int(self.coordinateTransform.toScreen(self.coordinateTransform.coord_max))
         painter.drawLine(xb, y0, xb, y1)
 
         # tick start
         xt = xb - self.tickLength
-        xtm = xb - self.tickLength / 2
+        xtm = xb - self.tickLength // 2
 
         # label end
         le = xt - self.labelSpacing
@@ -86,15 +86,15 @@ class VerticalScaleBar(QtWidgets.QWidget):
 
         for tick in self.scaleDivision.majorTicks():
             # for vertical scale we invert the coordinates
-            y = self.height() - self.coordinateTransform.toScreen(tick)
+            y = self.height() - int(self.coordinateTransform.toScreen(tick))
             painter.drawLine(xt, y, xb, y)
             if self.coordinateTransform.startBorder < y < self.coordinateTransform.length - self.coordinateTransform.endBorder:
                 tick_string = self.tickFormatter(tick, digits)
-                painter.drawText(le - fm.width(tick_string), y + lh / 2 - 2, tick_string)
+                painter.drawText(le - fm.width(tick_string), y + lh // 2 - 2, tick_string)
 
         for tick in self.scaleDivision.minorTicks():
             # for vertical scale we invert the coordinates
-            y = self.height() - self.coordinateTransform.toScreen(tick)
+            y = self.height() - int(self.coordinateTransform.toScreen(tick))
             painter.drawLine(xtm, y, xb, y)
 
     def spacingBorders(self):
@@ -154,13 +154,13 @@ class HorizontalScaleBar(QtWidgets.QWidget):
 
         # base line
         yb = self.borderOffset
-        x0 = self.coordinateTransform.toScreen(self.coordinateTransform.coord_min)
-        x1 = self.coordinateTransform.toScreen(self.coordinateTransform.coord_max)
+        x0 = int(self.coordinateTransform.toScreen(self.coordinateTransform.coord_min))
+        x1 = int(self.coordinateTransform.toScreen(self.coordinateTransform.coord_max))
         painter.drawLine(x0, yb, x1, yb)
 
         # tick start
         yt = yb + self.tickLength
-        ytm = yb + self.tickLength / 2
+        ytm = yb + self.tickLength // 2
 
         # label end
         le = yt + self.labelSpacing
@@ -176,14 +176,14 @@ class HorizontalScaleBar(QtWidgets.QWidget):
 
         for tick in self.scaleDivision.majorTicks():
             # for vertical scale we invert the coordinates
-            x = self.coordinateTransform.toScreen(tick)
+            x = int(self.coordinateTransform.toScreen(tick))
             painter.drawLine(x, yt, x, yb)
             tick_string = '{0:.{1}f}'.format(tick, digits)
-            painter.drawText(x - fm.width(tick_string) / 2, le + fm.height(), tick_string)
+            painter.drawText(x - fm.width(tick_string) // 2, le + fm.height(), tick_string)
 
         for tick in self.scaleDivision.minorTicks():
             # for vertical scale we invert the coordinates
-            x = self.coordinateTransform.toScreen(tick)
+            x = int(self.coordinateTransform.toScreen(tick))
             painter.drawLine(x, ytm, x, yb)
 
     def spacingBorders(self):
@@ -209,7 +209,10 @@ class ColorScaleBar(QtWidgets.QWidget):
 
         # should be shared with spectrogram_image in a dedicated class
         cmap = generated_cmrmap.CMAP
-        self.colors = [QtGui.QColor(cmap[i, 0] * 255, cmap[i, 1] * 255, cmap[i, 2] * 255) for i in range(cmap.shape[0])]
+        self.colors = [QtGui.QColor(int(cmap[i, 0] * 255),
+                                    int(cmap[i, 1] * 255),
+                                    int(cmap[i, 2] * 255)
+                       ) for i in range(cmap.shape[0])]
 
         # for vertical scale bar
         self.setSizePolicy(QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum))
@@ -257,13 +260,13 @@ class ColorScaleBar(QtWidgets.QWidget):
 
         # base line
         xb = self.borderOffset + self.colorBarWidth + self.barSpacing
-        y0 = self.coordinateTransform.toScreen(self.coordinateTransform.coord_min)
-        y1 = self.coordinateTransform.toScreen(self.coordinateTransform.coord_max)
+        y0 = int(self.coordinateTransform.toScreen(self.coordinateTransform.coord_min))
+        y1 = int(self.coordinateTransform.toScreen(self.coordinateTransform.coord_max))
         painter.drawLine(xb, y0, xb, y1)
 
         # tick start
         xt = xb + self.tickLength
-        xtm = xb + self.tickLength / 2
+        xtm = xb + self.tickLength // 2
 
         # label start
         ls = xt + self.labelSpacing
@@ -280,14 +283,14 @@ class ColorScaleBar(QtWidgets.QWidget):
 
         for tick in self.scaleDivision.majorTicks():
             # for vertical scale we invert the coordinates
-            y = self.height() - self.coordinateTransform.toScreen(tick)
+            y = self.height() - int(self.coordinateTransform.toScreen(tick))
             painter.drawLine(xt, y, xb, y)
             tick_string = '{0:.{1}f}'.format(tick, digits)
-            painter.drawText(ls, y + lh / 2 - 2, tick_string)
+            painter.drawText(ls, y + lh // 2 - 2, tick_string)
 
         for tick in self.scaleDivision.minorTicks():
             # for vertical scale we invert the coordinates
-            y = self.height() - self.coordinateTransform.toScreen(tick)
+            y = self.height() - int(self.coordinateTransform.toScreen(tick))
             painter.drawLine(xtm, y, xb, y)
 
     def spacingBorders(self):
