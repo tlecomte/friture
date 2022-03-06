@@ -40,7 +40,7 @@ SMOOTH_DISPLAY_TIMER_PERIOD_MS = 25
 
 class OctaveSpectrum_Widget(QtWidgets.QWidget):
 
-    def __init__(self, parent):
+    def __init__(self, parent, engine):
         super().__init__(parent)
 
         self.audiobuffer = None
@@ -48,7 +48,7 @@ class OctaveSpectrum_Widget(QtWidgets.QWidget):
         self.setObjectName("Spectrum_Widget")
         self.gridLayout = QtWidgets.QGridLayout(self)
         self.gridLayout.setObjectName("gridLayout")
-        self.PlotZoneSpect = HistPlot(self)
+        self.PlotZoneSpect = HistPlot(self, engine)
         self.PlotZoneSpect.setObjectName("PlotZoneSpect")
         self.gridLayout.addWidget(self.PlotZoneSpect, 0, 0, 1, 1)
 

@@ -17,109 +17,117 @@
 # You should have received a copy of the GNU General Public License
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt5 import Qt, QtWidgets
-from numpy import zeros, ones, log10, array
-from friture.histogramitem import HistogramItem
-from friture.histplotpeakbaritem import HistogramPeakBarItem
-from friture.plotting.scaleWidget import VerticalScaleWidget, HorizontalScaleWidget
-from friture.plotting.scaleDivision import ScaleDivision
+import logging
+from PyQt5 import QtWidgets
+from PyQt5.QtQuickWidgets import QQuickWidget
+from numpy import zeros, ones, log10
+import numpy
+from friture.filled_curve import CurveType, FilledCurve
+from friture.histplot_data import HistPlot_Data
 from friture.plotting.coordinateTransform import CoordinateTransform
-from friture.plotting.canvasWidget import CanvasWidget
 import friture.plotting.frequency_scales as fscales
+from friture.qml_tools import qml_url, raise_if_error
+from friture.store import GetStore
 
 # The peak decay rates (magic goes here :).
 PEAK_DECAY_RATE = 1.0 - 3E-6
 
 class HistPlot(QtWidgets.QWidget):
 
-    def __init__(self, parent):
-        super(HistPlot, self).__init__()
+    def __init__(self, parent, engine):
+        super(HistPlot, self).__init__(parent)
 
-        self.verticalScaleDivision = ScaleDivision(-140, 0)
-        self.verticalScaleTransform = CoordinateTransform(-140, 0, 100, 0, 0)
+        self.logger = logging.getLogger(__name__)
 
-        self.verticalScale = VerticalScaleWidget(self, self.verticalScaleDivision, self.verticalScaleTransform)
-        self.verticalScale.setTitle("PSD (dB A)")
+        store = GetStore()
+        self._histplot_data = HistPlot_Data(store)
+        store._dock_states.append(self._histplot_data)
+        state_id = len(store._dock_states) - 1
 
-        self.horizontalScaleDivision = ScaleDivision(44, 22000)
-        self.horizontalScaleTransform = CoordinateTransform(44, 22000, 100, 0, 0)
+        self._curve_peak = FilledCurve(CurveType.PEEK)
+        self._histplot_data.add_plot_item(self._curve_peak)
 
-        self.horizontalScale = HorizontalScaleWidget(self, self.horizontalScaleDivision, self.horizontalScaleTransform)
-        self.horizontalScale.setTitle("Frequency (Hz)")
+        self._curve_signal = FilledCurve(CurveType.SIGNAL)
+        self._histplot_data.add_plot_item(self._curve_signal)
 
-        self.canvasWidget = CanvasWidget(self, self.verticalScaleTransform, self.horizontalScaleTransform)
-        self.canvasWidget.setTrackerFormatter(lambda x, y: "%d Hz, %.1f dB" % (x, y))
+        self._histplot_data.show_legend = False
+        self._histplot_data.vertical_axis.name = "PSD (dB A)"
+        self._histplot_data.vertical_axis.setTrackerFormatter(lambda x: "%.1f dB" % (x))
+        self._histplot_data.horizontal_axis.name = "Frequency (Hz)"
+        self._histplot_data.horizontal_axis.setTrackerFormatter(lambda x: "%.0f Hz" % (x))
 
-        plot_layout = QtWidgets.QGridLayout()
-        plot_layout.setSpacing(0)
-        plot_layout.setContentsMargins(0, 0, 0, 0)
-        plot_layout.addWidget(self.verticalScale, 0, 0)
-        plot_layout.addWidget(self.canvasWidget, 0, 1)
-        plot_layout.addWidget(self.horizontalScale, 1, 1)
+        self._histplot_data.vertical_axis.setRange(0, 1)
+        self._histplot_data.horizontal_axis.setRange(44, 22000)
 
-        self.setLayout(plot_layout)
+        self.paused = False
 
-        self.needfullreplot = False
+        self.peak = zeros((3,))
+        self.peak_int = zeros((3,))
+        self.peak_decay = ones((3,)) * PEAK_DECAY_RATE
 
-        self.horizontalScaleTransform.setScale(fscales.Logarithmic)
-        self.horizontalScaleDivision.setScale(fscales.Logarithmic)
+        self.normVerticalScaleTransform = CoordinateTransform(0, 1, 1, 0, 0)
+        self.normHorizontalScaleTransform = CoordinateTransform(44, 22000, 1, 0, 0)
 
-        # insert an additional plot item for the peak bar
-        self.bar_peak = HistogramPeakBarItem()
-        self.canvasWidget.attach(self.bar_peak)
-        self.peak = zeros((1,))
-        self.peak_int = 0
-        self.peak_decay = PEAK_DECAY_RATE
+        self.normHorizontalScaleTransform.setScale(fscales.Logarithmic)
+        self._histplot_data.horizontal_axis.scale_division.setScale(fscales.Logarithmic)
+        self._histplot_data.horizontal_axis.coordinate_transform.setScale(fscales.Logarithmic)
 
-        self.histogram = HistogramItem()
-        self.histogram.set_color(Qt.Qt.darkGreen)
-        self.canvasWidget.attach(self.histogram)
+        plotLayout = QtWidgets.QGridLayout(self)
+        plotLayout.setSpacing(0)
+        plotLayout.setContentsMargins(0, 0, 0, 0)
 
-        # need to replot here for the size Hints to be computed correctly (depending on axis scales...)
-        self.update()
+        self.quickWidget = QQuickWidget(engine, self)
+        self.quickWidget.statusChanged.connect(self.on_status_changed)
+        self.quickWidget.setResizeMode(QQuickWidget.SizeRootObjectToView)
+        self.quickWidget.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        self.quickWidget.setSource(qml_url("HistPlot.qml"))
+        
+        raise_if_error(self.quickWidget)
+
+        self.quickWidget.rootObject().setProperty("stateId", state_id)
+
+        plotLayout.addWidget(self.quickWidget)
+
+        self.setLayout(plotLayout)
+
+    def on_status_changed(self, status):
+        if status == QQuickWidget.Error:
+            for error in self.quickWidget.errors():
+                self.logger.error("QML error: " + error.toString())
 
     def setdata(self, fl, fh, fc, y):
-        self.histogram.setData(fl, fh, fc, y)
+        if not self.paused:
+            M = numpy.max(y)
+            m = self.normVerticalScaleTransform.coord_min
+            y_int = (y-m)/(numpy.abs(M-m)+1e-3)
 
-        self.compute_peaks(y)
-        self.bar_peak.setData(fl, fh, self.peak, self.peak_int, y)
+            scaled_x_left = self.normHorizontalScaleTransform.toScreen(fl)
+            scaled_x_right = self.normHorizontalScaleTransform.toScreen(fh)
+            baseline = 1.
+            scaled_y = 1. - self.normVerticalScaleTransform.toScreen(y)
+            z = y_int
 
-        # only draw on demand
-        # self.draw()
+            self._curve_signal.setData(scaled_x_left, scaled_x_right, scaled_y, z, baseline)
+
+            self.compute_peaks(y)
+            scaled_peak = 1. - self.normVerticalScaleTransform.toScreen(self.peak)
+            z_peak = self.peak_int
+            self._curve_peak.setData(scaled_x_left, scaled_x_right, scaled_peak, z_peak, baseline)
+            
+            bar_label_x = (scaled_x_left + scaled_x_right)/2
+            self._histplot_data.setBarLabels(bar_label_x, fc, scaled_y)
 
     def draw(self):
-        if self.needfullreplot:
-            self.needfullreplot = False
+        return
 
-            self.verticalScaleTransform.setLength(self.canvasWidget.height())
+    def pause(self):
+        self.paused = True
 
-            start_border, end_border = self.verticalScale.spacingBorders()
-            self.verticalScaleTransform.setBorders(start_border, end_border)
+    def restart(self):
+        self.paused = False
 
-            self.verticalScale.update()
-
-            self.horizontalScaleTransform.setLength(self.canvasWidget.width())
-
-            start_border, end_border = self.horizontalScale.spacingBorders()
-            self.horizontalScaleTransform.setBorders(start_border, end_border)
-
-            self.horizontalScale.update()
-
-            x_major_tick = self.horizontalScaleDivision.majorTicks()
-            x_minor_tick = self.horizontalScaleDivision.minorTicks()
-            y_major_tick = self.verticalScaleDivision.majorTicks()
-            y_minor_tick = self.verticalScaleDivision.minorTicks()
-            self.canvasWidget.setGrid(array(x_major_tick),
-                                      array(x_minor_tick),
-                                      array(y_major_tick),
-                                      array(y_minor_tick))
-
-        self.canvasWidget.update()
-
-    # redraw when the widget is resized to update coordinates transformations
-    def resizeEvent(self, event):
-        self.needfullreplot = True
-        self.draw()
+    def canvasUpdate(self):
+        return
 
     def compute_peaks(self, y):
         if len(self.peak) != len(y):
@@ -143,14 +151,11 @@ class HistPlot(QtWidgets.QWidget):
         self.peak_int[mask2_b] *= 0.975
 
     def setspecrange(self, spec_min, spec_max):
-        self.verticalScaleTransform.setRange(spec_min, spec_max)
-        self.verticalScaleDivision.setRange(spec_min, spec_max)
+        if spec_min > spec_max:
+            spec_min, spec_max = spec_max, spec_min
 
-        # notify that sizeHint has changed (this should be done with a signal emitted from the scale division to the scale bar)
-        self.verticalScale.scaleBar.updateGeometry()
-
-        self.needfullreplot = True
-        self.update()
+        self._histplot_data.vertical_axis.setRange(spec_min, spec_max)
+        self.normVerticalScaleTransform.setRange(spec_min, spec_max)
 
     def setweighting(self, weighting):
         if weighting == 0:
@@ -162,4 +167,4 @@ class HistPlot(QtWidgets.QWidget):
         else:
             title = "PSD (dB C)"
 
-        self.verticalScale.setTitle(title)
+        self._histplot_data.vertical_axis.name = title
