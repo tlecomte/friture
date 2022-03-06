@@ -21,7 +21,6 @@ from PyQt5 import QtCore
 from PyQt5.QtCore import pyqtProperty
 
 from friture.scope_data import Scope_Data
-from friture.plotting.scaleDivision import Tick
 
 class Spectrum_Data(Scope_Data):
     fmax_changed = QtCore.pyqtSignal()
