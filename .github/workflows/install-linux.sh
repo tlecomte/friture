@@ -14,7 +14,7 @@ sudo apt-get update
 sudo apt-get install -y libportaudio2
 sudo apt-get install -y desktop-file-utils # for desktop-file-validate, used by pkg2appimage
 
-pip3 install -U pyinstaller==4.4
+pip3 install -U pyinstaller==4.10
 
 pyinstaller friture.spec -y --log-level=DEBUG
 
