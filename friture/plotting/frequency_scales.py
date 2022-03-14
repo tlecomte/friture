@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import annotations # to use built-in types in annotations before Python 3.9
 from typing import Union
 from math import ceil, floor
 from decimal import Decimal
