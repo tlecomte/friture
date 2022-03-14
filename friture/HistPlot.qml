@@ -48,7 +48,7 @@ Item {
 
                     Item {
                         x: modelData.x * parent.width - barLabel.height / 2
-                        y: Math.min(modelData.y * parent.height + 4, parent.height - barLabel.width - 4)
+                        y: Math.max(4, Math.min(modelData.y * parent.height + 4, parent.height - barLabel.width - 4))
 
                         // width vs. height: childrenRect doesn't take transformations into account.
                         // https://bugreports.qt-project.org/browse/QTBUG-38953
