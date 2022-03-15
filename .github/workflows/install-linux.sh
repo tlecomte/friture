@@ -11,8 +11,28 @@ pip3 install -r requirements.txt
 python3 setup.py build_ext --inplace
 
 sudo apt-get update
-sudo apt-get install -y libportaudio2
 sudo apt-get install -y desktop-file-utils # for desktop-file-validate, used by pkg2appimage
+
+# when PyInstaller collect libraries, it ignores libraries that are not found on the host.
+# Those missing libs prevent proper startup.
+# For example, PyQt5 bundles Qt5 libs that depend on libxcb-xinerama.so.0
+# which would not be bundled unless explicitly installed.
+sudo apt-get install libxcb-xinerama0
+sudo apt-get install libxkbcommon-x11-0
+
+# dependencies to build PortAudio
+sudo apt-get install -y libasound-dev
+sudo apt-get install -y libjack-dev
+
+# build PortAudio 19.7.0 from scratch (required for Jack fixes on distributions using PipeWire)
+wget https://github.com/PortAudio/portaudio/archive/refs/tags/v19.7.0.tar.gz
+tar -xvf v19.7.0.tar.gz
+cd portaudio-19.7.0
+./configure --prefix=$PWD/portaudio-install
+make
+make install
+ls -laR portaudio-install
+cd ..
 
 pip3 install -U pyinstaller==4.10
 
