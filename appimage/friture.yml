@@ -8,10 +8,20 @@ ingredients:
   sources:
     - deb http://us.archive.ubuntu.com/ubuntu/ bionic main universe
   packages:
-    - libportaudio2
+    # portaudio dependencies
+    # (although we build portaudio from scratch, we still need the dependencies)
+    - libasound2
+    - libc6
+    - libjack-jackd2-0
 
 script:
   - echo $PWD
   - cp ../../../appimage/friture.desktop .
   - cp ../../../resources/images-src/window-icon.svg friture.svg
   - cp -R ../../../dist/friture/* usr/bin/
+  - cp -R ../../../portaudio-19.7.0/portaudio-install/lib/libportaudio.so* usr/lib/x86_64-linux-gnu
+  # adjust LD_LIBRARY_PATH so that ctypes.find_library finds portaudio
+  - echo '#!/bin/bash
+  - HERE="$(dirname "$(readlink -f "${0}")")"
+  - export LD_LIBRARY_PATH="$HERE/usr/lib/x86_64-linux-gnu":$LD_LIBRARY_PATH
+  - "$HERE/usr/bin/friture" "$@" | cat' > AppRun
