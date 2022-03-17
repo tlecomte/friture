@@ -48,6 +48,7 @@ class OctaveSpectrum_Widget(QtWidgets.QWidget):
         self.setObjectName("Spectrum_Widget")
         self.gridLayout = QtWidgets.QGridLayout(self)
         self.gridLayout.setObjectName("gridLayout")
+        self.gridLayout.setContentsMargins(2, 2, 2, 2)
         self.PlotZoneSpect = HistPlot(self, engine)
         self.PlotZoneSpect.setObjectName("PlotZoneSpect")
         self.gridLayout.addWidget(self.PlotZoneSpect, 0, 0, 1, 1)
