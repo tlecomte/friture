@@ -13,8 +13,8 @@
     <file>images-src/spectrum.svg</file>
     <file>images-src/scope.svg</file>
     <file>images-src/levels.svg</file>
-    <file>images-src/stop.svg</file>
-    <file>images-src/start.svg</file>
+    <file>images-src/fa-stop.svg</file>
+    <file>images-src/fa-start.svg</file>
     <file>images/splash.png</file>
   </qresource>
 </RCC>

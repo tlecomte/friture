@@ -49,11 +49,11 @@
    </property>
    <property name="icon">
     <iconset resource="../resources/friture.qrc">
-     <normaloff>:/images-src/start.svg</normaloff>
-     <normalon>:/images-src/stop.svg</normalon>
-     <disabledon>:/images-src/stop.svg</disabledon>
-     <activeon>:/images-src/stop.svg</activeon>
-     <selectedon>:/images-src/stop.svg</selectedon>:/images-src/start.svg</iconset>
+     <normaloff>:/images-src/fa-start-normal-off.svg</normaloff>
+     <normalon>:/images-src/fa-stop-normal-on.svg</normalon>
+     <disabledon>:/images-src/fa-stop.svg</disabledon>
+     <activeon>:/images-src/fa-stop.svg</activeon>
+     <selectedon>:/images-src/fa-stop-selectedon.svg</selectedon>:/images-src/fa-start.svg</iconset>
    </property>
    <property name="text">
     <string>Stop</string>

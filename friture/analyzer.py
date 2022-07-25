@@ -26,10 +26,12 @@ import logging
 import logging.handlers
 
 from PyQt5 import QtCore
+from PyQt5.QtCore import QFile, QTextStream
 # specifically import from PyQt5.QtGui and QWidgets for startup time improvement :
 from PyQt5.QtWidgets import QMainWindow, QHBoxLayout, QApplication, QSplashScreen
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtQml import QQmlEngine, qmlRegisterSingletonType, qmlRegisterType
+import breeze_resources
 import appdirs
 
 # importing friture.exceptionhandler also installs a temporary exception hook
@@ -377,6 +379,10 @@ def main():
             logger.error("Could not set the app model ID. If the plaftorm is older than Windows 7, this is normal.")
 
     app = QApplication(sys.argv)
+    file = QFile(':/dark/stylesheet.qss')
+    file.open(QFile.ReadOnly | QFile.Text)
+    stream = QTextStream(file)
+    app.setStyleSheet(stream.readAll())
 
     if platform.system() == "Darwin":
         logger.info("Applying Mac OS-specific setup")
