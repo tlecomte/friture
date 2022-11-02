@@ -17,7 +17,7 @@ brew install portaudio --HEAD
 
 pip3 install -U pyinstaller==5.6.2
 
-pyinstaller friture.spec -y --onedir --windowed
+pyinstaller friture.spec -y
 
 ls -la dist/*
 
