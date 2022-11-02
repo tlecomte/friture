@@ -50,17 +50,17 @@ ext_modules = [LateIncludeExtension("friture_extensions.exp_smoothing_conv",
 # these will be installed when calling 'pip install friture'
 # they are also retrieved by 'requirements.txt'
 install_requires = [
-    "sounddevice==0.4.2",
-    "rtmixer==0.1.3",
-    "docutils==0.17.1",
-    "numpy==1.22.1",
-    "PyQt5==5.15.4",
+    "sounddevice==0.4.5",
+    "rtmixer==0.1.4",
+    "docutils==0.19",
+    "numpy==1.23.4",
+    "PyQt5==5.15.7",
     "appdirs==1.4.4",
     "pyrr==0.10.3",
 ]
 
 # Cython and numpy are needed when running setup.py, to build extensions
-setup_requires=["numpy==1.22.1", "Cython==0.29.24"]
+setup_requires=["numpy==1.23.4", "Cython==0.29.32"]
 
 with open(join(dirname(__file__), 'README.rst')) as f:
     long_description = f.read()
