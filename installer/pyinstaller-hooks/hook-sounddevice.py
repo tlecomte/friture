@@ -9,7 +9,6 @@
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 # ------------------------------------------------------------------
-# -----------------------------------------------------------------------------
 
 """
 sounddevice:
@@ -17,21 +16,59 @@ https://github.com/spatialaudio/python-sounddevice/
 """
 
 import os
+import pathlib
 
-from PyInstaller.compat import is_darwin, is_win
-from PyInstaller.utils.hooks import get_package_paths
+from PyInstaller.compat import is_darwin
+from PyInstaller.utils.hooks import get_module_file_attribute, logger
 
-sfp = get_package_paths("sounddevice")
+binaries = []
+datas = []
 
-path = None
-if is_win:
-    path = os.path.join(sfp[0], "_sounddevice_data", "portaudio-binaries")
-elif is_darwin:
+# PyPI wheels for Windows and macOS ship the sndfile shared library in _sounddevice_data directory,
+# located next to the sounddevice.py module file (i.e., in the site-packages directory).
+module_dir = pathlib.Path(get_module_file_attribute('sounddevice')).parent
+data_dir = module_dir / '_sounddevice_data' / 'portaudio-binaries'
+
+if is_darwin:
     # for Macos Big Sur, the stable portaudio (19.6.0) makes Friture freeze on startup
+    # so we build our own and bundle it manually here
     path = "/usr/local/lib/libportaudio.dylib"
+    destdir = str(data_dir.relative_to(module_dir))
+    binaries += [(path, destdir)]
     if not os.path.isfile(path):
         raise ValueError('libportaudio could not be found')
+elif data_dir.is_dir():
+    destdir = str(data_dir.relative_to(module_dir))
 
-if path is not None and os.path.exists(path):
-    binaries = [(path,
-                 os.path.join("_sounddevice_data", "portaudio-binaries"))]
+    # Collect the shared library (known variants: libportaudio64bit.dll, libportaudio32bit.dll, libportaudio.dylib)
+    for lib_file in data_dir.glob("libportaudio*.*"):
+        binaries += [(str(lib_file), destdir)]
+
+    # Collect the README.md file
+    readme_file = data_dir / "README.md"
+    if readme_file.is_file():
+        datas += [(str(readme_file), destdir)]
+else:
+    # On linux and in Anaconda in all OSes, the system-installed portaudio library needs to be collected.
+    def _find_system_portaudio_library():
+        import os
+        import ctypes.util
+        from PyInstaller.depend.utils import _resolveCtypesImports
+
+        libname = ctypes.util.find_library("portaudio")
+        if libname is not None:
+            resolved_binary = _resolveCtypesImports([os.path.basename(libname)])
+            if resolved_binary:
+                return resolved_binary[0][1]
+
+    try:
+        lib_file = _find_system_portaudio_library()
+    except Exception as e:
+        logger.warning("Error while trying to find system-installed portaudio library: %s", e)
+        lib_file = None
+
+    if lib_file:
+        binaries += [(lib_file, '.')]
+
+if not binaries:
+    logger.warning("portaudio shared library not found - sounddevice will likely fail to work!")
