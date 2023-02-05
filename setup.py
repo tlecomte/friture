@@ -53,14 +53,14 @@ install_requires = [
     "sounddevice==0.4.5",
     "rtmixer==0.1.4",
     "docutils==0.19",
-    "numpy==1.23.4",
-    "PyQt5==5.15.7",
+    "numpy==1.24.1",
+    "PyQt5==5.15.8",
     "appdirs==1.4.4",
     "pyrr==0.10.3",
 ]
 
 # Cython and numpy are needed when running setup.py, to build extensions
-setup_requires=["numpy==1.23.4", "Cython==0.29.32"]
+setup_requires=["numpy==1.24.1", "Cython==0.29.33"]
 
 with open(join(dirname(__file__), 'README.rst')) as f:
     long_description = f.read()
