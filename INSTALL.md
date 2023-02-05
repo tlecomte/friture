@@ -23,9 +23,9 @@ sudo apt-get install -y git
 sudo apt-get install -y libportaudio2
 ```
 
-3. Install python 3.10 and related build tools
+3. Install python 3.11 and related build tools
 ```
-sudo apt-get install -y python3.10-dev
+sudo apt-get install -y python3.11-dev
 ```
 
 4. Clone the repository
@@ -43,30 +43,30 @@ git checkout origin/<branchName>
 6. Update `pip`, `setuptools` and `virtualenv`
 
 ```
-sudo python3.10 -m pip install --upgrade pip
-sudo pip3.10 install --upgrade setuptools
-sudo pip3.10 install --upgrade virtualenv
+sudo python3.11 -m pip install --upgrade pip
+sudo pip3.11 install --upgrade setuptools
+sudo pip3.11 install --upgrade virtualenv
 ```
 
 7. Create a virtualenv and activate it
 ```
-virtualenv  -p /usr/bin/python3.10 buildenv
+virtualenv  -p /usr/bin/python3.11 buildenv
 source ./buildenv/bin/activate
 ```
 
 8. Install Friture requirements (PyQt5, etc.)
 ```
-pip3.10 install -r requirements.txt
+pip3.11 install -r requirements.txt
 ```
 
 9. Build Cython extensions
 ```
-python3.10 setup.py build_ext --inplace
+python3.11 setup.py build_ext --inplace
 ```
 
 10. Run Friture
 ```
-python3.10 main.py
+python3.11 main.py
 ```
 
 ## Running Friture from source on Windows
