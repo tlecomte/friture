@@ -44,3 +44,6 @@ Notepad++
 
 # Macos
 .DS_Store
+
+# pyenv local config
+.python-version 
