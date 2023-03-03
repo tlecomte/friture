@@ -11,9 +11,9 @@ With Friture, users can analyze and equalize the audio response of a venue, ensu
 
 The name *Friture* is derived from the French word for *frying* and is also commonly used to refer to *noise* in sound. Friture is a powerful tool that is both easy to use and incredibly versatile, making it an ideal choice for professionals and amateurs alike.
 
-For more information about the program and to see screenshots of its various features, visit the `project homepage http://friture.org`_.
+For more information about the program and to see screenshots of its various features, visit the `project homepage <http://friture.org>`_.
 
 License
 -------
 
-All content in this repository is licensed under the GPL-3.0 license. See `COPYING.txt https://github.com/tlecomte/friture/blob/master/COPYING.txt`_. for details.
+All content in this repository is licensed under the GPL-3.0 license. See `COPYING.txt <https://github.com/tlecomte/friture/blob/master/COPYING.txt>`_ for details.
