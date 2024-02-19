@@ -89,8 +89,7 @@ class SpectrumPlotWidget(QtWidgets.QWidget):
 
     def setfreqscale(self, scale):
         self.normHorizontalScaleTransform.setScale(scale)
-        self._spectrum_data.horizontal_axis.scale_division.setScale(scale)
-        self._spectrum_data.horizontal_axis.coordinate_transform.setScale(scale)
+        self._spectrum_data.horizontal_axis.setScale(scale)
 
     def setfreqrange(self, minfreq, maxfreq):
         self.xmin = minfreq

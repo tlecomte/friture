@@ -69,8 +69,7 @@ class HistPlot(QtWidgets.QWidget):
         self.normHorizontalScaleTransform = CoordinateTransform(44, 22000, 1, 0, 0)
 
         self.normHorizontalScaleTransform.setScale(fscales.Logarithmic)
-        self._histplot_data.horizontal_axis.scale_division.setScale(fscales.Logarithmic)
-        self._histplot_data.horizontal_axis.coordinate_transform.setScale(fscales.Logarithmic)
+        self._histplot_data.horizontal_axis.setScale(fscales.Logarithmic)
 
         plotLayout = QtWidgets.QGridLayout(self)
         plotLayout.setSpacing(0)

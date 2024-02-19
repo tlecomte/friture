@@ -36,7 +36,11 @@ class Axis(QtCore.QObject):
     def setRange(self, scale_min, scale_max):
         self._scale_division.setRange(scale_min, scale_max)
         self._coordinate_transform.setRange(scale_min, scale_max)
-    
+
+    def setScale(self, scale):
+        self._scale_division.setScale(scale)
+        self._coordinate_transform.setScale(scale)
+
     @pyqtProperty(ScaleDivision, constant=True)
     def scale_division(self):
         return self._scale_division
