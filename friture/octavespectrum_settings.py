@@ -81,6 +81,7 @@ class OctaveSpectrum_Settings_Dialog(QtWidgets.QDialog):
         self.comboBox_response_time.addItem("125 ms (Fast)")
         self.comboBox_response_time.addItem("300 ms")
         self.comboBox_response_time.addItem("1s (Slow)")
+        self.comboBox_response_time.addItem("5s (Very Slow)")
         self.comboBox_response_time.setCurrentIndex(DEFAULT_RESPONSE_TIME_INDEX)
 
         self.formLayout.addRow("Bands per octave:", self.comboBox_bandsperoctave)
@@ -113,6 +114,8 @@ class OctaveSpectrum_Settings_Dialog(QtWidgets.QDialog):
             response_time = 0.3
         elif index == 3:
             response_time = 1.
+        elif index == 4:
+            response_time = 5.           
         self.logger.info("responsetimechanged slot %d %d", index, response_time)
         self.parent().setresponsetime(response_time)
 
