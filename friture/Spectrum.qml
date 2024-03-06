@@ -39,6 +39,13 @@ Item {
                 fmaxValue: scopedata.fmaxValue
                 fmaxLogicalValue: scopedata.fmaxLogicalValue
             }
+
+            FrequencyTracker {
+                visible: scopedata.showPitchTracker
+                anchors.fill: parent
+                fmaxValue: scopedata.fpitchDisplayText
+                fmaxLogicalValue: scopedata.fpitchValue
+            }
         }
     }
 }

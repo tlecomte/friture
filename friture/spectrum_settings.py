@@ -32,6 +32,7 @@ DEFAULT_SPEC_MIN = -100
 DEFAULT_SPEC_MAX = -20
 DEFAULT_WEIGHTING = 1  # A
 DEFAULT_SHOW_FREQ_LABELS = True
+DEFAULT_SHOW_PITCH_LABELS = False
 DEFAULT_RESPONSE_TIME = 0.025
 DEFAULT_RESPONSE_TIME_INDEX = 0
 
@@ -125,6 +126,10 @@ class Spectrum_Settings_Dialog(QtWidgets.QDialog):
         self.checkBox_showFreqLabels.setObjectName("showFreqLabels")
         self.checkBox_showFreqLabels.setChecked(DEFAULT_SHOW_FREQ_LABELS)
 
+        self.checkBox_showPitchLabel = QtWidgets.QCheckBox(self)
+        self.checkBox_showPitchLabel.setObjectName("showPitchLabels")
+        self.checkBox_showPitchLabel.setChecked(DEFAULT_SHOW_PITCH_LABELS)
+
         self.formLayout.addRow("Measurement type:", self.comboBox_dual_channel)
         self.formLayout.addRow("FFT Size:", self.comboBox_fftsize)
         self.formLayout.addRow("Frequency scale:", self.comboBox_freqscale)
@@ -135,6 +140,7 @@ class Spectrum_Settings_Dialog(QtWidgets.QDialog):
         self.formLayout.addRow("Middle-ear weighting:", self.comboBox_weighting)
         self.formLayout.addRow("Response time:", self.comboBox_response_time)
         self.formLayout.addRow("Display max-frequency label:", self.checkBox_showFreqLabels)
+        self.formLayout.addRow("Display pitch label:", self.checkBox_showPitchLabel)
 
         self.setLayout(self.formLayout)
 
@@ -148,6 +154,7 @@ class Spectrum_Settings_Dialog(QtWidgets.QDialog):
         self.comboBox_weighting.currentIndexChanged.connect(self.parent().setweighting)
         self.comboBox_response_time.currentIndexChanged.connect(self.responsetimechanged)
         self.checkBox_showFreqLabels.toggled.connect(self.parent().setShowFreqLabel)
+        self.checkBox_showPitchLabel.toggled.connect(self.parent().setShowPitchLabel)
 
     # slot
     def dualchannelchanged(self, index):
@@ -192,6 +199,7 @@ class Spectrum_Settings_Dialog(QtWidgets.QDialog):
         settings.setValue("weighting", self.comboBox_weighting.currentIndex())
         settings.setValue("responseTime", self.comboBox_response_time.currentIndex())
         settings.setValue("showFreqLabels", self.checkBox_showFreqLabels.isChecked())
+        settings.setValue("showPitchLabel", self.checkBox_showPitchLabel.isChecked())
 
     # method
     def restoreState(self, settings):
@@ -213,3 +221,5 @@ class Spectrum_Settings_Dialog(QtWidgets.QDialog):
         self.comboBox_response_time.setCurrentIndex(responseTime)
         showFreqLabels = settings.value("showFreqLabels", DEFAULT_SHOW_FREQ_LABELS, type=bool)
         self.checkBox_showFreqLabels.setChecked(showFreqLabels)
+        showPitchLabel = settings.value("showPitchLabel", DEFAULT_SHOW_PITCH_LABELS, type=bool)
+        self.checkBox_showPitchLabel.setChecked(showPitchLabel)
