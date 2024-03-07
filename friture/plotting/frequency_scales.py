@@ -18,7 +18,7 @@
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import annotations # to use built-in types in annotations before Python 3.9
-from typing import Union
+from typing import List, Union, Tuple
 from math import ceil, floor
 from decimal import Decimal
 import numpy as np
@@ -184,6 +184,43 @@ class Logarithmic(object):
         return majorTicks, minorTicks
 
 
+class Octave(object):
+    '''
+    A log2 scale with major ticks at the A of each octave, and minor ticks each
+    minor third, which is useful when analysing pitch.
+    '''
+    NAME = 'Octave'
+
+    @staticmethod
+    def transform(frequency: float) -> float:
+        return np.log2(frequency)
+
+    @staticmethod
+    def inverse(logs: float) -> float:
+        return 2 ** logs
+
+    @staticmethod
+    def ticks(scale_min, scale_max) -> Tuple[List[float], List[float]]:
+        if scale_min > scale_max:
+            scale_min, scale_max = (scale_max, scale_min)
+        scale_min = max(1e-20, scale_min)
+        scale_max = max(1e-20, scale_max)
+
+        # Relative to A4 = 440Hz
+        min_A = ceil(np.log2(scale_min / 440))
+        max_A = floor(np.log2(scale_max / 440))
+        major_ticks = [ 440 * (2 ** i) for i in range(min_A, max_A + 1)]
+
+        thirds = np.power(2, [3/12, 6/12, 9/12])
+        minor_ticks = [440 * (2 ** a) * t
+            for a in range(min_A - 1, max_A + 1)
+            for t in thirds]
+        minor_ticks = [t for t in minor_ticks
+            if t >= scale_min and t <= scale_max]
+
+        return major_ticks, minor_ticks
+
+
 class Mel(object):
     NAME = 'Mel'
 
@@ -218,4 +255,4 @@ class Erb(object):
         return Logarithmic.ticks(scale_min, scale_max)
 
 
-ALL = [Linear, Logarithmic, Mel, Erb]
+ALL = [Linear, Logarithmic, Mel, Erb, Octave]
