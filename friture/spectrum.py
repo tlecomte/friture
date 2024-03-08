@@ -170,7 +170,7 @@ class Spectrum_Widget(QtWidgets.QWidget):
             # likely to correspond to a fundamental frequency.
             harmonic_products = self.harmonic_product_spectrum(sp1)
             pitch_idx = argmax(harmonic_products)
-            fpitch = self.freq[pitch_idx]
+            fpitch = max(self.freq[pitch_idx], 1e-20)
 
             self.PlotZoneSpect.setdata(self.freq, dB_spectrogram, fmax, fpitch)
 
