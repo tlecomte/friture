@@ -137,6 +137,18 @@ class SpectrumPlotWidget(QtWidgets.QWidget):
     def set_baseline_dataUnits(self, baseline):
         self._baseline = Baseline.DATA_ZERO
 
+
+    def freq_to_note(self, freq: float) -> str:
+        if freq == 0:
+            return ""
+        # number of semitones from C4
+        # A4 = 440Hz and is 9 semitones above C4
+        semitone = round(np.log2(freq/440) * 12) + 9
+        octave = int(np.floor(semitone / 12)) + 4
+        notes = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
+        return f'{notes[semitone % 12]}{octave}'
+
+
     def setdata(self, x, y, fmax, fpitch):
         if not self.paused:
             if fmax < 2e2:
@@ -145,7 +157,7 @@ class SpectrumPlotWidget(QtWidgets.QWidget):
                 text = "%d Hz" % (np.rint(fmax))
             self._spectrum_data.setFmax(text, self.normHorizontalScaleTransform.toScreen(fmax))
             self._spectrum_data.setFpitch(
-                    f'{int(fpitch)} Hz',
+                    f'{int(fpitch)} Hz ({self.freq_to_note(fpitch)})',
                     self.normHorizontalScaleTransform.toScreen(fpitch)
             )
 
