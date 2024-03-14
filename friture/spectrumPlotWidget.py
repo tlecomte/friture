@@ -73,7 +73,7 @@ class SpectrumPlotWidget(QtWidgets.QWidget):
         self.quickWidget.setResizeMode(QQuickWidget.SizeRootObjectToView)
         self.quickWidget.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         self.quickWidget.setSource(qml_url("Spectrum.qml"))
-        
+
         raise_if_error(self.quickWidget)
 
         self.quickWidget.rootObject().setProperty("stateId", state_id)
@@ -120,6 +120,9 @@ class SpectrumPlotWidget(QtWidgets.QWidget):
     def setShowFreqLabel(self, showFreqLabel):
         self._spectrum_data.showFrequencyTracker = showFreqLabel
 
+    def setShowPitchLabel(self, showPitchLabel):
+        self._spectrum_data.showPitchTracker = showPitchLabel
+
     def set_peaks_enabled(self, enabled):
         self.peaks_enabled = enabled
 
@@ -134,13 +137,17 @@ class SpectrumPlotWidget(QtWidgets.QWidget):
     def set_baseline_dataUnits(self, baseline):
         self._baseline = Baseline.DATA_ZERO
 
-    def setdata(self, x, y, fmax):
+    def setdata(self, x, y, fmax, fpitch):
         if not self.paused:
             if fmax < 2e2:
                 text = "%.1f Hz" % (fmax)
             else:
                 text = "%d Hz" % (np.rint(fmax))
             self._spectrum_data.setFmax(text, self.normHorizontalScaleTransform.toScreen(fmax))
+            self._spectrum_data.setFpitch(
+                    f'{int(fpitch)} Hz',
+                    self.normHorizontalScaleTransform.toScreen(fpitch)
+            )
 
             M = np.max(y)
             m = self.normVerticalScaleTransform.coord_min
