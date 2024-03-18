@@ -137,6 +137,15 @@ class Linear(object):
 
         return ticks
 
+def freq_to_note(freq: float) -> str:
+    if np.isnan(freq) or freq <= 0:
+        return ""
+    # number of semitones from C4
+    # A4 = 440Hz and is 9 semitones above C4
+    semitone = round(np.log2(freq/440) * 12) + 9
+    octave = int(np.floor(semitone / 12)) + 4
+    notes = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
+    return f'{notes[semitone % 12]}{octave}'
 
 class Logarithmic(object):
     NAME = 'Logarithmic'
