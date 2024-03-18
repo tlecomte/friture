@@ -196,7 +196,7 @@ class ImagePlot(QtWidgets.QWidget):
         self.colorScale.setTitle("PSD (dB A)")
 
         self.canvasWidget = CanvasWidget(self, self.verticalScaleTransform, self.horizontalScaleTransform)
-        self.canvasWidget.setTrackerFormatter(lambda x, y: "%.2f s, %d Hz" % (x, y))
+        self.canvasWidget.setTrackerFormatter(self.trackerFormatter)
 
         plotLayout = QtWidgets.QGridLayout()
         plotLayout.setSpacing(0)
@@ -220,6 +220,9 @@ class ImagePlot(QtWidgets.QWidget):
 
         # need to replot here for the size Hints to be computed correctly (depending on axis scales...)
         self.update()
+
+    def trackerFormatter(self, x: float, y: float) -> str:
+        return f'{x:.2f} s, {y:.0f} Hz ({fscales.freq_to_note(y)})'
 
     def addData(self, freq, xyzs, last_data_time):
         self.plotImage.addData(freq, xyzs, self.freqscale, last_data_time)

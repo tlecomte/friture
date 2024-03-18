@@ -54,7 +54,7 @@ class HistPlot(QtWidgets.QWidget):
         self._histplot_data.vertical_axis.name = "PSD (dB A)"
         self._histplot_data.vertical_axis.setTrackerFormatter(lambda x: "%.1f dB" % (x))
         self._histplot_data.horizontal_axis.name = "Frequency (Hz)"
-        self._histplot_data.horizontal_axis.setTrackerFormatter(lambda x: "%.0f Hz" % (x))
+        self._histplot_data.horizontal_axis.setTrackerFormatter(self.format_frequency)
 
         self._histplot_data.vertical_axis.setRange(0, 1)
         self._histplot_data.horizontal_axis.setRange(44, 22000)
@@ -88,6 +88,9 @@ class HistPlot(QtWidgets.QWidget):
         plotLayout.addWidget(self.quickWidget)
 
         self.setLayout(plotLayout)
+
+    def format_frequency(self, freq: float) -> str:
+        return f'{freq:.0f} Hz ({fscales.freq_to_note(freq)})'
 
     def on_status_changed(self, status):
         if status == QQuickWidget.Error:

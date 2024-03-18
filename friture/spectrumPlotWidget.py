@@ -12,6 +12,7 @@ import numpy as np
 
 from friture.audiobackend import SAMPLING_RATE
 from friture.plotting.coordinateTransform import CoordinateTransform
+from friture.plotting.frequency_scales import freq_to_note
 from friture.spectrum_data import Spectrum_Data
 from friture.filled_curve import CurveType, FilledCurve
 from friture.store import GetStore
@@ -49,9 +50,7 @@ class SpectrumPlotWidget(QtWidgets.QWidget):
         self._spectrum_data.vertical_axis.name = "PSD (dB)"
         self._spectrum_data.vertical_axis.setTrackerFormatter(lambda x: "%.1f dB" % (x))
         self._spectrum_data.horizontal_axis.name = "Frequency (Hz)"
-        self._spectrum_data.horizontal_axis.setTrackerFormatter(
-            self.trackerFormatterPitch
-        )
+        self._spectrum_data.horizontal_axis.setTrackerFormatter(self.format_frequency)
 
         self._spectrum_data.vertical_axis.setRange(0, 1)
         self._spectrum_data.horizontal_axis.setRange(0, 22000)
@@ -143,25 +142,8 @@ class SpectrumPlotWidget(QtWidgets.QWidget):
     def set_baseline_dataUnits(self, baseline):
         self._baseline = Baseline.DATA_ZERO
 
-    def freq_to_note(self, freq: float) -> str:
-        if freq == 0:
-            return ""
-        # number of semitones from C4
-        # A4 = 440Hz and is 9 semitones above C4
-        semitone = round(np.log2(freq / 440) * 12) + 9
-        octave = int(np.floor(semitone / 12)) + 4
-        notes = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
-        return f"{notes[semitone % 12]}{octave}"
-
-    def trackerFormatterPitch(self, x):
-        try:
-            note = self.freq_to_note(x)
-        except ValueError:
-            return ""
-        if x < 1000:
-            return "%d Hz (%s)" % (int(x), note)
-        else:
-            return "%.1f kHz (%s)" % (x / 1000, note)
+    def format_frequency(self, freq: float) -> str:
+        return f'{freq:.0f} Hz ({freq_to_note(freq)})'
 
     def setdata(self, x, y, fmax, fpitch):
         if not self.paused:
@@ -173,7 +155,7 @@ class SpectrumPlotWidget(QtWidgets.QWidget):
                 text, self.normHorizontalScaleTransform.toScreen(fmax)
             )
             self._spectrum_data.setFpitch(
-                f"{int(fpitch)} Hz ({self.freq_to_note(fpitch)})",
+                self.format_frequency(fpitch),
                 self.normHorizontalScaleTransform.toScreen(fpitch),
             )
 
