@@ -17,18 +17,25 @@
 # You should have received a copy of the GNU General Public License
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
+from collections.abc import Generator
 import logging
+import math as m
+import numpy as np
 from PyQt5 import QtWidgets
 from PyQt5.QtQuickWidgets import QQuickWidget
-import numpy as np
+from typing import Optional
 
+from friture.audiobackend import SAMPLING_RATE
+from friture.audioproc import audioproc
 from friture.curve import Curve
 from friture.pitch_tracker_settings import (
     DEFAULT_MIN_FREQ,
     DEFAULT_MAX_FREQ,
     DEFAULT_DURATION
 )
+from friture.plotting.coordinateTransform import CoordinateTransform
 import friture.plotting.frequency_scales as fscales
+from friture.ringbuffer import RingBuffer
 from friture.scope_data import Scope_Data
 from friture.store import GetStore
 from friture.qml_tools import qml_url, raise_if_error
@@ -79,20 +86,34 @@ class PitchTrackerWidget(QtWidgets.QWidget):
         self._pitch_tracker_data.vertical_axis.setRange(
             self.min_freq, self.max_freq)
         self._pitch_tracker_data.vertical_axis.setScale(fscales.Octave)
+        self.vertical_transform = CoordinateTransform(
+            self.min_freq, self.max_freq, 1, 0, 0)
+        self.vertical_transform.setScale(fscales.Octave)
 
         self.duration = DEFAULT_DURATION
         self._pitch_tracker_data.horizontal_axis.setRange(-self.duration, 0.)
 
         self.audiobuffer = None
+        self.tracker = PitchTracker(RingBuffer())
 
-        self._curve.setData(np.array([0.0, 0.75]), np.array([0.0, 0.5]))
+        self.update_curve()
+
 
     # method
     def set_buffer(self, buffer):
         self.audiobuffer = buffer
+        self.tracker.set_input_buffer(buffer.ringbuffer)
 
     def handle_new_data(self, floatdata):
-        pass
+        if self.tracker.update():
+            self.update_curve()
+
+    def update_curve(self):
+        pitches = self.tracker.get_estimates(self.duration)
+        pitches = 1.0 - self.vertical_transform.toScreen(pitches)
+        pitches = np.clip(pitches, 0, 1)
+        times = np.linspace(0, 1.0, pitches.shape[0])
+        self._curve.setData(times, pitches)
 
     def on_status_changed(self, status):
         if status == QQuickWidget.Error:
@@ -130,3 +151,70 @@ class PitchTrackerWidget(QtWidgets.QWidget):
     def restoreState(self, settings):
         # self.settings_dialog.restoreState(settings)
         pass
+
+
+class PitchTracker:
+    def __init__(
+        self,
+        input_buf: RingBuffer,
+        fft_size: int = 8192,
+        overlap: float = 0.75,
+        sample_rate: int = SAMPLING_RATE
+    ):
+        self.fft_size = fft_size
+        self.overlap = overlap
+        self.sample_rate = sample_rate
+
+        self.input_buf = input_buf
+        self.input_buf.grow_if_needed(fft_size)
+        self.next_in_offset = self.input_buf.offset
+
+        self.out_buf = RingBuffer()
+        self.out_offset = self.out_buf.offset
+
+        self.proc = audioproc()
+        self.proc.set_fftsize(self.fft_size)
+
+    def set_input_buffer(self, new_buf: RingBuffer) -> None:
+        self.input_buf = new_buf
+        self.input_buf.grow_if_needed(self.fft_size)
+        self.next_in_offset = self.input_buf.offset
+
+    def update(self) -> bool:
+        new = [self.estimate_pitch(f) for f in self.new_frames()]
+        self.out_buf.push(np.array([new]))
+        self.out_offset = self.out_buf.offset
+        return len(new) != 0
+
+    def get_estimates(self, time_s: float) -> np.ndarray:
+        step_size = m.floor(self.fft_size * (1.0 - self.overlap))
+        num_results = m.floor(time_s / (step_size / self.sample_rate)) + 1
+        return self.out_buf.data_indexed(self.out_offset, num_results)[0,:]
+
+    def new_frames(self) -> Generator[np.ndarray, None, None]:
+        assert self.input_buf.offset >= self.next_in_offset
+        while self.next_in_offset + self.fft_size <= self.input_buf.offset:
+            # data_indexed is (end_index, length) for some reason
+            yield self.input_buf.data_indexed(
+                self.next_in_offset + self.fft_size, self.fft_size)
+            self.next_in_offset += m.floor(self.fft_size * (1.0 - self.overlap))
+
+    def estimate_pitch(self, frame: np.ndarray) -> Optional[float]:
+        spectrum = np.abs(np.fft.rfft(frame[0, :] * self.proc.window))
+
+        # Compute harmonic product spectrum; the frequency with the largest
+        # value is quite likely to be a fundamental frequency.
+        # Chose 3 harmonics for no particularly good reason; empirically this
+        # seems reasonably effective.
+        product_count = 3
+        harmonic_length = spectrum.shape[0] // product_count
+        hps = spectrum[:harmonic_length]
+        for i in range(2, product_count + 1):
+            hps *= spectrum[::i][:harmonic_length]
+
+        pitch_idx = np.argmax(hps)
+        if pitch_idx == 0:
+            # This should only occur if the HPS is all zero. No pitch, don't
+            # try to take the log of zero.
+            return None
+        return self.proc.freq[pitch_idx]
