@@ -235,4 +235,12 @@ class PitchTracker:
             # This should only occur if the HPS is all zero. No pitch, don't
             # try to take the log of zero.
             return None
-        return self.proc.freq[pitch_idx]
+
+        # Compute SNR for the detected pitch; if it's too low presume it's
+        # a false detection and return no result.
+        variance = np.mean(spectrum ** 2)
+        snr = 10 * np.log10((spectrum[pitch_idx] ** 2) / variance)
+        if snr < 3:
+            return None
+        else:
+            return self.proc.freq[pitch_idx]
