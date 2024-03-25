@@ -20,4 +20,4 @@
 # Roughly the maximum singing range:
 DEFAULT_MIN_FREQ = 80
 DEFAULT_MAX_FREQ = 1000
-DEFAULT_DURATION = 60
+DEFAULT_DURATION = 30
