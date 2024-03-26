@@ -31,7 +31,10 @@ from friture.curve import Curve
 from friture.pitch_tracker_settings import (
     DEFAULT_MIN_FREQ,
     DEFAULT_MAX_FREQ,
-    DEFAULT_DURATION
+    DEFAULT_DURATION,
+    DEFAULT_FFT_SIZE,
+    DEFAULT_MIN_SNR,
+    PitchTrackerSettingsDialog
 )
 from friture.plotting.coordinateTransform import CoordinateTransform
 import friture.plotting.frequency_scales as fscales
@@ -111,9 +114,10 @@ class PitchTrackerWidget(QtWidgets.QWidget):
         self.duration = DEFAULT_DURATION
         self._pitch_tracker_data.horizontal_axis.setRange(-self.duration, 0.)
 
+        self.settings_dialog = PitchTrackerSettingsDialog(self)
+
         self.audiobuffer = None
         self.tracker = PitchTracker(RingBuffer())
-
         self.update_curve()
 
 
@@ -143,45 +147,49 @@ class PitchTrackerWidget(QtWidgets.QWidget):
         # nothing to do here
         return
 
-    def setmin(self, value):
+    def set_min_freq(self, value):
         self.min_freq = value
         self._pitch_tracker_data.vertical_axis.setRange(self.min_freq, self.max_freq)
+        self.vertical_transform.setRange(self.min_freq, self.max_freq)
 
-    def setmax(self, value):
+    def set_max_freq(self, value):
         self.max_freq = value
         self._pitch_tracker_data.vertical_axis.setRange(self.min_freq, self.max_freq)
+        self.vertical_transform.setRange(self.min_freq, self.max_freq)
 
-    def setduration(self, value):
+    def set_duration(self, value):
         self.duration = value
         self._pitch_tracker_data.horizontal_axis.setRange(-self.duration, 0.)
 
+    def set_min_snr(self, value: float):
+        self.tracker.min_snr = value
+
     # slot
     def settings_called(self, checked):
-        # self.settings_dialog.show()
-        pass
+        self.settings_dialog.show()
 
     # method
     def saveState(self, settings):
-        # self.settings_dialog.saveState(settings)
-        pass
+        self.settings_dialog.save_state(settings)
 
     # method
     def restoreState(self, settings):
-        # self.settings_dialog.restoreState(settings)
-        pass
+        self.settings_dialog.restore_state(settings)
 
 
 class PitchTracker:
     def __init__(
         self,
         input_buf: RingBuffer,
-        fft_size: int = 8192,
+        fft_size: int = DEFAULT_FFT_SIZE,
         overlap: float = 0.75,
-        sample_rate: int = SAMPLING_RATE
+        sample_rate: int = SAMPLING_RATE,
+        min_snr: float = DEFAULT_MIN_SNR,
     ):
         self.fft_size = fft_size
         self.overlap = overlap
         self.sample_rate = sample_rate
+        self.min_snr = min_snr
 
         self.input_buf = input_buf
         self.input_buf.grow_if_needed(fft_size)
@@ -240,7 +248,7 @@ class PitchTracker:
         # a false detection and return no result.
         variance = np.mean(spectrum ** 2)
         snr = 10 * np.log10((spectrum[pitch_idx] ** 2) / variance)
-        if snr < 3:
+        if snr < self.min_snr:
             return None
         else:
             return self.proc.freq[pitch_idx]
