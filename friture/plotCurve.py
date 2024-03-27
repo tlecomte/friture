@@ -1,7 +1,7 @@
 import numpy as np
-from PyQt5.QtCore import pyqtSignal, pyqtProperty
+from PyQt5.QtCore import pyqtSignal, pyqtProperty # type: ignore
 from PyQt5.QtGui import QColor
-from PyQt5.QtQuick import QQuickItem, QSGGeometryNode, QSGGeometry, QSGFlatColorMaterial, QSGNode
+from PyQt5.QtQuick import QQuickItem, QSGGeometryNode, QSGGeometry, QSGFlatColorMaterial, QSGNode # type: ignore
 
 from friture.curve import Curve
 
@@ -24,24 +24,24 @@ class PlotCurve(QQuickItem):
     def color(self):
         return self._color
 
-    @color.setter
+    @color.setter # type: ignore
     def color(self, color):
         if color != self._color:
             self._color = color
             self.update()
             self.colorChanged.emit()
-    
+
     @pyqtProperty(Curve, notify=curveChanged)
     def curve(self):
         return self._curve
 
-    @curve.setter
+    @curve.setter # type: ignore
     def curve(self, curve):
         if curve != self._curve:
             self._curve = curve
             if self._curve is not None:
                 self._curve.data_changed.connect(self.update)
-            
+
             self.update()
             self.curveChanged.emit()
 
@@ -60,7 +60,7 @@ class PlotCurve(QQuickItem):
             paint_node.setMaterial(material)
             paint_node.setFlag(QSGNode.OwnsMaterial)
             paint_node.markDirty(QSGNode.DirtyMaterial)
-        
+
         else:
             geometry = paint_node.geometry()
             geometry.allocate(self.curve.x_array().size) # geometry will be marked as dirty below
@@ -69,7 +69,7 @@ class PlotCurve(QQuickItem):
             if material.color() != self._color:
                 material.setColor(self._color)
                 paint_node.markDirty(QSGNode.DirtyMaterial)
-             
+
         size = self.curve.x_array().size
 
         # ideally we would use geometry.vertexDataAsPoint2D

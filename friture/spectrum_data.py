@@ -38,11 +38,11 @@ class Spectrum_Data(Scope_Data):
         self._show_frequency_tracker = True
         self._show_pitch_tracker = True
 
-    @pyqtProperty(str, notify=fmax_changed)
+    @pyqtProperty(str, notify=fmax_changed) # type: ignore
     def fmaxValue(self):
         return self._fmax_value
 
-    @pyqtProperty(float, notify=fmax_changed)
+    @pyqtProperty(float, notify=fmax_changed) # type: ignore
     def fmaxLogicalValue(self):
         return self._fmax_logical_value
 
@@ -52,11 +52,11 @@ class Spectrum_Data(Scope_Data):
             self._fmax_logical_value = logical_value
             self.fmax_changed.emit()
 
-    @pyqtProperty(str, notify=fpitch_changed)
+    @pyqtProperty(str, notify=fpitch_changed) # type: ignore
     def fpitchDisplayText(self):
         return self._fpitch_display
 
-    @pyqtProperty(float, notify=fpitch_changed)
+    @pyqtProperty(float, notify=fpitch_changed) # type: ignore
     def fpitchValue(self):
         return self._fpitch_value
 
@@ -66,21 +66,21 @@ class Spectrum_Data(Scope_Data):
             self._fpitch_value = value
             self.fpitch_changed.emit()
 
-    @pyqtProperty(bool, notify=show_frequency_tracker_changed)
+    @pyqtProperty(bool, notify=show_frequency_tracker_changed) # type: ignore
     def showFrequencyTracker(self):
         return self._show_frequency_tracker
 
-    @showFrequencyTracker.setter
+    @showFrequencyTracker.setter # type: ignore
     def showFrequencyTracker(self, show_frequency_tracker):
         if self._show_frequency_tracker != show_frequency_tracker:
             self._show_frequency_tracker = show_frequency_tracker
             self.show_frequency_tracker_changed.emit(show_frequency_tracker)
 
-    @pyqtProperty(bool, notify=show_pitch_tracker_changed)
+    @pyqtProperty(bool, notify=show_pitch_tracker_changed) # type: ignore
     def showPitchTracker(self):
         return self._show_pitch_tracker
 
-    @showPitchTracker.setter
+    @showPitchTracker.setter # type: ignore
     def showPitchTracker(self, show_pitch_tracker):
         if self._show_pitch_tracker != show_pitch_tracker:
             self._show_pitch_tracker = show_pitch_tracker

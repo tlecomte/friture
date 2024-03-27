@@ -19,8 +19,8 @@
 
 import numpy as np
 
-from PyQt5.QtCore import pyqtSignal, pyqtProperty
-from PyQt5.QtQuick import QQuickItem, QSGGeometryNode, QSGGeometry, QSGNode, QSGVertexColorMaterial
+from PyQt5.QtCore import pyqtSignal, pyqtProperty # type: ignore
+from PyQt5.QtQuick import QQuickItem, QSGGeometryNode, QSGGeometry, QSGNode, QSGVertexColorMaterial # type: ignore
 
 from friture.filled_curve import CurveType, FilledCurve
 
@@ -33,18 +33,18 @@ class PlotFilledCurve(QQuickItem):
         self.setFlag(QQuickItem.ItemHasContents, True)
 
         self._curve = FilledCurve(CurveType.SIGNAL)
-   
+
     @pyqtProperty(FilledCurve, notify=curveChanged)
     def curve(self):
         return self._curve
 
-    @curve.setter
+    @curve.setter # type: ignore
     def curve(self, curve):
         if curve != self._curve:
             self._curve = curve
             if self._curve is not None:
                 self._curve.data_changed.connect(self.update)
-            
+
             self.update()
             self.curveChanged.emit()
 
@@ -98,7 +98,7 @@ class PlotFilledCurve(QQuickItem):
         # a custom structured data type that represents the vertex data is interpreted
         vertex_dtype = np.dtype([('x', np.float32), ('y', np.float32), ('r', np.ubyte), ('g', np.ubyte), ('b', np.ubyte), ('a', np.ubyte)])
         vertex_data.setsize(vertex_dtype.itemsize * vertex_count)
-       
+
         vertices = np.frombuffer(vertex_data, dtype=vertex_dtype)
 
         baseline = self.curve.baseline() * self.height() + 0.*y

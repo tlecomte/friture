@@ -5,7 +5,7 @@ if __name__ == '__main__':
     import sys
     sys.path.insert(0, '.')
 
-    import friture.qsynthmeter as meter
+    import friture.qsynthmeter as meter # type: ignore
 
     scale = meter.IECScale()
 

@@ -19,7 +19,7 @@
 
 from PyQt5 import QtCore
 from PyQt5.QtCore import pyqtProperty
-from PyQt5.QtQml import QQmlListProperty
+from PyQt5.QtQml import QQmlListProperty # type: ignore
 
 from friture.bar_label import BarLabel
 from friture.scope_data import Scope_Data
@@ -33,7 +33,7 @@ class HistPlot_Data(Scope_Data):
 
         self._bar_labels = []
         self._bar_labels_x_distance = 0.
-    
+
     def setBarLabels(self, x, unscaled_x, y):
         x_distance = x[1] - x[0]
         if self._bar_labels_x_distance != x_distance:
@@ -41,7 +41,7 @@ class HistPlot_Data(Scope_Data):
             self.bar_labels_x_distance_changed.emit()
 
         label_count = x.shape[0]
-        
+
         # never display more than 60 labels
         # it is not useful visually
         # and the loop to build them would be too slow
@@ -55,10 +55,10 @@ class HistPlot_Data(Scope_Data):
         for i in range(label_count):
             self._bar_labels[i].setData(x[i], unscaled_x[i], y[i])
 
-    @pyqtProperty(QQmlListProperty, notify=bar_labels_changed)
+    @pyqtProperty(QQmlListProperty, notify=bar_labels_changed) # type: ignore
     def barLabels(self):
         return QQmlListProperty(BarLabel, self, self._bar_labels)
 
-    @pyqtProperty(float, notify=bar_labels_x_distance_changed)
+    @pyqtProperty(float, notify=bar_labels_x_distance_changed) # type: ignore
     def bar_labels_x_distance(self):
         return self._bar_labels_x_distance

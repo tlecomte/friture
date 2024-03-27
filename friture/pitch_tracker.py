@@ -27,9 +27,10 @@ from PyQt5.QtCore import QObject, QSettings # type: ignore
 from PyQt5.QtQuick import QQuickWindow
 from PyQt5.QtQuickWidgets import QQuickWidget
 from PyQt5.QtQml import QQmlComponent, QQmlEngine
-from typing import Any, no_type_check, Optional
+from typing import Any, Optional
 
 from friture.audiobackend import SAMPLING_RATE
+from friture.audiobuffer import AudioBuffer
 from friture.audioproc import audioproc
 from friture.curve import Curve
 from friture.pitch_tracker_settings import (
@@ -66,7 +67,7 @@ def format_frequency(freq: float) -> str:
 
 
 class PitchTrackerWidget(QtWidgets.QWidget):
-    def __init__(self, parent, engine):
+    def __init__(self, parent: QtWidgets.QWidget, engine: QQmlEngine):
         super().__init__(parent)
 
         self.logger = logging.getLogger(__name__)
@@ -79,15 +80,17 @@ class PitchTrackerWidget(QtWidgets.QWidget):
         state_id = len(store._dock_states) - 1
 
         self._curve = Curve()
-        self._curve.name = "Ch1"
+        self._curve.name = "Ch1" # type: ignore [assignment]
         self._pitch_tracker_data.add_plot_item(self._curve)
 
-        self._pitch_tracker_data.vertical_axis.name = "Frequency (Hz)"
-        self._pitch_tracker_data.vertical_axis.setTrackerFormatter(
+        # cast for qt properties which aren't properly typed
+        tracker_data: Any = self._pitch_tracker_data
+        tracker_data.vertical_axis.name = "Frequency (Hz)"
+        tracker_data.vertical_axis.setTrackerFormatter(
             format_frequency)
-        self._pitch_tracker_data.vertical_axis.show_minor_grid_lines = True
-        self._pitch_tracker_data.horizontal_axis.name = "Time (sec)"
-        self._pitch_tracker_data.horizontal_axis.setTrackerFormatter(
+        tracker_data.vertical_axis.show_minor_grid_lines = True
+        tracker_data.horizontal_axis.name = "Time (sec)"
+        tracker_data.horizontal_axis.setTrackerFormatter(
             lambda x: "%#.3g sec" % (x))
 
         self.gridLayout = QtWidgets.QGridLayout(self)
@@ -103,7 +106,8 @@ class PitchTrackerWidget(QtWidgets.QWidget):
 
         raise_if_error(self.quickWidget)
 
-        self.quickWidget.rootObject().setProperty("stateId", state_id)
+        root: Any = self.quickWidget.rootObject()
+        root.setProperty("stateId", state_id)
 
         self.gridLayout.addWidget(self.quickWidget, 0, 0, 1, 1)
 
@@ -111,7 +115,7 @@ class PitchTrackerWidget(QtWidgets.QWidget):
         pitch_window = QQuickWindow()
         pitch_component = QQmlComponent(engine, qml_url("PitchView.qml"), self)
         raise_if_error(pitch_component)
-        pitch_object = pitch_component.createWithInitialProperties(
+        pitch_object: Any = pitch_component.createWithInitialProperties(
             {
                 "parent": pitch_window.contentItem(),
                 "pitch_view_model": self.pitch_view_model
@@ -141,65 +145,65 @@ class PitchTrackerWidget(QtWidgets.QWidget):
 
         self.settings_dialog = PitchTrackerSettingsDialog(self)
 
-        self.audiobuffer = None
+        self.audiobuffer: Optional[AudioBuffer] = None
         self.tracker = PitchTracker(RingBuffer())
         self.update_curve()
 
 
     # method
-    def set_buffer(self, buffer):
+    def set_buffer(self, buffer: AudioBuffer) -> None:
         self.audiobuffer = buffer
         self.tracker.set_input_buffer(buffer.ringbuffer)
 
-    def handle_new_data(self, floatdata):
+    def handle_new_data(self, floatdata: np.ndarray) -> None:
         if self.tracker.update():
             self.update_curve()
             self.pitch_view_model.pitch = self.tracker.get_latest_estimate() # type: ignore
 
-    def update_curve(self):
+    def update_curve(self) -> None:
         pitches = self.tracker.get_estimates(self.duration)
-        pitches = 1.0 - self.vertical_transform.toScreen(pitches)
+        pitches = 1.0 - self.vertical_transform.toScreen(pitches) # type: ignore
         pitches = np.clip(pitches, 0, 1)
         times = np.linspace(0, 1.0, pitches.shape[0])
         self._curve.setData(times, pitches)
 
-    def on_status_changed(self, status):
+    def on_status_changed(self, status: QQuickWidget.Status) -> None:
         if status == QQuickWidget.Error:
             for error in self.quickWidget.errors():
                 self.logger.error("QML error: " + error.toString())
 
     # method
-    def canvasUpdate(self):
+    def canvasUpdate(self) -> None:
         # nothing to do here
         return
 
-    def set_min_freq(self, value):
+    def set_min_freq(self, value: int) -> None:
         self.min_freq = value
-        self._pitch_tracker_data.vertical_axis.setRange(self.min_freq, self.max_freq)
+        self._pitch_tracker_data.vertical_axis.setRange(self.min_freq, self.max_freq) # type: ignore
         self.vertical_transform.setRange(self.min_freq, self.max_freq)
 
-    def set_max_freq(self, value):
+    def set_max_freq(self, value: int) -> None:
         self.max_freq = value
-        self._pitch_tracker_data.vertical_axis.setRange(self.min_freq, self.max_freq)
+        self._pitch_tracker_data.vertical_axis.setRange(self.min_freq, self.max_freq) # type: ignore
         self.vertical_transform.setRange(self.min_freq, self.max_freq)
 
-    def set_duration(self, value):
+    def set_duration(self, value: int) -> None:
         self.duration = value
-        self._pitch_tracker_data.horizontal_axis.setRange(-self.duration, 0.)
+        self._pitch_tracker_data.horizontal_axis.setRange(-self.duration, 0.) # type: ignore
 
-    def set_min_db(self, value: float):
+    def set_min_db(self, value: float) -> None:
         self.tracker.min_db = value
 
     # slot
-    def settings_called(self, checked):
+    def settings_called(self, checked: bool) -> None:
         self.settings_dialog.show()
 
     # method
-    def saveState(self, settings):
+    def saveState(self, settings: QSettings) -> None:
         self.settings_dialog.save_state(settings)
 
     # method
-    def restoreState(self, settings):
+    def restoreState(self, settings: QSettings) -> None:
         self.settings_dialog.restore_state(settings)
 
 

@@ -1,6 +1,6 @@
 from PyQt5 import QtCore
 from PyQt5.QtCore import QObject, pyqtProperty
-from PyQt5.QtQml import QQmlListProperty
+from PyQt5.QtQml import QQmlListProperty # type: ignore
 
 __storeInstance = None
 
@@ -16,7 +16,7 @@ class Store(QtCore.QObject):
     def __init__(self, parent=None):
         super().__init__(parent)
         self._dock_states = []
-    
-    @pyqtProperty(QQmlListProperty, notify=dock_states_changed)
+
+    @pyqtProperty(QQmlListProperty, notify=dock_states_changed) # type: ignore
     def dock_states(self):
         return QQmlListProperty(QObject, self, self._dock_states)

@@ -38,36 +38,36 @@ class LevelViewModel(QtCore.QObject):
         self._level_data_ballistic = BallisticPeak(self)
         self._level_data_ballistic_2 = BallisticPeak(self)
 
-    @pyqtProperty(bool, notify=two_channels_changed)
+    @pyqtProperty(bool, notify=two_channels_changed) # type: ignore
     def two_channels(self):
         return self._two_channels
-    
-    @two_channels.setter
+
+    @two_channels.setter # type: ignore
     def two_channels(self, two_channels):
         if self._two_channels != two_channels:
             self._two_channels = two_channels
             self.two_channels_changed.emit(two_channels)
 
-    @pyqtProperty(LevelData, constant = True)
+    @pyqtProperty(LevelData, constant = True) # type: ignore
     def level_data(self):
         return self._level_data
-    
-    @pyqtProperty(LevelData, constant = True)
+
+    @pyqtProperty(LevelData, constant = True) # type: ignore
     def level_data_2(self):
         return self._level_data_2
-    
-    @pyqtProperty(LevelData, constant = True)
+
+    @pyqtProperty(LevelData, constant = True) # type: ignore
     def level_data_slow(self):
         return self._level_data_slow
-    
-    @pyqtProperty(LevelData, constant = True)
+
+    @pyqtProperty(LevelData, constant = True) # type: ignore
     def level_data_slow_2(self):
         return self._level_data_slow_2
-    
-    @pyqtProperty(LevelData, constant = True)
+
+    @pyqtProperty(LevelData, constant = True) # type: ignore
     def level_data_ballistic(self):
         return self._level_data_ballistic
-    
-    @pyqtProperty(LevelData, constant = True)
+
+    @pyqtProperty(LevelData, constant = True) # type: ignore
     def level_data_ballistic_2(self):
         return self._level_data_ballistic_2

@@ -41,6 +41,12 @@ dependencies = [
     "pyrr==0.10.3",
 ]
 
+[project.optional-dependencies]
+dev = [
+    "mypy==1.10.0",
+    "PyQt5-stubs==5.15.6.0",
+]
+
 [project.scripts]
 friture = "friture.analyzer:main"
 
