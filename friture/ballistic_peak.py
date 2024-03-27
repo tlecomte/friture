@@ -18,7 +18,7 @@
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
 from PyQt5 import QtCore
-from PyQt5.QtCore import pyqtProperty
+from PyQt5.QtCore import pyqtProperty # type: ignore
 
 PEAK_DECAY_RATE = (1.0 - 3E-6/500.)
 # Number of cycles the peak stays on hold before fall-off.
@@ -37,8 +37,8 @@ class BallisticPeak(QtCore.QObject):
     @pyqtProperty(float, notify=peak_changed)
     def peak_iec(self):
         return self._peak_iec
-    
-    @peak_iec.setter
+
+    @peak_iec.setter # type: ignore
     def peak_iec(self, peak_iec):
 
         # peak-hold-then-decay mechanism

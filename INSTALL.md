@@ -56,7 +56,7 @@ source ./buildenv/bin/activate
 
 8. Install Friture dependencies (PyQt5, etc.)
 ```
-pip3.11 install . 
+pip3.11 install .[dev] 
 ```
 
 9. Build Cython extensions
@@ -114,7 +114,7 @@ virtualenv buildenv
 8. Install dependencies
 
 ```
-pip install .
+pip install .[dev]
 ```
 
 9. Build Cython extensions

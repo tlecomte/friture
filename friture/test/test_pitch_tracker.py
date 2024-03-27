@@ -24,7 +24,7 @@ from friture.pitch_tracker import *
 from friture.ringbuffer import RingBuffer
 
 class PitchTrackerTest(unittest.TestCase):
-    def test_new_frames(self):
+    def test_new_frames(self) -> None:
         buf = RingBuffer()
         tracker = PitchTracker(buf, fft_size=4, overlap=0.5)
         buf.push(np.array([np.arange(2)]))
@@ -39,7 +39,7 @@ class PitchTrackerTest(unittest.TestCase):
             list(tracker.new_frames())
         )
 
-    def test_estimate_pitch(self):
+    def test_estimate_pitch(self) -> None:
         buf = RingBuffer()
         tracker = PitchTracker(buf, fft_size=32, overlap=0.5)
         # use inverse fft to synthesize a signal where the first harmonic has
@@ -51,7 +51,7 @@ class PitchTrackerTest(unittest.TestCase):
         ]))
         self.assertEqual(pitch, 3000)
 
-    def test_update(self):
+    def test_update(self) -> None:
         buf = RingBuffer()
         tracker = PitchTracker(buf, fft_size=32, overlap=0.5, sample_rate=32)
 

@@ -32,29 +32,29 @@ class LevelData(QtCore.QObject):
         self._level_rms = -30.
         self._level_max = -30.
 
-    @pyqtProperty(float, notify=level_rms_changed)
+    @pyqtProperty(float, notify=level_rms_changed) # type: ignore
     def level_rms(self):
         return self._level_rms
-    
-    @pyqtProperty(float, notify=level_rms_changed)
+
+    @pyqtProperty(float, notify=level_rms_changed) # type: ignore
     def level_rms_iec(self):
         return dB_to_IEC(self._level_rms)
-    
-    @level_rms.setter
+
+    @level_rms.setter # type: ignore
     def level_rms(self, level_rms):
         if self._level_rms != level_rms:
             self._level_rms = level_rms
             self.level_rms_changed.emit(level_rms)
 
-    @pyqtProperty(float, notify=level_max_changed)
+    @pyqtProperty(float, notify=level_max_changed) # type: ignore
     def level_max(self):
         return self._level_max
 
-    @pyqtProperty(float, notify=level_max_changed)
+    @pyqtProperty(float, notify=level_max_changed) # type: ignore
     def level_max_iec(self):
         return dB_to_IEC(self._level_max)
-    
-    @level_max.setter
+
+    @level_max.setter # type: ignore
     def level_max(self, level_max):
         if self._level_max != level_max:
             self._level_max = level_max

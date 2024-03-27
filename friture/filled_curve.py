@@ -49,7 +49,7 @@ class FilledCurve(QtCore.QObject):
         self._z_array = z_array
         self._baseline = baseline
         self.data_changed.emit()
-    
+
     def x_left_array(self):
         return self._x_left_array
 
@@ -64,17 +64,17 @@ class FilledCurve(QtCore.QObject):
 
     def baseline(self):
         return self._baseline
-    
+
     @pyqtProperty(str, notify=name_changed)
     def name(self):
         return self._name
-    
-    @name.setter
+
+    @name.setter # type: ignore
     def name(self, name):
         if self._name != name:
             self._name = name
             self.name_changed.emit(name)
-    
-    @pyqtProperty(CurveType, constant = True)
+
+    @pyqtProperty(int, constant = True) # type: ignore
     def curve_type(self):
         return self._curve_type

@@ -19,7 +19,7 @@
 
 from PyQt5 import QtCore
 from PyQt5.QtCore import pyqtProperty
-from PyQt5.QtQml import QQmlListProperty
+from PyQt5.QtQml import QQmlListProperty # type: ignore
 
 import friture.plotting.frequency_scales as fscales
 from friture.plotting.coordinateTransform import CoordinateTransform
@@ -29,12 +29,12 @@ class Tick(QtCore.QObject):
         super().__init__(parent)
         self._value = value
         self._logical_value = logical_value
-    
-    @pyqtProperty(str, constant = True)
+
+    @pyqtProperty(str, constant = True) # type: ignore
     def value(self):
         return self._value
 
-    @pyqtProperty(float, constant = True)
+    @pyqtProperty(float, constant = True) # type: ignore
     def logicalValue(self):
         return self._logical_value
 
@@ -65,15 +65,15 @@ class ScaleDivision(QtCore.QObject):
 
     def majorTicks(self):
         return self.major_ticks
-    
+
     def minorTicks(self):
         return self.minor_ticks
 
-    @pyqtProperty(QQmlListProperty, notify=logical_major_ticks_changed)
+    @pyqtProperty(QQmlListProperty, notify=logical_major_ticks_changed) # type: ignore
     def logicalMajorTicks(self):
         return QQmlListProperty(Tick, self, self._logical_major_ticks)
 
-    @pyqtProperty(QQmlListProperty, notify=logical_minor_ticks_changed)
+    @pyqtProperty(QQmlListProperty, notify=logical_minor_ticks_changed) # type: ignore
     def logicalMinorTicks(self):
         return QQmlListProperty(Tick, self, self._logical_minor_ticks)
 

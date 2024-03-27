@@ -18,7 +18,7 @@
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
 from PyQt5 import QtCore
-from PyQt5.QtCore import pyqtProperty
+from PyQt5.QtCore import pyqtProperty # type: ignore
 import numpy
 
 class Curve(QtCore.QObject):
@@ -36,18 +36,18 @@ class Curve(QtCore.QObject):
         self._x_array = x_array
         self._y_array = y_array
         self.data_changed.emit()
-    
+
     def x_array(self):
         return self._x_array
 
     def y_array(self):
         return self._y_array
-    
+
     @pyqtProperty(str, notify=name_changed)
     def name(self):
         return self._name
-    
-    @name.setter
+
+    @name.setter # type: ignore
     def name(self, name):
         if self._name != name:
             self._name = name

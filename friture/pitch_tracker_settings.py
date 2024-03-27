@@ -18,6 +18,8 @@
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
 from PyQt5 import QtWidgets
+from PyQt5.QtCore import QSettings
+from typing import Any
 
 from friture.audiobackend import SAMPLING_RATE
 
@@ -29,7 +31,7 @@ DEFAULT_MIN_DB = -70.0
 DEFAULT_FFT_SIZE = 16384
 
 class PitchTrackerSettingsDialog(QtWidgets.QDialog):
-    def __init__(self, parent):
+    def __init__(self, parent: QtWidgets.QWidget) -> None:
         super().__init__(parent)
         self.setWindowTitle("Pitch Tracker Settings")
         self.form_layout = QtWidgets.QFormLayout(self)
@@ -41,7 +43,7 @@ class PitchTrackerSettingsDialog(QtWidgets.QDialog):
         self.min_freq.setValue(DEFAULT_MIN_FREQ)
         self.min_freq.setSuffix(" Hz")
         self.min_freq.setObjectName("min_freq")
-        self.min_freq.valueChanged.connect(self.parent().set_min_freq)
+        self.min_freq.valueChanged.connect(self.parent().set_min_freq) # type: ignore
         self.form_layout.addRow("Min:", self.min_freq)
 
         self.max_freq = QtWidgets.QSpinBox(self)
@@ -51,7 +53,7 @@ class PitchTrackerSettingsDialog(QtWidgets.QDialog):
         self.max_freq.setValue(DEFAULT_MAX_FREQ)
         self.max_freq.setSuffix(" Hz")
         self.max_freq.setObjectName("max_freq")
-        self.max_freq.valueChanged.connect(self.parent().set_max_freq)
+        self.max_freq.valueChanged.connect(self.parent().set_max_freq) # type: ignore
         self.form_layout.addRow("Max:", self.max_freq)
 
         self.duration = QtWidgets.QSpinBox(self)
@@ -61,7 +63,7 @@ class PitchTrackerSettingsDialog(QtWidgets.QDialog):
         self.duration.setValue(DEFAULT_DURATION)
         self.duration.setSuffix(" s")
         self.duration.setObjectName("duration")
-        self.duration.valueChanged.connect(self.parent().set_duration)
+        self.duration.valueChanged.connect(self.parent().set_duration) # type: ignore
         self.form_layout.addRow("Duration:", self.duration)
 
         self.min_db = QtWidgets.QDoubleSpinBox(self)
@@ -76,13 +78,13 @@ class PitchTrackerSettingsDialog(QtWidgets.QDialog):
 
         self.setLayout(self.form_layout)
 
-    def save_state(self, settings):
+    def save_state(self, settings: QSettings) -> None:
         settings.setValue("min_freq", self.min_freq.value())
         settings.setValue("max_freq", self.max_freq.value())
         settings.setValue("duration", self.duration.value())
         settings.setValue("min_db", self.min_db.value())
 
-    def restore_state(self, settings):
+    def restore_state(self, settings: QSettings) -> None:
         self.min_freq.setValue(
             settings.value("min_freq", DEFAULT_MIN_FREQ, type=int))
         self.max_freq.setValue(

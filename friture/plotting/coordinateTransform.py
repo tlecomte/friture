@@ -58,7 +58,7 @@ class CoordinateTransform(QtCore.QObject):
     def setScale(self, scale):
         self.scale = scale
 
-    @pyqtSlot(float, result=float)
+    @pyqtSlot(float, result=float) # type: ignore
     def toScreen(self, x):
         if self.scale is fscales.Logarithmic:
             if self.coord_clipped_min == self.coord_clipped_max:
@@ -82,7 +82,7 @@ class CoordinateTransform(QtCore.QObject):
                     / (trans_max - trans_min)
                     + self.startBorder)
 
-    @pyqtSlot(float, result=float)
+    @pyqtSlot(float, result=float) # type: ignore
     def toPlot(self, x):
         if self.length == self.startBorder + self.endBorder:
             return self.coord_min + 0. * x  # keep x type (this can produce a RunTimeWarning if x contains inf)

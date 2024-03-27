@@ -21,7 +21,7 @@
 
 from PyQt5 import QtWidgets
 from PyQt5.QtQml import QQmlComponent
-from PyQt5.QtQuick import QQuickWindow
+from PyQt5.QtQuick import QQuickWindow # type: ignore
 import numpy as np
 
 from friture.store import GetStore
@@ -62,7 +62,7 @@ class Levels_Widget(QtWidgets.QWidget):
         self.qmlObject.setParent(self.quickWindow)
 
         self.quickWidget = QtWidgets.QWidget.createWindowContainer(self.quickWindow, self)
-        self.quickWidget.setSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Expanding)       
+        self.quickWidget.setSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Expanding)
         self.gridLayout.addWidget(self.quickWidget)
 
         self.qmlObject.widthChanged.connect(self.onWidthChanged)
@@ -174,7 +174,7 @@ class Levels_Widget(QtWidgets.QWidget):
             if self.two_channels:
                 self.level_view_model.level_data_slow_2.level_rms = self.level_view_model.level_data_2.level_rms
                 self.level_view_model.level_data_slow_2.level_max = self.level_view_model.level_data_2.level_max
- 
+
         self.i = self.i % LEVEL_TEXT_LABEL_STEPS
 
     # slot

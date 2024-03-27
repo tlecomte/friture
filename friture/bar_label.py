@@ -45,14 +45,14 @@ class BarLabel(QtCore.QObject):
             self._y = y
             self.y_changed.emit()
 
-    @pyqtProperty(float, notify=x_changed)
+    @pyqtProperty(float, notify=x_changed) # type: ignore
     def x(self):
         return self._x
 
-    @pyqtProperty(float, notify=y_changed)
+    @pyqtProperty(float, notify=y_changed) # type: ignore
     def y(self):
         return self._y
 
-    @pyqtProperty(str, notify=unscaled_x_changed)
+    @pyqtProperty(str, notify=unscaled_x_changed) # type: ignore
     def unscaled_x(self):
         return self._unscaled_x
