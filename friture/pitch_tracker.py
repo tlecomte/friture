@@ -22,7 +22,11 @@ import logging
 import math as m
 import numpy as np
 from PyQt5 import QtWidgets
+from PyQt5.QtCore import pyqtSignal, pyqtProperty # type: ignore
+from PyQt5.QtCore import QObject, QSettings # type: ignore
+from PyQt5.QtQuick import QQuickWindow
 from PyQt5.QtQuickWidgets import QQuickWidget
+from PyQt5.QtQml import QQmlComponent, QQmlEngine
 from typing import Optional
 
 from friture.audiobackend import SAMPLING_RATE
@@ -102,6 +106,24 @@ class PitchTrackerWidget(QtWidgets.QWidget):
 
         self.gridLayout.addWidget(self.quickWidget, 0, 0, 1, 1)
 
+        self.pitch_view_model = PitchViewModel(self)
+        pitch_window = QQuickWindow()
+        pitch_component = QQmlComponent(engine, qml_url("PitchView.qml"), self)
+        raise_if_error(pitch_component)
+        pitch_object = pitch_component.createWithInitialProperties(
+            {
+                "parent": pitch_window.contentItem(),
+                "pitch_view_model": self.pitch_view_model
+            },
+            engine.rootContext()
+        )
+        pitch_object.setParent(pitch_window)
+        pitch_widget = QtWidgets.QWidget.createWindowContainer(pitch_window, self)
+        pitch_widget.setSizePolicy(
+            QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
+        pitch_widget.setFixedWidth(int(pitch_object.width()))
+        self.gridLayout.addWidget(pitch_widget, 0, 1)
+
         self.min_freq = DEFAULT_MIN_FREQ
         self.max_freq = DEFAULT_MAX_FREQ
         self._pitch_tracker_data.vertical_axis.setRange(
@@ -129,6 +151,7 @@ class PitchTrackerWidget(QtWidgets.QWidget):
     def handle_new_data(self, floatdata):
         if self.tracker.update():
             self.update_curve()
+            self.pitch_view_model.pitch = self.tracker.get_latest_estimate() # type: ignore
 
     def update_curve(self):
         pitches = self.tracker.get_estimates(self.duration)
@@ -177,6 +200,42 @@ class PitchTrackerWidget(QtWidgets.QWidget):
         self.settings_dialog.restore_state(settings)
 
 
+class PitchViewModel(QObject):
+    pitch_changed = pyqtSignal(float)
+
+    def __init__(self, parent: QObject):
+        super().__init__(parent)
+        self._pitch = 0.0
+
+    @pyqtProperty(str, notify=pitch_changed)
+    def pitch(self) -> str:
+        if not self._pitch or np.isnan(self._pitch):
+            return '--'
+        elif self._pitch < 1000:
+            return f"{self._pitch:.0f}"
+        else:
+            return f"{self._pitch/1000:.2f}"
+
+    @pitch.setter # type: ignore
+    def pitch(self, pitch: float):
+        self._pitch = pitch
+        self.pitch_changed.emit(pitch)
+
+    @pyqtProperty(str, notify=pitch_changed)
+    def pitch_unit(self) -> str:
+        if self._pitch >= 1000.0:
+            return "kHz"
+        else:
+            return "Hz"
+
+    @pyqtProperty(str, notify=pitch_changed)
+    def note(self) -> str:
+        if not self._pitch or np.isnan(self._pitch):
+            return '--'
+        else:
+            return frequency_to_note(self._pitch)
+
+
 class PitchTracker:
     def __init__(
         self,
@@ -216,6 +275,9 @@ class PitchTracker:
         step_size = m.floor(self.fft_size * (1.0 - self.overlap))
         num_results = m.floor(time_s / (step_size / self.sample_rate)) + 1
         return self.out_buf.data_indexed(self.out_offset, num_results)[0,:]
+
+    def get_latest_estimate(self) -> float:
+        return self.out_buf.data_indexed(self.out_offset, 1)[0,0]
 
     def new_frames(self) -> Generator[np.ndarray, None, None]:
         assert self.input_buf.offset >= self.next_in_offset
