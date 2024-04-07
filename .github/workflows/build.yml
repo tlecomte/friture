@@ -68,7 +68,7 @@ jobs:
         if-no-files-found: error
 
   build-linux:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     strategy:
       matrix:
         python-version: ['3.11']
@@ -96,7 +96,7 @@ jobs:
         if-no-files-found: error
 
   build-macos:
-    runs-on: macos-10.15
+    runs-on: macos-12
     strategy:
       matrix:
         python-version: ['3.11']
