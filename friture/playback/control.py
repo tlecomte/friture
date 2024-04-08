@@ -55,4 +55,4 @@ class PlaybackControlWidget(QWidget):
                 logger.error("QML error: " + error.toString())
 
     def on_paused(self) -> None:
-        logger.info("got paused")
+        pass

@@ -8,9 +8,15 @@ RowLayout {
     id: controlRow
 
     signal paused()
+    signal played()
 
     Button {
         text: "Pause"
         onClicked: controlRow.paused()
+    }
+
+    Button {
+        text: "Play"
+        onClicked: controlRow.played()
     }
 }
