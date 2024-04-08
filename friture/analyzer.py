@@ -27,7 +27,7 @@ import logging.handlers
 
 from PyQt5 import QtCore
 # specifically import from PyQt5.QtGui and QWidgets for startup time improvement :
-from PyQt5.QtWidgets import QMainWindow, QHBoxLayout, QApplication, QSplashScreen
+from PyQt5.QtWidgets import QMainWindow, QHBoxLayout, QVBoxLayout, QApplication, QSplashScreen
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtQml import QQmlEngine, qmlRegisterSingletonType, qmlRegisterType
 import appdirs
@@ -49,6 +49,7 @@ from friture.store import GetStore, Store
 from friture.scope_data import Scope_Data
 from friture.axis import Axis
 from friture.curve import Curve
+from friture.playback.control import PlaybackControlWidget
 from friture.plotCurve import PlotCurve
 from friture.plotting.coordinateTransform import CoordinateTransform
 from friture.plotting.scaleDivision import ScaleDivision, Tick
@@ -133,9 +134,15 @@ class Friture(QMainWindow, ):
         self.hboxLayout.setContentsMargins(0, 0, 0, 0)
         self.hboxLayout.addWidget(self.level_widget)
 
+        self.vboxLayout = QVBoxLayout(self.ui.centralwidget)
+        self.hboxLayout.addLayout(self.vboxLayout)
+
         self.centralLayout = TileLayout()
         self.centralLayout.setContentsMargins(0, 0, 0, 0)
-        self.hboxLayout.addLayout(self.centralLayout)
+        self.vboxLayout.addLayout(self.centralLayout)
+
+        playback_widget = PlaybackControlWidget(self, self.qml_engine)
+        self.vboxLayout.addWidget(playback_widget)
 
         self.dockmanager = DockManager(self)
 
@@ -149,6 +156,7 @@ class Friture(QMainWindow, ):
         self.ui.actionSettings.triggered.connect(self.settings_called)
         self.ui.actionAbout.triggered.connect(self.about_called)
         self.ui.actionNew_dock.triggered.connect(self.dockmanager.new_dock)
+        playback_widget.root.paused.connect(self.timer_toggle)
 
         # restore the settings and widgets geometries
         self.restoreAppState()
