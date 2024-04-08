@@ -56,6 +56,7 @@ class HistPlot(QtWidgets.QWidget):
         self._histplot_data.vertical_axis.setTrackerFormatter(lambda x: "%.1f dB" % (x))
         self._histplot_data.horizontal_axis.name = "Frequency (Hz)"
         self._histplot_data.horizontal_axis.setTrackerFormatter(format_frequency)
+        self._histplot_data.horizontal_axis.show_minor_grid_lines = True
 
         self._histplot_data.vertical_axis.setRange(0, 1)
         self._histplot_data.horizontal_axis.setRange(44, 22000)

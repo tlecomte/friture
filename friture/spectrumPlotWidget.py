@@ -51,6 +51,7 @@ class SpectrumPlotWidget(QtWidgets.QWidget):
         self._spectrum_data.vertical_axis.setTrackerFormatter(lambda x: "%.1f dB" % (x))
         self._spectrum_data.horizontal_axis.name = "Frequency (Hz)"
         self._spectrum_data.horizontal_axis.setTrackerFormatter(format_frequency)
+        self._spectrum_data.horizontal_axis.show_minor_grid_lines = True
 
         self._spectrum_data.vertical_axis.setRange(0, 1)
         self._spectrum_data.horizontal_axis.setRange(0, 22000)

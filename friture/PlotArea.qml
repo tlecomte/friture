@@ -14,12 +14,14 @@ Item {
     PlotBackground {
         anchors.fill: parent
     }
-    
+
     PlotGrid {
         anchors.fill: parent
 
         vertical_scale_division: scopePlotArea.vertical_axis.scale_division
+        show_minor_vertical: scopePlotArea.vertical_axis.show_minor_grid_lines
         horizontal_scale_division: scopePlotArea.horizontal_axis.scale_division
+        show_minor_horizontal: scopePlotArea.horizontal_axis.show_minor_grid_lines
     }
 
     Item {
@@ -43,7 +45,7 @@ Item {
 
         property double posX: Math.min(Math.max(plotMouseArea.mouseX, 0), scopePlotArea.width)
         property double posY: Math.min(Math.max(plotMouseArea.mouseY, 0), scopePlotArea.height)
-        
+
         property double relativePosX: posX / scopePlotArea.width
         property double relativePosY: posY / scopePlotArea.height
 

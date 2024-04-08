@@ -10,11 +10,31 @@ Item {
     property color lineColor: "lightgray"
 
     required property ScaleDivision vertical_scale_division
+    property bool show_minor_vertical: false
     required property ScaleDivision horizontal_scale_division
+    property bool show_minor_horizontal: false
 
     // QML docs discourage the use of multiple Shape objects. But the Repeater cannot be used inside Shape.
     Repeater {
         model: vertical_scale_division.logicalMajorTicks
+
+        Shape {
+            y: (1. - modelData.logicalValue) * plotGrid.height
+
+            ShapePath {
+                strokeWidth: lineWidth
+                strokeColor: lineColor
+                fillColor: "transparent"
+                scale: Qt.size(plotGrid.width, 1)
+
+                PathMove { x: 0; y: 0 }
+                PathLine { x: 1; y: 0 }
+            }
+        }
+    }
+
+    Repeater {
+        model: show_minor_vertical ? vertical_scale_division.logicalMinorTicks : []
 
         Shape {
             y: (1. - modelData.logicalValue) * plotGrid.height
@@ -52,7 +72,7 @@ Item {
 
     // QML docs discourage the use of multiple Shape objects. But the Repeater cannot be used inside Shape.
     Repeater {
-        model: horizontal_scale_division.logicalMinorTicks
+        model: show_minor_horizontal ? horizontal_scale_division.logicalMinorTicks : []
 
         Shape {
             x: modelData.logicalValue * plotGrid.width

@@ -14,21 +14,22 @@ class Axis(QtCore.QObject):
         self._formatter = lambda x: str(x)
         self._scale_division = ScaleDivision(-1., 1., self)
         self._coordinate_transform = CoordinateTransform(-1, 1, 1., 0, 0, self)
+        self._show_minor_grid_lines = False
 
     @pyqtProperty(str, notify=name_changed)
     def name(self):
         return self._name
-    
+
     @name.setter
     def name(self, name):
         if self._name != name:
             self._name = name
             self.name_changed.emit(name)
-    
+
     def setTrackerFormatter(self, formatter):
         if self._formatter != formatter:
             self._formatter = formatter
-    
+
     @pyqtSlot(float, result=str)
     def formatTracker(self, value):
         return self._formatter(value)
@@ -44,7 +45,15 @@ class Axis(QtCore.QObject):
     @pyqtProperty(ScaleDivision, constant=True)
     def scale_division(self):
         return self._scale_division
-    
+
+    @pyqtProperty(bool, constant=True)
+    def show_minor_grid_lines(self) -> bool:
+        return self._show_minor_grid_lines
+
+    @show_minor_grid_lines.setter # type: ignore
+    def show_minor_grid_lines(self, show: bool):
+        self._show_minor_grid_lines = show
+
     @pyqtProperty(CoordinateTransform, constant=True)
     def coordinate_transform(self):
         return self._coordinate_transform
