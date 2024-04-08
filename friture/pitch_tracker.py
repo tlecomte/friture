@@ -85,6 +85,7 @@ class PitchTrackerWidget(QtWidgets.QWidget):
         self._pitch_tracker_data.vertical_axis.name = "Frequency (Hz)"
         self._pitch_tracker_data.vertical_axis.setTrackerFormatter(
             format_frequency)
+        self._pitch_tracker_data.vertical_axis.show_minor_grid_lines = True
         self._pitch_tracker_data.horizontal_axis.name = "Time (sec)"
         self._pitch_tracker_data.horizontal_axis.setTrackerFormatter(
             lambda x: "%#.3g sec" % (x))
