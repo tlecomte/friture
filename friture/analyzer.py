@@ -50,6 +50,7 @@ from friture.scope_data import Scope_Data
 from friture.axis import Axis
 from friture.curve import Curve
 from friture.playback.control import PlaybackControlWidget
+from friture.playback.player import Player
 from friture.plotCurve import PlotCurve
 from friture.plotting.coordinateTransform import CoordinateTransform
 from friture.plotting.scaleDivision import ScaleDivision, Tick
@@ -73,12 +74,12 @@ class Friture(QMainWindow, ):
     def __init__(self):
         QMainWindow.__init__(self)
 
-        self.logger = logging.getLogger(__name__)        
+        self.logger = logging.getLogger(__name__)
 
         # exception hook that logs to console, file, and display a message box
         self.errorDialogOpened = False
         sys.excepthook = self.excepthook
-        
+
         store = GetStore()
 
         # set the store as the parent of the QML engine
@@ -114,6 +115,9 @@ class Friture(QMainWindow, ):
         # Initialize the audio backend
         # signal containing new data from the audio callback thread, processed as numpy array
         AudioBackend().new_data_available.connect(self.audiobuffer.handle_new_data)
+
+        self.player = Player(self)
+        self.audiobuffer.new_data_available.connect(self.player.handle_new_data)
 
         # this timer is used to update widgets that just need to display as fast as they can
         self.display_timer = QtCore.QTimer()
@@ -157,6 +161,7 @@ class Friture(QMainWindow, ):
         self.ui.actionAbout.triggered.connect(self.about_called)
         self.ui.actionNew_dock.triggered.connect(self.dockmanager.new_dock)
         playback_widget.root.paused.connect(self.timer_toggle)
+        playback_widget.root.played.connect(self.player.play)
 
         # restore the settings and widgets geometries
         self.restoreAppState()
