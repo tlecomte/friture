@@ -51,7 +51,6 @@ class Player(QObject):
 
         self.device: Optional[Dict[str, Any]] = None
         self.stream: Optional[OutputStream] = None
-        self.out_channels: int = 0
         self.play_offset = 0
         self.state = PlayState.STOPPED
 
@@ -63,22 +62,32 @@ class Player(QObject):
             self.recorded_len + data.shape[1], self.history_samples)
 
     def play(self) -> None:
+        if self.state != PlayState.STOPPED:
+            log.info("Already playing!")
+            return
+        self.state = PlayState.PLAYING
+
         log.info(f"Playing back {self.recorded_len} samples")
         if self.stream is None:
             for device in AudioBackend().output_devices:
                 log.info(f"Opening stream for {device['name']}")
                 try:
+                    self.device = device
                     self.stream = AudioBackend().open_output_stream(
                         device, self.output_callback)
                     self.stream.start()
-                    self.device = device
                 except Exception:
                     log.exception("Failed to open stream")
                 else:
                     break
-        self.out_channels = AudioBackend().get_device_outputchannels_count(self.device)
         self.play_offset = self.buffer.offset - self.recorded_len
-        self.state = PlayState.PLAYING
+
+    def stop(self) -> None:
+        if self.state == PlayState.PLAYING:
+            self.on_stopping()
+
+    def is_stopped(self) -> bool:
+        return self.state == PlayState.STOPPED
 
     def output_callback(
         self,
@@ -90,25 +99,26 @@ class Player(QObject):
         if status:
             log.info(status)
 
-        res = np.zeros((self.out_channels, samples))
+        out_channels = AudioBackend().get_device_outputchannels_count(self.device)
+        res = np.zeros((out_channels, samples))
         available = self.buffer.offset - self.play_offset
         to_copy = min(available, samples)
         self.play_offset += to_copy
 
         if available < samples and self.state == PlayState.PLAYING:
-            log.info("Playback stopping")
+            log.info("Reached end of playback")
             self.state = PlayState.STOPPING
             self.stopping.emit()
 
         in_channels = self.buffer.buffer.shape[0]
         if in_channels == 1:
             # Mono recording, duplicate to all output channels:
-            for i in range(self.out_channels):
+            for i in range(out_channels):
                 res[i,0:to_copy] = self.buffer.data_indexed(
                     self.play_offset, samples)[0,0:to_copy]
         else:
             # Stereo+ recording, leave higher out channels zero if present
-            copy_channels = min(self.out_channels, self.buffer.buffer.shape[0])
+            copy_channels = min(out_channels, self.buffer.buffer.shape[0])
             res[0:copy_channels,0:to_copy] = self.buffer.data_indexed(
                 self.play_offset, samples)[0:copy_channels,0:to_copy]
 

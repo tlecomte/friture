@@ -20,17 +20,21 @@
 import logging
 from typing import Any
 
+from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtGui import QColor, QPalette
 from PyQt5.QtWidgets import QGridLayout, QSizePolicy, QWidget
 from PyQt5.QtQml import QQmlEngine
 from PyQt5.QtQuickWidgets import QQuickWidget
 
 from friture.qml_tools import qml_url, raise_if_error
+from friture.playback.player import Player
 
 logger = logging.getLogger(__name__)
 
 class PlaybackControlWidget(QWidget):
-    def __init__(self, parent: QWidget, engine: QQmlEngine):
+    recording_toggled = pyqtSignal()
+
+    def __init__(self, parent: QWidget, engine: QQmlEngine, player: Player):
         super().__init__(parent)
         self.widget = QQuickWidget(engine, self)
         self.widget.statusChanged.connect(self.on_status_changed)
@@ -47,12 +51,38 @@ class PlaybackControlWidget(QWidget):
         self.setLayout(layout)
 
         self.root: Any = self.widget.rootObject()
-        self.root.paused.connect(self.on_paused)
+        self.root.stopClicked.connect(self.on_stopped)
+        self.root.recordClicked.connect(self.on_record)
+        self.root.playClicked.connect(self.on_played)
+
+        self.player = player
+        self.player.stopped.connect(self.on_playback_stopped)
+
+
+    def start_recording(self) -> None:
+        if not self.player.is_stopped():
+            self.player.stop()
+        self.root.showRecording()
+
+    def stop_recording(self) -> None:
+        self.root.showStopped()
 
     def on_status_changed(self, status: QQuickWidget.Status) -> None:
         if status == QQuickWidget.Error:
             for error in self.widget.errors():
                 logger.error("QML error: " + error.toString())
 
-    def on_paused(self) -> None:
-        pass
+    def on_stopped(self) -> None:
+        if self.player.is_stopped():
+            self.recording_toggled.emit()
+        else:
+            self.player.stop()
+
+    def on_record(self) -> None:
+        self.recording_toggled.emit()
+
+    def on_played(self) -> None:
+        self.player.play()
+
+    def on_playback_stopped(self) -> None:
+        self.root.showStopped()

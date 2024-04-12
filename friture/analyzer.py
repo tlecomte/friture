@@ -138,15 +138,16 @@ class Friture(QMainWindow, ):
         self.hboxLayout.setContentsMargins(0, 0, 0, 0)
         self.hboxLayout.addWidget(self.level_widget)
 
-        self.vboxLayout = QVBoxLayout(self.ui.centralwidget)
+        self.vboxLayout = QVBoxLayout()
         self.hboxLayout.addLayout(self.vboxLayout)
 
         self.centralLayout = TileLayout()
         self.centralLayout.setContentsMargins(0, 0, 0, 0)
         self.vboxLayout.addLayout(self.centralLayout)
 
-        playback_widget = PlaybackControlWidget(self, self.qml_engine)
-        self.vboxLayout.addWidget(playback_widget)
+        self.playback_widget = PlaybackControlWidget(
+            self, self.qml_engine, self.player)
+        self.vboxLayout.addWidget(self.playback_widget)
 
         self.dockmanager = DockManager(self)
 
@@ -160,8 +161,7 @@ class Friture(QMainWindow, ):
         self.ui.actionSettings.triggered.connect(self.settings_called)
         self.ui.actionAbout.triggered.connect(self.about_called)
         self.ui.actionNew_dock.triggered.connect(self.dockmanager.new_dock)
-        playback_widget.root.paused.connect(self.timer_toggle)
-        playback_widget.root.played.connect(self.player.play)
+        self.playback_widget.recording_toggled.connect(self.timer_toggle)
 
         # restore the settings and widgets geometries
         self.restoreAppState()
@@ -286,12 +286,14 @@ class Friture(QMainWindow, ):
             self.logger.info("Timer stop")
             self.display_timer.stop()
             self.ui.actionStart.setText("Start")
+            self.playback_widget.stop_recording()
             AudioBackend().pause()
             self.dockmanager.pause()
         else:
             self.logger.info("Timer start")
             self.display_timer.start()
             self.ui.actionStart.setText("Stop")
+            self.playback_widget.start_recording()
             AudioBackend().restart()
             self.dockmanager.restart()
 
