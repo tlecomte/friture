@@ -12,9 +12,9 @@ import numpy as np
 
 from friture.audiobackend import SAMPLING_RATE
 from friture.plotting.coordinateTransform import CoordinateTransform
-from friture.plotting.frequency_scales import freq_to_note
 from friture.spectrum_data import Spectrum_Data
 from friture.filled_curve import CurveType, FilledCurve
+from friture.pitch_tracker import format_frequency
 from friture.store import GetStore
 from friture.qml_tools import qml_url, raise_if_error
 
@@ -50,7 +50,7 @@ class SpectrumPlotWidget(QtWidgets.QWidget):
         self._spectrum_data.vertical_axis.name = "PSD (dB)"
         self._spectrum_data.vertical_axis.setTrackerFormatter(lambda x: "%.1f dB" % (x))
         self._spectrum_data.horizontal_axis.name = "Frequency (Hz)"
-        self._spectrum_data.horizontal_axis.setTrackerFormatter(self.format_frequency)
+        self._spectrum_data.horizontal_axis.setTrackerFormatter(format_frequency)
 
         self._spectrum_data.vertical_axis.setRange(0, 1)
         self._spectrum_data.horizontal_axis.setRange(0, 22000)
@@ -142,9 +142,6 @@ class SpectrumPlotWidget(QtWidgets.QWidget):
     def set_baseline_dataUnits(self, baseline):
         self._baseline = Baseline.DATA_ZERO
 
-    def format_frequency(self, freq: float) -> str:
-        return f'{freq:.0f} Hz ({freq_to_note(freq)})'
-
     def setdata(self, x, y, fmax, fpitch):
         if not self.paused:
             if fmax < 2e2:
@@ -155,7 +152,7 @@ class SpectrumPlotWidget(QtWidgets.QWidget):
                 text, self.normHorizontalScaleTransform.toScreen(fmax)
             )
             self._spectrum_data.setFpitch(
-                self.format_frequency(fpitch),
+                format_frequency(fpitch),
                 self.normHorizontalScaleTransform.toScreen(fpitch),
             )
 

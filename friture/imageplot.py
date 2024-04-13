@@ -24,6 +24,7 @@ from friture.audiobackend import AudioBackend
 from friture.spectrogram_image import CanvasScaledSpectrogram
 from friture.signal.online_linear_2D_resampler import Online_Linear_2D_resampler
 from friture.signal.frequency_resampler import Frequency_Resampler
+from friture.pitch_tracker import format_frequency
 from friture.plotting.scaleWidget import VerticalScaleWidget, HorizontalScaleWidget, ColorScaleWidget
 from friture.plotting.scaleDivision import ScaleDivision
 from friture.plotting.coordinateTransform import CoordinateTransform
@@ -222,7 +223,7 @@ class ImagePlot(QtWidgets.QWidget):
         self.update()
 
     def trackerFormatter(self, x: float, y: float) -> str:
-        return f'{x:.2f} s, {y:.0f} Hz ({fscales.freq_to_note(y)})'
+        return f'{x:.2f} s, {format_frequency(y)}'
 
     def addData(self, freq, xyzs, last_data_time):
         self.plotImage.addData(freq, xyzs, self.freqscale, last_data_time)
@@ -262,7 +263,7 @@ class ImagePlot(QtWidgets.QWidget):
 
     def setfreqscale(self, scale):
         self.freqscale = scale
-        
+
         self.plotImage.erase()
         self.plotImage.setfreqscale(scale)
 
