@@ -10,6 +10,7 @@ RowLayout {
     signal recordClicked()
     signal stopClicked()
     signal playClicked()
+    signal positionChanged(real value)
 
     function showRecording() {
         record.enabled = false;
@@ -17,6 +18,7 @@ RowLayout {
         stop.enabled = true;
         play.enabled = false;
         play.down = undefined;
+        position.enabled = true;
     }
 
     function showStopped() {
@@ -25,6 +27,7 @@ RowLayout {
         stop.enabled = false;
         play.enabled = true;
         play.down = undefined;
+        position.enabled = true;
     }
 
     function showPlaying() {
@@ -33,6 +36,17 @@ RowLayout {
         stop.enabled = true;
         play.enabled = false;
         play.down = true;
+        position.enabled = false;
+    }
+
+    function setRecordingStartTime(time) {
+        startTime.text = time.toFixed(1);
+        position.from = time;
+    }
+
+    function setPlaybackPosition(time) {
+        position.value = time;
+        selectedTime.text = time.toFixed(1);
     }
 
     Button {
@@ -62,5 +76,40 @@ RowLayout {
             controlRow.showPlaying();
             controlRow.playClicked();
         }
+    }
+
+    FontMetrics {
+        id: fontMetrics
+    }
+
+    Text {
+        id: startTime
+        text: "-5.0"
+        // fixed width so the slider position doesn't change with this value
+        width: fontMetrics.boundingRect("-000.0").width
+        horizontalAlignment: Text.AlignRight
+    }
+
+    Slider {
+        id: position
+        from: -5.0
+        to: 0.0
+        value: 0.0
+        stepSize: 0.1
+
+        Layout.fillWidth: true
+
+        onMoved: {
+            selectedTime.text = position.value.toFixed(1);
+            controlRow.positionChanged(position.value);
+        }
+    }
+
+    Text {
+        id: selectedTime
+        text: "0.0"
+        // fixed width so the slider position doesn't change with this value
+        width: fontMetrics.boundingRect("-000.0").width
+        horizontalAlignment: Text.AlignLeft
     }
 }
