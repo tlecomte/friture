@@ -27,7 +27,7 @@ from PyQt5.QtCore import QObject, QSettings # type: ignore
 from PyQt5.QtQuick import QQuickWindow
 from PyQt5.QtQuickWidgets import QQuickWidget
 from PyQt5.QtQml import QQmlComponent, QQmlEngine
-from typing import Optional
+from typing import Any, no_type_check, Optional
 
 from friture.audiobackend import SAMPLING_RATE
 from friture.audioproc import audioproc
@@ -37,8 +37,8 @@ from friture.pitch_tracker_settings import (
     DEFAULT_MAX_FREQ,
     DEFAULT_DURATION,
     DEFAULT_FFT_SIZE,
-    DEFAULT_MIN_SNR,
-    PitchTrackerSettingsDialog
+    DEFAULT_MIN_DB,
+    PitchTrackerSettingsDialog,
 )
 from friture.plotting.coordinateTransform import CoordinateTransform
 import friture.plotting.frequency_scales as fscales
@@ -127,15 +127,17 @@ class PitchTrackerWidget(QtWidgets.QWidget):
 
         self.min_freq = DEFAULT_MIN_FREQ
         self.max_freq = DEFAULT_MAX_FREQ
-        self._pitch_tracker_data.vertical_axis.setRange(
+        self._pitch_tracker_data.vertical_axis.setRange( # type: ignore
             self.min_freq, self.max_freq)
-        self._pitch_tracker_data.vertical_axis.setScale(fscales.Octave)
+        self._pitch_tracker_data.vertical_axis.setScale( # type: ignore
+            fscales.Octave)
         self.vertical_transform = CoordinateTransform(
             self.min_freq, self.max_freq, 1, 0, 0)
         self.vertical_transform.setScale(fscales.Octave)
 
         self.duration = DEFAULT_DURATION
-        self._pitch_tracker_data.horizontal_axis.setRange(-self.duration, 0.)
+        self._pitch_tracker_data.horizontal_axis.setRange( # type: ignore
+            -self.duration, 0.)
 
         self.settings_dialog = PitchTrackerSettingsDialog(self)
 
@@ -185,8 +187,8 @@ class PitchTrackerWidget(QtWidgets.QWidget):
         self.duration = value
         self._pitch_tracker_data.horizontal_axis.setRange(-self.duration, 0.)
 
-    def set_min_snr(self, value: float):
-        self.tracker.min_snr = value
+    def set_min_db(self, value: float):
+        self.tracker.min_db = value
 
     # slot
     def settings_called(self, checked):
@@ -222,14 +224,14 @@ class PitchViewModel(QObject):
         self._pitch = pitch
         self.pitch_changed.emit(pitch)
 
-    @pyqtProperty(str, notify=pitch_changed)
+    @pyqtProperty(str, notify=pitch_changed) # type: ignore
     def pitch_unit(self) -> str:
         if self._pitch >= 1000.0:
             return "kHz"
         else:
             return "Hz"
 
-    @pyqtProperty(str, notify=pitch_changed)
+    @pyqtProperty(str, notify=pitch_changed) # type: ignore
     def note(self) -> str:
         if not self._pitch or np.isnan(self._pitch):
             return '--'
@@ -244,12 +246,12 @@ class PitchTracker:
         fft_size: int = DEFAULT_FFT_SIZE,
         overlap: float = 0.75,
         sample_rate: int = SAMPLING_RATE,
-        min_snr: float = DEFAULT_MIN_SNR,
+        min_db: float = DEFAULT_MIN_DB,
     ):
         self.fft_size = fft_size
         self.overlap = overlap
         self.sample_rate = sample_rate
-        self.min_snr = min_snr
+        self.min_db = min_db
 
         self.input_buf = input_buf
         self.input_buf.grow_if_needed(fft_size)
@@ -307,11 +309,10 @@ class PitchTracker:
             # try to take the log of zero.
             return None
 
-        # Compute SNR for the detected pitch; if it's too low presume it's
+        # Compute dB for the detected fundamental; if it's too low presume it's
         # a false detection and return no result.
-        variance = np.mean(spectrum ** 2)
-        snr = 10 * np.log10((spectrum[pitch_idx] ** 2) / variance)
-        if snr < self.min_snr:
+        db = 10 * np.log10(spectrum[pitch_idx] ** 2 / self.fft_size ** 2)
+        if db < self.min_db:
             return None
         else:
             return self.proc.freq[pitch_idx]
