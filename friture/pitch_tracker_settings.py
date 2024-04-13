@@ -25,7 +25,7 @@ from friture.audiobackend import SAMPLING_RATE
 DEFAULT_MIN_FREQ = 80
 DEFAULT_MAX_FREQ = 1000
 DEFAULT_DURATION = 30
-DEFAULT_MIN_SNR = 3.0
+DEFAULT_MIN_DB = -70.0
 DEFAULT_FFT_SIZE = 16384
 
 class PitchTrackerSettingsDialog(QtWidgets.QDialog):
@@ -64,15 +64,15 @@ class PitchTrackerSettingsDialog(QtWidgets.QDialog):
         self.duration.valueChanged.connect(self.parent().set_duration)
         self.form_layout.addRow("Duration:", self.duration)
 
-        self.min_snr = QtWidgets.QDoubleSpinBox(self)
-        self.min_snr.setMinimum(0)
-        self.min_snr.setMaximum(50)
-        self.min_snr.setSingleStep(1)
-        self.min_snr.setValue(DEFAULT_MIN_SNR)
-        self.min_snr.setSuffix(" dB")
-        self.min_snr.setObjectName("min_snr")
-        self.min_snr.valueChanged.connect(self.parent().set_min_snr)
-        self.form_layout.addRow("Min SNR:", self.min_snr)
+        self.min_db = QtWidgets.QDoubleSpinBox(self)
+        self.min_db.setMinimum(-100)
+        self.min_db.setMaximum(0)
+        self.min_db.setSingleStep(1)
+        self.min_db.setValue(DEFAULT_MIN_DB)
+        self.min_db.setSuffix(" dB")
+        self.min_db.setObjectName("min_db")
+        self.min_db.valueChanged.connect(self.parent().set_min_db) # type: ignore
+        self.form_layout.addRow("Min Amplitude:", self.min_db)
 
         self.setLayout(self.form_layout)
 
@@ -80,7 +80,7 @@ class PitchTrackerSettingsDialog(QtWidgets.QDialog):
         settings.setValue("min_freq", self.min_freq.value())
         settings.setValue("max_freq", self.max_freq.value())
         settings.setValue("duration", self.duration.value())
-        settings.setValue("min_snr", self.min_snr.value())
+        settings.setValue("min_db", self.min_db.value())
 
     def restore_state(self, settings):
         self.min_freq.setValue(
@@ -89,5 +89,6 @@ class PitchTrackerSettingsDialog(QtWidgets.QDialog):
             settings.value("max_freq", DEFAULT_MAX_FREQ, type=int))
         self.duration.setValue(
             settings.value("duration", DEFAULT_DURATION, type=int))
-        self.min_snr.setValue(
-            settings.value("min_snr", DEFAULT_MIN_SNR, type=float))
+        self.min_db.setValue(
+            settings.value("min_db", DEFAULT_MIN_DB, type=float))
+
