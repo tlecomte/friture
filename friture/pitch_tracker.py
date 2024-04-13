@@ -40,6 +40,24 @@ from friture.scope_data import Scope_Data
 from friture.store import GetStore
 from friture.qml_tools import qml_url, raise_if_error
 
+
+def frequency_to_note(freq: float) -> str:
+    if np.isnan(freq) or freq <= 0:
+        return ""
+    # number of semitones from C4
+    # A4 = 440Hz and is 9 semitones above C4
+    semitone = round(np.log2(freq/440) * 12) + 9
+    octave = int(np.floor(semitone / 12)) + 4
+    notes = ["C", "C♯", "D", "D♯", "E", "F", "F♯", "G", "G♯", "A", "A♯", "B"]
+    return f'{notes[semitone % 12]}{octave}'
+
+def format_frequency(freq: float) -> str:
+    if freq < 1000:
+        return f'{freq:.0f} Hz ({frequency_to_note(freq)})'
+    else:
+        return f'{freq/1000:.1f} kHz ({frequency_to_note(freq)})'
+
+
 class PitchTrackerWidget(QtWidgets.QWidget):
     def __init__(self, parent, engine):
         super().__init__(parent)
@@ -59,7 +77,7 @@ class PitchTrackerWidget(QtWidgets.QWidget):
 
         self._pitch_tracker_data.vertical_axis.name = "Frequency (Hz)"
         self._pitch_tracker_data.vertical_axis.setTrackerFormatter(
-            lambda x: "%.0f Hz" % (x))
+            format_frequency)
         self._pitch_tracker_data.horizontal_axis.name = "Time (sec)"
         self._pitch_tracker_data.horizontal_axis.setTrackerFormatter(
             lambda x: "%#.3g sec" % (x))

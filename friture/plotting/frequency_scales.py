@@ -69,7 +69,7 @@ class Linear(object):
     def transform(frequency: float) -> float :
         # No transformation is applied
         return frequency
-    
+
     @staticmethod
     def inverse(value: float) -> float :
         # No transformation is applied
@@ -103,7 +103,7 @@ class Linear(object):
         # add ticks up to the max
         N = int(floor((trueMax - rmin) / approx_interval))
         ticks = [rmin + approx_interval * i for i in range(N + 1)]
-        
+
         return ticks, approx_interval
 
     @staticmethod
@@ -137,23 +137,13 @@ class Linear(object):
 
         return ticks
 
-def freq_to_note(freq: float) -> str:
-    if np.isnan(freq) or freq <= 0:
-        return ""
-    # number of semitones from C4
-    # A4 = 440Hz and is 9 semitones above C4
-    semitone = round(np.log2(freq/440) * 12) + 9
-    octave = int(np.floor(semitone / 12)) + 4
-    notes = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
-    return f'{notes[semitone % 12]}{octave}'
-
 class Logarithmic(object):
     NAME = 'Logarithmic'
 
     @staticmethod
     def transform(frequency: float) -> float :
         return np.log10(frequency)
-    
+
     @staticmethod
     def inverse(logs: float) -> float :
         return 10 ** logs
@@ -174,9 +164,9 @@ class Logarithmic(object):
         trueMaxLog10Floor = int(floor(trueMaxLog10))
 
         majorTicks = [10 ** i for i in range(trueMinLog10Ceil, trueMaxLog10Floor + 1)]
-        
+
         minorTicks = []
-        
+
         if len(majorTicks) >= 2:
             standardLogTicks = [2, 3, 4, 5, 6, 7, 8, 9]
 
@@ -202,7 +192,7 @@ class Octave(object):
 
     @staticmethod
     def transform(frequency: float) -> float:
-        return np.log2(frequency)
+        return np.log2(np.fmax(frequency, 1e-20))
 
     @staticmethod
     def inverse(logs: float) -> float:
@@ -236,7 +226,7 @@ class Mel(object):
     @staticmethod
     def transform(frequency: float) -> float :
         return 2595 * np.log10(1 + frequency / 700)
-    
+
     @staticmethod
     def inverse(mels: float) -> float :
         return 700 * (10 ** (mels / 2595) - 1)
@@ -245,7 +235,7 @@ class Mel(object):
     def ticks(scale_min, scale_max) -> tuple[list[float], list[float]] :
         return Logarithmic.ticks(scale_min, scale_max)
 
-        
+
 class Erb(object):
     NAME = 'ERB'
 
@@ -254,7 +244,7 @@ class Erb(object):
     @staticmethod
     def transform(frequency: float) -> float :
         return Erb.A * np.log10(1 + 0.00437 * frequency)
-    
+
     @staticmethod
     def inverse(erbs: float) -> float :
         return (10 ** (erbs / Erb.A) - 1) / 0.00437

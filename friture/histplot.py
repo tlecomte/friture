@@ -26,6 +26,7 @@ from friture.filled_curve import CurveType, FilledCurve
 from friture.histplot_data import HistPlot_Data
 from friture.plotting.coordinateTransform import CoordinateTransform
 import friture.plotting.frequency_scales as fscales
+from friture.pitch_tracker import format_frequency
 from friture.qml_tools import qml_url, raise_if_error
 from friture.store import GetStore
 
@@ -54,7 +55,7 @@ class HistPlot(QtWidgets.QWidget):
         self._histplot_data.vertical_axis.name = "PSD (dB A)"
         self._histplot_data.vertical_axis.setTrackerFormatter(lambda x: "%.1f dB" % (x))
         self._histplot_data.horizontal_axis.name = "Frequency (Hz)"
-        self._histplot_data.horizontal_axis.setTrackerFormatter(self.format_frequency)
+        self._histplot_data.horizontal_axis.setTrackerFormatter(format_frequency)
 
         self._histplot_data.vertical_axis.setRange(0, 1)
         self._histplot_data.horizontal_axis.setRange(44, 22000)
@@ -80,7 +81,7 @@ class HistPlot(QtWidgets.QWidget):
         self.quickWidget.setResizeMode(QQuickWidget.SizeRootObjectToView)
         self.quickWidget.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         self.quickWidget.setSource(qml_url("HistPlot.qml"))
-        
+
         raise_if_error(self.quickWidget)
 
         self.quickWidget.rootObject().setProperty("stateId", state_id)
@@ -88,9 +89,6 @@ class HistPlot(QtWidgets.QWidget):
         plotLayout.addWidget(self.quickWidget)
 
         self.setLayout(plotLayout)
-
-    def format_frequency(self, freq: float) -> str:
-        return f'{freq:.0f} Hz ({fscales.freq_to_note(freq)})'
 
     def on_status_changed(self, status):
         if status == QQuickWidget.Error:
@@ -115,7 +113,7 @@ class HistPlot(QtWidgets.QWidget):
             scaled_peak = 1. - self.normVerticalScaleTransform.toScreen(self.peak)
             z_peak = self.peak_int
             self._curve_peak.setData(scaled_x_left, scaled_x_right, scaled_peak, z_peak, baseline)
-            
+
             bar_label_x = (scaled_x_left + scaled_x_right)/2
             self._histplot_data.setBarLabels(bar_label_x, fc, scaled_y)
 
