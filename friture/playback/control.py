@@ -38,7 +38,7 @@ class PlaybackControlWidget(QWidget):
         super().__init__(parent)
         self.widget = QQuickWidget(engine, self)
         self.widget.statusChanged.connect(self.on_status_changed)
-        self.widget.setResizeMode(QQuickWidget.SizeViewToRootObject)
+        self.widget.setResizeMode(QQuickWidget.SizeRootObjectToView)
         self.widget.setSizePolicy(
             QSizePolicy.Expanding, QSizePolicy.Preferred
         )
@@ -54,9 +54,13 @@ class PlaybackControlWidget(QWidget):
         self.root.stopClicked.connect(self.on_stopped)
         self.root.recordClicked.connect(self.on_record)
         self.root.playClicked.connect(self.on_played)
+        self.root.positionChanged.connect(self.on_playback_position_changed)
+        self.root.setRecordingStartTime(-0.1)
 
         self.player = player
         self.player.stopped.connect(self.on_playback_stopped)
+        self.player.recorded_length_changed.connect(self.on_recorded_len_changed)
+        self.player.playback_time_changed.connect(self.on_playback_time_changed)
 
 
     def start_recording(self) -> None:
@@ -86,3 +90,14 @@ class PlaybackControlWidget(QWidget):
 
     def on_playback_stopped(self) -> None:
         self.root.showStopped()
+        self.root.setPlaybackPosition(self.player.play_start_time)
+
+    def on_playback_position_changed(self, value: float) -> None:
+        self.player.play_start_time = value
+
+    def on_recorded_len_changed(self, length: float) -> None:
+        # Always give the slider a nonzero length even if nothing is recorded
+        self.root.setRecordingStartTime(-max(length, 0.1))
+
+    def on_playback_time_changed(self, time: float) -> None:
+        self.root.setPlaybackPosition(time)

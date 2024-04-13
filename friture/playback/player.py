@@ -29,7 +29,7 @@ from friture.ringbuffer import RingBuffer
 
 log = logging.getLogger(__name__)
 
-DEFAULT_HISTORY_LENGTH_S = 5
+DEFAULT_HISTORY_LENGTH_S = 30
 
 class PlayState(Enum):
     STOPPED = 0
@@ -39,6 +39,8 @@ class PlayState(Enum):
 class Player(QObject):
     stopping = pyqtSignal()
     stopped = pyqtSignal()
+    recorded_length_changed = pyqtSignal(float)
+    playback_time_changed = pyqtSignal(float)
 
     def __init__(self, parent: QObject):
         super().__init__(parent)
@@ -49,6 +51,10 @@ class Player(QObject):
         self.recorded_len = 0
         self.stopping.connect(self.on_stopping)
 
+        # If zero, play starts at beginning of buffer. Otherwise, this
+        # is a negative offset in seconds from the end of the buffer.
+        self.play_start_time = 0.0
+
         self.device: Optional[Dict[str, Any]] = None
         self.stream: Optional[OutputStream] = None
         self.play_offset = 0
@@ -58,8 +64,11 @@ class Player(QObject):
         # this will zero out history if channel count changes, not ideal but
         # probably doesn't matter
         self.buffer.push(data)
-        self.recorded_len = min(
+        new_len = min(
             self.recorded_len + data.shape[1], self.history_samples)
+        if new_len != self.recorded_len:
+            self.recorded_len = new_len
+            self.recorded_length_changed.emit(self.recorded_len / SAMPLING_RATE)
 
     def play(self) -> None:
         if self.state != PlayState.STOPPED:
@@ -80,7 +89,15 @@ class Player(QObject):
                     log.exception("Failed to open stream")
                 else:
                     break
-        self.play_offset = self.buffer.offset - self.recorded_len
+
+        if self.play_start_time == 0.0:
+            self.play_offset = self.buffer.offset - self.recorded_len
+        else:
+            start_offset = max(
+                -self.recorded_len,
+                int(self.play_start_time * SAMPLING_RATE)
+            )
+            self.play_offset = self.buffer.offset + start_offset
 
     def stop(self) -> None:
         if self.state == PlayState.PLAYING:
@@ -104,6 +121,8 @@ class Player(QObject):
         available = self.buffer.offset - self.play_offset
         to_copy = min(available, samples)
         self.play_offset += to_copy
+        self.playback_time_changed.emit(
+            (self.play_offset - self.buffer.offset) / SAMPLING_RATE)
 
         if available < samples and self.state == PlayState.PLAYING:
             log.info("Reached end of playback")
