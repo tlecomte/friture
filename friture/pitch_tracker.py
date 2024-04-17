@@ -23,7 +23,7 @@ import math as m
 import numpy as np
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import pyqtSignal, pyqtProperty # type: ignore
-from PyQt5.QtCore import QObject, QSettings # type: ignore
+from PyQt5.QtCore import QObject, QSettings, Qt
 from PyQt5.QtQuick import QQuickWindow
 from PyQt5.QtQuickWidgets import QQuickWidget
 from PyQt5.QtQml import QQmlComponent, QQmlEngine
@@ -102,6 +102,7 @@ class PitchTrackerWidget(QtWidgets.QWidget):
         self.quickWidget.setResizeMode(QQuickWidget.SizeRootObjectToView)
         self.quickWidget.setSizePolicy(
             QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        self.quickWidget.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.quickWidget.setSource(qml_url("Scope.qml"))
 
         raise_if_error(self.quickWidget)
