@@ -61,7 +61,7 @@ class DockManager(QtCore.QObject):
             widget_id = self.last_widget_stack.pop()
             settings = self.last_settings.get(widget_id)
 
-        new_dock = Dock(self.parent(), name, self._parent.qml_engine, widget_id)
+        new_dock = Dock(self._parent, name, self._parent.qml_engine, widget_id)
         if settings is not None:
             new_dock.restoreState(settings)
         #self.parent().addDockWidget(QtCore.Qt.TopDockWidgetArea, new_dock)
@@ -73,6 +73,7 @@ class DockManager(QtCore.QObject):
     def close_dock(self, dock: Dock) -> None:
         settings = QtCore.QSettings()
         dock.saveState(settings)
+        assert dock.widgetId is not None # true but mypy can't prove it
         self.last_settings[dock.widgetId] = settings
         self.last_widget_stack.append(dock.widgetId)
 
