@@ -88,6 +88,15 @@ class DockManager(QtCore.QObject):
             dock.saveState(settings)
             settings.endGroup()
 
+        settings.setValue("widgetIdStack", self.last_widget_stack)
+        settings.beginGroup("lastSettings")
+        for widgetId, widgetSettings in self.last_settings.items():
+            settings.beginGroup(str(widgetId))
+            for key in widgetSettings.allKeys():
+                settings.setValue(key, widgetSettings.value(key))
+            settings.endGroup()
+        settings.endGroup()
+
     def restoreState(self, settings):
         if settings.contains("dockNames"):
             docknames = settings.value("dockNames", [])
@@ -107,6 +116,17 @@ class DockManager(QtCore.QObject):
             for dock in self.docks:
                 #self.parent().addDockWidget(QtCore.Qt.TopDockWidgetArea, dock)
                 self.parent().centralLayout.addWidget(dock)
+
+        self.last_widget_stack = settings.value("widgetIdStack", [])
+        settings.beginGroup("lastSettings")
+        for strId in settings.childGroups():
+            settings.beginGroup(strId)
+            widgetSettings = QtCore.QSettings()
+            for key in settings.allKeys():
+                widgetSettings.setValue(key, settings.value(key))
+            self.last_settings[int(strId)] = widgetSettings
+            settings.endGroup()
+        settings.endGroup()
 
     def canvasUpdate(self):
         for dock in self.docks:
