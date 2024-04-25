@@ -97,7 +97,11 @@ class Player(QObject):
             self.recorded_len + data.shape[1], self.history_samples)
         if new_len != self.recorded_len:
             self.recorded_len = new_len
-            self.recorded_length_changed.emit(self.recorded_len / SAMPLING_RATE)
+            self.recorded_length_changed.emit(self.recorded_len_sec)
+
+    @property
+    def recorded_len_sec(self) -> float:
+        return self.recorded_len / SAMPLING_RATE
 
     def play(self) -> None:
         if self.state != PlayState.STOPPED:

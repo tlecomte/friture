@@ -20,7 +20,10 @@
 """Spectrogram widget, that displays a rolling 2D image of the time-frequency spectrum."""
 
 from PyQt5 import QtWidgets
+import PyQt5.QtCore as QtCore
 from numpy import log10, floor, zeros, float64, tile, array
+from typing import Callable
+
 from friture.imageplot import ImagePlot
 from friture.audioproc import audioproc  # audio processing class
 from friture.spectrogram_settings import (Spectrogram_Settings_Dialog,  # settings dialog
@@ -39,6 +42,8 @@ from fractions import Fraction
 
 
 class Spectrogram_Widget(QtWidgets.QWidget):
+    # x=time is age, or (negative) distance from right edge
+    point_selected = QtCore.pyqtSignal(float, float)
 
     def __init__(self, parent):
         super().__init__(parent)
@@ -89,6 +94,9 @@ class Spectrogram_Widget(QtWidgets.QWidget):
         self.settings_dialog = Spectrogram_Settings_Dialog(self)
 
         AudioBackend().underflow.connect(self.PlotZoneImage.plotImage.canvasscaledspectrogram.syncOffsets)
+
+        self.PlotZoneImage.canvasWidget.point_selected.connect(
+            self.on_point_selected)
 
         self.last_data_time = 0.
 
@@ -176,6 +184,12 @@ class Spectrogram_Widget(QtWidgets.QWidget):
     def restart(self):
         # defer the restart until we get data from the audio source (so that a fresh lastdatatime is passed to the spectrogram image)
         self.mustRestart = True
+
+    def on_point_selected(self, time: float, freq: float) -> None:
+        self.point_selected.emit(time - self.timerange_s, freq)
+
+    def connect_time_selected(self, slot: Callable[[float], None]) -> None:
+        self.point_selected.connect(lambda t, _f: slot(t))
 
     def setminfreq(self, freq):
         self.minfreq = freq

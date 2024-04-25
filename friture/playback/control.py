@@ -93,7 +93,15 @@ class PlaybackControlWidget(QWidget):
         self.root.setPlaybackPosition(self.player.play_start_time)
 
     def on_playback_position_changed(self, value: float) -> None:
+        # This handles changes in the slider
         self.player.play_start_time = value
+
+    def on_time_selected(self, time: float) -> None:
+        # This handles clicks on plot widgets, i.e. the slider also needs
+        # to be updated.
+        time = max(time, -self.player.recorded_len_sec)
+        self.root.setPlaybackPosition(time)
+        self.on_playback_position_changed(time)
 
     def on_recorded_len_changed(self, length: float) -> None:
         # Always give the slider a nonzero length even if nothing is recorded

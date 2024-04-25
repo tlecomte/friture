@@ -25,6 +25,7 @@ from .grid import Grid
 class CanvasWidget(QtWidgets.QWidget):
 
     resized = QtCore.pyqtSignal(int, int)
+    point_selected = QtCore.pyqtSignal(float, float)
 
     def __init__(self, parent, verticalScaleTransform, horizontalScaleTransform):
         super(CanvasWidget, self).__init__(parent)
@@ -169,6 +170,11 @@ class CanvasWidget(QtWidgets.QWidget):
         self.ruler = False
         # ask for update so the the ruler is actually erased
         self.update()
+        if event.button() == QtCore.Qt.RightButton:
+            self.point_selected.emit(
+                self.horizontalScaleTransform.toPlot(event.x()),
+                self.verticalScaleTransform.toPlot(float(self.height() - event.y()))
+            )
 
     def mouseMoveEvent(self, event):
         if event.buttons() & QtCore.Qt.LeftButton:
