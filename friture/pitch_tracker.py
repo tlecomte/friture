@@ -27,7 +27,7 @@ from PyQt5.QtCore import QObject, QSettings, Qt
 from PyQt5.QtQuick import QQuickWindow
 from PyQt5.QtQuickWidgets import QQuickWidget
 from PyQt5.QtQml import QQmlComponent, QQmlEngine
-from typing import Any, Optional
+from typing import Any, Callable, Optional
 
 from friture.audiobackend import SAMPLING_RATE
 from friture.audiobuffer import AudioBuffer
@@ -67,6 +67,9 @@ def format_frequency(freq: float) -> str:
 
 
 class PitchTrackerWidget(QtWidgets.QWidget):
+    # x=time is negative from present, y=frequency in Hz
+    point_selected = pyqtSignal(float, float)
+
     def __init__(self, parent: QtWidgets.QWidget, engine: QQmlEngine):
         super().__init__(parent)
 
@@ -109,6 +112,7 @@ class PitchTrackerWidget(QtWidgets.QWidget):
 
         root: Any = self.quickWidget.rootObject()
         root.setProperty("stateId", state_id)
+        root.pointSelected.connect(self.on_point_selected)
 
         self.gridLayout.addWidget(self.quickWidget, 0, 0, 1, 1)
 
@@ -172,6 +176,12 @@ class PitchTrackerWidget(QtWidgets.QWidget):
         if status == QQuickWidget.Error:
             for error in self.quickWidget.errors():
                 self.logger.error("QML error: " + error.toString())
+
+    def on_point_selected(self, x: float, y: float) -> None:
+        self.point_selected.emit(x, y)
+
+    def connect_time_selected(self, slot: Callable[[float], None]) -> None:
+        self.point_selected.connect(lambda t, _f: slot(t))
 
     # method
     def canvasUpdate(self) -> None:

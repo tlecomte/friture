@@ -14,6 +14,8 @@ Rectangle {
     required property ScopeData scopedata
     default property alias content: plotItemPlaceholder.children
 
+    signal pointSelected(real x, real y)
+
     GridLayout {
         anchors.fill: parent
         rowSpacing: 2
@@ -68,6 +70,8 @@ Rectangle {
                 id: plotItemPlaceholder
                 anchors.fill: parent
             }
+
+            onPointSelected: (x, y) => plot.pointSelected(x, y)
         }
 
         Item {

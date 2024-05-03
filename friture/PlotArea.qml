@@ -11,6 +11,8 @@ Item {
 
     default property alias content: plotItemPlaceholder.children
 
+    signal pointSelected(real x, real y)
+
     PlotBackground {
         anchors.fill: parent
     }
@@ -40,7 +42,7 @@ Item {
     Item
     {
         id: crosshair
-        visible: plotMouseArea.pressed
+        visible: plotMouseArea.pressed && plotMouseArea.pressedButtons & Qt.LeftButton
         anchors.fill: parent
 
         property double posX: Math.min(Math.max(plotMouseArea.mouseX, 0), scopePlotArea.width)
@@ -83,6 +85,18 @@ Item {
     MouseArea {
         id: plotMouseArea
         anchors.fill: parent
+        acceptedButtons: Qt.LeftButton | Qt.RightButton
         cursorShape: Qt.CrossCursor
+
+        onClicked: (event) => {
+            if (event.button == Qt.RightButton) {
+                scopePlotArea.pointSelected(
+                    scopePlotArea.horizontal_axis.coordinate_transform.toPlot(
+                        crosshair.relativePosX),
+                    scopePlotArea.vertical_axis.coordinate_transform.toPlot(
+                        1. - crosshair.relativePosY)
+                );
+            }
+        }
     }
 }

@@ -9,6 +9,8 @@ Item {
     id: container
     property var stateId
 
+    signal pointSelected(real x, real y)
+
     // delay the load of the Plot until stateId has been set
     Loader {
         id: loader
@@ -34,6 +36,8 @@ Item {
                     curve: modelData
                 }
             }
+
+            onPointSelected: (x, y) => container.pointSelected(x, y)
         }
     }
 }
