@@ -104,9 +104,13 @@ class Spectrum_Widget(QtWidgets.QWidget):
     def harmonic_product_spectrum(self, sp):
         # Chose 3 harmonics for no particularly good reason; initial results
         # for pitch detection are good.
-        res = zeros(sp.shape)
-        for i in range(sp.shape[0] // 3):
-            res[i] = sp[i] * sp[i*2] * sp[i*3]
+        product_count = 3
+  
+        # Downsample and multiply
+        harmonic_length = sp.shape[0] // product_count
+        res = sp[:harmonic_length]
+        for i in range(2, product_count + 1):
+            res *= sp[::i][:harmonic_length]
         return res
 
     def handle_new_data(self, floatdata):

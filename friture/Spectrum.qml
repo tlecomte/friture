@@ -33,18 +33,24 @@ Item {
                 }
             }
 
-            FrequencyTracker {
-                visible: scopedata.showFrequencyTracker
+            Column {
                 anchors.fill: parent
-                fmaxValue: scopedata.fmaxValue
-                fmaxLogicalValue: scopedata.fmaxLogicalValue
-            }
+                spacing: 0
+                FrequencyTracker {
+                    visible: scopedata.showFrequencyTracker
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    fmaxValue: scopedata.fmaxValue
+                    fmaxLogicalValue: scopedata.fmaxLogicalValue
+                }
 
-            FrequencyTracker {
-                visible: scopedata.showPitchTracker
-                anchors.fill: parent
-                fmaxValue: scopedata.fpitchDisplayText
-                fmaxLogicalValue: scopedata.fpitchValue
+                FrequencyTracker {
+                    visible: scopedata.showPitchTracker
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    fmaxValue: scopedata.fpitchDisplayText
+                    fmaxLogicalValue: scopedata.fpitchValue
+                }
             }
         }
     }
