@@ -1,0 +1,65 @@
+[build-system]
+requires = [
+    "setuptools",
+
+    # Cython and numpy are needed when running setup.py, to build extensions
+    "numpy==1.26.4",
+    "Cython==0.29.33",
+]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "friture"
+description = "Real-time visualization of live audio data"
+license = {file = "COPYING.txt"}
+readme = "README.rst"
+authors = [
+    {name = "Timothée Lecomte", email = "contact@friture.org"},
+]
+keywords = ["audio", "spectrum", "spectrogram"]
+classifiers=[
+    "Programming Language :: Python",
+    "Programming Language :: Cython",
+    "Development Status :: 4 - Beta",
+    "Environment :: MacOS X",
+    "Environment :: Win32 (MS Windows)",
+    "Environment :: X11 Applications :: Qt",
+    "Intended Audience :: End Users/Desktop",
+    "License :: OSI Approved :: GNU General Public License (GPL)",
+    "Operating System :: OS Independent",
+    "Topic :: Multimedia :: Sound/Audio :: Analysis",
+    "Topic :: Multimedia :: Sound/Audio :: Speech"
+]
+dynamic = ["version"]
+dependencies = [
+    "sounddevice==0.4.5",
+    "rtmixer==0.1.4",
+    "docutils==0.21.2",
+    "numpy==1.26.4",
+    "PyQt5==5.15.10",
+    "appdirs==1.4.4",
+    "pyrr==0.10.3",
+]
+
+[project.scripts]
+friture = "friture.analyzer:main"
+
+[project.urls]
+Homepage = "http://www.friture.org"
+Repository = "https://github.com/tlecomte/friture"
+Issues = "https://github.com/tlecomte/friture/issues"
+
+[tool.setuptools]
+packages=[
+    "friture",
+    "friture.plotting",
+    "friture.generators",
+    "friture.signal",
+    "friture_extensions"
+]
+
+[tool.setuptools.data-files]
+"share/applications" = ["appimage/friture.desktop"]
+
+[tool.setuptools.dynamic]
+version = {attr = "friture.__version__"}

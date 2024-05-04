@@ -5,7 +5,7 @@ set -x
 which python3
 python3 -c 'import sys; print(sys.version)'
 
-pip3 install -r requirements.txt
+pip3 install .
 
 # pyinstaller needs to have the extensions built explicitely
 python3 setup.py build_ext --inplace
