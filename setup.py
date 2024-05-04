@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from setuptools import setup
 from setuptools.extension import Extension
+import numpy
 
 # see INSTALL file for details
 # to create a source package
@@ -18,12 +19,16 @@ from setuptools.extension import Extension
 # autopep8 --max-line-length=170 -d -r friture
 
 ext_modules = [Extension("friture_extensions.exp_smoothing_conv",
-                    ["friture_extensions/exp_smoothing_conv.pyx"]),
+                    ["friture_extensions/exp_smoothing_conv.pyx"],
+                    include_dirs=[numpy.get_include()]),
                Extension("friture_extensions.linear_interp",
-                    ["friture_extensions/linear_interp.pyx"]),
+                    ["friture_extensions/linear_interp.pyx"],
+                    include_dirs=[numpy.get_include()]),
                Extension("friture_extensions.lookup_table",
-                    ["friture_extensions/lookup_table.pyx"]),
+                    ["friture_extensions/lookup_table.pyx"],
+                    include_dirs=[numpy.get_include()]),
                Extension("friture_extensions.lfilter",
-                    ["friture_extensions/lfilter.pyx"])]
+                    ["friture_extensions/lfilter.pyx"],
+                    include_dirs=[numpy.get_include()])]
 
 setup(ext_modules=ext_modules)
