@@ -54,9 +54,9 @@ virtualenv  -p /usr/bin/python3.11 buildenv
 source ./buildenv/bin/activate
 ```
 
-8. Install Friture requirements (PyQt5, etc.)
+8. Install Friture dependencies (PyQt5, etc.)
 ```
-pip3.11 install -r requirements.txt
+pip3.11 install . 
 ```
 
 9. Build Cython extensions
@@ -114,7 +114,7 @@ virtualenv buildenv
 8. Install dependencies
 
 ```
-pip install -r requirements.txt
+pip install .
 ```
 
 9. Build Cython extensions
@@ -131,7 +131,7 @@ python main.py
 
 ## Dependencies
 
-See [requirements.txt](requirements.txt)
+See [pyproject.toml](pyproject.toml)
 
 ## UI and resource files
 

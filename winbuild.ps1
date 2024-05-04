@@ -75,10 +75,10 @@ Write-Host "==========================================="
 
 Write-Host ""
 Write-Host "==========================================="
-Write-Host "Installing requirements"
+Write-Host "Installing dependencies"
 Write-Host "==========================================="
 
-& pip install -r requirements.txt
+& pip install .
 
 Write-Host ""
 Write-Host "==========================================="

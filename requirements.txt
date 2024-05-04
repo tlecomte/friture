@@ -1,3 +1,0 @@
-# dependencies are taken from 'install_requires' in setup.py
-# reference: https://caremad.io/posts/2013/07/setup-vs-requirement/
--e .

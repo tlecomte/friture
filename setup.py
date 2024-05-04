@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 from setuptools import setup
 from setuptools.extension import Extension
-from os.path import join, dirname  # for README content reading
-import friture  # for the version number
 
 # see INSTALL file for details
 # to create a source package
@@ -19,83 +17,13 @@ import friture  # for the version number
 # to fix pep8 issues automatically (replace -d by -i if the changes are fine):
 # autopep8 --max-line-length=170 -d -r friture
 
-# solve chicken-and-egg problem that setup.py needs to import Numpy to build the extensions,
-# but Numpy is not available until it is installed as a setup dependency
-# see: https://stackoverflow.com/a/54128391
-class LateIncludeExtension(Extension):
-    def __init__(self, *args, **kwargs):
-        self.__include_dirs = []
-        super().__init__(*args, **kwargs)
+ext_modules = [Extension("friture_extensions.exp_smoothing_conv",
+                    ["friture_extensions/exp_smoothing_conv.pyx"]),
+               Extension("friture_extensions.linear_interp",
+                    ["friture_extensions/linear_interp.pyx"]),
+               Extension("friture_extensions.lookup_table",
+                    ["friture_extensions/lookup_table.pyx"]),
+               Extension("friture_extensions.lfilter",
+                    ["friture_extensions/lfilter.pyx"])]
 
-    @property
-    def include_dirs(self):
-        import numpy
-        return self.__include_dirs + [numpy.get_include()]
-
-    @include_dirs.setter
-    def include_dirs(self, dirs):
-        self.__include_dirs = dirs
-
-# extensions
-ext_modules = [LateIncludeExtension("friture_extensions.exp_smoothing_conv",
-                                    ["friture_extensions/exp_smoothing_conv.pyx"]),
-               LateIncludeExtension("friture_extensions.linear_interp",
-                                    ["friture_extensions/linear_interp.pyx"]),
-               LateIncludeExtension("friture_extensions.lookup_table",
-                                    ["friture_extensions/lookup_table.pyx"]),
-               LateIncludeExtension("friture_extensions.lfilter",
-                                    ["friture_extensions/lfilter.pyx"])]
-
-# Friture runtime dependencies
-# these will be installed when calling 'pip install friture'
-# they are also retrieved by 'requirements.txt'
-install_requires = [
-    "sounddevice==0.4.5",
-    "rtmixer==0.1.4",
-    "docutils==0.21.2",
-    "numpy==1.26.4",
-    "PyQt5==5.15.10",
-    "appdirs==1.4.4",
-    "pyrr==0.10.3",
-]
-
-# Cython and numpy are needed when running setup.py, to build extensions
-setup_requires=["numpy==1.26.4", "Cython==0.29.33"]
-
-with open(join(dirname(__file__), 'README.rst')) as f:
-    long_description = f.read()
-
-setup(name="friture",
-      version=friture.__version__,
-      description='Real-time visualization of live audio data',
-      long_description=long_description,
-      license="GNU GENERAL PUBLIC LICENSE",
-      author='Timothée Lecomte',
-      author_email='contact@friture.org',
-      url='http://www.friture.org',
-      keywords=["audio", "spectrum", "spectrogram"],
-      classifiers=[
-          "Programming Language :: Python",
-          "Programming Language :: Cython",
-          "Development Status :: 4 - Beta",
-          "Environment :: MacOS X",
-          "Environment :: Win32 (MS Windows)",
-          "Environment :: X11 Applications :: Qt",
-          "Intended Audience :: End Users/Desktop",
-          "License :: OSI Approved :: GNU General Public License (GPL)",
-          "Operating System :: OS Independent",
-          "Topic :: Multimedia :: Sound/Audio :: Analysis",
-          "Topic :: Multimedia :: Sound/Audio :: Speech"
-      ],
-      packages=['friture',
-                'friture.plotting',
-                'friture.generators',
-                'friture.signal',
-                'friture_extensions'],
-      scripts=['scripts/friture'],
-      ext_modules=ext_modules,
-      install_requires=install_requires,
-      setup_requires=setup_requires,
-      include_package_data=True,
-      data_files = [('share/applications', ['appimage/friture.desktop'])],
-)
+setup(ext_modules=ext_modules)
