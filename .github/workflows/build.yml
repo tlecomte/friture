@@ -30,7 +30,7 @@ jobs:
 
     - name: Build
       shell: powershell
-      run: ./winbuild.ps1
+      run: ./.github/workflows/winbuild.ps1
 
     - name: Upload friture appx
       uses: actions/upload-artifact@v2
