@@ -114,7 +114,7 @@ class Scope_Widget(QtWidgets.QWidget):
         trig_search_stop = -width // 2
         triggerdata = triggerdata[trig_search_start: trig_search_stop]
 
-        trigger_level = floatdata.max() * 2. / 3.
+        trigger_level = triggerdata.max() * 2. / 3.
         trigger_pos = where((triggerdata[:-1] < trigger_level) * (triggerdata[1:] >= trigger_level))[0]
 
         if len(trigger_pos) == 0:
