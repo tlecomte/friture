@@ -134,7 +134,7 @@ Write-Host "Build MSI with WiX"
 Write-Host "==========================================="
 
 & "$env:WIX/bin/heat.exe" dir "dist/friture" -cg FritureFiles -gg -scom -sreg -sfrag -srd -dr INSTALLFOLDER -out "dist/FritureFilesFragment.wxs"
-& "$env:WIX/bin/candle.exe" installer/friture.wxs -dVersion="$version" -o dist/wixobj/
+& "$env:WIX/bin/candle.exe" installer/friture.wxs -dVersion="$version" -o dist/wixobj/ -arch x64
 & "$env:WIX/bin/candle.exe" dist/FritureFilesFragment.wxs -o dist/wixobj/
 & "$env:WIX/bin/light.exe" -ext WixUIExtension -cultures:en-us -b dist/friture dist/wixobj\*.wixobj -o "dist/friture-$version.msi"
 
