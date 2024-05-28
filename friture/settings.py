@@ -21,6 +21,7 @@ import sys
 import logging
 
 from PyQt5 import QtCore, QtWidgets
+from PyQt5.QtCore import pyqtSignal, pyqtProperty
 from friture.audiobackend import AudioBackend
 from friture.ui_settings import Ui_Settings_Dialog
 
@@ -35,6 +36,8 @@ Friture will now exit.
 
 
 class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
+    show_playback_changed = pyqtSignal(bool)
+    history_length_changed = pyqtSignal(int)
 
     def __init__(self, parent):
         QtWidgets.QDialog.__init__(self, parent)
@@ -76,6 +79,12 @@ class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
         self.comboBox_secondChannel.activated.connect(self.second_channel_changed)
         self.radioButton_single.toggled.connect(self.single_input_type_selected)
         self.radioButton_duo.toggled.connect(self.duo_input_type_selected)
+        self.checkbox_showPlayback.stateChanged.connect(self.show_playback_checkbox_changed)
+        self.spinBox_historyLength.editingFinished.connect(self.history_length_edit_finished)
+
+    @pyqtProperty(bool, notify=show_playback_changed) # type: ignore
+    def show_playback(self) -> bool:
+        return bool(self.checkbox_showPlayback.checkState())
 
     # slot
     # used when no audio input device has been found, to exit immediately
@@ -162,6 +171,14 @@ class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
             AudioBackend().set_duo_input()
             self.logger.info("Switching to difference between two inputs")
 
+    # slot
+    def show_playback_checkbox_changed(self, state: int) -> None:
+        self.show_playback_changed.emit(bool(state))
+
+    # slot
+    def history_length_edit_finished(self) -> None:
+        self.history_length_changed.emit(self.spinBox_historyLength.value())
+
     # method
     def saveState(self, settings):
         # for the input device, we search by name instead of index, since
@@ -170,6 +187,8 @@ class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
         settings.setValue("firstChannel", self.comboBox_firstChannel.currentIndex())
         settings.setValue("secondChannel", self.comboBox_secondChannel.currentIndex())
         settings.setValue("duoInput", self.inputTypeButtonGroup.checkedId())
+        settings.setValue("showPlayback", self.checkbox_showPlayback.checkState())
+        settings.setValue("historyLength", self.spinBox_historyLength.value())
 
     # method
     def restoreState(self, settings):
@@ -184,3 +203,7 @@ class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
             self.comboBox_secondChannel.setCurrentIndex(channel)
             duo_input_id = settings.value("duoInput", 0, type=int)
             self.inputTypeButtonGroup.button(duo_input_id).setChecked(True)
+        self.checkbox_showPlayback.setCheckState(settings.value("showPlayback", 0, type=int))
+        self.spinBox_historyLength.setValue(settings.value("historyLength", 30, type=int))
+        # need to emit this because setValue doesn't emit editFinished
+        self.history_length_changed.emit(self.spinBox_historyLength.value())

@@ -60,6 +60,35 @@ class Player(QObject):
         self.play_offset = 0
         self.state = PlayState.STOPPED
 
+    def set_history_seconds(self, new_len: int) -> None:
+        if new_len <= 0:
+            raise ValueError("History must have positive length")
+
+        self.history_sec = new_len
+        self.history_samples = self.history_sec * SAMPLING_RATE
+        self.buffer.grow_if_needed(self.history_samples)
+
+        # Handle the case where the current play position is truncated out
+        # (will result in a skip in playback)
+        if self.state == PlayState.PLAYING:
+            if self.play_offset < (self.buffer.offset - self.history_samples):
+                self.play_offset = self.buffer.offset - self.history_samples
+                self.playback_time_changed.emit(
+                    (self.play_offset - self.buffer.offset) / SAMPLING_RATE)
+
+        # Handle the case where the selected start time is truncated
+        if self.play_start_time < -self.history_sec:
+            self.play_start_time = -self.history_sec
+            # Start time == playback time only when not playing
+            if self.state != PlayState.PLAYING:
+                self.playback_time_changed.emit(-self.history_sec)
+
+        # Note that this sets the valid range for the slider, and the current
+        # position will have been adjusted to fit, above.
+        if self.history_samples < self.recorded_len:
+            self.recorded_len = self.history_samples
+            self.recorded_length_changed.emit(self.recorded_len / SAMPLING_RATE)
+
     def handle_new_data(self, data: np.ndarray) -> None:
         # this will zero out history if channel count changes, not ideal but
         # probably doesn't matter
