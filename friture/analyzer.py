@@ -147,6 +147,7 @@ class Friture(QMainWindow, ):
 
         self.playback_widget = PlaybackControlWidget(
             self, self.qml_engine, self.player)
+        self.playback_widget.setVisible(self.settings_dialog.show_playback)
         self.vboxLayout.addWidget(self.playback_widget)
 
         self.dockmanager = DockManager(self)
@@ -162,6 +163,10 @@ class Friture(QMainWindow, ):
         self.ui.actionAbout.triggered.connect(self.about_called)
         self.ui.actionNew_dock.triggered.connect(self.dockmanager.new_dock)
         self.playback_widget.recording_toggled.connect(self.timer_toggle)
+
+        # settings changes
+        self.settings_dialog.show_playback_changed.connect(self.show_playback_changed)
+        self.settings_dialog.history_length_changed.connect(self.player.set_history_seconds)
 
         # restore the settings and widgets geometries
         self.restoreAppState()
@@ -194,6 +199,9 @@ class Friture(QMainWindow, ):
     # slot
     def settings_called(self):
         self.settings_dialog.show()
+
+    def show_playback_changed(self, show: bool) -> None:
+        self.playback_widget.setVisible(show)
 
     # slot
     def about_called(self):
