@@ -20,7 +20,7 @@ from scipy import stats
 
 def pink1d(n, rvs=stats.norm.rvs):
     k = min(int(np.floor(np.log(n)/np.log(2))), 12)
-    pink = np.zeros((n,), np.float)
+    pink = np.zeros((n,), np.float32)
     m = 1
     for i in range(k):
         p = int(np.ceil(float(n) / m))

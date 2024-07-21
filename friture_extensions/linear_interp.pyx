@@ -18,7 +18,7 @@ def pyx_linear_interp_2D(np.ndarray[dtype_t, ndim=2] resampled_buffer not None,
                          dtype_t resampling_ratio,
                          int n):
     cdef dtype_t a
-    cdef np.int_t i, j
+    cdef np.intp_t i, j
     cdef Py_ssize_t N = data.shape[0]
 
     for i in range(n):

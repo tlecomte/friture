@@ -80,8 +80,8 @@ class PlotCurve(QQuickItem):
         vertices.setsize(2 * np.dtype(np.float32).itemsize * size)
 
         polygon_array = np.frombuffer(vertices, dtype=np.float32)
-        polygon_array[: (size - 1) * 2 + 1 : 2] = np.array(self.curve.x_array() * self.width(), dtype=np.float32, copy=False)
-        polygon_array[1 : (size - 1) * 2 + 2 : 2] = np.array(self.curve.y_array() * self.height(), dtype=np.float32, copy=False)
+        polygon_array[: (size - 1) * 2 + 1 : 2] = np.asarray(self.curve.x_array() * self.width(), dtype=np.float32)
+        polygon_array[1 : (size - 1) * 2 + 2 : 2] = np.asarray(self.curve.y_array() * self.height(), dtype=np.float32)
 
         paint_node.markDirty(QSGNode.DirtyGeometry)
 
