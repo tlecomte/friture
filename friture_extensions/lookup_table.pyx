@@ -12,7 +12,7 @@ cimport cython
 
 def pyx_color_from_float(np.ndarray[np.uint32_t, ndim=1] lut not None,
                          np.ndarray[np.float64_t, ndim=1] values not None):
-    cdef np.int_t i, j
+    cdef np.intp_t i, j
     cdef Py_ssize_t N = values.shape[0]
     cdef np.ndarray[np.uint32_t, ndim=1] out = np.zeros([N], dtype=np.uint32)
 
@@ -24,7 +24,7 @@ def pyx_color_from_float(np.ndarray[np.uint32_t, ndim=1] lut not None,
 
 def pyx_color_from_float_2D(np.ndarray[np.uint32_t, ndim=1] lut not None,
                             np.ndarray[np.float64_t, ndim=2] values not None):
-    cdef np.int_t i, j, k
+    cdef np.intp_t i, j, k
     cdef Py_ssize_t M = values.shape[0]
     cdef Py_ssize_t N = values.shape[1]
     cdef np.ndarray[np.uint32_t, ndim=2] out = np.zeros([M, N], dtype=np.uint32)

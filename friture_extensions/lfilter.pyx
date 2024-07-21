@@ -89,8 +89,8 @@ def pyx_lfilter_float64_1D(
 
     cdef Py_ssize_t len_x = x.shape[0]
     cdef Py_ssize_t len_b = b.shape[0]
-    cdef np.int_t n
-    cdef np.uint_t k
+    cdef np.intp_t n
+    cdef np.uintp_t k
 
     cdef np.ndarray[np.float64_t, ndim=1] y = np.empty(x.shape[0])
     cdef np.ndarray[np.float64_t, ndim=1] z = np.array(zi, copy=True)

@@ -17,7 +17,7 @@ t = np.arange(0, time_s, 1./float(SAMPLING_RATE))
 
 def pinknoise(n, rvs=stats.norm.rvs):
     k = min(int(np.floor(np.log(n)/np.log(2))), 12)
-    pink = np.zeros((n,), np.float)
+    pink = np.zeros((n,), np.float32)
 
     for m in 2**np.arange(k):
         p = int(np.ceil(float(n) / m))

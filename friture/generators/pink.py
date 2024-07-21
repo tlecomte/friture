@@ -30,7 +30,7 @@ def pinknoise(n, rvs=standard_normal):
 
     # k = int(min(np.floor(np.log(n)/np.log(2)), PINK_FIDELITY))
     k = 13  # dynamic k adds audible "clicks"
-    pink = np.zeros((n,), np.float)
+    pink = np.zeros((n,), np.float32)
 
     for m in 2 ** np.arange(k):
         p = int(np.ceil(float(n) / m))
