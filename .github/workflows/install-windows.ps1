@@ -103,17 +103,6 @@ Write-Host "==========================================="
 
 Write-Host ""
 Write-Host "==========================================="
-Write-Host "Replace icudt53.dll with smaller version"
-Write-Host "==========================================="
-
-# icudt53.dll is huge but needed for Qt
-# A stripped down version is available here:
-# https://forum.qt.io/topic/37891/minimal-icudt51-dll-icudt52-dll-and-icudt53-dll
-# http://qlcplus.sourceforge.net/icudt53.dll
-Copy-Item -Path "installer\icudt53.dll" -Destination "dist\friture\icudt53.dll"
-
-Write-Host ""
-Write-Host "==========================================="
 Write-Host "Archiving the package as a zip file"
 Write-Host "==========================================="
 
