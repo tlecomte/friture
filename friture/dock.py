@@ -19,17 +19,29 @@
 
 from inspect import signature
 
-from PyQt5 import QtWidgets
+from PyQt5 import QtCore, QtWidgets
 from friture.widgetdict import getWidgetById, widgetIds
 from friture.controlbar import ControlBar
+
+from typing import Dict, List, Optional, TYPE_CHECKING
+if TYPE_CHECKING:
+    from friture.analyzer import Friture
+    from friture.dockmanager import DockManager
+    from PyQt5.QtQml import QQmlEngine
 
 
 class Dock(QtWidgets.QWidget):
 
-    def __init__(self, parent, name, qml_engine, widgetId=None):
+    def __init__(
+        self,
+        parent: 'Friture',
+        name: str,
+        qml_engine: 'QQmlEngine',
+        widgetId: Optional[int]=None
+    ) -> None:
         super().__init__(parent)
 
-        self.dockmanager = parent.dockmanager
+        self.dockmanager: 'DockManager' = parent.dockmanager
         self.audiobuffer = parent.audiobuffer
 
         self.setObjectName(name)
@@ -41,15 +53,15 @@ class Dock(QtWidgets.QWidget):
         self.control_bar.close_button.clicked.connect(self.closeClicked)
 
         #self.dockwidget = QtWidgets.QWidget(self)
-        self.layout = QtWidgets.QVBoxLayout(self)
-        self.layout.addWidget(self.control_bar)
-        self.layout.setContentsMargins(0, 0, 0, 0)
-        # self.dockwidget.setLayout(self.layout)
+        self.vbox = QtWidgets.QVBoxLayout(self)
+        self.vbox.addWidget(self.control_bar)
+        self.vbox.setContentsMargins(0, 0, 0, 0)
+        # self.dockwidget.setLayout(self.vbox)
 
         # self.setWidget(self.dockwidget)
 
-        self.widgetId = None
-        self.audiowidget = None
+        self.widgetId: Optional[int] = None
+        self.audiowidget: Optional[QtWidgets.QWidget] = None
         self.qml_engine = qml_engine
 
         if widgetId is None:
@@ -72,11 +84,16 @@ class Dock(QtWidgets.QWidget):
         self.widget_select(widgetIds()[index])
 
     # slot
-    def widget_select(self, widgetId):
+    def widget_select(self, widgetId: int) -> None:
         if self.widgetId == widgetId:
             return
 
         if self.audiowidget is not None:
+            settings = QtCore.QSettings()
+            self.audiowidget.saveState(settings) # type: ignore
+            assert self.widgetId is not None
+            self.dockmanager.last_settings[self.widgetId] = settings
+
             self.audiowidget.close()
             self.audiowidget.deleteLater()
 
@@ -90,11 +107,17 @@ class Dock(QtWidgets.QWidget):
             self.audiowidget = constructor(self, self.qml_engine)
         else:
             self.audiowidget = constructor(self)
+        assert self.audiowidget is not None # mypy can't prove this :(
 
-        self.audiowidget.set_buffer(self.audiobuffer)
-        self.audiobuffer.new_data_available.connect(self.audiowidget.handle_new_data)
+        # audiowidget is duck typed for this:
+        self.audiowidget.set_buffer(self.audiobuffer) # type: ignore
+        self.audiobuffer.new_data_available.connect(
+            self.audiowidget.handle_new_data) # type: ignore
+        if widgetId in self.dockmanager.last_settings:
+            self.audiowidget.restoreState( # type: ignore
+                self.dockmanager.last_settings[widgetId])
 
-        self.layout.addWidget(self.audiowidget)
+        self.vbox.addWidget(self.audiowidget)
 
         index = widgetIds().index(widgetId)
         self.control_bar.combobox_select.setCurrentIndex(index)

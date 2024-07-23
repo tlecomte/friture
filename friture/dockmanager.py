@@ -24,21 +24,28 @@ from PyQt5.QtWidgets import QMainWindow
 from friture.defaults import DEFAULT_DOCKS
 from friture.dock import Dock
 
+from typing import Dict, List, Optional, TYPE_CHECKING
+if TYPE_CHECKING:
+    from friture.analyzer import Friture
+
 
 class DockManager(QtCore.QObject):
 
-    def __init__(self, parent):
+    def __init__(self, parent: 'Friture') -> None:
         super().__init__(parent)
+        self._parent = parent
 
         self.logger = logging.getLogger(__name__)
 
         # the parent must of the QMainWindow so that docks are created as children of it
         assert isinstance(parent, QMainWindow)
 
-        self.docks = []
+        self.docks: List[Dock] = []
+        self.last_settings: Dict[int, QtCore.QSettings] = {}
+        self.last_widget_stack: List[int] = []
 
     # slot
-    def new_dock(self):
+    def new_dock(self) -> None:
         # the dock objectName is unique
         docknames = [dock.objectName() for dock in self.docks]
         dockindexes = [int(str(name).partition(' ')[-1]) for name in docknames]
@@ -47,15 +54,30 @@ class DockManager(QtCore.QObject):
         else:
             index = max(dockindexes) + 1
         name = "Dock %d" % index
-        new_dock = Dock(self.parent(), name, self.parent().qml_engine)
+
+        widget_id: Optional[int] = None
+        settings: Optional[QtCore.QSettings] = None
+        if self.last_widget_stack:
+            widget_id = self.last_widget_stack.pop()
+            settings = self.last_settings.get(widget_id)
+
+        new_dock = Dock(self._parent, name, self._parent.qml_engine, widget_id)
+        if settings is not None:
+            new_dock.restoreState(settings)
         #self.parent().addDockWidget(QtCore.Qt.TopDockWidgetArea, new_dock)
-        self.parent().centralLayout.addWidget(new_dock)
+        self._parent.centralLayout.addWidget(new_dock)
 
         self.docks += [new_dock]
 
     # slot
-    def close_dock(self, dock):
-        self.parent().centralLayout.removeWidget(dock)
+    def close_dock(self, dock: Dock) -> None:
+        settings = QtCore.QSettings()
+        dock.saveState(settings)
+        assert dock.widgetId is not None # true but mypy can't prove it
+        self.last_settings[dock.widgetId] = settings
+        self.last_widget_stack.append(dock.widgetId)
+
+        self._parent.centralLayout.removeWidget(dock)
         self.docks.remove(dock)
 
     def saveState(self, settings):
@@ -65,6 +87,15 @@ class DockManager(QtCore.QObject):
             settings.beginGroup(dock.objectName())
             dock.saveState(settings)
             settings.endGroup()
+
+        settings.setValue("widgetIdStack", self.last_widget_stack)
+        settings.beginGroup("lastSettings")
+        for widgetId, widgetSettings in self.last_settings.items():
+            settings.beginGroup(str(widgetId))
+            for key in widgetSettings.allKeys():
+                settings.setValue(key, widgetSettings.value(key))
+            settings.endGroup()
+        settings.endGroup()
 
     def restoreState(self, settings):
         if settings.contains("dockNames"):
@@ -85,6 +116,17 @@ class DockManager(QtCore.QObject):
             for dock in self.docks:
                 #self.parent().addDockWidget(QtCore.Qt.TopDockWidgetArea, dock)
                 self.parent().centralLayout.addWidget(dock)
+
+        self.last_widget_stack = settings.value("widgetIdStack", [])
+        settings.beginGroup("lastSettings")
+        for strId in settings.childGroups():
+            settings.beginGroup(strId)
+            widgetSettings = QtCore.QSettings()
+            for key in settings.allKeys():
+                widgetSettings.setValue(key, settings.value(key))
+            self.last_settings[int(strId)] = widgetSettings
+            settings.endGroup()
+        settings.endGroup()
 
     def canvasUpdate(self):
         for dock in self.docks:
