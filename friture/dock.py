@@ -27,6 +27,7 @@ from typing import Dict, List, Optional, TYPE_CHECKING
 if TYPE_CHECKING:
     from friture.analyzer import Friture
     from friture.dockmanager import DockManager
+    from friture.playback.control import PlaybackControlWidget
     from PyQt5.QtQml import QQmlEngine
 
 
@@ -43,6 +44,7 @@ class Dock(QtWidgets.QWidget):
 
         self.dockmanager: 'DockManager' = parent.dockmanager
         self.audiobuffer = parent.audiobuffer
+        self.playback_widget: 'PlaybackControlWidget' = parent.playback_widget
 
         self.setObjectName(name)
 
@@ -108,6 +110,10 @@ class Dock(QtWidgets.QWidget):
         else:
             self.audiowidget = constructor(self)
         assert self.audiowidget is not None # mypy can't prove this :(
+
+        if hasattr(self.audiowidget, 'connect_time_selected'):
+            self.audiowidget.connect_time_selected(
+                self.playback_widget.on_time_selected)
 
         # audiowidget is duck typed for this:
         self.audiowidget.set_buffer(self.audiobuffer) # type: ignore
