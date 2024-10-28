@@ -19,12 +19,10 @@
 
 import sys
 import logging
-import os.path
 import time
-import io
 import traceback
 import friture
-import appdirs
+import platformdirs
 from PyQt5 import QtCore
 from PyQt5.QtWidgets import QMessageBox, QApplication
 
@@ -40,8 +38,7 @@ def fileexcepthook(exception_type, exception_value, traceback_object):
 
     # same as in analyzer.py
     logFileName = "friture.log.txt"
-    dirs = appdirs.AppDirs("Friture", "")
-    logDir = dirs.user_data_dir
+    logDir = platformdirs.user_data_dir("Friture", "")
 
     email = "contact@friture.org"
 
