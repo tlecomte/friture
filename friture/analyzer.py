@@ -30,7 +30,7 @@ from PyQt5 import QtCore
 from PyQt5.QtWidgets import QMainWindow, QHBoxLayout, QVBoxLayout, QApplication, QSplashScreen
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtQml import QQmlEngine, qmlRegisterSingletonType, qmlRegisterType
-import appdirs
+import platformdirs
 
 # importing friture.exceptionhandler also installs a temporary exception hook
 from friture.exceptionhandler import errorBox, fileexcepthook
@@ -346,8 +346,7 @@ def main():
     formatter = logging.Formatter(logFormat)
 
     logFileName = "friture.log.txt"
-    dirs = appdirs.AppDirs("Friture", "")
-    logDir = dirs.user_data_dir
+    logDir = platformdirs.user_data_dir("Friture", "")
     try:
         os.makedirs(logDir)
     except OSError as e:

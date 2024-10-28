@@ -3,8 +3,8 @@ requires = [
     "setuptools",
 
     # Cython and numpy are needed when running setup.py, to build extensions
-    "numpy==2.0.1",
-    "Cython==3.0.10",
+    "numpy==2.1.2",
+    "Cython==3.0.11",
 ]
 build-backend = "setuptools.build_meta"
 
@@ -32,18 +32,18 @@ classifiers=[
 ]
 dynamic = ["version"]
 dependencies = [
-    "sounddevice==0.4.5",
-    "rtmixer==0.1.4",
+    "sounddevice==0.5.1",
+    "rtmixer==0.1.7",
     "docutils==0.21.2",
-    "numpy==2.0.1",
-    "PyQt5==5.15.10",
-    "appdirs==1.4.4",
+    "numpy==2.1.2",
+    "PyQt5==5.15.11",
+    "platformdirs==4.3.6",
     "pyrr==0.10.3",
 ]
 
 [project.optional-dependencies]
 dev = [
-    "mypy==1.10.0",
+    "mypy==1.13.0",
     "PyQt5-stubs==5.15.6.0",
 ]
 
