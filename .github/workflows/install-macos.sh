@@ -15,8 +15,6 @@ python3 setup.py build_ext --inplace
 # see: https://github.com/tlecomte/friture/issues/154
 brew install portaudio --HEAD
 
-pip3 install -U pyinstaller==6.11.0
-
 pyinstaller friture.spec -y
 
 ls -la dist/*
