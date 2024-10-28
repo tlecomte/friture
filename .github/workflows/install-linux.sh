@@ -34,8 +34,6 @@ make install
 ls -laR portaudio-install
 cd ..
 
-pip3 install -U pyinstaller==6.11.0
-
 pyinstaller friture.spec -y --log-level=DEBUG
 
 cd appimage
