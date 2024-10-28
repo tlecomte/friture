@@ -5,18 +5,13 @@ on: [push, pull_request]
 jobs:
   build-windows:
     runs-on: windows-2019
-    strategy:
-      matrix:
-        python-version: ['3.11']
 
     steps:
     - name: Checkout
       uses: actions/checkout@v4
 
-    - name: Set up Python ${{ matrix.python-version }}
+    - name: Set up Python
       uses: actions/setup-python@v5
-      with:
-        python-version: ${{ matrix.python-version }}
 
     - name: Display Python version
       run: python -c "import sys; print(sys.version)"
@@ -69,18 +64,13 @@ jobs:
 
   build-linux:
     runs-on: ubuntu-20.04
-    strategy:
-      matrix:
-        python-version: ['3.11']
 
     steps:
     - name: Checkout
       uses: actions/checkout@v4
 
-    - name: Set up Python ${{ matrix.python-version }}
+    - name: Set up Python
       uses: actions/setup-python@v5
-      with:
-        python-version: ${{ matrix.python-version }}
 
     - name: Display Python version
       run: python -c "import sys; print(sys.version)"
@@ -97,18 +87,13 @@ jobs:
 
   build-macos:
     runs-on: macos-12
-    strategy:
-      matrix:
-        python-version: ['3.11']
 
     steps:
     - name: Checkout
       uses: actions/checkout@v4
 
-    - name: Set up Python ${{ matrix.python-version }}
+    - name: Set up Python
       uses: actions/setup-python@v5
-      with:
-        python-version: ${{ matrix.python-version }}
 
     - name: Display Python version
       run: python -c "import sys; print(sys.version)"
