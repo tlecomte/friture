@@ -33,35 +33,35 @@ jobs:
       run: ./.github/workflows/install-windows.ps1
 
     - name: Upload friture appx
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: friture-appx
         path: dist/friture-*.appx
         if-no-files-found: error
 
     - name: Upload friture msi
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: friture-msi
         path: dist/friture-*.msi
         if-no-files-found: error
 
     - name: Upload friture zip
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: friture-zip
         path: dist/friture.zip
         if-no-files-found: error
 
     - name: Upload import xref
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: friture-import-xref
         path: build/friture/xref-friture.html
         if-no-files-found: error
 
     - name: Upload import graph
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: friture-import-graph
         path: build/friture/graph-friture.dot
@@ -89,7 +89,7 @@ jobs:
       run: source ./.github/workflows/install-linux.sh
 
     - name: Upload appImage
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: friture-appImage
         path: friture*.AppImage
@@ -117,7 +117,7 @@ jobs:
       run: source ./.github/workflows/install-macos.sh
 
     - name: Upload dmg
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: friture-dmg
         path: friture*.dmg
@@ -132,7 +132,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Download all workflow run artifacts
-        uses: actions/download-artifact@v4.1.7
+        uses: actions/download-artifact@v4
 
       - name: Display structure of downloaded files
         run: ls -R
