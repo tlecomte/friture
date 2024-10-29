@@ -5,6 +5,8 @@ import Friture 1.0
 Item {
     id: frequencyTracker
 
+    SystemPalette { id: systemPalette; colorGroup: SystemPalette.Active }
+
     required property string fmaxValue
     required property string fmaxLogicalValue
 
@@ -24,11 +26,12 @@ Item {
             id: background
             width: frequencyTrackerText.contentWidth
             height: frequencyTrackerText.contentHeight
-            color: "white"
+            color: systemPalette.base
 
             Text {
                 id: frequencyTrackerText
                 text: frequencyTracker.fmaxValue
+                color: systemPalette.windowText
             }
         }
 
@@ -38,7 +41,7 @@ Item {
 
             ShapePath {
                 strokeWidth: 0
-                fillColor: "white"
+                fillColor: systemPalette.base
 
                 // draw a small downward-pointing triangle to indicate the frequency
                 PathMove { x: background.width / 2 - outline.triangleSize; y: 0 }
@@ -49,8 +52,8 @@ Item {
             ShapePath {
                 id: outline
                 strokeWidth: 1
-                strokeColor: "black"
-                fillColor: "white"
+                strokeColor: systemPalette.windowText
+                fillColor: systemPalette.base
 
                 property int triangleSize: 4
 

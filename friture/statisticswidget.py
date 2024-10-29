@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt5 import QtCore, QtWidgets
+from PyQt5 import QtCore, QtWidgets, QtGui
 from friture.audiobackend import AudioBackend
 
 
@@ -35,8 +35,12 @@ class StatisticsWidget(QtWidgets.QWidget):
 
         self.scrollAreaWidgetContents = QtWidgets.QWidget(self.stats_scrollarea)
         self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 87, 220))
-        self.scrollAreaWidgetContents.setStyleSheet("""QWidget { background: white }""")
         self.scrollAreaWidgetContents.setObjectName("stats_scrollAreaWidgetContents")
+
+        palette = self.scrollAreaWidgetContents.palette()
+        palette.setColor(QtGui.QPalette.Window, palette.color(QtGui.QPalette.Base))
+        self.scrollAreaWidgetContents.setPalette(palette)
+        self.scrollAreaWidgetContents.setAutoFillBackground(True)
 
         self.LabelStats = QtWidgets.QLabel(self.scrollAreaWidgetContents)
         self.LabelStats.setAlignment(QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)

@@ -5,8 +5,8 @@ import Friture 1.0
 
 Rectangle {
     id: pitch
-    SystemPalette { id: myPalette; colorGroup: SystemPalette.Active }
-    color: myPalette.window
+    SystemPalette { id: systemPalette; colorGroup: SystemPalette.Active }
+    color: systemPalette.window
 
     implicitWidth: pitchCol.implicitWidth
     implicitHeight: parent ? parent.height : 0
@@ -32,6 +32,7 @@ Rectangle {
             rightPadding: 6
             horizontalAlignment: Text.AlignRight
             Layout.alignment: Qt.AlignTop | Qt.AlignRight
+            color: systemPalette.windowText
         }
 
         Text {
@@ -44,6 +45,7 @@ Rectangle {
             horizontalAlignment: Text.AlignRight
             Layout.preferredWidth: fontMetrics.boundingRect("000.0").width
             Layout.alignment: Qt.AlignTop | Qt.AlignRight
+            color: systemPalette.windowText
         }
 
         Text {
@@ -53,6 +55,7 @@ Rectangle {
             rightPadding: 6
             horizontalAlignment: Text.AlignRight
             Layout.alignment: Qt.AlignTop | Qt.AlignRight
+            color: systemPalette.windowText
         }
     }
 }

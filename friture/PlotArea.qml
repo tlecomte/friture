@@ -6,6 +6,8 @@ import Friture 1.0
 Item {
     id: scopePlotArea
 
+    SystemPalette { id: systemPalette; colorGroup: SystemPalette.Active }
+
     required property Axis vertical_axis
     required property Axis horizontal_axis
 
@@ -32,7 +34,7 @@ Item {
     Rectangle {
         id: plotBorder
         anchors.fill: parent
-        border.color: "gray"
+        border.color: systemPalette.mid
         border.width: 1
         color: "transparent"
     }
@@ -55,7 +57,7 @@ Item {
             y: Math.max(crosshair.posY - mouseText.contentHeight - 4, 0)
             implicitWidth: mouseText.contentWidth
             implicitHeight: mouseText.contentHeight
-            color: "white"
+            color: systemPalette.base
 
             Text {
                 id: mouseText
@@ -64,13 +66,14 @@ Item {
                 property double dataY: scopePlotArea.vertical_axis.coordinate_transform.toPlot(1. - crosshair.relativePosY)
 
                 text: scopePlotArea.horizontal_axis.formatTracker(dataX)  + ", " + scopePlotArea.vertical_axis.formatTracker(dataY)
+                color: systemPalette.windowText
             }
         }
 
         Shape {
             ShapePath {
                 strokeWidth: 1
-                strokeColor: "lightgray"
+                strokeColor: systemPalette.windowText
                 fillColor: "transparent"
                 PathMove { x: crosshair.posX; y: 0 }
                 PathLine { x: crosshair.posX; y: scopePlotArea.height }

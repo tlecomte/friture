@@ -8,8 +8,8 @@ Rectangle {
     id: plot
     anchors.fill: parent
 
-    SystemPalette { id: myPalette; colorGroup: SystemPalette.Active }
-    color: myPalette.window
+    SystemPalette { id: systemPalette; colorGroup: SystemPalette.Active }
+    color: systemPalette.window
 
     required property ScopeData scopedata
     default property alias content: plotItemPlaceholder.children
@@ -43,6 +43,7 @@ Rectangle {
                 transformOrigin: Item.Center
                 rotation: -90
                 anchors.centerIn: parent
+                color: systemPalette.windowText
             }
         }
 
@@ -104,6 +105,7 @@ Rectangle {
             text: scopedata.horizontal_axis.name
             horizontalAlignment: Text.AlignHCenter
             Layout.fillWidth: true
+            color: systemPalette.windowText
         }
     }
 }
