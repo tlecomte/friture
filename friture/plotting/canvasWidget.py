@@ -124,10 +124,10 @@ class CanvasWidget(QtWidgets.QWidget):
 
             # draw a white background
             painter.setPen(QtCore.Qt.NoPen)
-            painter.setBrush(QtCore.Qt.white)
+            painter.setBrush(self.palette().color(QtGui.QPalette.Base))
             painter.drawRect(rect)
 
-            painter.setPen(QtCore.Qt.black)
+            painter.setPen(self.palette().color(QtGui.QPalette.WindowText))
             painter.drawText(rect, QtCore.Qt.AlignLeft, text)
 
     def drawBackground(self, painter):
@@ -153,7 +153,7 @@ class CanvasWidget(QtWidgets.QWidget):
         if self.ruler:
             w = self.width()
             h = self.height()
-            painter.setPen(QtGui.QPen(QtGui.QColor(QtCore.Qt.black)))
+            painter.setPen(QtGui.QPen(QtGui.QColor(QtCore.Qt.white)))
             painter.drawLine(self.mousex, 0, self.mousex, h)
             painter.drawLine(0, self.mousey, w, self.mousey)
 

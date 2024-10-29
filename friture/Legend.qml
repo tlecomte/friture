@@ -4,6 +4,8 @@ import Friture 1.0
 import "plotItemColors.js" as PlotItemColors
 
 Item {
+    SystemPalette { id: systemPalette; colorGroup: SystemPalette.Active }
+
     required property ScopeData scopedata
 
     implicitWidth: childrenRect.width
@@ -31,6 +33,7 @@ Item {
                 Text {
                     id: curve1legend
                     text: modelData.name
+                    color: systemPalette.windowText
                 }
             }
         }

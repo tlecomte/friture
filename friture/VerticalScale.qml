@@ -7,6 +7,8 @@ import Friture 1.0
 Item {
     id: yscaleColumn
 
+    SystemPalette { id: systemPalette; colorGroup: SystemPalette.Active }
+
     required property ScaleDivision scale_division
 
     readonly property int majorTickLength: 8
@@ -38,7 +40,7 @@ Item {
 
         ShapePath {
             strokeWidth: 1
-            strokeColor: "black"
+            strokeColor: systemPalette.windowText
             fillColor: "transparent"
 
             PathMove { x: 0; y: 0 }
@@ -61,7 +63,7 @@ Item {
 
                 ShapePath {
                     strokeWidth: 1
-                    strokeColor: "black"
+                    strokeColor: systemPalette.windowText
                     fillColor: "transparent"
 
                     PathMove { x: 0; y: 0 }
@@ -89,6 +91,7 @@ Item {
                     anchors.right: parent.right
                     verticalAlignment: Text.AlignVCenter
                     horizontalAlignment: Text.AlignRight
+                    color: systemPalette.windowText
                 }
             }
         }
@@ -107,7 +110,7 @@ Item {
 
                 ShapePath {
                     strokeWidth: 1
-                    strokeColor: "black"
+                    strokeColor: systemPalette.windowText
                     fillColor: "transparent"
 
                     PathMove { x: 0; y: 0 }

@@ -4,8 +4,8 @@ import QtQuick.Layouts 1.15
 import Friture 1.0
 
 Rectangle {
-    SystemPalette { id: myPalette; colorGroup: SystemPalette.Active }
-    color: myPalette.window
+    SystemPalette { id: systemPalette; colorGroup: SystemPalette.Active }
+    color: systemPalette.window
 
     required property LevelViewModel level_view_model
 

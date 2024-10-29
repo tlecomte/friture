@@ -5,8 +5,10 @@ import QtQuick.Shapes 1.15
 Rectangle {
     id: background
 
+    SystemPalette { id: systemPalette; colorGroup: SystemPalette.Active }
+
     gradient: Gradient {
-        GradientStop { position: 0.0; color: "#E0E0E0" }
-        GradientStop { position: 0.5; color: "white" }
+        GradientStop { position: -0.5; color: systemPalette.window }
+        GradientStop { position: 0.5; color: systemPalette.base }
     }
 }

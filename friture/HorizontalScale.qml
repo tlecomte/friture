@@ -7,6 +7,8 @@ import Friture 1.0
 Item {
     id: xscaleColumn
 
+    SystemPalette { id: systemPalette; colorGroup: SystemPalette.Active }
+
     implicitHeight: childrenRect.height
 
     required property ScaleDivision scale_division
@@ -39,7 +41,7 @@ Item {
 
         ShapePath {
             strokeWidth: 1
-            strokeColor: "black"
+            strokeColor: systemPalette.windowText
             fillColor: "transparent"
 
             PathMove { x: 0; y: 0 }
@@ -59,7 +61,7 @@ Item {
             Shape {
                 ShapePath {
                     strokeWidth: 1
-                    strokeColor: "black"
+                    strokeColor: systemPalette.windowText
                     fillColor: "transparent"
 
                     PathMove { x: 0; y: 0 }
@@ -74,6 +76,7 @@ Item {
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignTop
                 y: majorTickLength + 1
+                color: systemPalette.windowText
             }
         }
     }
@@ -89,7 +92,7 @@ Item {
             Shape {
                 ShapePath {
                     strokeWidth: 1
-                    strokeColor: "black"
+                    strokeColor: systemPalette.windowText
                     fillColor: "transparent"
 
                     PathMove { x: 0; y: 0 }

@@ -6,6 +6,7 @@ import "iec.js" as IECFunctions
 Item {
     id: meterScale
     implicitWidth: 16
+    SystemPalette { id: systemPalette; colorGroup: SystemPalette.Active }
 
     required property int topOffset
     required property bool twoChannels
@@ -35,7 +36,7 @@ Item {
             Shape {
                 ShapePath {
                     strokeWidth: 1
-                    strokeColor: "black"
+                    strokeColor: systemPalette.windowText
                     startX: 0
                     startY: 0
                     PathLine { x: 2; y: 0 }
@@ -51,6 +52,7 @@ Item {
                 height: 10
                 verticalAlignment: Text.AlignVCenter
                 horizontalAlignment: Text.AlignHCenter
+                color: systemPalette.windowText
             }
 
             Shape {
@@ -58,7 +60,7 @@ Item {
 
                 ShapePath {
                     strokeWidth: 1
-                    strokeColor: "black"
+                    strokeColor: systemPalette.windowText
                     startX: 14
                     startY: 0
                     PathLine { x: 16; y: 0 }

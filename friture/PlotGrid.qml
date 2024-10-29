@@ -6,8 +6,10 @@ import Friture 1.0
 Item {
     id: plotGrid
 
+    SystemPalette { id: systemPalette; colorGroup: SystemPalette.Active }
+
     property double lineWidth: 1
-    property color lineColor: "lightgray"
+    property color lineColor: systemPalette.button
 
     required property ScaleDivision vertical_scale_division
     property bool show_minor_vertical: false

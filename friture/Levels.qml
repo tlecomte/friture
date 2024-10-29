@@ -5,8 +5,8 @@ import Friture 1.0
 
 Rectangle {
     id: levels
-    SystemPalette { id: myPalette; colorGroup: SystemPalette.Active }
-    color: myPalette.window
+    SystemPalette { id: systemPalette; colorGroup: SystemPalette.Active }
+    color: systemPalette.window
 
     property var stateId
     property LevelViewModel level_view_model: Store.dock_states[stateId]  
@@ -41,6 +41,7 @@ Rectangle {
             verticalAlignment: Text.AlignBottom
             horizontalAlignment: Text.AlignRight
             Layout.alignment: Qt.AlignBottom | Qt.AlignRight
+            color: systemPalette.windowText
         }
 
         Text {
@@ -50,6 +51,7 @@ Rectangle {
             verticalAlignment: Text.AlignTop
             horizontalAlignment: Text.AlignRight
             Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
+            color: systemPalette.windowText
         }
 
         Text {
@@ -61,6 +63,7 @@ Rectangle {
             verticalAlignment: Text.AlignBottom
             horizontalAlignment: Text.AlignRight
             Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
+            color: systemPalette.windowText
         }
 
         Text {
@@ -70,6 +73,7 @@ Rectangle {
             verticalAlignment: Text.AlignTop
             horizontalAlignment: Text.AlignRight
             Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
+            color: systemPalette.windowText
         }
 
         LevelsMeter {

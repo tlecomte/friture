@@ -9,6 +9,8 @@ Item {
     id: container
     property var stateId
 
+    SystemPalette { id: systemPalette; colorGroup: SystemPalette.Active }
+
     // delay the load of the Plot until stateId has been set
     Loader {
         id: loader
@@ -61,7 +63,7 @@ Item {
                             rotation: 270
                             transformOrigin: Item.Center
                             anchors.centerIn: parent
-                            color: modelData.y * parent.parent.height + 4 > parent.parent.height - barLabel.width - 4 ? "black" : "white"
+                            color: modelData.y * parent.parent.height + 4 > parent.parent.height - barLabel.width - 4 ? systemPalette.windowText : systemPalette.base
                         }
                     }               
                 }
