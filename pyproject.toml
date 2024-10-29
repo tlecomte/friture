@@ -59,6 +59,7 @@ Issues = "https://github.com/tlecomte/friture/issues"
 [tool.setuptools]
 packages=[
     "friture",
+    "friture.playback",
     "friture.plotting",
     "friture.generators",
     "friture.signal",
