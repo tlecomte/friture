@@ -48,12 +48,15 @@ from friture.levels import Levels_Widget
 from friture.store import GetStore, Store
 from friture.scope_data import Scope_Data
 from friture.axis import Axis
+from friture.colorBar import ColorBar
 from friture.curve import Curve
 from friture.playback.control import PlaybackControlWidget
 from friture.playback.player import Player
 from friture.plotCurve import PlotCurve
 from friture.plotting.coordinateTransform import CoordinateTransform
 from friture.plotting.scaleDivision import ScaleDivision, Tick
+from friture.spectrogram_item import SpectrogramItem
+from friture.spectrogram_item_data import SpectrogramImageData
 from friture.spectrum_data import Spectrum_Data
 from friture.plotFilledCurve import PlotFilledCurve
 from friture.filled_curve import FilledCurve
@@ -102,6 +105,9 @@ class Friture(QMainWindow, ):
         qmlRegisterType(FilledCurve, 'Friture', 1, 0, 'FilledCurve')
         qmlRegisterType(PlotCurve, 'Friture', 1, 0, 'PlotCurve')
         qmlRegisterType(PlotFilledCurve, 'Friture', 1, 0, 'PlotFilledCurve')
+        qmlRegisterType(SpectrogramItem, 'Friture', 1, 0, 'SpectrogramItem')
+        qmlRegisterType(SpectrogramImageData, 'Friture', 1, 0, 'SpectrogramImageData')
+        qmlRegisterType(ColorBar, 'Friture', 1, 0, 'ColorBar')
         qmlRegisterType(Tick, 'Friture', 1, 0, 'Tick')
         qmlRegisterSingletonType(Store, 'Friture', 1, 0, 'Store', lambda engine, script_engine: GetStore())
 

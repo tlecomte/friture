@@ -90,6 +90,36 @@ Rectangle {
             scopedata: plot.scopedata
         }
 
+        ColorScale {
+            id: colorScale
+            Layout.row: 1
+            Layout.column: 5
+            Layout.fillHeight: true
+            visible: scopedata.show_color_axis
+
+            scale_division: scopedata.color_axis.scale_division
+        }
+
+        Item {
+            Layout.row: 1
+            Layout.column: 6
+            visible: scopedata.show_color_axis
+
+            // width vs. height: childrenRect doesn't take transformations into account.
+            // https://bugreports.qt-project.org/browse/QTBUG-38953
+            implicitWidth: colorAxisLabel.height
+            implicitHeight: colorAxisLabel.width
+
+            Text {
+                id: colorAxisLabel
+                text: scopedata.color_axis.name
+                transformOrigin: Item.Center
+                rotation: 90
+                anchors.centerIn: parent
+                color: systemPalette.windowText
+            }
+        }
+
         HorizontalScale {
             id: horizontalScale
             Layout.row: 2

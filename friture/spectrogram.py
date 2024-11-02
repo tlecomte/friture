@@ -20,9 +20,14 @@
 """Spectrogram widget, that displays a rolling 2D image of the time-frequency spectrum."""
 
 from PyQt5 import QtWidgets
-from numpy import log10, floor, zeros, float64, tile, array
+from numpy import log10, floor, zeros, float64, tile, array, ndarray
+from friture.audiobuffer import AudioBuffer
 from friture.imageplot import ImagePlot
-from friture.audioproc import audioproc  # audio processing class
+from friture.audioproc import audioproc
+from friture.signal.color_tranform import Color_Transform
+from friture.signal.frequency_resampler import Frequency_Resampler
+from friture.signal.online_linear_2D_resampler import Online_Linear_2D_resampler
+from friture.signal.transform_pipeline import Transform_Pipeline  # audio processing class
 from friture.spectrogram_settings import (Spectrogram_Settings_Dialog,  # settings dialog
                                           DEFAULT_FFT_SIZE,
                                           DEFAULT_FREQ_SCALE,
@@ -40,13 +45,13 @@ from fractions import Fraction
 
 class Spectrogram_Widget(QtWidgets.QWidget):
 
-    def __init__(self, parent):
+    def __init__(self, parent, engine):
         super().__init__(parent)
 
         self.setObjectName("Spectrogram_Widget")
         self.gridLayout = QtWidgets.QGridLayout(self)
         self.gridLayout.setObjectName("gridLayout")
-        self.PlotZoneImage = ImagePlot(self)
+        self.PlotZoneImage = ImagePlot(self, engine)
         self.PlotZoneImage.setObjectName("PlotZoneImage")
         self.gridLayout.addWidget(self.PlotZoneImage, 0, 1, 1, 1)
 
@@ -54,6 +59,20 @@ class Spectrogram_Widget(QtWidgets.QWidget):
 
         # initialize the class instance that will do the fft
         self.proc = audioproc()
+
+        self.frequency_resampler = Frequency_Resampler()
+        self.screen_resampler = Online_Linear_2D_resampler()
+        self.color_transform = Color_Transform()
+
+        self.audio_pipeline = Transform_Pipeline(
+            [
+                self.frequency_resampler,
+                self.screen_resampler,
+                self.color_transform,
+            ]
+        )
+
+        self.sfft_rate_frac = Fraction(1, 1)
 
         self.maxfreq = DEFAULT_MAXFREQ
         self.proc.set_maxfreq(self.maxfreq)
@@ -66,36 +85,33 @@ class Spectrogram_Widget(QtWidgets.QWidget):
 
         self.update_weighting()
         self.freq = self.proc.get_freq_scale()
+        self.frequency_resampler.setfreq(self.freq)
+
+        self.setfreqscale(fscales.Mel) # matches DEFAULT_FREQ_SCALE = 2 # Mel
+        self.frequency_resampler.setfreqrange(self.minfreq, self.maxfreq)
 
         self.timerange_s = DEFAULT_TIMERANGE
-        self.canvas_width = 100.
 
         self.old_index = 0
         self.overlap = 3. / 4.
         self.overlap_frac = Fraction(3, 4)
         self.dT_s = self.fft_size * (1. - self.overlap) / float(SAMPLING_RATE)
 
-        self.PlotZoneImage.setfreqscale(fscales.Mel) # matches DEFAULT_FREQ_SCALE = 2 # Mel
         self.PlotZoneImage.setfreqrange(self.minfreq, self.maxfreq)
         self.PlotZoneImage.setspecrange(self.spec_min, self.spec_max)
         self.PlotZoneImage.setweighting(self.weighting)
         self.PlotZoneImage.settimerange(self.timerange_s, self.dT_s)
         self.update_jitter()
 
-        sfft_rate_frac = Fraction(SAMPLING_RATE, self.fft_size) / (Fraction(1) - self.overlap_frac) / 1000
-        self.PlotZoneImage.set_sfft_rate(sfft_rate_frac)
+        self.sfft_rate_frac = Fraction(SAMPLING_RATE, self.fft_size) / (Fraction(1) - self.overlap_frac) / 1000
 
         # initialize the settings dialog
         self.settings_dialog = Spectrogram_Settings_Dialog(self)
 
-        AudioBackend().underflow.connect(self.PlotZoneImage.plotImage.canvasscaledspectrogram.syncOffsets)
-
-        self.last_data_time = 0.
-
         self.mustRestart = False
 
     # method
-    def set_buffer(self, buffer):
+    def set_buffer(self, buffer: AudioBuffer) -> None:
         self.audiobuffer = buffer
         self.old_index = self.audiobuffer.ringbuffer.offset
 
@@ -111,10 +127,9 @@ class Spectrogram_Widget(QtWidgets.QWidget):
     def scale_spectrogram(self, sp):
         return (sp - self.spec_min) / (self.spec_max - self.spec_min)
 
-    def handle_new_data(self, floatdata):
+    def handle_new_data(self, floatdata: ndarray) -> None:
         # we need to maintain an index of where we are in the buffer
         index = self.audiobuffer.ringbuffer.offset
-        self.last_data_time = self.audiobuffer.lastDataTime
 
         available = index - self.old_index
 
@@ -132,6 +147,7 @@ class Spectrogram_Widget(QtWidgets.QWidget):
 
             for i in range(realizable):
                 floatdata = self.audiobuffer.data_indexed(self.old_index, self.fft_size)
+                data_time = self.audiobuffer.data_time(self.old_index)
 
                 # for now, take the first channel only
                 floatdata = floatdata[0, :]
@@ -143,7 +159,17 @@ class Spectrogram_Widget(QtWidgets.QWidget):
 
             w = tile(self.w, (1, realizable))
             norm_spectrogram = self.scale_spectrogram(self.log_spectrogram(spn) + w)
-            self.PlotZoneImage.addData(self.freq, norm_spectrogram, self.last_data_time)
+
+            self.screen_resampler.set_height(self.PlotZoneImage.spectrogram_screen_height())
+            screen_rate_frac = Fraction(self.PlotZoneImage.spectrogram_screen_width(), int(self.timerange_s * 1000))
+            self.screen_resampler.set_ratio(self.sfft_rate_frac, screen_rate_frac)
+            self.frequency_resampler.setnsamples(self.PlotZoneImage.spectrogram_screen_height())
+
+            data = self.audio_pipeline.push(norm_spectrogram)
+
+            # ideally we would use the time of the last frame that is really consumed by the FFT processor.
+            # it may not be the current time if we don't have enough to compute a FFT window
+            self.PlotZoneImage.push(data, data_time)
 
             if self.mustRestart:
                 self.PlotZoneImage.restart()
@@ -166,9 +192,8 @@ class Spectrogram_Widget(QtWidgets.QWidget):
     def update_jitter(self):
         audio_jitter = 2 * float(FRAMES_PER_BUFFER) / SAMPLING_RATE
         analysis_jitter = self.fft_size * (1. - self.overlap) / SAMPLING_RATE
-        canvas_jitter = audio_jitter + analysis_jitter
-        # print audio_jitter, analysis_jitter, canvas_jitter
-        self.PlotZoneImage.plotImage.set_jitter(canvas_jitter)
+        total_jitter = audio_jitter + analysis_jitter
+        self.PlotZoneImage.set_jitter(total_jitter)
 
     def pause(self):
         self.PlotZoneImage.pause()
@@ -180,13 +205,20 @@ class Spectrogram_Widget(QtWidgets.QWidget):
     def setminfreq(self, freq):
         self.minfreq = freq
         self.PlotZoneImage.setfreqrange(self.minfreq, self.maxfreq)
+        self.frequency_resampler.setfreqrange(self.minfreq, self.maxfreq)
 
     def setmaxfreq(self, freq):
         self.maxfreq = freq
         self.PlotZoneImage.setfreqrange(self.minfreq, self.maxfreq)
+        self.frequency_resampler.setfreqrange(self.minfreq, self.maxfreq)
         self.proc.set_maxfreq(freq)
         self.update_weighting()
         self.freq = self.proc.get_freq_scale()
+        self.frequency_resampler.setfreq(self.freq)
+    
+    def setfreqscale(self, freqscale):
+        self.PlotZoneImage.setfreqscale(freqscale)
+        self.frequency_resampler.setfreqscale(freqscale)
 
     def setfftsize(self, fft_size):
         self.fft_size = fft_size
@@ -194,12 +226,12 @@ class Spectrogram_Widget(QtWidgets.QWidget):
         self.proc.set_fftsize(fft_size)
         self.update_weighting()
         self.freq = self.proc.get_freq_scale()
+        self.frequency_resampler.setfreq(self.freq)
 
         self.dT_s = self.fft_size * (1. - self.overlap) / float(SAMPLING_RATE)
         self.PlotZoneImage.settimerange(self.timerange_s, self.dT_s)
 
-        sfft_rate_frac = Fraction(SAMPLING_RATE, self.fft_size) / (Fraction(1) - self.overlap_frac) / 1000
-        self.PlotZoneImage.set_sfft_rate(sfft_rate_frac)
+        self.sfft_rate_frac = Fraction(SAMPLING_RATE, self.fft_size) / (Fraction(1) - self.overlap_frac) / 1000
 
         self.update_jitter()
 
@@ -241,7 +273,3 @@ class Spectrogram_Widget(QtWidgets.QWidget):
     def timerangechanged(self, value):
         self.timerange_s = value
         self.PlotZoneImage.settimerange(self.timerange_s, self.dT_s)
-
-    # slot
-    def canvasWidthChanged(self, width):
-        self.canvas_width = width

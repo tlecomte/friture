@@ -21,7 +21,8 @@
 
 import logging
 
-from numpy import zeros
+from numpy import zeros, ndarray
+from friture.audiobackend import SAMPLING_RATE
 
 
 class RingBuffer():
@@ -33,8 +34,9 @@ class RingBuffer():
         self.buffer_length = 10000
         self.buffer = zeros((1, 2 * self.buffer_length))
         self.offset = 0
+        self.offset_time = 0
 
-    def push(self, floatdata):
+    def push(self, floatdata: ndarray, input_time: float) -> None:
         # update the circular buffer
 
         dim = floatdata.shape[0]
@@ -56,6 +58,7 @@ class RingBuffer():
         self.buffer[:, :folded] = floatdata[:, direct:]
 
         self.offset += l
+        self.offset_time = input_time
 
     def data(self, length):
         self.grow_if_needed(length)
@@ -94,6 +97,10 @@ class RingBuffer():
             raise ArithmeticError("Stop index is larger than buffer size: %d > %d" % (stop0, 2 * self.buffer_length))
 
         return self.buffer[:, start0: stop0]
+
+    def data_time(self, start: int) -> float:
+        """The stream time in seconds at the position defined by 'start'."""
+        return self.offset_time + (start - self.offset) / SAMPLING_RATE
 
     def grow_if_needed(self, length):
         if length > self.buffer_length:

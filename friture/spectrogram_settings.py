@@ -142,7 +142,7 @@ class Spectrogram_Settings_Dialog(QtWidgets.QDialog):
     # slot
     def freqscalechanged(self, index):
         self.logger.info("freq_scale slot %d %s", index, fscales.ALL[index])
-        self.parent().PlotZoneImage.setfreqscale(fscales.ALL[index])
+        self.parent().setfreqscale(fscales.ALL[index])
         
     # method
     def saveState(self, settings):

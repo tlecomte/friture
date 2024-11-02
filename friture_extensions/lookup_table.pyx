@@ -35,3 +35,18 @@ def pyx_color_from_float_2D(np.ndarray[np.uint32_t, ndim=1] lut not None,
             out[i, j] = lut[k]
     
     return out
+
+def pyx_rgb_from_float_2D(np.ndarray[np.uint32_t, ndim=2] lut not None,
+                          np.ndarray[np.float64_t, ndim=2] values not None):
+    cdef np.intp_t i, j, k
+    cdef Py_ssize_t M = values.shape[0]
+    cdef Py_ssize_t N = values.shape[1]
+    cdef np.ndarray[np.uint32_t, ndim=3] out = np.zeros([M, N, 3], dtype=np.uint32)
+
+    for i in range(M):
+        for j in range(N):
+            l = (int)(values[i, j]*255)
+            for k in range(3):
+                out[i, j, k] = lut[l, k]
+    
+    return out

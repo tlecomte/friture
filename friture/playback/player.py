@@ -92,7 +92,7 @@ class Player(QObject):
     def handle_new_data(self, data: np.ndarray) -> None:
         # this will zero out history if channel count changes, not ideal but
         # probably doesn't matter
-        self.buffer.push(data)
+        self.buffer.push(data, 0)
         new_len = min(
             self.recorded_len + data.shape[1], self.history_samples)
         if new_len != self.recorded_len:
