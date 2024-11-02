@@ -38,10 +38,28 @@ echo $ARTIFACT_FILENAME
 
 # macos has random hdiutil errors because of XProtectBehaviorService, retry a few times.
 # Reference: https://github.com/actions/runner-images/issues/7522#issuecomment-1556766641
-for t in $(seq 1 20); do
-  sleep 5
-  hdiutil create $ARTIFACT_FILENAME -volname "Friture" -fs HFS+ -srcfolder dist/friture.app
-  break
+max_retries=5
+retry_delay_seconds=5
+
+for ((i=1; i<=max_retries; i++)); do
+    set +e  # Disable 'exit on error'
+    hdiutil create $ARTIFACT_FILENAME -volname "Friture" -fs HFS+ -srcfolder dist/friture.app
+    status=$?
+    set -e  # Re-enable 'exit on error'
+
+    if [ $status -eq 0 ]; then
+        echo "hdiutil create succeeded on attempt $i"
+        break
+    else
+        echo "hdiutil create failed on attempt $i"
+        if [ $i -lt $max_retries ]; then
+            echo "Retrying in $retry_delay_seconds seconds..."
+            sleep $retry_delay_seconds
+        else
+            echo "All attempts failed."
+            exit 1
+        fi
+    fi
 done
 
 du -hs dist/friture.app
