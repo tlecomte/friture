@@ -35,6 +35,14 @@ codesign -dv dist/friture.app
 # prepare a dmg out of friture.app
 export ARTIFACT_FILENAME=friture-$(python3 -c 'import friture; print(friture.__version__)')-$(date +'%Y%m%d').dmg
 echo $ARTIFACT_FILENAME
-hdiutil create $ARTIFACT_FILENAME -volname "Friture" -fs HFS+ -srcfolder dist/friture.app
+
+# macos has random hdiutil errors because of XProtectBehaviorService, retry a few times.
+# Reference: https://github.com/actions/runner-images/issues/7522#issuecomment-1556766641
+for t in $(seq 1 20); do
+  sleep 5s
+  hdiutil create $ARTIFACT_FILENAME -volname "Friture" -fs HFS+ -srcfolder dist/friture.app
+  break
+done
+
 du -hs dist/friture.app
 du -hs $ARTIFACT_FILENAME
