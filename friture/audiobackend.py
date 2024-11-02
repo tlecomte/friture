@@ -274,6 +274,8 @@ class __AudioBackend(QtCore.QObject):
             (self.stream, self.ringBuffer, self.action, self.nchannels_max) = self.open_stream(device)
             self.device = device
             self.stream.start()
+            self.stream_start_time = self.stream.time
+            self.stream_read_index = 0
             success = True
         except Exception:
             self.logger.exception("Failed to open input device")
@@ -434,11 +436,29 @@ class __AudioBackend(QtCore.QObject):
         while self.ringBuffer.read_available >= FRAMES_PER_BUFFER:
             read, buf1, buf2 = self.ringBuffer.get_read_buffers(FRAMES_PER_BUFFER)
             assert read == FRAMES_PER_BUFFER
+
+            stream_time = self.get_stream_time()
+
             buffer1 = frombuffer(buf1, dtype='float32')
             buffer2 = frombuffer(buf2, dtype='float32')
             buffer = concatenate((buffer1, buffer2)).astype(float64)
             buffer.shape = -1, self.nchannels_max
             self.ringBuffer.advance_read_index(FRAMES_PER_BUFFER)
+
+            # ideally we would use the exact time of the samples retrieved from the ring buffer,
+            # but rtmixer does not provide it
+            self.stream_read_index += read
+            stream_read_time = self.stream_start_time + self.stream_read_index / SAMPLING_RATE
+
+            # when starting a stream, it seems PortAudio gives us some data that is already in the buffer
+            # so the stream start time is actually older
+            # so we compensate here
+            if stream_read_time > stream_time and self.stream_read_index < 100000:
+                delta_seconds = stream_read_time - stream_time
+                self.stream_start_time -= delta_seconds
+
+            if stream_read_time < stream_time - 100 * FRAMES_PER_BUFFER / SAMPLING_RATE:
+                self.logger.warning("Ringbuffer lagging behind: ringbuffer time = %f, stream time = %f", stream_read_time, stream_time)
 
             channel = self.get_current_first_channel()
             if self.duo_input:
@@ -453,8 +473,6 @@ class __AudioBackend(QtCore.QObject):
                 floatdata = floatdata1
                 floatdata.shape = (1, floatdata.size)
 
-            input_time = self.get_stream_time()
-
             input_overflows = self.action.stats.input_overflows
             input_overflow = input_overflows > self.xruns
             if input_overflow:
@@ -462,7 +480,7 @@ class __AudioBackend(QtCore.QObject):
                 self.logger.info("Stream overflow!")
                 self.underflow.emit()
 
-            self.new_data_available.emit(floatdata, input_time, input_overflow)
+            self.new_data_available.emit(floatdata, stream_read_time, input_overflow)
 
             self.chunk_number += 1
 
@@ -472,8 +490,21 @@ class __AudioBackend(QtCore.QObject):
     def set_duo_input(self):
         self.duo_input = True
 
-    # returns the stream time in seconds
-    def get_stream_time(self):
+    def get_stream_time(self) -> float:
+        """The current stream time in seconds.
+
+        The time values are monotonically increasing and have
+        unspecified origin.
+
+        This provides valid time values for the entire life of the
+        stream, from when the stream is opened until it is closed.
+        Starting and stopping the stream does not affect the passage of
+        time as provided here.
+
+        This time may be used for synchronizing other events to the
+        audio stream.
+        """
+
         if self.stream is None:
             return 0
 
@@ -492,3 +523,5 @@ class __AudioBackend(QtCore.QObject):
     def restart(self):
         if self.stream is not None:
             self.stream.start()
+            self.stream_start_time = self.stream.time
+            self.stream_read_index = 0

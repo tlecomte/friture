@@ -135,8 +135,8 @@ class Delay_Estimator_Widget(QtWidgets.QWidget):
             # push to a 1-second ring buffer
             x0_dec.shape = (1, x0_dec.size)
             x1_dec.shape = (1, x1_dec.size)
-            self.ringbuffer0.push(x0_dec)
-            self.ringbuffer1.push(x1_dec)
+            self.ringbuffer0.push(x0_dec, 0)
+            self.ringbuffer1.push(x1_dec, 0)
 
             # we need to maintain an index of where we are in the buffer
             index = self.ringbuffer0.offset

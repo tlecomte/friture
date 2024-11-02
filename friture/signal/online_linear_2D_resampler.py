@@ -12,6 +12,11 @@ from friture_extensions.linear_interp import pyx_linear_interp_2D
 
 
 class Online_Linear_2D_resampler:
+    """
+    A class to apply a linear resampling along the time axis of a 2D array.
+    The resampling is applied online, as data is pushed.
+    Meant to be used to resample from the source sampling to the screen sampling.
+    """
 
     def __init__(self, interp_factor_L=1, decim_factor_M=1, height=1):
         self.interp_factor_L = interp_factor_L
@@ -24,6 +29,7 @@ class Online_Linear_2D_resampler:
         self.resampled_index = 0.
 
         self.old_data = np.zeros((self.height))
+        self.buffer = None
 
         self.resampled_data = np.zeros((self.height, 1))
 
@@ -52,16 +58,40 @@ class Online_Linear_2D_resampler:
         return int(np.ceil((self.orig_index + m - (self.resampled_index + self.resampling_ratio)) / self.resampling_ratio))
 
     # will return as much resampled data as possible
-    def process(self, data):
-        self.orig_index += 1.
-        n = int(np.ceil((self.orig_index - (self.resampled_index + self.resampling_ratio)) / self.resampling_ratio))
+    def push(self, data):
+        self.set_height(data.shape[0])
 
-        if self.resampled_data.shape[1] < n:
-            self.resampled_data = np.zeros((self.height, n))
+        time_sample_count = data.shape[1]
 
-        self.resampled_index = pyx_linear_interp_2D(self.resampled_data, data, self.old_data, self.orig_index, self.resampled_index, self.resampling_ratio, n)
+        processable_time_sample_count = self.processable(time_sample_count)
 
-        # shift
-        self.old_data = data
+        output_data = np.zeros((self.height, processable_time_sample_count))
+        output_data_index = 0
 
-        return self.resampled_data[:, :n]
+        for j in range(time_sample_count):
+            self.orig_index += 1.
+            n = self.processable(0)
+            if n <= 0:
+                # shift
+                self.old_data = data[:, j]
+                continue
+
+            if self.resampled_data.shape[1] < n:
+                self.resampled_data = np.zeros((self.height, n))
+
+            self.resampled_index = pyx_linear_interp_2D(
+                self.resampled_data,
+                data[:, j],
+                self.old_data,
+                self.orig_index,
+                self.resampled_index,
+                self.resampling_ratio,
+                n)
+            
+            # shift
+            self.old_data = data[:, j]
+
+            output_data[:, output_data_index:output_data_index+n] = self.resampled_data[:, :n]
+            output_data_index += n
+
+        return output_data

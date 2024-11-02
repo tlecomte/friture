@@ -275,7 +275,7 @@ class PitchTracker:
 
     def update(self) -> bool:
         new = [self.estimate_pitch(f) for f in self.new_frames()]
-        self.out_buf.push(np.array([new]))
+        self.out_buf.push(np.array([new]), 0)
         self.out_offset = self.out_buf.offset
         return len(new) != 0
 

@@ -48,9 +48,13 @@ class AudioBuffer(QtCore.QObject):
 
     def data_indexed(self, start, length):
         return self.ringbuffer.data_indexed(start, length)
+    
+    def data_time(self, start: int) -> float:
+        """The stream time in seconds at the position defined by 'start'."""
+        return self.ringbuffer.data_time(start)
 
-    def handle_new_data(self, floatdata, input_time, status):
-        self.ringbuffer.push(floatdata)
+    def handle_new_data(self, floatdata: np.ndarray, input_time: float, status) -> None:
+        self.ringbuffer.push(floatdata, input_time)
         self.set_newdata(floatdata.shape[1])
         self.new_data_available.emit(floatdata)
         self.lastDataTime = input_time

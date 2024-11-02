@@ -25,6 +25,7 @@ from friture.axis import Axis
 from friture.curve import Curve
 
 class Scope_Data(QtCore.QObject):
+    show_color_axis_changed = QtCore.pyqtSignal(bool)
     show_legend_changed = QtCore.pyqtSignal(bool)
     plot_items_changed = QtCore.pyqtSignal()
 
@@ -34,6 +35,8 @@ class Scope_Data(QtCore.QObject):
         self._plot_items = []
         self._horizontal_axis = Axis(self)
         self._vertical_axis = Axis(self)
+        self._color_axis = Axis(self)
+        self._show_color_axis = False
         self._show_legend = True
 
     @pyqtProperty(QQmlListProperty, notify=plot_items_changed) # type: ignore
@@ -61,6 +64,20 @@ class Scope_Data(QtCore.QObject):
     def vertical_axis(self):
         return self._vertical_axis
 
+    @pyqtProperty(Axis, constant=True)
+    def color_axis(self):
+        return self._color_axis
+    
+    @pyqtProperty(bool, notify=show_color_axis_changed)
+    def show_color_axis(self):
+        return self._show_color_axis
+    
+    @show_color_axis.setter
+    def show_color_axis(self, show_color_axis):
+        if self._show_color_axis != show_color_axis:
+            self._show_color_axis = show_color_axis
+            self.show_color_axis_changed.emit(show_color_axis)
+    
     @pyqtProperty(bool, notify=show_legend_changed) # type: ignore
     def show_legend(self):
         return self._show_legend

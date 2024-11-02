@@ -200,7 +200,7 @@ class LongLevelWidget(QtWidgets.QWidget):
                 l = np.array([self.level_rms])
                 l.shape = (1, 1)
 
-                self.ringbuffer.push(l)
+                self.ringbuffer.push(l, 0)
 
                 self.old_index += needed
 
