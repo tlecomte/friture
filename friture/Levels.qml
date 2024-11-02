@@ -18,7 +18,7 @@ Rectangle {
     // but do not bind directly to their widths
     // to avoid frequent costly resizes
     //due to level changes or variations in the width of the font characters
-    implicitWidth: 2 + fontMetrics.boundingRect(level_view_model.two_channels ? "2: -88.8" : "-88:8").width
+    implicitWidth: 4 + fontMetrics.boundingRect(level_view_model.two_channels ? "2: -88.8" : "-88:8").width
 
     FontMetrics {
         id: fontMetrics
@@ -34,8 +34,8 @@ Rectangle {
 
         Text {
             id: peakValues
-            textFormat: Text.PlainText
-            text: level_view_model.two_channels ? "1: " + level_to_text(level_view_model.level_data_slow.level_max) + "\n2: " + level_to_text(level_view_model.level_data_slow_2.level_max) : level_to_text(level_view_model.level_data_slow.level_max)
+            textFormat: Text.MarkdownText
+            text: level_view_model.two_channels ? "1: " + level_to_text(level_view_model.level_data_slow.level_max) + "<br />2: " + level_to_text(level_view_model.level_data_slow_2.level_max) : level_to_text(level_view_model.level_data_slow.level_max)
             font.pointSize: 14
             font.bold: true
             verticalAlignment: Text.AlignBottom
@@ -56,8 +56,8 @@ Rectangle {
 
         Text {
             id: rmsValues
-            textFormat: Text.PlainText
-            text: level_view_model.two_channels ? "1: " + level_to_text(level_view_model.level_data_slow.level_rms) + "\n2: " + level_to_text(level_view_model.level_data_slow_2.level_rms) : level_to_text(level_view_model.level_data_slow.level_rms)
+            textFormat: Text.MarkdownText
+            text: level_view_model.two_channels ? "1: " + level_to_text(level_view_model.level_data_slow.level_rms) + "<br />2: " + level_to_text(level_view_model.level_data_slow_2.level_rms) : level_to_text(level_view_model.level_data_slow.level_rms)
             font.pointSize: 14
             font.bold: true
             verticalAlignment: Text.AlignBottom
@@ -85,9 +85,9 @@ Rectangle {
 
     function level_to_text(dB) {
         if (dB < -150.) {
-            return "-Inf";
+            return "`-Inf`";
         }
 
-        return dB.toFixed(1);
+        return "`" + dB.toFixed(1) + "`";
     }
 }
