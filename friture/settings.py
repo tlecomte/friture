@@ -24,6 +24,7 @@ from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtCore import pyqtSignal, pyqtProperty
 from friture.audiobackend import AudioBackend
 from friture.ui_settings import Ui_Settings_Dialog
+import csv
 
 no_input_device_title = "No audio input device found"
 
@@ -81,6 +82,9 @@ class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
         self.radioButton_duo.toggled.connect(self.duo_input_type_selected)
         self.checkbox_showPlayback.stateChanged.connect(self.show_playback_checkbox_changed)
         self.spinBox_historyLength.editingFinished.connect(self.history_length_edit_finished)
+
+        self.fileBox_compensation.clicked.connect(self.browse_compensation_file)
+        self.clearButton.clicked.connect(self.compensation_file_cleared)
 
     @pyqtProperty(bool, notify=show_playback_changed) # type: ignore
     def show_playback(self) -> bool:
@@ -178,6 +182,37 @@ class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
     # slot
     def history_length_edit_finished(self) -> None:
         self.history_length_changed.emit(self.spinBox_historyLength.value())
+    
+    def browse_compensation_file(self):
+        file_name = QtWidgets.QFileDialog.getOpenFileName(self, "Open compensation file", "", "Compensation files (*.*)")[0]
+        self.fileBox_compensation.setText(file_name)
+        self.load_compensation_file()
+    
+    def load_compensation_file(self):
+        file_name = self.fileBox_compensation.text()
+        if file_name:
+            try:
+                with open(file_name, newline='') as csvfile:
+                    csvreader = csv.reader(csvfile)
+                    self.parent().original_calibration = []
+                    self.parent().original_calibration_freqs = []
+                    for row in csvreader:
+                        if row[0][0].isdigit():
+                            dict = row[0].split()
+                            self.parent().original_calibration.append(float(dict[1]))
+                            self.parent().original_calibration_freqs.append(float(dict[0]))
+                    
+            except Exception as e:
+                self.logger.error(f"Failed to load compensation file: {e}")
+        else:
+            self.parent().original_calibration = [0, 0]
+            self.parent().original_calibration_freqs = [0, 20000]
+        
+        self.parent().recalculate_calibration()
+    
+    def compensation_file_cleared(self):
+        self.fileBox_compensation.setText("")
+        self.load_compensation_file()
 
     # method
     def saveState(self, settings):
@@ -189,6 +224,7 @@ class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
         settings.setValue("duoInput", self.inputTypeButtonGroup.checkedId())
         settings.setValue("showPlayback", self.checkbox_showPlayback.checkState())
         settings.setValue("historyLength", self.spinBox_historyLength.value())
+        settings.setValue("compensationFile", self.fileBox_compensation.text())
 
     # method
     def restoreState(self, settings):
@@ -196,6 +232,9 @@ class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
         device_index = self.comboBox_inputDevice.findText(device_name)
         # change the device only if it exists in the device list
         if device_index >= 0:
+            compensation_file = settings.value("compensationFile", "")
+            self.fileBox_compensation.setText(compensation_file)
+            self.load_compensation_file()
             self.comboBox_inputDevice.setCurrentIndex(device_index)
             channel = settings.value("firstChannel", 0, type=int)
             self.comboBox_firstChannel.setCurrentIndex(channel)

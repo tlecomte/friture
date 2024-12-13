@@ -19,14 +19,15 @@
 
 import logging
 
-from numpy import linspace, log10, cos, arange, pi
+from numpy import linspace, log10, cos, arange, pi, interp
 from numpy.fft import rfft
 from friture.audiobackend import SAMPLING_RATE
 
 
 class audioproc():
 
-    def __init__(self):
+    def __init__(self, parent):
+        self.parent_widget = parent
         self.logger = logging.getLogger(__name__)
 
         self.freq = linspace(0, SAMPLING_RATE / 2, 10)
@@ -38,6 +39,10 @@ class audioproc():
         self.size_sq = 1.
 
         self.fft_size = 10
+
+        self.calibration = [0 for i in self.freq]
+
+        self.recalculate_calibration()
 
     def analyzelive(self, samples):
         # FFT for a linear transformation in frequency scale
@@ -94,6 +99,17 @@ class audioproc():
             self.C = 0.06 + 20. * log10(Rc + eps)
             self.B = 0.17 + 20. * log10(Rb + eps)
             self.A = 2.0 + 20. * log10(Ra + eps)
+
+            self.recalculate_calibration()
+    
+    def recalculate_calibration(self):
+        try:
+            if hasattr(self.parent_widget.parent(), "dockmanager"):
+                self.calibration = interp(self.freq, self.parent_widget.parent().dockmanager.parent().original_calibration_freqs, self.parent_widget.parent().dockmanager.parent().original_calibration)
+            else:
+                self.calibration = interp(self.freq, self.parent_widget.parent().original_calibration_freqs, self.parent_widget.parent().original_calibration)
+        except:
+            self.calibration = [0 for i in self.freq]
 
     # above is done a FFT of the signal. This is ok for linear frequency scale, but
     # not satisfying for logarithmic scale, which is much more adapted to voice or music

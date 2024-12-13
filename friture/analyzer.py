@@ -45,6 +45,7 @@ from friture.tilelayout import TileLayout
 from friture.level_view_model import LevelViewModel
 from friture.level_data import LevelData
 from friture.levels import Levels_Widget
+from friture.octavespectrum import OctaveSpectrum_Widget
 from friture.store import GetStore, Store
 from friture.scope_data import Scope_Data
 from friture.axis import Axis
@@ -112,6 +113,9 @@ class Friture(QMainWindow, ):
         qmlRegisterType(ColorBar, 'Friture', 1, 0, 'ColorBar')
         qmlRegisterType(Tick, 'Friture', 1, 0, 'Tick')
         qmlRegisterSingletonType(Store, 'Friture', 1, 0, 'Store', lambda engine, script_engine: GetStore())
+        
+        self.original_calibration = [0, 0]
+        self.original_calibration_freqs = [0, 20000]
 
         # Setup the user interface
         self.ui = Ui_MainWindow()
@@ -312,6 +316,14 @@ class Friture(QMainWindow, ):
             self.playback_widget.start_recording()
             AudioBackend().restart()
             self.dockmanager.restart()
+    
+    def recalculate_calibration(self):
+        for dock in self.dockmanager.docks:
+            if not dock.audiowidget is None:
+                if hasattr(dock.audiowidget, "proc"):
+                    dock.audiowidget.proc.recalculate_calibration()
+                elif type(dock.audiowidget) == OctaveSpectrum_Widget:
+                    dock.audiowidget.filters.recalculate_calibration()
 
 
 def qt_message_handler(mode, context, message):

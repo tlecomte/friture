@@ -78,7 +78,7 @@ class Levels_Widget(QtWidgets.QWidget):
         self.calibration = 0
 
         # initialize the class instance that will do the fft
-        self.proc = audioproc()
+        self.proc = audioproc(self)
 
         # time = SMOOTH_DISPLAY_TIMER_PERIOD_MS/1000. #DISPLAY
         # time = 0.025 #IMPULSE setting for a sound level meter
@@ -160,8 +160,6 @@ class Levels_Widget(QtWidgets.QWidget):
             # exponential smoothing for RMS
             value_rms = pyx_exp_smoothed_value(self.kernel, self.alpha, y2 ** 2, self.old_rms_2)
             self.old_rms_2 = value_rms
-
-            value_spl = value_rms + 94.0 + self.calibration
 
             self.level_view_model.level_data_2.level_rms = 10. * np.log10(value_rms + 0. * 1e-80)
             self.level_view_model.level_data_2.level_spl = self.level_view_model.level_data_2.level_rms + 94.0 + self.calibration

@@ -265,7 +265,7 @@ class PitchTracker:
         self.out_buf = RingBuffer()
         self.out_offset = self.out_buf.offset
 
-        self.proc = audioproc()
+        self.proc = audioproc(self)
         self.proc.set_fftsize(self.fft_size)
 
     def set_input_buffer(self, new_buf: RingBuffer) -> None:

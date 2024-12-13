@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
-from numpy import log10, array, where
+from numpy import log10, array, where, interp
 
 from friture.filter import (octave_filter_bank_decimation, octave_frequencies,
                             octave_filter_bank_decimation_filtic, NOCTAVE)
@@ -26,11 +26,15 @@ import friture.renard as renard
 
 class Octave_Filters():
 
-    def __init__(self, bandsperoctave):
+    def __init__(self, parent, bandsperoctave):
         [self.bdec, self.adec] = generated_filters.PARAMS['dec']
 
         self.bdec = array(self.bdec)
         self.adec = array(self.adec)
+
+        self.calibration = []
+
+        self.parent_widget = parent
 
         self.setbandsperoctave(bandsperoctave)
 
@@ -48,11 +52,20 @@ class Octave_Filters():
 
         return decs
 
+    def recalculate_calibration(self):
+        try:
+            
+            self.calibration = interp(self.fi, self.parent_widget.parent().dockmanager.parent().original_calibration_freqs, self.parent_widget.parent().dockmanager.parent().original_calibration)
+        except:
+            self.calibration = [0 for i in self.fi]
+
     def setbandsperoctave(self, bandsperoctave):
         self.bandsperoctave = bandsperoctave
         self.nbands = NOCTAVE * self.bandsperoctave
         self.fi, self.flow, self.fhigh = octave_frequencies(self.nbands, self.bandsperoctave)
         [self.boct, self.aoct, fi, flow, fhigh] = generated_filters.PARAMS['%d' % bandsperoctave]
+
+        self.recalculate_calibration()
 
         self.boct = [array(f) for f in self.boct]
         self.aoct = [array(f) for f in self.aoct]

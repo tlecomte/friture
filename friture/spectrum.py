@@ -53,7 +53,7 @@ class Spectrum_Widget(QtWidgets.QWidget):
         self.gridLayout.addWidget(self.PlotZoneSpect, 0, 0, 1, 1)
 
         # initialize the class instance that will do the fft
-        self.proc = audioproc()
+        self.proc = audioproc(self)
 
         self.maxfreq = DEFAULT_MAXFREQ
         self.proc.set_maxfreq(self.maxfreq)
@@ -159,7 +159,7 @@ class Spectrum_Widget(QtWidgets.QWidget):
             if self.dual_channels and floatdata.shape[0] > 1:
                 dB_spectrogram = self.log_spectrogram(sp2) - self.log_spectrogram(sp1)
             else:
-                dB_spectrogram = self.log_spectrogram(sp1) + self.w
+                dB_spectrogram = self.log_spectrogram(sp1) + self.w + self.proc.calibration
 
             # the log operation and the weighting could be deffered
             # to the post-weedening !
