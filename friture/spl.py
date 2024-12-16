@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2009 Timoth?Lecomte
+# Copyright (C) 2024 NathaU
 
 # This file is part of Friture.
 #
@@ -20,7 +20,7 @@
 from PyQt5 import QtWidgets
 from numpy import log10, argmax, zeros, arange, floor, float64
 from friture.audioproc import audioproc  # audio processing class
-from friture.spectrum_settings import (Spectrum_Settings_Dialog,  # settings dialog
+from friture.spl_settings import (SPL_Settings_Dialog,  # settings dialog
                                        DEFAULT_FFT_SIZE,
                                        DEFAULT_FREQ_SCALE,
                                        DEFAULT_MAXFREQ,
@@ -33,11 +33,11 @@ from friture.spectrum_settings import (Spectrum_Settings_Dialog,  # settings dia
 import friture.plotting.frequency_scales as fscales
 
 from friture.audiobackend import SAMPLING_RATE
-from friture.spectrumPlotWidget import SpectrumPlotWidget
+from friture.splPlotWidget import SPLPlotWidget
 from friture_extensions.exp_smoothing_conv import pyx_exp_smoothed_value_numpy
 
 
-class Spectrum_Widget(QtWidgets.QWidget):
+class SPL_Widget(QtWidgets.QWidget):
 
     def __init__(self, parent, engine):
         super().__init__(parent)
@@ -48,7 +48,7 @@ class Spectrum_Widget(QtWidgets.QWidget):
         self.gridLayout = QtWidgets.QGridLayout(self)
         self.gridLayout.setObjectName("gridLayout")
         self.gridLayout.setContentsMargins(2, 2, 2, 2)
-        self.PlotZoneSpect = SpectrumPlotWidget(self, engine)
+        self.PlotZoneSpect = SPLPlotWidget(self, engine)
         self.PlotZoneSpect.setObjectName("PlotZoneSpect")
         self.gridLayout.addWidget(self.PlotZoneSpect, 0, 0, 1, 1)
 
@@ -65,6 +65,7 @@ class Spectrum_Widget(QtWidgets.QWidget):
         self.weighting = DEFAULT_WEIGHTING
         self.dual_channels = False
         self.response_time = DEFAULT_RESPONSE_TIME
+        self.calibration = 1
 
         self.update_weighting()
         self.freq = self.proc.get_freq_scale()
@@ -86,7 +87,7 @@ class Spectrum_Widget(QtWidgets.QWidget):
         self.PlotZoneSpect.setShowFreqLabel(DEFAULT_SHOW_FREQ_LABELS)
 
         # initialize the settings dialog
-        self.settings_dialog = Spectrum_Settings_Dialog(self)
+        self.settings_dialog = SPL_Settings_Dialog(self)
 
     # method
     def set_buffer(self, buffer):
@@ -172,6 +173,8 @@ class Spectrum_Widget(QtWidgets.QWidget):
             pitch_idx = argmax(harmonic_products)
             fpitch = max(self.freq[pitch_idx], 1e-20)
 
+            dB_spectrogram = dB_spectrogram + 94.0 + self.calibration # if db_spectrogram is in dB RMS, thenn just add 94db + calibration factor in db
+
             self.PlotZoneSpect.setdata(self.freq, dB_spectrogram, fmax, fpitch)
 
     # method
@@ -242,11 +245,11 @@ class Spectrum_Widget(QtWidgets.QWidget):
         self.setresponsetime(self.response_time)
 
     def setmin(self, value):
-        self.spec_min = value
+        #self.spec_min = value
         self.PlotZoneSpect.setspecrange(self.spec_min, self.spec_max)
 
     def setmax(self, value):
-        self.spec_max = value
+        #self.spec_max = value
         self.PlotZoneSpect.setspecrange(self.spec_min, self.spec_max)
 
     def setweighting(self, weighting):
@@ -257,10 +260,8 @@ class Spectrum_Widget(QtWidgets.QWidget):
     def update_weighting(self):
         A, B, C = self.proc.get_freq_weighting()
         if self.weighting == 0:
-            self.w = zeros(A.shape)
-        elif self.weighting == 1:
             self.w = A
-        elif self.weighting == 2:
+        elif self.weighting == 1:
             self.w = B
         else:
             self.w = C
@@ -290,3 +291,6 @@ class Spectrum_Widget(QtWidgets.QWidget):
 
     def restoreState(self, settings):
         self.settings_dialog.restoreState(settings)
+    
+    def setcalibration(self, calibration_db):
+        self.calibration = calibration_db

@@ -30,6 +30,20 @@ class Ui_Settings_Dialog(object):
         self.comboBox_inputDevice = QtWidgets.QComboBox(self.inputGroup)
         self.comboBox_inputDevice.setObjectName("comboBox_inputDevice")
         self.verticalLayout_6.addWidget(self.comboBox_inputDevice)
+        self.label_inputType_3 = QtWidgets.QLabel(self.inputGroup)
+        self.label_inputType_3.setObjectName("label_inputType_3")
+        self.verticalLayout_6.addWidget(self.label_inputType_3)
+        
+        # Add horizontal layout for QLineEdit and buttons
+        self.horizontalLayout_file = QtWidgets.QHBoxLayout()
+        self.fileBox_compensation = QtWidgets.QPushButton("Browse", self.inputGroup)
+        self.fileBox_compensation.setObjectName("fileButton")
+        self.horizontalLayout_file.addWidget(self.fileBox_compensation)
+        self.clearButton = QtWidgets.QPushButton("Clear", self.inputGroup)
+        self.clearButton.setObjectName("clearButton")
+        self.horizontalLayout_file.addWidget(self.clearButton)
+        self.verticalLayout_6.addLayout(self.horizontalLayout_file)
+        
         self.horizontalLayout = QtWidgets.QHBoxLayout()
         self.horizontalLayout.setObjectName("horizontalLayout")
         self.verticalLayout_3 = QtWidgets.QVBoxLayout()
@@ -108,6 +122,7 @@ class Ui_Settings_Dialog(object):
         Settings_Dialog.setWindowTitle(_translate("Settings_Dialog", "Settings"))
         self.inputGroup.setTitle(_translate("Settings_Dialog", "Input"))
         self.label_inputType_2.setText(_translate("Settings_Dialog", "Select the input device :"))
+        self.label_inputType_3.setText(_translate("Settings_Dialog", "Select the compensation file:"))
         self.label_inputType.setText(_translate("Settings_Dialog", "Select the type of input :"))
         self.radioButton_single.setText(_translate("Settings_Dialog", "Single channel"))
         self.radioButton_duo.setText(_translate("Settings_Dialog", "Two channels"))
