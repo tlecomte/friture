@@ -32,7 +32,7 @@ classifiers=[
 ]
 dynamic = ["version"]
 dependencies = [
-    "sounddevice==0.5.1",
+    "sounddevice==0.5.2",
     "rtmixer==0.1.7",
     "docutils==0.21.2",
     "numpy==2.2.5",
