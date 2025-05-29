@@ -12,6 +12,7 @@ python3 setup.py build_ext --inplace
 
 sudo apt-get update
 sudo apt-get install -y desktop-file-utils # for desktop-file-validate, used by pkg2appimage
+sudo apt-get install -y fuse # AppImages require FUSE to run
 
 # when PyInstaller collect libraries, it ignores libraries that are not found on the host.
 # Those missing libs prevent proper startup.
