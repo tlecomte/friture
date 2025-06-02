@@ -44,7 +44,7 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = [
-    "mypy==1.15.0",
+    "mypy==1.16.0",
     "PyQt5-stubs==5.15.6.0",
 ]
 
