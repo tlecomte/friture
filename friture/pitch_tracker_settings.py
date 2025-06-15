@@ -25,10 +25,14 @@ from friture.audiobackend import SAMPLING_RATE
 
 # Roughly the maximum singing range:
 DEFAULT_MIN_FREQ = 80
+DEFAULT_MIN_FREQ = 60
+
 DEFAULT_MAX_FREQ = 1000
 DEFAULT_DURATION = 30
-DEFAULT_MIN_DB = -70.0
-DEFAULT_FFT_SIZE = 16384
+DEFAULT_MIN_DB = -80.0
+DEFAULT_FFT_SIZE = 4096
+DEFAULT_C_RES = 10
+DEFAULT_P_CONF = 10
 
 class PitchTrackerSettingsDialog(QtWidgets.QDialog):
     def __init__(self, parent: QtWidgets.QWidget) -> None:
@@ -66,6 +70,16 @@ class PitchTrackerSettingsDialog(QtWidgets.QDialog):
         self.duration.valueChanged.connect(self.parent().set_duration) # type: ignore
         self.form_layout.addRow("Duration:", self.duration)
 
+        self.conf = QtWidgets.QDoubleSpinBox(self)
+        self.conf.setMinimum(0)
+        self.conf.setMaximum(30)
+        self.conf.setSingleStep(1)
+        self.conf.setValue(DEFAULT_P_CONF)
+        self.conf.setSuffix("")
+        self.conf.setObjectName("conf")
+        self.conf.valueChanged.connect(self.parent().set_conf) # type: ignore
+        self.form_layout.addRow("Conf Cut:", self.conf)
+        
         self.min_db = QtWidgets.QDoubleSpinBox(self)
         self.min_db.setMinimum(-100)
         self.min_db.setMaximum(0)
@@ -76,6 +90,7 @@ class PitchTrackerSettingsDialog(QtWidgets.QDialog):
         self.min_db.valueChanged.connect(self.parent().set_min_db) # type: ignore
         self.form_layout.addRow("Min Amplitude:", self.min_db)
 
+
         self.setLayout(self.form_layout)
 
     def save_state(self, settings: QSettings) -> None:
@@ -83,6 +98,7 @@ class PitchTrackerSettingsDialog(QtWidgets.QDialog):
         settings.setValue("max_freq", self.max_freq.value())
         settings.setValue("duration", self.duration.value())
         settings.setValue("min_db", self.min_db.value())
+        settings.setValue("conf", self.conf.value())
 
     def restore_state(self, settings: QSettings) -> None:
         self.min_freq.setValue(
@@ -93,4 +109,6 @@ class PitchTrackerSettingsDialog(QtWidgets.QDialog):
             settings.value("duration", DEFAULT_DURATION, type=int))
         self.min_db.setValue(
             settings.value("min_db", DEFAULT_MIN_DB, type=float))
-
+        self.conf.setValue(
+            settings.value("conf", DEFAULT_P_CONF, type=float)
+        )
