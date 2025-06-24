@@ -117,7 +117,7 @@ class CanvasScaledSpectrogram(QtCore.QObject):
         self.last_write_time = last_data_time
 
     def colors_to_bytes(self, data):
-        return data.tostring()
+        return data.tobytes()
 
     # defined as a separate function so that it appears in the profiler
     # NOTE: QImage with a colormap is slower (by a factor of 2) than the custom
