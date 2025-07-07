@@ -58,7 +58,7 @@ class Spectrogram_Widget(QtWidgets.QWidget):
         self.audiobuffer = None
 
         # initialize the class instance that will do the fft
-        self.proc = audioproc()
+        self.proc = audioproc(self)
 
         self.frequency_resampler = Frequency_Resampler()
         self.screen_resampler = Online_Linear_2D_resampler()
@@ -159,6 +159,7 @@ class Spectrogram_Widget(QtWidgets.QWidget):
 
             w = tile(self.w, (1, realizable))
             norm_spectrogram = self.scale_spectrogram(self.log_spectrogram(spn) + w)
+            #norm_spectrogram = self.scale_spectrogram(self.log_spectrogram(spn) + w + self.proc.calibration) # This produces lags
 
             self.screen_resampler.set_height(self.PlotZoneImage.spectrogram_screen_height())
             screen_rate_frac = Fraction(self.PlotZoneImage.spectrogram_screen_width(), int(self.timerange_s * 1000))
