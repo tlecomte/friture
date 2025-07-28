@@ -38,7 +38,7 @@ echo $ARTIFACT_FILENAME
 
 # macos has random hdiutil errors because of XProtectBehaviorService, retry a few times.
 # Reference: https://github.com/actions/runner-images/issues/7522#issuecomment-1556766641
-max_retries=5
+max_retries=30
 retry_delay_seconds=5
 
 for ((i=1; i<=max_retries; i++)); do
