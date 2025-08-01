@@ -196,6 +196,7 @@ class Friture(QMainWindow, ):
     def excepthook(self, exception_type, exception_value, traceback_object):
         # a keyboard interrupt is an intentional exit, so close the application
         if exception_type is KeyboardInterrupt:
+            self.close()
             exit(0)
 
         gui_message = fileexcepthook(exception_type, exception_value, traceback_object)
