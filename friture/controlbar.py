@@ -51,9 +51,17 @@ class ControlBar(QtWidgets.QWidget):
         self.close_button.setIcon(close_icon)
         self.close_button.setToolTip("Close the audio widget")
 
+        self.orderPrevious = QtWidgets.QToolButton(self)
+        self.orderPrevious.setToolTip("Move widget to previous slot")
+
+        self.orderNext = QtWidgets.QToolButton(self)
+        self.orderNext.setToolTip("Move widget to next slot")
+
         self.layout.addWidget(self.combobox_select)
         self.layout.addWidget(self.settings_button)
         self.layout.addWidget(self.close_button)
+        self.layout.addWidget(self.orderPrevious)
+        self.layout.addWidget(self.orderNext)
         self.layout.addStretch()
 
         self.setLayout(self.layout)
