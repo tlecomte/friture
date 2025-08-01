@@ -73,7 +73,7 @@ class Dock(QtWidgets.QWidget):
     def closeEvent(self, event):
         self.dockmanager.close_dock(self)
 
-    def closeClicked(self, checked):
+    def closeClicked(self):
         self.close()
 
     # slot
