@@ -34,7 +34,7 @@ Rectangle {
 
         Text {
             id: peakValues
-            textFormat: Text.MarkdownText
+            textFormat: Text.StyledText
             text: level_view_model.two_channels ? "1: " + level_to_text(level_view_model.level_data_slow.level_max) + "<br />2: " + level_to_text(level_view_model.level_data_slow_2.level_max) : level_to_text(level_view_model.level_data_slow.level_max)
             font.pointSize: 14
             font.bold: true
@@ -56,7 +56,7 @@ Rectangle {
 
         Text {
             id: rmsValues
-            textFormat: Text.MarkdownText
+            textFormat: Text.StyledText
             text: level_view_model.two_channels ? "1: " + level_to_text(level_view_model.level_data_slow.level_rms) + "<br />2: " + level_to_text(level_view_model.level_data_slow_2.level_rms) : level_to_text(level_view_model.level_data_slow.level_rms)
             font.pointSize: 14
             font.bold: true
@@ -88,6 +88,6 @@ Rectangle {
             return "`-Inf`";
         }
 
-        return "`" + dB.toFixed(1) + "`";
+        return dB.toFixed(1);
     }
 }
