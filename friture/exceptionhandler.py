@@ -43,7 +43,7 @@ def fileexcepthook(exception_type, exception_value, traceback_object):
     email = "contact@friture.org"
 
     notice = """
-        <h1>Opps! Something went wrong!</h1>
+        <h1>Oops! Something went wrong!</h1>
         <p>Sorry, there was an error we could not handle.</p>
         <p>You can choose to abort, or to ignore the error and try to continue
         (this is not guaranteed to work).</p>
