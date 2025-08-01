@@ -194,6 +194,10 @@ class Friture(QMainWindow, ):
 
     # exception hook that logs to console, file, and display a message box
     def excepthook(self, exception_type, exception_value, traceback_object):
+        # a keyboard interrupt is an intentional exit, so close the application
+        if exception_type is KeyboardInterrupt:
+            exit(0)
+
         gui_message = fileexcepthook(exception_type, exception_value, traceback_object)
 
         # we do not want to flood the user with message boxes when the error happens repeatedly on each timer event
