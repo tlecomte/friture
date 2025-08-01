@@ -85,9 +85,10 @@ class Dock(QtWidgets.QWidget):
         for i, item in enumerate(itemList):
             if item.widget() is self:
                 if i > 0 and i < len(itemList):
-                    itemList.pop(i)
-                    itemList.insert(i-1, item)
+                    itemList.insert(i-1, itemList.pop(i))
+                    self.dockmanager.docks.insert(i-1, self.dockmanager.docks.pop(i))
                     layout.update()
+
                 break
 
     def moveNext(self):
@@ -97,8 +98,8 @@ class Dock(QtWidgets.QWidget):
         for i, item in enumerate(itemList):
             if item.widget() is self:
                 if i >= 0 and i < len(itemList)-1:
-                    itemList.pop(i)
-                    itemList.insert(i+1, item)
+                    itemList.insert(i+1, itemList.pop(i))
+                    self.dockmanager.docks.insert(i+1, self.dockmanager.docks.pop(i))
                     layout.update()
                 break
 
