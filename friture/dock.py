@@ -51,6 +51,8 @@ class Dock(QtWidgets.QWidget):
         self.control_bar.combobox_select.activated.connect(self.indexChanged)
         self.control_bar.settings_button.clicked.connect(self.settings_slot)
         self.control_bar.close_button.clicked.connect(self.closeClicked)
+        self.control_bar.orderPrevious.clicked.connect(self.movePrevious)
+        self.control_bar.orderNext.clicked.connect(self.moveNext)
 
         #self.dockwidget = QtWidgets.QWidget(self)
         self.vbox = QtWidgets.QVBoxLayout(self)
@@ -75,6 +77,30 @@ class Dock(QtWidgets.QWidget):
 
     def closeClicked(self):
         self.close()
+
+    def movePrevious(self):
+        layout = self.parent().parent().centralLayout
+        itemList = layout.itemList
+        
+        for i, item in enumerate(itemList):
+            if item.widget() is self:
+                if i > 0 and i < len(itemList):
+                    itemList.pop(i)
+                    itemList.insert(i-1, item)
+                    layout.update()
+                break
+
+    def moveNext(self):
+        layout = self.parent().parent().centralLayout
+        itemList = layout.itemList
+        
+        for i, item in enumerate(itemList):
+            if item.widget() is self:
+                if i >= 0 and i < len(itemList)-1:
+                    itemList.pop(i)
+                    itemList.insert(i+1, item)
+                    layout.update()
+                break
 
     # slot
     def indexChanged(self, index):
