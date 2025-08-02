@@ -45,23 +45,29 @@ class ControlBar(QtWidgets.QWidget):
         settings_icon.addPixmap(QtGui.QPixmap(":/images-src/dock-settings.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.settings_button.setIcon(settings_icon)
 
+        self.order_previous = QtWidgets.QToolButton(self)
+        order_previous_icon = QtGui.QIcon()
+        order_previous_icon.addPixmap(QtGui.QPixmap(":/images-src/dock-order-previous.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.order_previous.setIcon(order_previous_icon)
+        self.order_previous.setToolTip("Move widget to previous slot")
+
+        self.order_next = QtWidgets.QToolButton(self)
+        order_next_icon = QtGui.QIcon()
+        order_next_icon.addPixmap(QtGui.QPixmap(":/images-src/dock-order-next.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.order_next.setIcon(order_next_icon)
+        self.order_next.setToolTip("Move widget to next slot")
+
         self.close_button = QtWidgets.QToolButton(self)
         close_icon = QtGui.QIcon()
         close_icon.addPixmap(QtGui.QPixmap(":/images-src/dock-close.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.close_button.setIcon(close_icon)
         self.close_button.setToolTip("Close the audio widget")
 
-        self.orderPrevious = QtWidgets.QToolButton(self)
-        self.orderPrevious.setToolTip("Move widget to previous slot")
-
-        self.orderNext = QtWidgets.QToolButton(self)
-        self.orderNext.setToolTip("Move widget to next slot")
-
         self.layout.addWidget(self.combobox_select)
         self.layout.addWidget(self.settings_button)
+        self.layout.addWidget(self.order_previous)
+        self.layout.addWidget(self.order_next)
         self.layout.addWidget(self.close_button)
-        self.layout.addWidget(self.orderPrevious)
-        self.layout.addWidget(self.orderNext)
         self.layout.addStretch()
 
         self.setLayout(self.layout)

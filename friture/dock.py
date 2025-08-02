@@ -50,9 +50,9 @@ class Dock(QtWidgets.QWidget):
 
         self.control_bar.combobox_select.activated.connect(self.indexChanged)
         self.control_bar.settings_button.clicked.connect(self.settings_slot)
+        self.control_bar.order_previous.clicked.connect(self.movePrevious)
+        self.control_bar.order_next.clicked.connect(self.moveNext)
         self.control_bar.close_button.clicked.connect(self.closeClicked)
-        self.control_bar.orderPrevious.clicked.connect(self.movePrevious)
-        self.control_bar.orderNext.clicked.connect(self.moveNext)
 
         #self.dockwidget = QtWidgets.QWidget(self)
         self.vbox = QtWidgets.QVBoxLayout(self)
