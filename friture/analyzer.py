@@ -352,7 +352,7 @@ def main():
     formatter = logging.Formatter(logFormat)
 
     logFileName = "friture.log.txt"
-    logDir = platformdirs.user_data_dir("Friture", "")
+    logDir = platformdirs.user_log_dir("Friture", "")
     try:
         os.makedirs(logDir)
     except OSError as e:
