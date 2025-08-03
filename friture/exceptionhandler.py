@@ -38,7 +38,7 @@ def fileexcepthook(exception_type, exception_value, traceback_object):
 
     # same as in analyzer.py
     logFileName = "friture.log.txt"
-    logDir = platformdirs.user_data_dir("Friture", "")
+    logDir = platformdirs.user_log_dir("Friture", "")
 
     email = "contact@friture.org"
 
