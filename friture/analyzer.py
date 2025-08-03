@@ -413,6 +413,9 @@ def main():
         logger.info("Adding the following to the Library paths: %s", pluginsPath)
         QApplication.addLibraryPath(pluginsPath)
 
+    if platform.system() == "Linux":
+        os.environ['PIPEWIRE_ALSA'] = '{ application.name = "Friture" }'
+
     # Splash screen
     pixmap = QPixmap(":/images/splash.png")
     splash = QSplashScreen(pixmap)
