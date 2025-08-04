@@ -20,6 +20,7 @@
 import sys
 import os
 import os.path
+import argparse
 import errno
 import platform
 import logging
@@ -345,6 +346,20 @@ class StreamToLogger(object):
 
 
 def main():
+    # parse command line arguments
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument(
+        "--python",
+        action="store_true",
+        help="Print data to friture.cprof")
+
+    parser.add_argument(
+        "--kcachegrind",
+        action="store_true")
+
+    program_arguments = parser.parse_args()
+
     # make the Python warnings go to Friture logger
     logging.captureWarnings(True)
 
@@ -426,15 +441,10 @@ def main():
 
     profile = "no"  # "python" or "kcachegrind" or anything else to disable
 
-    if len(sys.argv) > 1:
-        if sys.argv[1] == "--python":
-            profile = "python"
-        elif sys.argv[1] == "--kcachegrind":
-            profile = "kcachegrind"
-        elif sys.argv[1] == "--no":
-            profile = "no"
-        else:
-            logger.info("command-line arguments (%s) not recognized", sys.argv[1:])
+    if program_arguments.python:
+        profile = "python"
+    elif program_arguments.kcachegrind:
+        profile = "kcachegrind"
 
     return_code = 0
     if profile == "python":
