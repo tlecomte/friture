@@ -4,8 +4,8 @@
     <file>images-src/dock-settings.svg</file>
     <file>images-src/dock-dock.svg</file>
     <file>images-src/dock-close.svg</file>
-    <file>images-src/dock-order-previous.svg</file>
-    <file>images-src/dock-order-next.svg</file>
+    <file>images-src/dock-move-previous.svg</file>
+    <file>images-src/dock-move-next.svg</file>
     <file>images-src/about.svg</file>
     <file>images-src/log.svg</file>
     <file>images-src/dock-undock.svg</file>
