@@ -358,6 +358,11 @@ def main():
         "--kcachegrind",
         action="store_true")
 
+    parser.add_argument(
+        "--no-splash",
+        action="store_true",
+        help="Disable the splash screen on startup")
+
     program_arguments = parser.parse_args()
 
     # make the Python warnings go to Friture logger
@@ -429,15 +434,17 @@ def main():
         QApplication.addLibraryPath(pluginsPath)
 
     # Splash screen
-    pixmap = QPixmap(":/images/splash.png")
-    splash = QSplashScreen(pixmap)
-    splash.show()
-    splash.showMessage("Initializing the audio subsystem")
-    app.processEvents()
+    if not program_arguments.no_splash:
+        pixmap = QPixmap(":/images/splash.png")
+        splash = QSplashScreen(pixmap)
+        splash.show()
+        splash.showMessage("Initializing the audio subsystem")
+        app.processEvents()
 
     window = Friture()
     window.show()
-    splash.finish(window)
+    if not program_arguments.no_splash:
+        splash.finish(window)
 
     profile = "no"  # "python" or "kcachegrind" or anything else to disable
 
