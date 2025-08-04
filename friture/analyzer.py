@@ -363,7 +363,8 @@ def main():
         action="store_true",
         help="Disable the splash screen on startup")
 
-    program_arguments = parser.parse_args()
+    program_arguments, remaining_arguments = parser.parse_known_args()
+    remaining_arguments.insert(0, sys.argv[0])
 
     # make the Python warnings go to Friture logger
     logging.captureWarnings(True)
@@ -424,7 +425,7 @@ def main():
         except:
             logger.error("Could not set the app model ID. If the plaftorm is older than Windows 7, this is normal.")
 
-    app = QApplication(sys.argv)
+    app = QApplication(remaining_arguments)
 
     if platform.system() == "Darwin":
         logger.info("Applying Mac OS-specific setup")
