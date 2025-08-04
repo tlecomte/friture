@@ -440,7 +440,8 @@ def main():
         QApplication.addLibraryPath(pluginsPath)
 
     if platform.system() == "Linux":
-        os.environ['PIPEWIRE_ALSA'] = '{ application.name = "Friture" }'
+        if "PIPEWIRE_ALSA" not in os.environ:
+            os.environ['PIPEWIRE_ALSA'] = '{ application.name = "Friture" }'
 
     # Splash screen
     if not program_arguments.no_splash:
