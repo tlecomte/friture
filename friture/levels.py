@@ -22,6 +22,7 @@
 from PyQt5 import QtWidgets
 from PyQt5.QtQml import QQmlComponent
 from PyQt5.QtQuick import QQuickWindow # type: ignore
+from PyQt5.QtGui import QFontDatabase
 import numpy as np
 
 from friture.store import GetStore
@@ -56,8 +57,10 @@ class Levels_Widget(QtWidgets.QWidget):
         component = QQmlComponent(engine, qml_url("Levels.qml"), self)
         raise_if_error(component)
 
+        fixedFont = QFontDatabase.systemFont(QFontDatabase.FixedFont)
+
         engineContext = engine.rootContext()
-        initialProperties = {"parent": self.quickWindow.contentItem(), "stateId": state_id }
+        initialProperties = {"parent": self.quickWindow.contentItem(), "stateId": state_id, "fixedFont": fixedFont }
         self.qmlObject = component.createWithInitialProperties(initialProperties, engineContext)
         self.qmlObject.setParent(self.quickWindow)
 

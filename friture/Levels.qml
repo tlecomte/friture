@@ -9,7 +9,9 @@ Rectangle {
     color: systemPalette.window
 
     property var stateId
-    property LevelViewModel level_view_model: Store.dock_states[stateId]  
+    property LevelViewModel level_view_model: Store.dock_states[stateId]
+
+    property var fixedFont
 
     // parent here will be unset on exit
     height: parent ? parent.height : 0
@@ -24,7 +26,7 @@ Rectangle {
         id: fontMetrics
         font.pointSize: 14
         font.bold: true
-        font.family: "monospace"
+        font.family: fixedFont
     }
 
     ColumnLayout {
@@ -39,7 +41,7 @@ Rectangle {
             text: level_view_model.two_channels ? "1: " + level_to_text(level_view_model.level_data_slow.level_max) + "<br />2: " + level_to_text(level_view_model.level_data_slow_2.level_max) : level_to_text(level_view_model.level_data_slow.level_max)
             font.pointSize: 14
             font.bold: true
-            font.family: "monospace"
+            font.family: fixedFont
             verticalAlignment: Text.AlignBottom
             horizontalAlignment: Text.AlignRight
             Layout.alignment: Qt.AlignBottom | Qt.AlignRight
@@ -62,7 +64,7 @@ Rectangle {
             text: level_view_model.two_channels ? "1: " + level_to_text(level_view_model.level_data_slow.level_rms) + "<br />2: " + level_to_text(level_view_model.level_data_slow_2.level_rms) : level_to_text(level_view_model.level_data_slow.level_rms)
             font.pointSize: 14
             font.bold: true
-            font.family: "monospace"
+            font.family: fixedFont
             verticalAlignment: Text.AlignBottom
             horizontalAlignment: Text.AlignRight
             Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
