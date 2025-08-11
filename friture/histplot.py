@@ -33,10 +33,10 @@ from friture.store import GetStore
 # The peak decay rates (magic goes here :).
 PEAK_DECAY_RATE = 1.0 - 3E-6
 
-class HistPlot(QtWidgets.QWidget):
+class HistPlot(QQuickWidget):
 
     def __init__(self, parent, engine):
-        super(HistPlot, self).__init__(parent)
+        super(HistPlot, self).__init__(engine, parent)
 
         self.logger = logging.getLogger(__name__)
 
@@ -73,27 +73,18 @@ class HistPlot(QtWidgets.QWidget):
         self.normHorizontalScaleTransform.setScale(fscales.Logarithmic)
         self._histplot_data.horizontal_axis.setScale(fscales.Logarithmic)
 
-        plotLayout = QtWidgets.QGridLayout(self)
-        plotLayout.setSpacing(0)
-        plotLayout.setContentsMargins(0, 0, 0, 0)
+        self.statusChanged.connect(self.on_status_changed)
+        self.setResizeMode(QQuickWidget.SizeRootObjectToView)
+        self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        self.setSource(qml_url("HistPlot.qml"))
 
-        self.quickWidget = QQuickWidget(engine, self)
-        self.quickWidget.statusChanged.connect(self.on_status_changed)
-        self.quickWidget.setResizeMode(QQuickWidget.SizeRootObjectToView)
-        self.quickWidget.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
-        self.quickWidget.setSource(qml_url("HistPlot.qml"))
+        raise_if_error(self)
 
-        raise_if_error(self.quickWidget)
-
-        self.quickWidget.rootObject().setProperty("stateId", state_id)
-
-        plotLayout.addWidget(self.quickWidget)
-
-        self.setLayout(plotLayout)
+        self.rootObject().setProperty("stateId", state_id)
 
     def on_status_changed(self, status):
         if status == QQuickWidget.Error:
-            for error in self.quickWidget.errors():
+            for error in self.errors():
                 self.logger.error("QML error: " + error.toString())
 
     def setdata(self, fl, fh, fc, y):

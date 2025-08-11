@@ -21,8 +21,8 @@ import logging
 from typing import Any
 
 from PyQt5.QtCore import pyqtSignal
-from PyQt5.QtGui import QColor, QPalette
-from PyQt5.QtWidgets import QGridLayout, QSizePolicy, QWidget
+from PyQt5.QtGui import QPalette
+from PyQt5.QtWidgets import QSizePolicy, QWidget
 from PyQt5.QtQml import QQmlEngine
 from PyQt5.QtQuickWidgets import QQuickWidget
 
@@ -31,26 +31,21 @@ from friture.playback.player import Player
 
 logger = logging.getLogger(__name__)
 
-class PlaybackControlWidget(QWidget):
+class PlaybackControlWidget(QQuickWidget):
     recording_toggled = pyqtSignal()
 
     def __init__(self, parent: QWidget, engine: QQmlEngine, player: Player):
-        super().__init__(parent)
-        self.widget = QQuickWidget(engine, self)
-        self.widget.statusChanged.connect(self.on_status_changed)
-        self.widget.setResizeMode(QQuickWidget.SizeRootObjectToView)
-        self.widget.setSizePolicy(
+        super().__init__(engine, parent)
+        self.statusChanged.connect(self.on_status_changed)
+        self.setResizeMode(QQuickWidget.SizeRootObjectToView)
+        self.setSizePolicy(
             QSizePolicy.Expanding, QSizePolicy.Preferred
         )
-        self.widget.setClearColor(self.palette().color(QPalette.Window))
-        self.widget.setSource(qml_url("playback/Control.qml"))
-        raise_if_error(self.widget)
+        self.setClearColor(self.palette().color(QPalette.Window))
+        self.setSource(qml_url("playback/Control.qml"))
+        raise_if_error(self)
 
-        layout = QGridLayout(self)
-        layout.addWidget(self.widget)
-        self.setLayout(layout)
-
-        self.root: Any = self.widget.rootObject()
+        self.root: Any = self.rootObject()
         self.root.stopClicked.connect(self.on_stopped)
         self.root.recordClicked.connect(self.on_record)
         self.root.playClicked.connect(self.on_played)
@@ -73,7 +68,7 @@ class PlaybackControlWidget(QWidget):
 
     def on_status_changed(self, status: QQuickWidget.Status) -> None:
         if status == QQuickWidget.Error:
-            for error in self.widget.errors():
+            for error in self.errors():
                 logger.error("QML error: " + error.toString())
 
     def on_stopped(self) -> None:

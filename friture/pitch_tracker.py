@@ -22,17 +22,16 @@ import logging
 import math as m
 import numpy as np
 from PyQt5 import QtWidgets
-from PyQt5.QtCore import pyqtSignal, pyqtProperty # type: ignore
-from PyQt5.QtCore import QObject, QSettings, Qt
-from PyQt5.QtQuick import QQuickWindow
+from PyQt5.QtCore import QSettings
 from PyQt5.QtQuickWidgets import QQuickWidget
-from PyQt5.QtQml import QQmlComponent, QQmlEngine
+from PyQt5.QtQml import QQmlEngine
 from typing import Any, Optional
 
 from friture.audiobackend import SAMPLING_RATE
 from friture.audiobuffer import AudioBuffer
 from friture.audioproc import audioproc
 from friture.curve import Curve
+from friture.pitch_tracker_data import PitchTracker_Data, format_frequency, frequency_to_note
 from friture.pitch_tracker_settings import (
     DEFAULT_MIN_FREQ,
     DEFAULT_MAX_FREQ,
@@ -44,38 +43,17 @@ from friture.pitch_tracker_settings import (
 from friture.plotting.coordinateTransform import CoordinateTransform
 import friture.plotting.frequency_scales as fscales
 from friture.ringbuffer import RingBuffer
-from friture.scope_data import Scope_Data
 from friture.store import GetStore
 from friture.qml_tools import qml_url, raise_if_error
 
-
-def frequency_to_note(freq: float) -> str:
-    if np.isnan(freq) or freq <= 0:
-        return ""
-    # number of semitones from C4
-    # A4 = 440Hz and is 9 semitones above C4
-    semitone = round(np.log2(freq/440) * 12) + 9
-    octave = int(np.floor(semitone / 12)) + 4
-    notes = ["C", "C♯", "D", "D♯", "E", "F", "F♯", "G", "G♯", "A", "A♯", "B"]
-    return f'{notes[semitone % 12]}{octave}'
-
-def format_frequency(freq: float) -> str:
-    if freq < 1000:
-        return f'{freq:.0f} Hz ({frequency_to_note(freq)})'
-    else:
-        return f'{freq/1000:.1f} kHz ({frequency_to_note(freq)})'
-
-
-class PitchTrackerWidget(QtWidgets.QWidget):
+class PitchTrackerWidget(QQuickWidget):
     def __init__(self, parent: QtWidgets.QWidget, engine: QQmlEngine):
-        super().__init__(parent)
+        super().__init__(engine, parent)
 
         self.logger = logging.getLogger(__name__)
 
-        self.setObjectName("PitchTracker_Widget")
-
         store = GetStore()
-        self._pitch_tracker_data = Scope_Data(store)
+        self._pitch_tracker_data = PitchTracker_Data(store)
         store._dock_states.append(self._pitch_tracker_data)
         state_id = len(store._dock_states) - 1
 
@@ -92,43 +70,14 @@ class PitchTrackerWidget(QtWidgets.QWidget):
         tracker_data.horizontal_axis.name = "Time (sec)"
         tracker_data.horizontal_axis.setTrackerFormatter(
             lambda x: "%#.3g sec" % (x))
+        
+        self.statusChanged.connect(self.on_status_changed)
+        self.setResizeMode(QQuickWidget.SizeRootObjectToView)
+        self.setSource(qml_url("PitchView.qml"))
 
-        self.gridLayout = QtWidgets.QGridLayout(self)
-        self.gridLayout.setObjectName("gridLayout")
-        self.gridLayout.setContentsMargins(2, 2, 2, 2)
+        raise_if_error(self)
 
-        self.quickWidget = QQuickWidget(engine, self)
-        self.quickWidget.statusChanged.connect(self.on_status_changed)
-        self.quickWidget.setResizeMode(QQuickWidget.SizeRootObjectToView)
-        self.quickWidget.setSizePolicy(
-            QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
-        self.quickWidget.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        self.quickWidget.setSource(qml_url("Scope.qml"))
-
-        raise_if_error(self.quickWidget)
-
-        root: Any = self.quickWidget.rootObject()
-        root.setProperty("stateId", state_id)
-
-        self.gridLayout.addWidget(self.quickWidget, 0, 0, 1, 1)
-
-        self.pitch_view_model = PitchViewModel(self)
-        pitch_window = QQuickWindow()
-        pitch_component = QQmlComponent(engine, qml_url("PitchView.qml"), self)
-        raise_if_error(pitch_component)
-        pitch_object: Any = pitch_component.createWithInitialProperties(
-            {
-                "parent": pitch_window.contentItem(),
-                "pitch_view_model": self.pitch_view_model
-            },
-            engine.rootContext()
-        )
-        pitch_object.setParent(pitch_window)
-        pitch_widget = QtWidgets.QWidget.createWindowContainer(pitch_window, self)
-        pitch_widget.setSizePolicy(
-            QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
-        pitch_widget.setFixedWidth(int(pitch_object.width()))
-        self.gridLayout.addWidget(pitch_widget, 0, 1)
+        self.rootObject().setProperty("stateId", state_id)
 
         self.min_freq = DEFAULT_MIN_FREQ
         self.max_freq = DEFAULT_MAX_FREQ
@@ -159,7 +108,7 @@ class PitchTrackerWidget(QtWidgets.QWidget):
     def handle_new_data(self, floatdata: np.ndarray) -> None:
         if self.tracker.update():
             self.update_curve()
-            self.pitch_view_model.pitch = self.tracker.get_latest_estimate() # type: ignore
+            self._pitch_tracker_data.pitch = self.tracker.get_latest_estimate() # type: ignore
 
     def update_curve(self) -> None:
         pitches = self.tracker.get_estimates(self.duration)
@@ -170,7 +119,7 @@ class PitchTrackerWidget(QtWidgets.QWidget):
 
     def on_status_changed(self, status: QQuickWidget.Status) -> None:
         if status == QQuickWidget.Error:
-            for error in self.quickWidget.errors():
+            for error in self.errors():
                 self.logger.error("QML error: " + error.toString())
 
     # method
@@ -206,42 +155,6 @@ class PitchTrackerWidget(QtWidgets.QWidget):
     # method
     def restoreState(self, settings: QSettings) -> None:
         self.settings_dialog.restore_state(settings)
-
-
-class PitchViewModel(QObject):
-    pitch_changed = pyqtSignal(float)
-
-    def __init__(self, parent: QObject):
-        super().__init__(parent)
-        self._pitch = 0.0
-
-    @pyqtProperty(str, notify=pitch_changed)
-    def pitch(self) -> str:
-        if not self._pitch or np.isnan(self._pitch):
-            return '--'
-        elif self._pitch < 1000:
-            return f"{self._pitch:.0f}"
-        else:
-            return f"{self._pitch/1000:.2f}"
-
-    @pitch.setter # type: ignore
-    def pitch(self, pitch: float):
-        self._pitch = pitch
-        self.pitch_changed.emit(pitch)
-
-    @pyqtProperty(str, notify=pitch_changed) # type: ignore
-    def pitch_unit(self) -> str:
-        if self._pitch >= 1000.0:
-            return "kHz"
-        else:
-            return "Hz"
-
-    @pyqtProperty(str, notify=pitch_changed) # type: ignore
-    def note(self) -> str:
-        if not self._pitch or np.isnan(self._pitch):
-            return '--'
-        else:
-            return frequency_to_note(self._pitch)
 
 
 class PitchTracker:
