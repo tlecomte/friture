@@ -29,10 +29,10 @@ class Baseline(Enum):
     DATA_ZERO = 2
 
 
-class SpectrumPlotWidget(QtWidgets.QWidget):
+class SpectrumPlotWidget(QQuickWidget):
 
     def __init__(self, parent, engine):
-        super(SpectrumPlotWidget, self).__init__(parent)
+        super(SpectrumPlotWidget, self).__init__(engine, parent)
 
         self.logger = logging.getLogger(__name__)
 
@@ -68,29 +68,20 @@ class SpectrumPlotWidget(QtWidgets.QWidget):
         self.normVerticalScaleTransform = CoordinateTransform(0, 1, 1, 0, 0)
         self.normHorizontalScaleTransform = CoordinateTransform(0, 22000, 1, 0, 0)
 
-        plotLayout = QtWidgets.QGridLayout(self)
-        plotLayout.setSpacing(0)
-        plotLayout.setContentsMargins(0, 0, 0, 0)
-
-        self.quickWidget = QQuickWidget(engine, self)
-        self.quickWidget.statusChanged.connect(self.on_status_changed)
-        self.quickWidget.setResizeMode(QQuickWidget.SizeRootObjectToView)
-        self.quickWidget.setSizePolicy(
+        self.statusChanged.connect(self.on_status_changed)
+        self.setResizeMode(QQuickWidget.SizeRootObjectToView)
+        self.setSizePolicy(
             QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding
         )
-        self.quickWidget.setSource(qml_url("Spectrum.qml"))
+        self.setSource(qml_url("Spectrum.qml"))
 
-        raise_if_error(self.quickWidget)
+        raise_if_error(self)
 
-        self.quickWidget.rootObject().setProperty("stateId", state_id)
-
-        plotLayout.addWidget(self.quickWidget)
-
-        self.setLayout(plotLayout)
+        self.rootObject().setProperty("stateId", state_id)
 
     def on_status_changed(self, status):
         if status == QQuickWidget.Error:
-            for error in self.quickWidget.errors():
+            for error in self.errors():
                 self.logger.error("QML error: " + error.toString())
 
     def setfreqscale(self, scale):

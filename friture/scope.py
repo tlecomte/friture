@@ -33,10 +33,10 @@ from friture.qml_tools import qml_url, raise_if_error
 SMOOTH_DISPLAY_TIMER_PERIOD_MS = 25
 DEFAULT_TIMERANGE = 2 * SMOOTH_DISPLAY_TIMER_PERIOD_MS
 
-class Scope_Widget(QtWidgets.QWidget):
+class Scope_Widget(QQuickWidget):
 
     def __init__(self, parent, engine):
-        super().__init__(parent)
+        super().__init__(engine, parent)
 
         self.logger = logging.getLogger(__name__)
 
@@ -59,21 +59,13 @@ class Scope_Widget(QtWidgets.QWidget):
         self._scope_data.horizontal_axis.name = "Time (ms)"
         self._scope_data.horizontal_axis.setTrackerFormatter(lambda x: "%#.3g ms" % (x))
 
-        self.setObjectName("Scope_Widget")
-        self.gridLayout = QtWidgets.QGridLayout(self)
-        self.gridLayout.setObjectName("gridLayout")
-        self.gridLayout.setContentsMargins(2, 2, 2, 2)
-
-        self.quickWidget = QQuickWidget(engine, self)
-        self.quickWidget.statusChanged.connect(self.on_status_changed)
-        self.quickWidget.setResizeMode(QQuickWidget.SizeRootObjectToView)
-        self.quickWidget.setSource(qml_url("Scope.qml"))
+        self.statusChanged.connect(self.on_status_changed)
+        self.setResizeMode(QQuickWidget.SizeRootObjectToView)
+        self.setSource(qml_url("Scope.qml"))
         
-        raise_if_error(self.quickWidget)
+        raise_if_error(self)
 
-        self.quickWidget.rootObject().setProperty("stateId", state_id)
-
-        self.gridLayout.addWidget(self.quickWidget)
+        self.rootObject().setProperty("stateId", state_id)
 
         self.settings_dialog = Scope_Settings_Dialog(self)
 
@@ -85,7 +77,7 @@ class Scope_Widget(QtWidgets.QWidget):
 
     def on_status_changed(self, status):
         if status == QQuickWidget.Error:
-            for error in self.quickWidget.errors():
+            for error in self.errors():
                 self.logger.error("QML error: " + error.toString())
 
     # method

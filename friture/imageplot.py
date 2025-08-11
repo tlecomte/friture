@@ -26,10 +26,10 @@ from friture.spectrogram_item_data import SpectrogramImageData
 from friture.store import GetStore
 from friture.pitch_tracker import format_frequency
 
-class ImagePlot(QtWidgets.QWidget):
+class ImagePlot(QQuickWidget):
 
     def __init__(self, parent, engine):
-        super(ImagePlot, self).__init__(parent)
+        super(ImagePlot, self).__init__(engine, parent)
 
         self.logger = logging.getLogger(__name__)
 
@@ -53,27 +53,18 @@ class ImagePlot(QtWidgets.QWidget):
         self._spectrogram_data.color_axis.setRange(-140, 0)
         self._spectrogram_data.show_color_axis = True
 
-        plotLayout = QtWidgets.QGridLayout(self)
-        plotLayout.setSpacing(0)
-        plotLayout.setContentsMargins(0, 0, 0, 0)
-
-        self.quickWidget = QQuickWidget(engine, self)
-        self.quickWidget.statusChanged.connect(self.on_status_changed)
-        self.quickWidget.setResizeMode(QQuickWidget.SizeRootObjectToView)
-        self.quickWidget.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
-        self.quickWidget.setSource(qml_url("ImagePlot.qml"))
+        self.statusChanged.connect(self.on_status_changed)
+        self.setResizeMode(QQuickWidget.SizeRootObjectToView)
+        self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        self.setSource(qml_url("ImagePlot.qml"))
         
-        raise_if_error(self.quickWidget)
+        raise_if_error(self)
 
-        self.quickWidget.rootObject().setProperty("stateId", state_id)
-
-        plotLayout.addWidget(self.quickWidget)
-
-        self.setLayout(plotLayout)
+        self.rootObject().setProperty("stateId", state_id)
 
     def on_status_changed(self, status):
         if status == QQuickWidget.Error:
-            for error in self.quickWidget.errors():
+            for error in self.errors():
                 self.logger.error("QML error: " + error.toString())
 
     def push(self, data, last_data_time):
