@@ -18,26 +18,27 @@
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
 from numpy.random import standard_normal
-from PyQt5 import QtWidgets
-
+from PyQt5.QtCore import QObject
 
 class WhiteGenerator:
     name = "White noise"
 
     def __init__(self, parent):
-        self.settings = SettingsWidget(parent)
+        self._view_model = White_Generator_Settings_View_Model(parent)
 
-    def settingsWidget(self):
-        return self.settings
+    def view_model(self):
+        return self._view_model
+
+    def qml_file_name(self) -> str:
+        return "WhiteSettings.qml"
 
     def signal(self, t):
         n = len(t)
         return standard_normal(n)
 
+class White_Generator_Settings_View_Model(QObject):
 
-class SettingsWidget(QtWidgets.QWidget):
-
-    def __init__(self, parent):
+    def __init__(self, parent: QObject):
         super().__init__(parent)
 
     def saveState(self, settings):

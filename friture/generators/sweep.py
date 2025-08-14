@@ -18,7 +18,7 @@
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
 import numpy as np
-from PyQt5 import QtWidgets
+from PyQt5.QtCore import QObject, pyqtProperty, pyqtSignal
 
 DEFAULT_SWEEP_STARTFREQUENCY = 20.
 DEFAULT_SWEEP_STOPFREQUENCY = 22000.
@@ -29,20 +29,28 @@ class SweepGenerator:
     name = "Sweep"
 
     def __init__(self, parent):
-        self.f1 = 20.
-        self.f2 = 22000.
-        self.Tuser = 1.
-        self.L, self.K, self.T = self.computeParams(self.f1, self.f2, self.Tuser)
-        self.timeoffset = 0.
+        self._view_model = Sweep_Generator_Settings_View_Model(parent)
+    
+        self._view_model.start_frequency_changed.connect(self.updateParams)
+        self._view_model.stop_frequency_changed.connect(self.updateParams)
+        self._view_model.peiod_changed.connect(self.updateParams)
+    
+        self.updateParams()
+        [self.L, self.K, self.T] = self.nextParams
         self.nextParams = None
+        self.timeoffset = 0.
 
-        self.settings = SettingsWidget(parent)
-        self.settings.spinBox_sweep_startfrequency.valueChanged.connect(self.setf1)
-        self.settings.spinBox_sweep_stopfrequency.valueChanged.connect(self.setf2)
-        self.settings.spinBox_sweep_period.valueChanged.connect(self.setT)
+    def view_model(self):
+        return self._view_model
 
-    def settingsWidget(self):
-        return self.settings
+    def qml_file_name(self) -> str:
+        return "SweepSettings.qml"
+    
+    def updateParams(self):
+        self.nextParams = self.computeParams(
+            self._view_model.start_frequency,
+            self._view_model.stop_frequency,
+            self._view_model.period)
 
     def computeParams(self, f1, f2, T):
         # adjust T so that we have an integer number of periods
@@ -60,25 +68,7 @@ class SweepGenerator:
         w2 = 2 * np.pi * f2
         K = w1 * T / np.log(w2 / w1)
         L = T / np.log(w2 / w1)
-        return L, K, T
-
-    def setf1(self, f1):
-        if self.f1 != f1:
-            self.f1 = f1
-            L, K, T = self.computeParams(self.f1, self.f2, self.Tuser)
-            self.nextParams = [L, K, T]
-
-    def setf2(self, f2):
-        if self.f2 != f2:
-            self.f2 = f2
-            L, K, T = self.computeParams(self.f1, self.f2, self.Tuser)
-            self.nextParams = [L, K, T]
-
-    def setT(self, T):
-        if self.Tuser != T:
-            self.Tuser = T
-            L, K, T = self.computeParams(self.f1, self.f2, self.Tuser)
-            self.nextParams = [L, K, T]
+        return [L, K, T]
 
     def signal(self, t):
         # https://ccrma.stanford.edu/realsimple/imp_meas/Sine_Sweep_Measurement_Theory.html
@@ -109,55 +99,53 @@ class SweepGenerator:
 
         return result
 
+class Sweep_Generator_Settings_View_Model(QObject):
+    start_frequency_changed = pyqtSignal(float)
+    stop_frequency_changed = pyqtSignal(float)
+    peiod_changed = pyqtSignal(float)
 
-class SettingsWidget(QtWidgets.QWidget):
-
-    def __init__(self, parent):
+    def __init__(self, parent: QObject):
         super().__init__(parent)
+        self._start_frequency = DEFAULT_SWEEP_STARTFREQUENCY
+        self._stop_frequency = DEFAULT_SWEEP_STOPFREQUENCY
+        self._period = DEFAULT_SWEEP_PERIOD_S
 
-        self.spinBox_sweep_startfrequency = QtWidgets.QSpinBox(self)
-        self.spinBox_sweep_startfrequency.setKeyboardTracking(False)
-        self.spinBox_sweep_startfrequency.setMinimum(20)
-        self.spinBox_sweep_startfrequency.setMaximum(22000)
-        self.spinBox_sweep_startfrequency.setProperty("value", DEFAULT_SWEEP_STARTFREQUENCY)
-        self.spinBox_sweep_startfrequency.setObjectName("spinBox_sweep_startfrequency")
-        self.spinBox_sweep_startfrequency.setSuffix(" Hz")
+    @pyqtProperty(float, notify=start_frequency_changed)
+    def start_frequency(self) -> float:
+        return self._start_frequency
 
-        self.spinBox_sweep_stopfrequency = QtWidgets.QSpinBox(self)
-        self.spinBox_sweep_stopfrequency.setKeyboardTracking(False)
-        self.spinBox_sweep_stopfrequency.setMinimum(20)
-        self.spinBox_sweep_stopfrequency.setMaximum(22000)
-        self.spinBox_sweep_stopfrequency.setProperty("value", DEFAULT_SWEEP_STOPFREQUENCY)
-        self.spinBox_sweep_stopfrequency.setObjectName("spinBox_sweep_stopfrequency")
-        self.spinBox_sweep_stopfrequency.setSuffix(" Hz")
+    @start_frequency.setter # type: ignore
+    def start_frequency(self, frequency: float):
+        if self._start_frequency != frequency:
+            self._start_frequency = frequency
+            self.start_frequency_changed.emit(frequency)
 
-        self.spinBox_sweep_period = QtWidgets.QDoubleSpinBox(self)
-        self.spinBox_sweep_period.setKeyboardTracking(False)
-        self.spinBox_sweep_period.setDecimals(2)
-        self.spinBox_sweep_period.setSingleStep(1)
-        self.spinBox_sweep_period.setMinimum(0.01)
-        self.spinBox_sweep_period.setMaximum(60)
-        self.spinBox_sweep_period.setProperty("value", DEFAULT_SWEEP_PERIOD_S)
-        self.spinBox_sweep_period.setObjectName("spinBox_sweep_period")
-        self.spinBox_sweep_period.setSuffix(" s")
+    @pyqtProperty(float, notify=stop_frequency_changed)
+    def stop_frequency(self) -> float:
+        return self._stop_frequency
+    
+    @stop_frequency.setter # type: ignore
+    def stop_frequency(self, frequency: float):
+        if self._stop_frequency != frequency:
+            self._stop_frequency = frequency
+            self.stop_frequency_changed.emit(frequency)
 
-        self.formLayout = QtWidgets.QFormLayout(self)
-
-        self.formLayout.addRow("Start frequency:", self.spinBox_sweep_startfrequency)
-        self.formLayout.addRow("Stop frequency:", self.spinBox_sweep_stopfrequency)
-        self.formLayout.addRow("Period:", self.spinBox_sweep_period)
-
-        self.setLayout(self.formLayout)
+    @pyqtProperty(float, notify=peiod_changed)
+    def period(self) -> float:
+        return self._period
+    
+    @period.setter # type: ignore
+    def period(self, period: float):
+        if self._period != period:
+            self._period = period
+            self.peiod_changed.emit(period)
 
     def saveState(self, settings):
-        settings.setValue("sweep start frequency", self.spinBox_sweep_startfrequency.value())
-        settings.setValue("sweep stop frequency", self.spinBox_sweep_stopfrequency.value())
-        settings.setValue("sweep period", self.spinBox_sweep_period.value())
+        settings.setValue("sweep start frequency", self.start_frequency)
+        settings.setValue("sweep stop frequency", self.stop_frequency)
+        settings.setValue("sweep period", self.period)
 
     def restoreState(self, settings):
-        sweep_start_frequency = settings.value("sweep start frequency", DEFAULT_SWEEP_STARTFREQUENCY, type=int)
-        self.spinBox_sweep_startfrequency.setValue(sweep_start_frequency)
-        sweep_stop_frequency = settings.value("sweep stop frequency", DEFAULT_SWEEP_STOPFREQUENCY, type=int)
-        self.spinBox_sweep_stopfrequency.setValue(sweep_stop_frequency)
-        sweep_period = settings.value("sweep period", DEFAULT_SWEEP_PERIOD_S, type=float)
-        self.spinBox_sweep_period.setValue(sweep_period)
+        self.start_frequency = settings.value("sweep start frequency", DEFAULT_SWEEP_STARTFREQUENCY, type=int)
+        self.stop_frequency = settings.value("sweep stop frequency", DEFAULT_SWEEP_STOPFREQUENCY, type=int)
+        self.period = settings.value("sweep period", DEFAULT_SWEEP_PERIOD_S, type=float)

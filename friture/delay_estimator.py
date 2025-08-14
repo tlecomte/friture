@@ -17,10 +17,12 @@
 # You should have received a copy of the GNU General Public License
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt5 import QtGui, QtWidgets
+from PyQt5 import QtWidgets
+from PyQt5.QtCore import QObject
 import numpy
 
 from friture import generated_filters
+from friture.delay_estimator_view_model import Delay_Estimator_View_Model
 from .audiobackend import SAMPLING_RATE
 from .ringbuffer import RingBuffer
 from .signal.decimate import decimate_multiple, decimate_multiple_filtic
@@ -28,60 +30,16 @@ from .signal.correlation import generalized_cross_correlation
 
 DEFAULT_DELAYRANGE = 1  # default delay range is 1 second
 
-
-class Delay_Estimator_Widget(QtWidgets.QWidget):
+class Delay_Estimator_Widget(QObject):
 
     def __init__(self, parent=None):
         super().__init__(parent)
 
         self.audiobuffer = None
 
-        self.previous_delay_message = ""
-        self.previous_correlation_message = ""
-        self.previous_polarity_message = ""
-        self.previous_channel_info_message = ""
+        self._view_model = Delay_Estimator_View_Model(self)
 
-        self.setObjectName("Delay_Estimator_Widget")
-        self.layout = QtWidgets.QFormLayout(self)
-        self.layout.setObjectName("layout")
-
-        font = QtGui.QFont()
-        font.setPointSize(14)
-        font.setWeight(75)
-        font.setBold(True)
-
-        self.delay_label = QtWidgets.QLabel(self)
-        self.delay_label.setFont(font)
-        self.delay_label.setObjectName("delay_label")
-
-        self.delay_text_label = QtWidgets.QLabel(self)
-        self.delay_text_label.setObjectName("delay_text_label")
-        self.delay_text_label.setText("Delay:")
-
-        self.correlation_label = QtWidgets.QLabel(self)
-        self.correlation_label.setObjectName("Correlation_label")
-
-        self.correlation_text_label = QtWidgets.QLabel(self)
-        self.correlation_text_label.setObjectName("correlation_text_label")
-        self.correlation_text_label.setText("Confidence:")
-
-        self.polarity_label = QtWidgets.QLabel(self)
-        self.polarity_label.setFont(font)
-        self.polarity_label.setObjectName("polarity_label")
-
-        self.polarity_text_label = QtWidgets.QLabel(self)
-        self.polarity_text_label.setObjectName("polarity_text_label")
-        self.polarity_text_label.setText("Polarity:")
-
-        self.channel_info_label = QtWidgets.QLabel(self)
-        self.channel_info_label.setObjectName("channel_info_label")
-
-        self.layout.addRow(self.delay_text_label, self.delay_label)
-        self.layout.addRow(self.correlation_text_label, self.correlation_label)
-        self.layout.addRow(self.polarity_text_label, self.polarity_label)
-        self.layout.addRow(None, self.channel_info_label)
-
-        self.settings_dialog = Delay_Estimator_Settings_Dialog(self)
+        self.settings_dialog = Delay_Estimator_Settings_Dialog(parent, self)
 
         # We will decimate several times
         # no decimation => 1/fs = 23 µs resolution
@@ -115,6 +73,12 @@ class Delay_Estimator_Widget(QtWidgets.QWidget):
         self.distance_m = 0.
         self.correlation = 0.
         self.Xcorr_extremum = 0.
+
+    def view_model(self):
+        return self._view_model
+    
+    def qml_file_name(self):
+        return "DelayEstimator.qml"
 
     # method
     def set_buffer(self, buffer):
@@ -213,44 +177,22 @@ class Delay_Estimator_Widget(QtWidgets.QWidget):
 
     # method
     def canvasUpdate(self):
-        if not self.isVisible():
-            return
-
         if self.two_channels:
-            delay_message = "%.1f ms\n= %.2f m" % (self.delay_ms, self.distance_m)
-            correlation_message = "%d%%" % (self.correlation)
+            self._view_model.delay = "%.1f ms\n= %.2f m" % (self.delay_ms, self.distance_m)
+            self._view_model.correlation = "%d%%" % (self.correlation)
             if self.Xcorr_extremum >= 0:
-                polarity_message = "In-phase"
+                self._view_model.polarity = "In-phase"
             else:
-                polarity_message = "Reversed phase"
-            channelInfo_message = ""
-
-            if delay_message != self.previous_delay_message:
-                self.delay_label.setText(delay_message)
-                self.previous_delay_message = delay_message
-            if correlation_message != self.previous_correlation_message:
-                self.correlation_label.setText(correlation_message)
-                self.previous_correlation_message = correlation_message
-            if polarity_message != self.previous_polarity_message:
-                self.polarity_label.setText(polarity_message)
-                self.previous_polarity_message = polarity_message
-            if channelInfo_message != self.previous_channel_info_message:
-                self.channel_info_label.setText(channelInfo_message)
-                self.previous_channel_info_message = channelInfo_message
+                self._view_model.polarity = "Reversed phase"
+            self._view_model.channel_info = ""
         else:
-            message = """Delay estimator only works
+            self._view_model.delay = "N/A ms\n(N/A m)"
+            self._view_model.correlation = "N/A %"
+            self._view_model.polarity = "N/A"
+            self._view_model.channel_info = """Delay estimator only works
 with two channels.
 Select two-channels mode
 in the setup window."""
-            if message != self.previous_channel_info_message:
-                self.previous_delay_message = "N/A ms\n(N/A m)"
-                self.delay_label.setText(self.previous_delay_message)
-                self.previous_correlation_message = "N/A %"
-                self.correlation_label.setText(self.previous_correlation_message)
-                self.previous_polarity_message = "N/A"
-                self.polarity_label.setText(self.previous_polarity_message)
-                self.channel_info_label.setText(message)
-                self.previous_channel_info_message = message
 
     def set_delayrange(self, delay_s):
         self.delayrange_s = delay_s
@@ -270,7 +212,7 @@ in the setup window."""
 
 class Delay_Estimator_Settings_Dialog(QtWidgets.QDialog):
 
-    def __init__(self, parent):
+    def __init__(self, parent, view_model):
         super().__init__(parent)
 
         self.setWindowTitle("Delay estimator settings")
@@ -289,7 +231,7 @@ class Delay_Estimator_Settings_Dialog(QtWidgets.QDialog):
 
         self.setLayout(self.form_layout)
 
-        self.double_spinbox_delayrange.valueChanged.connect(self.parent().set_delayrange)
+        self.double_spinbox_delayrange.valueChanged.connect(view_model.set_delayrange)
 
     # method
     def saveState(self, settings):

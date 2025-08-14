@@ -18,25 +18,20 @@
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
-from PyQt5 import QtWidgets
-from PyQt5.QtQuickWidgets import QQuickWidget
-from friture.qml_tools import qml_url, raise_if_error
+from PyQt5.QtCore import QObject
 from friture.spectrogram_data import Spectrogram_Data
 from friture.spectrogram_item_data import SpectrogramImageData
 from friture.store import GetStore
 from friture.pitch_tracker import format_frequency
 
-class ImagePlot(QQuickWidget):
+class ImagePlot(QObject):
 
-    def __init__(self, parent, engine):
-        super(ImagePlot, self).__init__(engine, parent)
+    def __init__(self, parent):
+        super(ImagePlot, self).__init__(parent)
 
         self.logger = logging.getLogger(__name__)
 
-        store = GetStore()
-        self._spectrogram_data = Spectrogram_Data(store)
-        store._dock_states.append(self._spectrogram_data)
-        state_id = len(store._dock_states) - 1
+        self._spectrogram_data = Spectrogram_Data(GetStore())
 
         self._spectrogram_item = SpectrogramImageData()
         self._spectrogram_data.add_plot_item(self._spectrogram_item)
@@ -53,19 +48,11 @@ class ImagePlot(QQuickWidget):
         self._spectrogram_data.color_axis.setRange(-140, 0)
         self._spectrogram_data.show_color_axis = True
 
-        self.statusChanged.connect(self.on_status_changed)
-        self.setResizeMode(QQuickWidget.SizeRootObjectToView)
-        self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
-        self.setSource(qml_url("ImagePlot.qml"))
-        
-        raise_if_error(self)
-
-        self.rootObject().setProperty("stateId", state_id)
-
-    def on_status_changed(self, status):
-        if status == QQuickWidget.Error:
-            for error in self.errors():
-                self.logger.error("QML error: " + error.toString())
+    def qml_file_name(self):
+        return "ImagePlot.qml"
+    
+    def view_model(self):
+        return self._spectrogram_data
 
     def push(self, data, last_data_time):
         self._spectrogram_item.push(data, last_data_time)

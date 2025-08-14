@@ -62,6 +62,11 @@ from friture.spectrum_data import Spectrum_Data
 from friture.plotFilledCurve import PlotFilledCurve
 from friture.filled_curve import FilledCurve
 from friture.qml_tools import qml_url
+from friture.generators.sine import Sine_Generator_Settings_View_Model
+from friture.generators.white import White_Generator_Settings_View_Model
+from friture.generators.pink import Pink_Generator_Settings_View_Model
+from friture.generators.sweep import Sweep_Generator_Settings_View_Model
+from friture.generators.burst import Burst_Generator_Settings_View_Model
 
 # the display timer could be made faster when the processing
 # power allows it, firing down to every 10 ms
@@ -110,6 +115,12 @@ class Friture(QMainWindow, ):
         qmlRegisterType(SpectrogramImageData, 'Friture', 1, 0, 'SpectrogramImageData')
         qmlRegisterType(ColorBar, 'Friture', 1, 0, 'ColorBar')
         qmlRegisterType(Tick, 'Friture', 1, 0, 'Tick')
+        qmlRegisterType(Burst_Generator_Settings_View_Model, 'Friture', 1, 0, 'Burst_Generator_Settings_View_Model')
+        qmlRegisterType(Pink_Generator_Settings_View_Model, 'Friture', 1, 0, 'Pink_Generator_Settings_View_Model')
+        qmlRegisterType(White_Generator_Settings_View_Model, 'Friture', 1, 0, 'White_Generator_Settings_View_Model')
+        qmlRegisterType(Sweep_Generator_Settings_View_Model, 'Friture', 1, 0, 'Sweep_Generator_Settings_View_Model')
+        qmlRegisterType(Sine_Generator_Settings_View_Model, 'Friture', 1, 0, 'Sine_Generator_Settings_View_Model')
+
         qmlRegisterSingletonType(Store, 'Friture', 1, 0, 'Store', lambda engine, script_engine: GetStore())
 
         # Setup the user interface
@@ -442,6 +453,11 @@ def main():
     if platform.system() == "Linux":
         if "PIPEWIRE_ALSA" not in os.environ:
             os.environ['PIPEWIRE_ALSA'] = '{ application.name = "Friture" }'
+
+    # Set the style for Qt Quick Controls
+    # We choose the Fusion style as it is a desktop-oriented style
+    # It uses the standard system palettes to provide colors that match the desktop environment.
+    os.environ["QT_QUICK_CONTROLS_STYLE"] = "Fusion"
 
     # Splash screen
     if not program_arguments.no_splash:

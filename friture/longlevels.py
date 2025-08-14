@@ -21,8 +21,7 @@
 
 
 import logging
-from PyQt5 import QtWidgets
-from PyQt5.QtQuickWidgets import QQuickWidget
+from PyQt5.QtCore import QObject
 import numpy as np
 from friture.longlevels_settings import (LongLevels_Settings_Dialog,
                                          DEFAULT_LEVEL_MIN,
@@ -36,7 +35,6 @@ from friture_extensions.lfilter import pyx_lfilter_float64_1D
 from friture.scope_data import Scope_Data
 from friture.curve import Curve
 from friture.store import GetStore
-from friture.qml_tools import qml_url, raise_if_error
 
 from friture.audiobackend import SAMPLING_RATE
 
@@ -93,17 +91,14 @@ class Subsampler:
         return x_dec
 
 
-class LongLevelWidget(QQuickWidget):
+class LongLevelWidget(QObject):
 
-    def __init__(self, parent, engine):
-        super().__init__(engine, parent)
+    def __init__(self, parent):
+        super().__init__(parent)
 
         self.logger = logging.getLogger(__name__)
 
-        store = GetStore()
-        self._long_levels_data = Scope_Data(store)
-        store._dock_states.append(self._long_levels_data)
-        state_id = len(store._dock_states) - 1
+        self._long_levels_data = Scope_Data(GetStore())
 
         self._curve = Curve()
         self._curve.name = "Ch1"
@@ -114,15 +109,6 @@ class LongLevelWidget(QQuickWidget):
         self._long_levels_data.horizontal_axis.name = "Time (sec)"
         self._long_levels_data.horizontal_axis.setTrackerFormatter(lambda x: "%#.3g sec" % (x))
 
-        self.statusChanged.connect(self.on_status_changed)
-        self.setResizeMode(QQuickWidget.SizeRootObjectToView)
-        self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
-        self.setSource(qml_url("Scope.qml"))
-        
-        raise_if_error(self)
-
-        self.rootObject().setProperty("stateId", state_id)
-
         self.level_min = DEFAULT_LEVEL_MIN
         self.level_max = DEFAULT_LEVEL_MAX
         self._long_levels_data.vertical_axis.setRange(self.level_min, self.level_max)
@@ -130,7 +116,7 @@ class LongLevelWidget(QQuickWidget):
         self.audiobuffer = None
 
         # initialize the settings dialog
-        self.settings_dialog = LongLevels_Settings_Dialog(self)
+        self.settings_dialog = LongLevels_Settings_Dialog(parent, self)
 
         # initialize the class instance that will do the fft
         self.proc = audioproc()
@@ -150,6 +136,12 @@ class LongLevelWidget(QQuickWidget):
 
         # ringbuffer for the subsampled data
         self.ringbuffer = RingBuffer()
+
+    def qml_file_name(self):
+        return "Scope.qml"
+    
+    def view_model(self):
+        return self._long_levels_data
 
     # method
     def set_buffer(self, buffer):
@@ -201,11 +193,6 @@ class LongLevelWidget(QQuickWidget):
             scaled_t = self.time / self.length_seconds
             scaled_y = np.clip(1. - (levels[0, :] - self.level_min) / (self.level_max - self.level_min), 0., 1.)
             self._curve.setData(scaled_t, scaled_y)
-
-    def on_status_changed(self, status):
-        if status == QQuickWidget.Error:
-            for error in self.errors():
-                self.logger.error("QML error: " + error.toString())
 
     # method
     def canvasUpdate(self):

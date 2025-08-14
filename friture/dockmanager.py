@@ -64,7 +64,6 @@ class DockManager(QtCore.QObject):
         new_dock = Dock(self._parent, name, self._parent.qml_engine, widget_id)
         if settings is not None:
             new_dock.restoreState(settings)
-        #self.parent().addDockWidget(QtCore.Qt.TopDockWidgetArea, new_dock)
         self._parent.centralLayout.addWidget(new_dock)
 
         self.docks += [new_dock]
@@ -114,7 +113,6 @@ class DockManager(QtCore.QObject):
             self.logger.info("First launch, display a default set of docks")
             self.docks = [Dock(self.parent(), "Dock %d" % (i), self.parent().qml_engine, widgetId=widget_type) for i, widget_type in enumerate(DEFAULT_DOCKS)]
             for dock in self.docks:
-                #self.parent().addDockWidget(QtCore.Qt.TopDockWidgetArea, dock)
                 self.parent().centralLayout.addWidget(dock)
 
         # Ugh it seems QSettings encodes an empty stack the same as None, and

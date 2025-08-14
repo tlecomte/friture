@@ -18,66 +18,57 @@
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
 import numpy as np
-from PyQt5 import QtWidgets
+from PyQt5.QtCore import QObject, pyqtProperty, pyqtSignal
 
 DEFAULT_SINE_FREQUENCY = 440.
-
 
 class SineGenerator:
 
     name = "Sine"
 
     def __init__(self, parent):
-        self.f = 440.
+        self._view_model = Sine_Generator_Settings_View_Model(parent)
 
-        self.settings = SettingsWidget(parent)
-        self.settings.spinBox_sine_frequency.valueChanged.connect(self.setf)
+    def view_model(self):
+        return self._view_model
 
+    def qml_file_name(self) -> str:
+        return "SineSettings.qml"
+
+    def signal(self, t):
+        self._view_model.lastt = t[-1]
+        return np.sin(2. * np.pi * t * self._view_model.frequency + self._view_model.offset)
+
+class Sine_Generator_Settings_View_Model(QObject):
+    frequency_changed = pyqtSignal(float)
+
+    def __init__(self, parent: QObject):
+        super().__init__(parent)
+        self._frequency = DEFAULT_SINE_FREQUENCY
         self.offset = 0
         self.lastt = 0
 
-    def setf(self, f):
-        oldf = self.f
-        self.f = f
+    @pyqtProperty(float, notify=frequency_changed)
+    def frequency(self) -> float:
+        return self._frequency
 
-        # the offset is adapted to avoid phase break
-        lastphase = 2. * np.pi * self.lastt * oldf + self.offset
-        newphase = 2. * np.pi * self.lastt * self.f + self.offset
-        self.offset += (lastphase - newphase)
-        self.offset %= 2. * np.pi
+    @frequency.setter # type: ignore
+    def frequency(self, frequency: float):
+        if self._frequency != frequency:
+            oldf = self._frequency
+            self._frequency = frequency
 
-    def settingsWidget(self):
-        return self.settings
+            # the offset is adapted to avoid phase break
+            lastphase = 2. * np.pi * self.lastt * oldf + self.offset
+            newphase = 2. * np.pi * self.lastt * self._frequency+ self.offset
+            self.offset += (lastphase - newphase)
+            self.offset %= 2. * np.pi
 
-    def signal(self, t):
-        self.lastt = t[-1]
-        return np.sin(2. * np.pi * t * self.f + self.offset)
-
-
-class SettingsWidget(QtWidgets.QWidget):
-
-    def __init__(self, parent):
-        super().__init__(parent)
-
-        self.spinBox_sine_frequency = QtWidgets.QDoubleSpinBox(self)
-        self.spinBox_sine_frequency.setKeyboardTracking(False)
-        self.spinBox_sine_frequency.setDecimals(2)
-        self.spinBox_sine_frequency.setSingleStep(1)
-        self.spinBox_sine_frequency.setMinimum(20)
-        self.spinBox_sine_frequency.setMaximum(22000)
-        self.spinBox_sine_frequency.setProperty("value", DEFAULT_SINE_FREQUENCY)
-        self.spinBox_sine_frequency.setObjectName("spinBox_sine_frequency")
-        self.spinBox_sine_frequency.setSuffix(" Hz")
-
-        self.formLayout = QtWidgets.QFormLayout(self)
-
-        self.formLayout.addRow("Frequency:", self.spinBox_sine_frequency)
-
-        self.setLayout(self.formLayout)
+            self.frequency_changed.emit(frequency)
 
     def saveState(self, settings):
-        settings.setValue("sine frequency", self.spinBox_sine_frequency.value())
+        settings.setValue("sine frequency", self.frequency)
 
     def restoreState(self, settings):
-        sine_freq = settings.value("sine frequency", DEFAULT_SINE_FREQUENCY, type=float)
-        self.spinBox_sine_frequency.setValue(sine_freq)
+        frequency = settings.value("sine frequency", DEFAULT_SINE_FREQUENCY, type=float)
+        self.frequency = frequency

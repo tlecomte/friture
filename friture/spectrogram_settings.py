@@ -36,10 +36,12 @@ DEFAULT_WEIGHTING = 0  # None
 
 class Spectrogram_Settings_Dialog(QtWidgets.QDialog):
 
-    def __init__(self, parent):
+    def __init__(self, parent, view_model):
         super().__init__(parent)
 
         self.logger = logging.getLogger(__name__)
+
+        self.view_model = view_model
 
         self.setWindowTitle("Spectrogram settings")
 
@@ -126,23 +128,23 @@ class Spectrogram_Settings_Dialog(QtWidgets.QDialog):
 
         self.comboBox_fftsize.currentIndexChanged.connect(self.fftsizechanged)
         self.comboBox_freqscale.currentIndexChanged.connect(self.freqscalechanged)
-        self.spinBox_minfreq.valueChanged.connect(self.parent().setminfreq)
-        self.spinBox_maxfreq.valueChanged.connect(self.parent().setmaxfreq)
-        self.spinBox_specmin.valueChanged.connect(self.parent().setmin)
-        self.spinBox_specmax.valueChanged.connect(self.parent().setmax)
-        self.doubleSpinBox_timerange.valueChanged.connect(self.parent().timerangechanged)
-        self.comboBox_weighting.currentIndexChanged.connect(self.parent().setweighting)
+        self.spinBox_minfreq.valueChanged.connect(view_model.setminfreq)
+        self.spinBox_maxfreq.valueChanged.connect(view_model.setmaxfreq)
+        self.spinBox_specmin.valueChanged.connect(view_model.setmin)
+        self.spinBox_specmax.valueChanged.connect(view_model.setmax)
+        self.doubleSpinBox_timerange.valueChanged.connect(view_model.timerangechanged)
+        self.comboBox_weighting.currentIndexChanged.connect(view_model.setweighting)
 
     # slot
     def fftsizechanged(self, index):
         self.logger.info("fft_size_changed slot %d %d %f", index, 2 ** index * 32, 150000 / 2 ** index * 32)
         fft_size = 2 ** index * 32
-        self.parent().setfftsize(fft_size)
+        self.view_model.setfftsize(fft_size)
 
     # slot
     def freqscalechanged(self, index):
         self.logger.info("freq_scale slot %d %s", index, fscales.ALL[index])
-        self.parent().setfreqscale(fscales.ALL[index])
+        self.view_model.setfreqscale(fscales.ALL[index])
         
     # method
     def saveState(self, settings):

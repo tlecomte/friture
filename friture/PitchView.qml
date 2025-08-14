@@ -7,100 +7,84 @@ import "plotItemColors.js" as PlotItemColors
 
 Item {
     id: container
-    property var stateId
+    required property var viewModel
+    required property string fixedFont
 
-    // delay the load of the Plot until stateId has been set
-    Loader {
-        id: loader
-        anchors.fill: parent
+    Plot {
+        id: plot
+        scopedata: viewModel
+
+        anchors.fill: null // override 'fill: parent' in Plot.qml
+        anchors.left: parent.left
+        anchors.right: pitchItem.left                
+        anchors.top: parent.top
+        anchors.bottom: parent.bottom
+
+        Repeater {
+            model: plot.scopedata.plot_items
+
+            PlotCurve {
+                anchors.fill: parent
+                color: PlotItemColors.color(index)
+                curve: modelData
+            }
+        }
     }
 
-    onStateIdChanged: {
-        console.log("stateId changed: " + stateId)
-        loader.sourceComponent = plotComponent
-    }
+    Rectangle {
+        id: pitchItem
 
-    Component {
-        id: plotComponent
+        implicitWidth: pitchCol.implicitWidth
+        implicitHeight: parent ? parent.height : 0
 
-        Item {
-            Plot {
-                id: plot
-                scopedata: Store.dock_states[container.stateId]
+        anchors.right: parent.right
 
-                anchors.fill: null // override 'fill: parent' in Plot.qml
-                anchors.left: parent.left
-                anchors.right: pitchItem.left                
-                anchors.top: parent.top
-                anchors.bottom: parent.bottom
+        SystemPalette { id: systemPalette; colorGroup: SystemPalette.Active }
+        color: systemPalette.window
 
-                Repeater {
-                    model: plot.scopedata.plot_items
+        ColumnLayout {
+            id: pitchCol
+            spacing: 0
 
-                    PlotCurve {
-                        anchors.fill: parent
-                        color: PlotItemColors.color(index)
-                        curve: modelData
-                    }
-                }
+            FontMetrics {
+                id: fontMetrics
+                font.pointSize: 14
+                font.bold: true
             }
 
-            Rectangle {
-                id: pitchItem
+            Text {
+                id: note
+                text: plot.scopedata.note
+                textFormat: Text.PlainText
+                font.pointSize: 14
+                font.bold: true
+                rightPadding: 6
+                horizontalAlignment: Text.AlignRight
+                Layout.alignment: Qt.AlignTop | Qt.AlignRight
+                color: systemPalette.windowText
+            }
 
-                implicitWidth: pitchCol.implicitWidth
-                implicitHeight: parent ? parent.height : 0
+            Text {
+                id: pitchHz
+                text: plot.scopedata.pitch
+                textFormat: Text.PlainText
+                font.pointSize: 14
+                font.bold: true
+                rightPadding: 6
+                horizontalAlignment: Text.AlignRight
+                Layout.preferredWidth: fontMetrics.boundingRect("000.0").width
+                Layout.alignment: Qt.AlignTop | Qt.AlignRight
+                color: systemPalette.windowText
+            }
 
-                anchors.right: parent.right
-
-                SystemPalette { id: systemPalette; colorGroup: SystemPalette.Active }
-                color: systemPalette.window
-
-                ColumnLayout {
-                    id: pitchCol
-                    spacing: 0
-
-                    FontMetrics {
-                        id: fontMetrics
-                        font.pointSize: 14
-                        font.bold: true
-                    }
-
-                    Text {
-                        id: note
-                        text: plot.scopedata.note
-                        textFormat: Text.PlainText
-                        font.pointSize: 14
-                        font.bold: true
-                        rightPadding: 6
-                        horizontalAlignment: Text.AlignRight
-                        Layout.alignment: Qt.AlignTop | Qt.AlignRight
-                        color: systemPalette.windowText
-                    }
-
-                    Text {
-                        id: pitchHz
-                        text: plot.scopedata.pitch
-                        textFormat: Text.PlainText
-                        font.pointSize: 14
-                        font.bold: true
-                        rightPadding: 6
-                        horizontalAlignment: Text.AlignRight
-                        Layout.preferredWidth: fontMetrics.boundingRect("000.0").width
-                        Layout.alignment: Qt.AlignTop | Qt.AlignRight
-                        color: systemPalette.windowText
-                    }
-
-                    Text {
-                        id: pitchUnit
-                        text: plot.scopedata.pitch_unit
-                        textFormat: Text.PlainText
-                        rightPadding: 6
-                        horizontalAlignment: Text.AlignRight
-                        Layout.alignment: Qt.AlignTop | Qt.AlignRight
-                        color: systemPalette.windowText
-                    }
-                }
+            Text {
+                id: pitchUnit
+                text: plot.scopedata.pitch_unit
+                textFormat: Text.PlainText
+                rightPadding: 6
+                horizontalAlignment: Text.AlignRight
+                Layout.alignment: Qt.AlignTop | Qt.AlignRight
+                color: systemPalette.windowText
             }
         }
     }

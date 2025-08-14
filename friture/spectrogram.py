@@ -19,7 +19,7 @@
 
 """Spectrogram widget, that displays a rolling 2D image of the time-frequency spectrum."""
 
-from PyQt5 import QtWidgets
+from PyQt5.QtCore import QObject
 from numpy import log10, floor, zeros, float64, tile, array, ndarray
 from friture.audiobuffer import AudioBuffer
 from friture.imageplot import ImagePlot
@@ -43,17 +43,12 @@ from friture.audiobackend import SAMPLING_RATE, FRAMES_PER_BUFFER, AudioBackend
 from fractions import Fraction
 
 
-class Spectrogram_Widget(QtWidgets.QWidget):
+class Spectrogram_Widget(QObject):
 
-    def __init__(self, parent, engine):
+    def __init__(self, parent):
         super().__init__(parent)
 
-        self.setObjectName("Spectrogram_Widget")
-        self.gridLayout = QtWidgets.QGridLayout(self)
-        self.gridLayout.setObjectName("gridLayout")
-        self.PlotZoneImage = ImagePlot(self, engine)
-        self.PlotZoneImage.setObjectName("PlotZoneImage")
-        self.gridLayout.addWidget(self.PlotZoneImage, 0, 1, 1, 1)
+        self.PlotZoneImage = ImagePlot(self)
 
         self.audiobuffer = None
 
@@ -106,9 +101,15 @@ class Spectrogram_Widget(QtWidgets.QWidget):
         self.sfft_rate_frac = Fraction(SAMPLING_RATE, self.fft_size) / (Fraction(1) - self.overlap_frac) / 1000
 
         # initialize the settings dialog
-        self.settings_dialog = Spectrogram_Settings_Dialog(self)
+        self.settings_dialog = Spectrogram_Settings_Dialog(parent, self)
 
         self.mustRestart = False
+
+    def qml_file_name(self):
+        return self.PlotZoneImage.qml_file_name()
+
+    def view_model(self):
+        return self.PlotZoneImage.view_model()
 
     # method
     def set_buffer(self, buffer: AudioBuffer) -> None:
@@ -184,9 +185,6 @@ class Spectrogram_Widget(QtWidgets.QWidget):
         # actual displayed spectrogram is a scaled version of the time-frequency plane
 
     def canvasUpdate(self):
-        if not self.isVisible():
-            return
-
         self.PlotZoneImage.draw()
 
     def update_jitter(self):
