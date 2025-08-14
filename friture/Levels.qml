@@ -11,7 +11,7 @@ Rectangle {
     property var stateId
     property LevelViewModel level_view_model: Store.dock_states[stateId]
 
-    property var fixedFont
+    property string fixedFont
 
     // parent here will be unset on exit
     height: parent ? parent.height : 0

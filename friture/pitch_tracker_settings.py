@@ -31,7 +31,7 @@ DEFAULT_MIN_DB = -70.0
 DEFAULT_FFT_SIZE = 16384
 
 class PitchTrackerSettingsDialog(QtWidgets.QDialog):
-    def __init__(self, parent: QtWidgets.QWidget) -> None:
+    def __init__(self, parent: QtWidgets.QWidget, view_model: Any) -> None:
         super().__init__(parent)
         self.setWindowTitle("Pitch Tracker Settings")
         self.form_layout = QtWidgets.QFormLayout(self)
@@ -43,7 +43,7 @@ class PitchTrackerSettingsDialog(QtWidgets.QDialog):
         self.min_freq.setValue(DEFAULT_MIN_FREQ)
         self.min_freq.setSuffix(" Hz")
         self.min_freq.setObjectName("min_freq")
-        self.min_freq.valueChanged.connect(self.parent().set_min_freq) # type: ignore
+        self.min_freq.valueChanged.connect(view_model.set_min_freq) # type: ignore
         self.form_layout.addRow("Min:", self.min_freq)
 
         self.max_freq = QtWidgets.QSpinBox(self)
@@ -53,7 +53,7 @@ class PitchTrackerSettingsDialog(QtWidgets.QDialog):
         self.max_freq.setValue(DEFAULT_MAX_FREQ)
         self.max_freq.setSuffix(" Hz")
         self.max_freq.setObjectName("max_freq")
-        self.max_freq.valueChanged.connect(self.parent().set_max_freq) # type: ignore
+        self.max_freq.valueChanged.connect(view_model.set_max_freq) # type: ignore
         self.form_layout.addRow("Max:", self.max_freq)
 
         self.duration = QtWidgets.QSpinBox(self)
@@ -63,7 +63,7 @@ class PitchTrackerSettingsDialog(QtWidgets.QDialog):
         self.duration.setValue(DEFAULT_DURATION)
         self.duration.setSuffix(" s")
         self.duration.setObjectName("duration")
-        self.duration.valueChanged.connect(self.parent().set_duration) # type: ignore
+        self.duration.valueChanged.connect(view_model.set_duration) # type: ignore
         self.form_layout.addRow("Duration:", self.duration)
 
         self.min_db = QtWidgets.QDoubleSpinBox(self)
@@ -73,7 +73,7 @@ class PitchTrackerSettingsDialog(QtWidgets.QDialog):
         self.min_db.setValue(DEFAULT_MIN_DB)
         self.min_db.setSuffix(" dB")
         self.min_db.setObjectName("min_db")
-        self.min_db.valueChanged.connect(self.parent().set_min_db) # type: ignore
+        self.min_db.valueChanged.connect(view_model.set_min_db) # type: ignore
         self.form_layout.addRow("Min Amplitude:", self.min_db)
 
         self.setLayout(self.form_layout)

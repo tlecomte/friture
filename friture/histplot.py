@@ -18,8 +18,7 @@
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
-from PyQt5 import QtWidgets
-from PyQt5.QtQuickWidgets import QQuickWidget
+from PyQt5.QtCore import QObject
 from numpy import zeros, ones, log10
 import numpy
 from friture.filled_curve import CurveType, FilledCurve
@@ -27,23 +26,19 @@ from friture.histplot_data import HistPlot_Data
 from friture.plotting.coordinateTransform import CoordinateTransform
 import friture.plotting.frequency_scales as fscales
 from friture.pitch_tracker import format_frequency
-from friture.qml_tools import qml_url, raise_if_error
 from friture.store import GetStore
 
 # The peak decay rates (magic goes here :).
 PEAK_DECAY_RATE = 1.0 - 3E-6
 
-class HistPlot(QQuickWidget):
+class HistPlot(QObject):
 
-    def __init__(self, parent, engine):
-        super(HistPlot, self).__init__(engine, parent)
+    def __init__(self, parent):
+        super(HistPlot, self).__init__(parent)
 
         self.logger = logging.getLogger(__name__)
 
-        store = GetStore()
-        self._histplot_data = HistPlot_Data(store)
-        store._dock_states.append(self._histplot_data)
-        state_id = len(store._dock_states) - 1
+        self._histplot_data = HistPlot_Data(GetStore())
 
         self._curve_peak = FilledCurve(CurveType.PEEK)
         self._histplot_data.add_plot_item(self._curve_peak)
@@ -73,19 +68,11 @@ class HistPlot(QQuickWidget):
         self.normHorizontalScaleTransform.setScale(fscales.Logarithmic)
         self._histplot_data.horizontal_axis.setScale(fscales.Logarithmic)
 
-        self.statusChanged.connect(self.on_status_changed)
-        self.setResizeMode(QQuickWidget.SizeRootObjectToView)
-        self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
-        self.setSource(qml_url("HistPlot.qml"))
-
-        raise_if_error(self)
-
-        self.rootObject().setProperty("stateId", state_id)
-
-    def on_status_changed(self, status):
-        if status == QQuickWidget.Error:
-            for error in self.errors():
-                self.logger.error("QML error: " + error.toString())
+    def qml_file_name(self):
+        return "HistPlot.qml"
+    
+    def view_model(self):
+        return self._histplot_data
 
     def setdata(self, fl, fh, fc, y):
         if not self.paused:

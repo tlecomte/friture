@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt5 import QtWidgets
+from PyQt5.QtCore import QObject
 from numpy import log10, argmax, zeros, arange, floor, float64
 from friture.audioproc import audioproc  # audio processing class
 from friture.spectrum_settings import (Spectrum_Settings_Dialog,  # settings dialog
@@ -37,20 +37,13 @@ from friture.spectrumPlotWidget import SpectrumPlotWidget
 from friture_extensions.exp_smoothing_conv import pyx_exp_smoothed_value_numpy
 
 
-class Spectrum_Widget(QtWidgets.QWidget):
+class Spectrum_Widget(QObject):
 
-    def __init__(self, parent, engine):
+    def __init__(self, parent):
         super().__init__(parent)
 
         self.audiobuffer = None
-
-        self.setObjectName("Spectrum_Widget")
-        self.gridLayout = QtWidgets.QGridLayout(self)
-        self.gridLayout.setObjectName("gridLayout")
-        self.gridLayout.setContentsMargins(2, 2, 2, 2)
-        self.PlotZoneSpect = SpectrumPlotWidget(self, engine)
-        self.PlotZoneSpect.setObjectName("PlotZoneSpect")
-        self.gridLayout.addWidget(self.PlotZoneSpect, 0, 0, 1, 1)
+        self.PlotZoneSpect = SpectrumPlotWidget(self)
 
         # initialize the class instance that will do the fft
         self.proc = audioproc()
@@ -86,7 +79,13 @@ class Spectrum_Widget(QtWidgets.QWidget):
         self.PlotZoneSpect.setShowFreqLabel(DEFAULT_SHOW_FREQ_LABELS)
 
         # initialize the settings dialog
-        self.settings_dialog = Spectrum_Settings_Dialog(self)
+        self.settings_dialog = Spectrum_Settings_Dialog(parent, self)
+
+    def qml_file_name(self):
+        return self.PlotZoneSpect.qml_file_name()
+    
+    def view_model(self):
+        return self.PlotZoneSpect.view_model()
 
     # method
     def set_buffer(self, buffer):

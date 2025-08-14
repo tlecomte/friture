@@ -39,8 +39,10 @@ DEFAULT_RESPONSE_TIME_INDEX = 0
 
 class Spectrum_Settings_Dialog(QtWidgets.QDialog):
 
-    def __init__(self, parent):
+    def __init__(self, parent, view_model):
         super().__init__(parent)
+
+        self.view_model = view_model
 
         self.logger = logging.getLogger(__name__)
 
@@ -148,33 +150,33 @@ class Spectrum_Settings_Dialog(QtWidgets.QDialog):
         self.comboBox_dual_channel.currentIndexChanged.connect(self.dualchannelchanged)
         self.comboBox_fftsize.currentIndexChanged.connect(self.fftsizechanged)
         self.comboBox_freqscale.currentIndexChanged.connect(self.freqscalechanged)
-        self.spinBox_minfreq.valueChanged.connect(self.parent().setminfreq)
-        self.spinBox_maxfreq.valueChanged.connect(self.parent().setmaxfreq)
-        self.spinBox_specmin.valueChanged.connect(self.parent().setmin)
-        self.spinBox_specmax.valueChanged.connect(self.parent().setmax)
-        self.comboBox_weighting.currentIndexChanged.connect(self.parent().setweighting)
+        self.spinBox_minfreq.valueChanged.connect(self.view_model.setminfreq)
+        self.spinBox_maxfreq.valueChanged.connect(self.view_model.setmaxfreq)
+        self.spinBox_specmin.valueChanged.connect(self.view_model.setmin)
+        self.spinBox_specmax.valueChanged.connect(self.view_model.setmax)
+        self.comboBox_weighting.currentIndexChanged.connect(self.view_model.setweighting)
         self.comboBox_response_time.currentIndexChanged.connect(self.responsetimechanged)
-        self.checkBox_showFreqLabels.toggled.connect(self.parent().setShowFreqLabel)
-        self.checkBox_showPitchLabel.toggled.connect(self.parent().setShowPitchLabel)
+        self.checkBox_showFreqLabels.toggled.connect(self.view_model.setShowFreqLabel)
+        self.checkBox_showPitchLabel.toggled.connect(self.view_model.setShowPitchLabel)
 
     # slot
     def dualchannelchanged(self, index):
         if index == 0:
-            self.parent().setdualchannels(False)
+            self.view_model.setdualchannels(False)
         else:
-            self.parent().setdualchannels(True)
+            self.view_model.setdualchannels(True)
 
     # slot
     def fftsizechanged(self, index):
         self.logger.info("fft_size_changed slot %d %d %f", index, 2 ** index * 32, 150000 / 2 ** index * 32)
         # FIXME the size should not be found from the index, but attached as item data
         fft_size = 2 ** index * 32
-        self.parent().setfftsize(fft_size)
+        self.view_model.setfftsize(fft_size)
 
     # slot
     def freqscalechanged(self, index):
         self.logger.info("freq_scale slot %d %s", index, fscales.ALL[index].NAME)
-        self.parent().PlotZoneSpect.setfreqscale(fscales.ALL[index])
+        self.view_model.PlotZoneSpect.setfreqscale(fscales.ALL[index])
 
     # slot
     def responsetimechanged(self, index):
@@ -189,7 +191,7 @@ class Spectrum_Settings_Dialog(QtWidgets.QDialog):
         elif index == 4:
             response_time = 5.            
         self.logger.info("responsetimechanged slot %d %d", index, response_time)
-        self.parent().setresponsetime(response_time)
+        self.view_model.setresponsetime(response_time)
 
     # method
     def saveState(self, settings):

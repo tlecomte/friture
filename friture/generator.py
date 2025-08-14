@@ -19,15 +19,16 @@
 
 import logging
 
-from PyQt5 import QtGui, QtCore, QtWidgets
+from PyQt5 import QtCore, QtWidgets
+from PyQt5.QtCore import QObject, pyqtProperty, pyqtSignal
 import numpy as np
 import sounddevice
 from friture.audiobackend import SAMPLING_RATE, AudioBackend
-from friture.generators.sweep import SweepGenerator
-from friture.generators.sine import SineGenerator
-from friture.generators.burst import BurstGenerator
-from friture.generators.pink import PinkGenerator
-from friture.generators.white import WhiteGenerator
+from friture.generators.sweep import SweepGenerator, Sweep_Generator_Settings_View_Model
+from friture.generators.sine import SineGenerator, Sine_Generator_Settings_View_Model
+from friture.generators.burst import BurstGenerator, Burst_Generator_Settings_View_Model
+from friture.generators.pink import PinkGenerator, Pink_Generator_Settings_View_Model
+from friture.generators.white import WhiteGenerator, White_Generator_Settings_View_Model
 
 SMOOTH_DISPLAY_TIMER_PERIOD_MS = 25
 FRAMES_PER_BUFFER = 2 * 1024
@@ -37,7 +38,7 @@ RAMP_LENGTH = 3e-3  # 10 ms
 (STOPPED, STARTING, PLAYING, STOPPING) = list(range(0, 4))
 
 
-class Generator_Widget(QtWidgets.QWidget):
+class Generator_Widget(QObject):
 
     stream_stop_ramp_finished = QtCore.pyqtSignal()
 
@@ -48,27 +49,15 @@ class Generator_Widget(QtWidgets.QWidget):
 
         self.audiobuffer = None
 
-        self.setObjectName("Generator_Widget")
-        self.grid_layout = QtWidgets.QGridLayout(self)
-        self.grid_layout.setObjectName("grid_layout")
-
         self.generators = []
-        self.generators.append(SineGenerator(self))
-        self.generators.append(WhiteGenerator(self))
-        self.generators.append(PinkGenerator(self))
-        self.generators.append(SweepGenerator(self))
-        self.generators.append(BurstGenerator(self))
+        self.generators.append(SineGenerator(parent))
+        self.generators.append(WhiteGenerator(parent))
+        self.generators.append(PinkGenerator(parent))
+        self.generators.append(SweepGenerator(parent))
+        self.generators.append(BurstGenerator(parent))
 
-        self.combobox_generator_kind = QtWidgets.QComboBox(self)
-        self.combobox_generator_kind.setObjectName("combobox_generator_kind")
-
-        self.stacked_settings_layout = QtWidgets.QStackedLayout()
-
-        for generator in self.generators:
-            self.combobox_generator_kind.addItem(generator.name)
-            self.stacked_settings_layout.addWidget(generator.settingsWidget())
-
-        self.combobox_generator_kind.setCurrentIndex(DEFAULT_GENERATOR_KIND_INDEX)
+        self._view_model = Generator_View_Model(parent, self.generators)
+        self._view_model.stateChanged.connect(self.start_stop_button_toggle)
 
         self.t = 0.
         self.t_start = 0.
@@ -94,36 +83,13 @@ class Generator_Widget(QtWidgets.QWidget):
             except Exception:
                 self.logger.exception("Failed to open stream")
 
-        self.start_stop_button = QtWidgets.QPushButton(self)
-
-        startStopIcon = QtGui.QIcon()
-        startStopIcon.addPixmap(QtGui.QPixmap(":/images-src/start.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        startStopIcon.addPixmap(QtGui.QPixmap(":/images-src/stop.svg"), QtGui.QIcon.Normal, QtGui.QIcon.On)
-        startStopIcon.addPixmap(QtGui.QPixmap(":/images-src/stop.svg"), QtGui.QIcon.Active, QtGui.QIcon.On)
-        startStopIcon.addPixmap(QtGui.QPixmap(":/images-src/stop.svg"), QtGui.QIcon.Selected, QtGui.QIcon.On)
-        startStopIcon.addPixmap(QtGui.QPixmap(":/images-src/stop.svg"), QtGui.QIcon.Disabled, QtGui.QIcon.On)
-        self.start_stop_button.setIcon(startStopIcon)
-
-        self.start_stop_button.setObjectName("generatorStartStop")
-        self.start_stop_button.setText("Start")
-        self.start_stop_button.setToolTip("Start/Stop generator")
-        self.start_stop_button.setCheckable(True)
-        self.start_stop_button.setChecked(False)
-
-        self.grid_layout.addWidget(self.start_stop_button, 0, 0, 1, 1)
-        self.grid_layout.addWidget(self.combobox_generator_kind, 1, 0, 1, 1)
-        self.grid_layout.addLayout(self.stacked_settings_layout, 2, 0, 1, 1)
-
-        self.combobox_generator_kind.activated.connect(self.stacked_settings_layout.setCurrentIndex)
-        self.start_stop_button.toggled.connect(self.start_stop_button_toggle)
-
         # initialize the settings dialog
         devices = AudioBackend().get_readable_output_devices_list()
         if self.device is not None:
             device_index = AudioBackend().output_devices.index(self.device)
         else:
             device_index = None
-        self.settings_dialog = Generator_Settings_Dialog(self, devices, device_index)
+        self.settings_dialog = Generator_Settings_Dialog(parent, devices, device_index)
 
         self.settings_dialog.combobox_output_device.currentIndexChanged.connect(self.device_changed)
 
@@ -139,6 +105,12 @@ class Generator_Widget(QtWidgets.QWidget):
 #        self.settings_dialog.comboBox_firstChannel.setCurrentIndex(first_channel)
 #        second_channel = AudioBackend().get_current_second_channel()
 #        self.settings_dialog.comboBox_secondChannel.setCurrentIndex(second_channel)
+
+    def view_model(self):
+        return self._view_model
+    
+    def qml_file_name(self):
+        return "Generator.qml"
 
     def device_changed(self, index):
         device = AudioBackend().output_devices[index]
@@ -197,15 +169,13 @@ class Generator_Widget(QtWidgets.QWidget):
         self.audiobuffer = buffer
 
     # slot
-    def start_stop_button_toggle(self, checked):
-        if checked:
-            self.start_stop_button.setText("Stop")
+    def start_stop_button_toggle(self):
+        if self._view_model.isPlaying:
             if self.state == STOPPED or self.state == STOPPING:
                 self.state = STARTING
                 self.t_start = 0.
                 self.stream.start()
         else:
-            self.start_stop_button.setText("Start")
             if self.state == PLAYING or self.state == STARTING:
                 self.state = STOPPING
                 self.t_stop = RAMP_LENGTH
@@ -234,21 +204,8 @@ class Generator_Widget(QtWidgets.QWidget):
 
         t = self.t + np.arange(0, N / float(SAMPLING_RATE), 1. / float(SAMPLING_RATE))
 
-        name = self.combobox_generator_kind.currentText()
-
-        generators = [generator for generator in self.generators if generator.name == name]
-
-        if len(generators) == 0:
-            self.logger.error("generator error : index of signal type not found")
-            out_data.fill(0)
-            return
-
-        if len(generators) > 1:
-            self.logger.error("generator error : 2 (or more) generators have the same name")
-            out_data.fill(0)
-            return
-
-        generator = generators[0]
+        index = self._view_model.generatorIndex
+        generator = self.generators[index]
         floatdata = generator.signal(t)
 
         # add smooth ramps at start/stop to avoid undesirable bursts
@@ -292,23 +249,79 @@ class Generator_Widget(QtWidgets.QWidget):
         return
 
     def saveState(self, settings):
-        settings.setValue("generator kind", self.combobox_generator_kind.currentIndex())
+        settings.setValue("generator kind", self._view_model.generatorIndex)
 
         for generator in self.generators:
-            generator.settingsWidget().saveState(settings)
+            generator.view_model().saveState(settings)
 
         self.settings_dialog.saveState(settings)
 
     def restoreState(self, settings):
-        generator_kind = settings.value("generator kind", DEFAULT_GENERATOR_KIND_INDEX, type=int)
-        self.combobox_generator_kind.setCurrentIndex(generator_kind)
-        self.stacked_settings_layout.setCurrentIndex(generator_kind)
+        self._view_model.generatorIndex = settings.value("generator kind", DEFAULT_GENERATOR_KIND_INDEX, type=int)
 
         for generator in self.generators:
-            generator.settingsWidget().restoreState(settings)
+            generator.view_model().restoreState(settings)
 
         self.settings_dialog.restoreState(settings)
 
+class Generator_View_Model(QObject):
+    generatorChanged = pyqtSignal()
+    stateChanged = pyqtSignal()
+
+    def __init__(self, parent, generators):
+        super().__init__(parent)
+
+        self._generators = generators
+        self._generatorIndex = DEFAULT_GENERATOR_KIND_INDEX
+        self._generator = generators[DEFAULT_GENERATOR_KIND_INDEX]
+        self._state = STOPPED
+
+    @pyqtProperty(list, constant=True) # type: ignore
+    def generatorNames(self):
+        return [generator.name for generator in self._generators]
+
+    @pyqtProperty(int, notify=generatorChanged)
+    def generatorIndex(self):
+        return self._generatorIndex
+    
+    @generatorIndex.setter # type: ignore
+    def generatorIndex(self, generatorIndex):
+        if self._generatorIndex != generatorIndex:
+            self._generatorIndex = generatorIndex
+            self._generator = self._generators[generatorIndex]
+            self.generatorChanged.emit()
+
+    @pyqtProperty(Sine_Generator_Settings_View_Model, constant=True) # type: ignore
+    def sineGenerator(self):
+        print("sineGenerator called", self._generators[0].view_model())
+        return self._generators[0].view_model()
+    
+    @pyqtProperty(White_Generator_Settings_View_Model, constant=True) # type: ignore
+    def whiteGenerator(self):
+        return self._generators[1].view_model()
+    
+    @pyqtProperty(Pink_Generator_Settings_View_Model, constant=True) # type: ignore
+    def pinkGenerator(self):
+        return self._generators[2].view_model()
+    
+    @pyqtProperty(Sweep_Generator_Settings_View_Model, constant=True) # type: ignore
+    def sweepGenerator(self):
+        return self._generators[3].view_model()
+    
+    @pyqtProperty(Burst_Generator_Settings_View_Model, constant=True) # type: ignore
+    def burstGenerator(self):
+        return self._generators[4].view_model()
+
+    @pyqtProperty(int, notify=stateChanged)
+    def isPlaying(self):
+        return self._state == PLAYING
+    
+    @isPlaying.setter # type: ignore
+    def isPlaying(self, playing):
+        state = PLAYING if playing else STOPPED
+        if self._state != state:
+            self._state = state
+            self.stateChanged.emit()
 
 class Generator_Settings_Dialog(QtWidgets.QDialog):
 

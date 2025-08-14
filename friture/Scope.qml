@@ -5,35 +5,19 @@ import QtQuick.Shapes 1.15
 import Friture 1.0
 import "plotItemColors.js" as PlotItemColors
 
-Item {
-    id: container
-    property var stateId
+Plot {
+    required property var viewModel
+    required property string fixedFont
 
-    // delay the load of the Plot until stateId has been set
-    Loader {
-        id: loader
-        anchors.fill: parent
-    }
+    scopedata: viewModel
 
-    onStateIdChanged: {
-        console.log("stateId changed: " + stateId)
-        loader.sourceComponent = plotComponent
-    }
+    Repeater {
+        model: scopedata.plot_items
 
-    Component {
-        id: plotComponent
-        Plot {
-            scopedata: Store.dock_states[container.stateId]
-
-            Repeater {
-                model: scopedata.plot_items
-
-                PlotCurve {
-                    anchors.fill: parent
-                    color: PlotItemColors.color(index)
-                    curve: modelData
-                }
-            }
+        PlotCurve {
+            anchors.fill: parent
+            color: PlotItemColors.color(index)
+            curve: modelData
         }
     }
 }

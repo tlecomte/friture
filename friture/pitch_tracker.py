@@ -22,9 +22,7 @@ import logging
 import math as m
 import numpy as np
 from PyQt5 import QtWidgets
-from PyQt5.QtCore import QSettings
-from PyQt5.QtQuickWidgets import QQuickWidget
-from PyQt5.QtQml import QQmlEngine
+from PyQt5.QtCore import QSettings, QObject
 from typing import Any, Optional
 
 from friture.audiobackend import SAMPLING_RATE
@@ -44,18 +42,14 @@ from friture.plotting.coordinateTransform import CoordinateTransform
 import friture.plotting.frequency_scales as fscales
 from friture.ringbuffer import RingBuffer
 from friture.store import GetStore
-from friture.qml_tools import qml_url, raise_if_error
 
-class PitchTrackerWidget(QQuickWidget):
-    def __init__(self, parent: QtWidgets.QWidget, engine: QQmlEngine):
-        super().__init__(engine, parent)
+class PitchTrackerWidget(QObject):
+    def __init__(self, parent: QtWidgets.QWidget):
+        super().__init__(parent)
 
         self.logger = logging.getLogger(__name__)
 
-        store = GetStore()
-        self._pitch_tracker_data = PitchTracker_Data(store)
-        store._dock_states.append(self._pitch_tracker_data)
-        state_id = len(store._dock_states) - 1
+        self._pitch_tracker_data = PitchTracker_Data(GetStore())
 
         self._curve = Curve()
         self._curve.name = "Ch1" # type: ignore [assignment]
@@ -70,14 +64,6 @@ class PitchTrackerWidget(QQuickWidget):
         tracker_data.horizontal_axis.name = "Time (sec)"
         tracker_data.horizontal_axis.setTrackerFormatter(
             lambda x: "%#.3g sec" % (x))
-        
-        self.statusChanged.connect(self.on_status_changed)
-        self.setResizeMode(QQuickWidget.SizeRootObjectToView)
-        self.setSource(qml_url("PitchView.qml"))
-
-        raise_if_error(self)
-
-        self.rootObject().setProperty("stateId", state_id)
 
         self.min_freq = DEFAULT_MIN_FREQ
         self.max_freq = DEFAULT_MAX_FREQ
@@ -93,12 +79,17 @@ class PitchTrackerWidget(QQuickWidget):
         self._pitch_tracker_data.horizontal_axis.setRange( # type: ignore
             -self.duration, 0.)
 
-        self.settings_dialog = PitchTrackerSettingsDialog(self)
+        self.settings_dialog = PitchTrackerSettingsDialog(parent, self)
 
         self.audiobuffer: Optional[AudioBuffer] = None
         self.tracker = PitchTracker(RingBuffer())
         self.update_curve()
+    
+    def qml_file_name(self) -> str:
+        return "PitchView.qml"
 
+    def view_model(self) -> PitchTracker_Data:
+        return self._pitch_tracker_data
 
     # method
     def set_buffer(self, buffer: AudioBuffer) -> None:
@@ -116,11 +107,6 @@ class PitchTrackerWidget(QQuickWidget):
         pitches = np.clip(pitches, 0, 1)
         times = np.linspace(0, 1.0, pitches.shape[0])
         self._curve.setData(times, pitches)
-
-    def on_status_changed(self, status: QQuickWidget.Status) -> None:
-        if status == QQuickWidget.Error:
-            for error in self.errors():
-                self.logger.error("QML error: " + error.toString())
 
     # method
     def canvasUpdate(self) -> None:

@@ -4,8 +4,7 @@
 from enum import Enum
 import logging
 
-from PyQt5 import QtWidgets
-from PyQt5.QtQuickWidgets import QQuickWidget
+from PyQt5.QtCore import QObject
 
 from numpy import zeros, ones, log10
 import numpy as np
@@ -16,7 +15,6 @@ from friture.spectrum_data import Spectrum_Data
 from friture.filled_curve import CurveType, FilledCurve
 from friture.pitch_tracker import format_frequency
 from friture.store import GetStore
-from friture.qml_tools import qml_url, raise_if_error
 
 # The peak decay rates (magic goes here :).
 PEAK_DECAY_RATE = 1.0 - 3e-6
@@ -29,17 +27,14 @@ class Baseline(Enum):
     DATA_ZERO = 2
 
 
-class SpectrumPlotWidget(QQuickWidget):
+class SpectrumPlotWidget(QObject):
 
-    def __init__(self, parent, engine):
-        super(SpectrumPlotWidget, self).__init__(engine, parent)
+    def __init__(self, parent):
+        super(SpectrumPlotWidget, self).__init__(parent)
 
         self.logger = logging.getLogger(__name__)
 
-        store = GetStore()
-        self._spectrum_data = Spectrum_Data(store)
-        store._dock_states.append(self._spectrum_data)
-        state_id = len(store._dock_states) - 1
+        self._spectrum_data = Spectrum_Data(GetStore())
 
         self._curve_signal = FilledCurve(CurveType.SIGNAL)
         self._spectrum_data.add_plot_item(self._curve_signal)
@@ -68,21 +63,11 @@ class SpectrumPlotWidget(QQuickWidget):
         self.normVerticalScaleTransform = CoordinateTransform(0, 1, 1, 0, 0)
         self.normHorizontalScaleTransform = CoordinateTransform(0, 22000, 1, 0, 0)
 
-        self.statusChanged.connect(self.on_status_changed)
-        self.setResizeMode(QQuickWidget.SizeRootObjectToView)
-        self.setSizePolicy(
-            QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding
-        )
-        self.setSource(qml_url("Spectrum.qml"))
-
-        raise_if_error(self)
-
-        self.rootObject().setProperty("stateId", state_id)
-
-    def on_status_changed(self, status):
-        if status == QQuickWidget.Error:
-            for error in self.errors():
-                self.logger.error("QML error: " + error.toString())
+    def qml_file_name(self):
+        return "Spectrum.qml"
+    
+    def view_model(self):
+        return self._spectrum_data
 
     def setfreqscale(self, scale):
         self.normHorizontalScaleTransform.setScale(scale)

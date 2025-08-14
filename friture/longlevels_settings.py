@@ -30,7 +30,7 @@ DEFAULT_RESPONSE_TIME = 20
 
 class LongLevels_Settings_Dialog(QtWidgets.QDialog):
 
-    def __init__(self, parent):
+    def __init__(self, parent, view_model):
         super().__init__(parent)
 
         self.setWindowTitle("Long levels settings")
@@ -77,10 +77,10 @@ class LongLevels_Settings_Dialog(QtWidgets.QDialog):
 
         self.setLayout(self.formLayout)
 
-        self.spinBox_specmin.valueChanged.connect(self.parent().setmin)
-        self.spinBox_specmax.valueChanged.connect(self.parent().setmax)
-        self.spinBox_resptime.valueChanged.connect(self.parent().setresptime)
-        self.spinBox_timemax.valueChanged.connect(self.parent().setduration)
+        self.spinBox_specmin.valueChanged.connect(view_model.setmin)
+        self.spinBox_specmax.valueChanged.connect(view_model.setmax)
+        self.spinBox_resptime.valueChanged.connect(view_model.setresptime)
+        self.spinBox_timemax.valueChanged.connect(view_model.setduration)
 
     # method
     def saveState(self, settings):

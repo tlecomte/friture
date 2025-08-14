@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt5 import QtWidgets
+from PyQt5.QtCore import QObject
 from numpy import log10, array, arange
 
 from friture.histplot import HistPlot
@@ -38,20 +38,14 @@ from friture.audiobackend import SAMPLING_RATE
 SMOOTH_DISPLAY_TIMER_PERIOD_MS = 25
 
 
-class OctaveSpectrum_Widget(QtWidgets.QWidget):
+class OctaveSpectrum_Widget(QObject):
 
-    def __init__(self, parent, engine):
+    def __init__(self, parent):
         super().__init__(parent)
 
         self.audiobuffer = None
 
-        self.setObjectName("Spectrum_Widget")
-        self.gridLayout = QtWidgets.QGridLayout(self)
-        self.gridLayout.setObjectName("gridLayout")
-        self.gridLayout.setContentsMargins(2, 2, 2, 2)
-        self.PlotZoneSpect = HistPlot(self, engine)
-        self.PlotZoneSpect.setObjectName("PlotZoneSpect")
-        self.gridLayout.addWidget(self.PlotZoneSpect, 0, 0, 1, 1)
+        self.PlotZoneSpect = HistPlot(self)
 
         self.spec_min = DEFAULT_SPEC_MIN
         self.spec_max = DEFAULT_SPEC_MAX
@@ -68,7 +62,13 @@ class OctaveSpectrum_Widget(QtWidgets.QWidget):
         self.setresponsetime(self.response_time)
 
         # initialize the settings dialog
-        self.settings_dialog = OctaveSpectrum_Settings_Dialog(self)
+        self.settings_dialog = OctaveSpectrum_Settings_Dialog(parent, self)
+
+    def qml_file_name(self):
+        return self.PlotZoneSpect.qml_file_name()
+    
+    def view_model(self):
+        return self.PlotZoneSpect.view_model()
 
     # method
     def set_buffer(self, buffer):
@@ -123,9 +123,6 @@ class OctaveSpectrum_Widget(QtWidgets.QWidget):
 
     # method
     def canvasUpdate(self):
-        if not self.isVisible():
-            return
-
         self.PlotZoneSpect.draw()
 
     def setmin(self, value):

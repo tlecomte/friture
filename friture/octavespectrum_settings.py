@@ -33,8 +33,10 @@ DEFAULT_RESPONSE_TIME_INDEX = 3
 
 class OctaveSpectrum_Settings_Dialog(QtWidgets.QDialog):
 
-    def __init__(self, parent):
+    def __init__(self, parent, view_model):
         super().__init__(parent)
+
+        self.view_model = view_model
 
         self.logger = logging.getLogger(__name__)
 
@@ -93,16 +95,16 @@ class OctaveSpectrum_Settings_Dialog(QtWidgets.QDialog):
         self.setLayout(self.formLayout)
 
         self.comboBox_bandsperoctave.currentIndexChanged.connect(self.bandsperoctavechanged)
-        self.spinBox_specmin.valueChanged.connect(self.parent().setmin)
-        self.spinBox_specmax.valueChanged.connect(self.parent().setmax)
-        self.comboBox_weighting.currentIndexChanged.connect(self.parent().setweighting)
+        self.spinBox_specmin.valueChanged.connect(view_model.setmin)
+        self.spinBox_specmax.valueChanged.connect(view_model.setmax)
+        self.comboBox_weighting.currentIndexChanged.connect(view_model.setweighting)
         self.comboBox_response_time.currentIndexChanged.connect(self.responsetimechanged)
 
     # slot
     def bandsperoctavechanged(self, index):
         bandsperoctave = 3 * 2 ** (index - 1) if index >= 1 else 1
         self.logger.info("bandsperoctavechanged slot %d %d", index, bandsperoctave)
-        self.parent().setbandsperoctave(bandsperoctave)
+        self.view_model.setbandsperoctave(bandsperoctave)
 
     # slot
     def responsetimechanged(self, index):
@@ -117,7 +119,7 @@ class OctaveSpectrum_Settings_Dialog(QtWidgets.QDialog):
         elif index == 4:
             response_time = 5.           
         self.logger.info("responsetimechanged slot %d %d", index, response_time)
-        self.parent().setresponsetime(response_time)
+        self.view_model.setresponsetime(response_time)
 
     # method
     def saveState(self, settings):

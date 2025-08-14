@@ -20,7 +20,7 @@
 import logging
 
 from PyQt5 import QtWidgets
-from PyQt5.QtQuickWidgets import QQuickWidget
+from PyQt5.QtCore import QObject
 
 from numpy import log10, where, sign, arange, zeros
 
@@ -28,24 +28,20 @@ from friture.store import GetStore
 from friture.audiobackend import SAMPLING_RATE
 from friture.scope_data import Scope_Data
 from friture.curve import Curve
-from friture.qml_tools import qml_url, raise_if_error
 
 SMOOTH_DISPLAY_TIMER_PERIOD_MS = 25
 DEFAULT_TIMERANGE = 2 * SMOOTH_DISPLAY_TIMER_PERIOD_MS
 
-class Scope_Widget(QQuickWidget):
+class Scope_Widget(QObject):
 
-    def __init__(self, parent, engine):
-        super().__init__(engine, parent)
+    def __init__(self, parent):
+        super().__init__(parent)
 
         self.logger = logging.getLogger(__name__)
 
         self.audiobuffer = None
 
-        store = GetStore()
-        self._scope_data = Scope_Data(store)
-        store._dock_states.append(self._scope_data)
-        state_id = len(store._dock_states) - 1
+        self._scope_data = Scope_Data(GetStore())
 
         self._curve = Curve()
         self._curve.name = "Ch1"
@@ -59,26 +55,19 @@ class Scope_Widget(QQuickWidget):
         self._scope_data.horizontal_axis.name = "Time (ms)"
         self._scope_data.horizontal_axis.setTrackerFormatter(lambda x: "%#.3g ms" % (x))
 
-        self.statusChanged.connect(self.on_status_changed)
-        self.setResizeMode(QQuickWidget.SizeRootObjectToView)
-        self.setSource(qml_url("Scope.qml"))
-        
-        raise_if_error(self)
-
-        self.rootObject().setProperty("stateId", state_id)
-
-        self.settings_dialog = Scope_Settings_Dialog(self)
+        self.settings_dialog = Scope_Settings_Dialog(parent, self)
 
         self.set_timerange(DEFAULT_TIMERANGE)
 
         self.time = zeros(10)
         self.y = zeros(10)
         self.y2 = zeros(10)
+    
+    def qml_file_name(self):
+        return "Scope.qml"
 
-    def on_status_changed(self, status):
-        if status == QQuickWidget.Error:
-            for error in self.errors():
-                self.logger.error("QML error: " + error.toString())
+    def view_model(self):
+        return self._scope_data
 
     # method
     def set_buffer(self, buffer):
@@ -175,7 +164,7 @@ class Scope_Widget(QQuickWidget):
 
 class Scope_Settings_Dialog(QtWidgets.QDialog):
 
-    def __init__(self, parent):
+    def __init__(self, parent, view_model):
         super().__init__(parent)
 
         self.setWindowTitle("Scope settings")
@@ -194,7 +183,7 @@ class Scope_Settings_Dialog(QtWidgets.QDialog):
 
         self.setLayout(self.formLayout)
 
-        self.doubleSpinBox_timerange.valueChanged.connect(self.parent().set_timerange)
+        self.doubleSpinBox_timerange.valueChanged.connect(view_model.set_timerange)
 
     # method
     def saveState(self, settings):

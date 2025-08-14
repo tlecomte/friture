@@ -19,10 +19,9 @@
 
 import numpy as np
 from numpy.random import standard_normal
-from PyQt5 import QtWidgets
+from PyQt5.QtCore import QObject
 
 PINK_FIDELITY = 100.
-
 
 def pinknoise(n, rvs=standard_normal):
     if n == 0:
@@ -38,24 +37,25 @@ def pinknoise(n, rvs=standard_normal):
 
     return pink / k
 
-
 class PinkGenerator:
     name = "Pink noise"
 
     def __init__(self, parent):
-        self.settings = SettingsWidget(parent)
+        self._view_model = Pink_Generator_Settings_View_Model(parent)
 
-    def settingsWidget(self):
-        return self.settings
+    def view_model(self):
+        return self._view_model
+
+    def qml_file_name(self) -> str:
+        return "PinkSettings.qml"
 
     def signal(self, t):
         n = len(t)
         return pinknoise(n)
 
+class Pink_Generator_Settings_View_Model(QObject):
 
-class SettingsWidget(QtWidgets.QWidget):
-
-    def __init__(self, parent):
+    def __init__(self, parent: QObject):
         super().__init__(parent)
 
     def saveState(self, settings):
