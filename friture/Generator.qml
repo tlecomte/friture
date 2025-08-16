@@ -12,7 +12,6 @@ Rectangle {
 
     SystemPalette { id: systemPalette; colorGroup: SystemPalette.Active }
     color: systemPalette.window
-    anchors.fill: parent
 
     ColumnLayout {
         anchors.top: parent.top

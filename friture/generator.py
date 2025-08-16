@@ -245,6 +245,15 @@ class Generator_Widget(QObject):
         # data copy
         out_data[:] = intdata
 
+    def cleanup(self):
+        if self.stream is not None:
+            try:
+                self.stream.stop()
+                self.stream.close()
+            except Exception:
+                self.logger.exception("Error while cleaning up audio stream")
+            self.stream = None
+
     def canvasUpdate(self):
         return
 
@@ -293,7 +302,6 @@ class Generator_View_Model(QObject):
 
     @pyqtProperty(Sine_Generator_Settings_View_Model, constant=True) # type: ignore
     def sineGenerator(self):
-        print("sineGenerator called", self._generators[0].view_model())
         return self._generators[0].view_model()
     
     @pyqtProperty(White_Generator_Settings_View_Model, constant=True) # type: ignore

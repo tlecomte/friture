@@ -171,14 +171,16 @@ class Logarithmic(object):
             standardLogTicks = [2, 3, 4, 5, 6, 7, 8, 9]
 
             for a in standardLogTicks:
-                if a * majorTicks[0] / 10. >= trueMin:
-                    minorTicks.append(a * majorTicks[0] / 10.)
+                minorTick = a * majorTicks[0] / 10.
+                if minorTick >= trueMin and minorTick <= trueMax:
+                    minorTicks.append(minorTick)
 
-            minorTicks += [a * x for a in standardLogTicks for x in majorTicks]
+            minorTicks += [a * x for a in standardLogTicks for x in majorTicks if a * x <= trueMax]
 
             for a in standardLogTicks:
-                if a * majorTicks[-1] <= trueMax:
-                    minorTicks.append(a * majorTicks[-1])
+                majorTick = a * majorTicks[-1]
+                if majorTick <= trueMax:
+                    minorTicks.append(majorTick)
 
         return majorTicks, minorTicks
 
