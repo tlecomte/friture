@@ -20,14 +20,16 @@
 from inspect import signature
 
 from PyQt5 import QtCore, QtWidgets
-from PyQt5.QtQuick import QQuickView # type: ignore
-from PyQt5.QtGui import QFontDatabase, QWindow
+from PyQt5.QtQuick import QQuickView, QQuickItem # type: ignore
+from PyQt5.QtQml import QQmlComponent
+from PyQt5.QtQuickWidgets import QQuickWidget
+from PyQt5.QtGui import QFontDatabase
 from PyQt5.QtCore import QEvent, QObject
 from PyQt5.QtWidgets import QWidget
 
-from friture.qml_tools import qml_url, raise_if_error
+from friture.qml_tools import component_raise_if_error, qml_url
 from friture.widgetdict import getWidgetById, widgetIds
-from friture.controlbar import ControlBar
+from friture.controlbar_viewmodel import ControlBarViewModel
 
 from typing import Optional, TYPE_CHECKING
 if TYPE_CHECKING:
@@ -52,23 +54,46 @@ class Dock(QtWidgets.QWidget):
 
         self.setObjectName(name)
 
-        self.control_bar = ControlBar(self)
-
-        self.control_bar.combobox_select.activated.connect(self.indexChanged)
-        self.control_bar.settings_button.clicked.connect(self.settings_slot)
-        self.control_bar.move_previous.clicked.connect(self.movePrevious)
-        self.control_bar.move_next.clicked.connect(self.moveNext)
-        self.control_bar.close_button.clicked.connect(self.closeClicked)
-
         self.vbox = QtWidgets.QVBoxLayout(self)
         self.vbox.setContentsMargins(0, 0, 0, 0)
-        self.vbox.addWidget(self.control_bar)
+
+        self.qml_engine = qml_engine
+
+        self.controlbar_viewmodel = ControlBarViewModel(self)
+
+        self.controlbar_viewmodel.indexChanged.connect(self.indexChanged)
+        self.controlbar_viewmodel.settingsClicked.connect(lambda: self.settings_slot(False))
+        self.controlbar_viewmodel.movePreviousClicked.connect(self.movePrevious)
+        self.controlbar_viewmodel.moveNextClicked.connect(self.moveNext)
+        self.controlbar_viewmodel.closeClicked.connect(self.closeClicked)
+
+        self.dockQuickWidget = QQuickWidget(self.qml_engine, self)
+        self.dockQuickWidget.setObjectName("dockQuickWidget")
+        self.dockQuickWidget.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        self.dockQuickWidget.setResizeMode(QQuickWidget.SizeRootObjectToView)
+        self.dockQuickWidget.setSource(qml_url("Dock.qml"))
+        self.vbox.addWidget(self.dockQuickWidget)
+
+        dock_root = self.dockQuickWidget.rootObject()
+        
+        initialProperties = {"viewModel": self.controlbar_viewmodel}
+        component = QQmlComponent(self.qml_engine)
+        component.loadUrl(qml_url("ControlBar.qml"))
+
+        component_raise_if_error(component)
+
+        controlbar_context = self.qml_engine.rootContext()
+        control_bar_qml = component.createWithInitialProperties(initialProperties, controlbar_context)
+        control_bar_qml.setParent(self.qml_engine)
+
+        control_bar_container = dock_root.findChild(QObject, "control_bar_container")
+        control_bar_qml.setParentItem(control_bar_container) # type: ignore
+ 
+        self.audio_widget_container = dock_root.findChild(QObject, "audio_widget_container")
 
         self.widgetId: Optional[int] = None
         self.audiowidget: Optional[QObject] = None
-        self.quickWidget: Optional[QWidget] = None
-        self.quickView: Optional[QQuickView] = None
-        self.qml_engine = qml_engine
+        self.audio_widget_qml: Optional[QQuickItem] = None
 
         if widgetId is None:
             widgetId = widgetIds()[0]
@@ -78,6 +103,17 @@ class Dock(QtWidgets.QWidget):
     # note that by default the closeEvent is accepted, no need to do it explicitely
     def closeEvent(self, event):
         self.dockmanager.close_dock(self)
+
+        if self.audio_widget_qml is not None:
+            self.audio_widget_qml.setParentItem(None) # type: ignore
+            self.audio_widget_qml.deleteLater()
+            self.audio_widget_qml = None
+
+        if self.audiowidget is not None:
+            if hasattr(self.audiowidget, 'cleanup'):
+                self.audiowidget.cleanup()
+            self.audiowidget.deleteLater()
+            self.audiowidget = None
 
     def closeClicked(self):
         self.close()
@@ -118,21 +154,21 @@ class Dock(QtWidgets.QWidget):
     def widget_select(self, widgetId: int) -> None:
         if self.widgetId == widgetId:
             return
-
-        if self.quickWidget is not None:
-            self.quickWidget.close()
-            self.quickWidget.deleteLater()
-
-        if self.quickView is not None:
-            self.quickView.close()
-            self.quickView.deleteLater()
+        
+        if self.audio_widget_qml is not None:
+            self.audio_widget_qml.setParentItem(None) # type: ignore
+            self.audio_widget_qml.deleteLater()
+            self.audio_widget_qml = None
 
         if self.audiowidget is not None:
             settings = QtCore.QSettings()
             self.audiowidget.saveState(settings) # type: ignore
             assert self.widgetId is not None
             self.dockmanager.last_settings[self.widgetId] = settings
+            if hasattr(self.audiowidget, 'cleanup'):
+                self.audiowidget.cleanup()
             self.audiowidget.deleteLater()
+            self.audiowidget = None
 
         if widgetId not in widgetIds():
             widgetId = widgetIds()[0]
@@ -148,23 +184,10 @@ class Dock(QtWidgets.QWidget):
             self.audiowidget = constructor(self)
         assert self.audiowidget is not None # mypy can't prove this :(
 
-        parent_window : QWindow = None # type: ignore
-        self.quickView = QQuickView(self.qml_engine, parent_window)
-
         initialProperties = {
-            "parent": self.quickView.contentItem(),
             "fixedFont": QFontDatabase.systemFont(QFontDatabase.FixedFont).family(),
-            "viewModel": self.audiowidget.view_model() # type: ignore
+            "viewModel": self.audiowidget.view_model(), # type: ignore
         }
-
-        self.quickView.setInitialProperties(initialProperties)
-        self.quickView.setSource(qml_url(self.audiowidget.qml_file_name())) # type: ignore
-        raise_if_error(self.quickView)
-        self.quickView.statusChanged.connect(self.on_status_changed)
-        self.quickView.setResizeMode(QQuickView.SizeRootObjectToView)
-
-        self.quickWidget = QtWidgets.QWidget.createWindowContainer(self.quickView, self)
-        self.quickWidget.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
 
         # audiowidget is duck typed for this:
         self.audiowidget.set_buffer(self.audiobuffer) # type: ignore
@@ -174,28 +197,30 @@ class Dock(QtWidgets.QWidget):
             self.audiowidget.restoreState( # type: ignore
                 self.dockmanager.last_settings[widgetId])
 
-        self.vbox.addWidget(self.quickWidget)
+        component = QQmlComponent(self.qml_engine)
+        component.loadUrl(qml_url(self.audiowidget.qml_file_name())) # type: ignore
+
+        component_raise_if_error(component)
+        component.statusChanged.connect(self.on_status_changed)
+
+        qml_context = self.qml_engine.rootContext()
+        self.audio_widget_qml = component.createWithInitialProperties(initialProperties, qml_context) # type: ignore
+        self.audio_widget_qml.setParent(self.qml_engine) # type: ignore
+        self.audio_widget_qml.setParentItem(self.audio_widget_container) # type: ignore
+        self.audio_widget_qml.setProperty("anchors.fill", self.audio_widget_container) # type: ignore
 
         index = widgetIds().index(widgetId)
-        self.control_bar.combobox_select.setCurrentIndex(index)
+        self.controlbar_viewmodel.setCurrentIndex(index)
 
     def on_status_changed(self, status):
-        if status == QQuickView.Error:
-            for error in self.quickView.errors():
+        if status == QQmlComponent.Error:
+            for error in self.audio_widget_qml.errors():
                 self.logger.error("QML error: " + error.toString())
 
     def canvasUpdate(self):
         if self.audiowidget is not None and self.isVisible():
             self.audiowidget.canvasUpdate()
 
-    def event(self, event):
-        # workaround for loss of focus on macOS for QQuickView
-        # https://bugreports.qt.io/browse/QTBUG-34414
-        if event.type() == QEvent.WindowActivate:
-            self.activateWindow()
-            self.quickView.requestActivate()
-    
-        return super().event(event)
 
     def pause(self):
         if self.audiowidget is not None:
