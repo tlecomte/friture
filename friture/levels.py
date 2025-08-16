@@ -34,6 +34,8 @@ from friture_extensions.exp_smoothing_conv import pyx_exp_smoothed_value
 from friture.audiobackend import SAMPLING_RATE
 from friture.qml_tools import qml_url, raise_if_error
 
+from friture.spl_settings import SPL_Settings_Dialog
+
 SMOOTH_DISPLAY_TIMER_PERIOD_MS = 25
 LEVEL_TEXT_LABEL_PERIOD_MS = 250
 
@@ -76,8 +78,10 @@ class Levels_Widget(QtWidgets.QWidget):
         # initialize the settings dialog
         self.settings_dialog = Levels_Settings_Dialog(self)
 
+        self.calibration = 0
+
         # initialize the class instance that will do the fft
-        self.proc = audioproc()
+        self.proc = audioproc(self)
 
         # time = SMOOTH_DISPLAY_TIMER_PERIOD_MS/1000. #DISPLAY
         # time = 0.025 #IMPULSE setting for a sound level meter
@@ -139,6 +143,7 @@ class Levels_Widget(QtWidgets.QWidget):
         self.old_rms = value_rms
 
         self.level_view_model.level_data.level_rms = 10. * np.log10(value_rms + 0. * 1e-80)
+        self.level_view_model.level_data.level_spl = self.level_view_model.level_data.level_rms + 94.0 + self.calibration
         self.level_view_model.level_data.level_max = 20. * np.log10(self.old_max + 0. * 1e-80)
         self.level_view_model.level_data_ballistic.peak_iec = dB_to_IEC(max(self.level_view_model.level_data.level_max, self.level_view_model.level_data.level_rms))
 
@@ -160,6 +165,7 @@ class Levels_Widget(QtWidgets.QWidget):
             self.old_rms_2 = value_rms
 
             self.level_view_model.level_data_2.level_rms = 10. * np.log10(value_rms + 0. * 1e-80)
+            self.level_view_model.level_data_2.level_spl = self.level_view_model.level_data_2.level_rms + 94.0 + self.calibration
             self.level_view_model.level_data_2.level_max = 20. * np.log10(self.old_max_2 + 0. * 1e-80)
             self.level_view_model.level_data_ballistic_2.peak_iec = dB_to_IEC(max(self.level_view_model.level_data_2.level_max, self.level_view_model.level_data_2.level_rms))
 
@@ -172,10 +178,12 @@ class Levels_Widget(QtWidgets.QWidget):
 
         if self.i == LEVEL_TEXT_LABEL_STEPS:
             self.level_view_model.level_data_slow.level_rms = self.level_view_model.level_data.level_rms
+            self.level_view_model.level_data_slow.level_spl = self.level_view_model.level_data.level_spl
             self.level_view_model.level_data_slow.level_max = self.level_view_model.level_data.level_max
 
             if self.two_channels:
                 self.level_view_model.level_data_slow_2.level_rms = self.level_view_model.level_data_2.level_rms
+                self.level_view_model.level_data_slow_2.level_spl = self.level_view_model.level_data_2.level_spl
                 self.level_view_model.level_data_slow_2.level_max = self.level_view_model.level_data_2.level_max
 
         self.i = self.i % LEVEL_TEXT_LABEL_STEPS
