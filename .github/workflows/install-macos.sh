@@ -11,9 +11,17 @@ pip3 install .
 python3 setup.py build_ext --inplace
 
 # for Macos Big Sur, the stable portaudio (19.6.0) makes Friture freeze on startup
-# install from latest master instead
+# install from a newer master commit instead
 # see: https://github.com/tlecomte/friture/issues/154
-brew install portaudio --HEAD
+PORTAUDIO_COMMIT=aa7a7902f1b79502633aeb88919657af46c84193
+rm -rf build/portaudio
+git clone https://github.com/PortAudio/portaudio.git build/portaudio
+cd build/portaudio
+git checkout $PORTAUDIO_COMMIT
+./configure --enable-mac-universal=no --enable-cxx
+make
+sudo make install
+cd -
 
 pyinstaller friture.spec -y
 
