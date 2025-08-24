@@ -29,7 +29,6 @@ ls -la dist/*
 
 # compare the portaudio libs to make sure the package contains the one that was installed with brew
 ls -la /usr/local/lib/libportaudio.dylib
-ls -la /usr/local/Cellar/portaudio/*/lib/libportaudio*.dylib
 ls -la dist/friture.app/Contents/Frameworks/_sounddevice_data/portaudio-binaries
 
 # PyInstaller will try to codesign friture.app, but will fail because of the Qt5 file structure
