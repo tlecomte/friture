@@ -38,6 +38,7 @@ Friture will now exit.
 class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
     show_playback_changed = pyqtSignal(bool)
     history_length_changed = pyqtSignal(int)
+    theme_changed = pyqtSignal(str)
 
     def __init__(self, parent):
         QtWidgets.QDialog.__init__(self, parent)
@@ -81,6 +82,7 @@ class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
         self.radioButton_duo.toggled.connect(self.duo_input_type_selected)
         self.checkbox_showPlayback.stateChanged.connect(self.show_playback_checkbox_changed)
         self.spinBox_historyLength.editingFinished.connect(self.history_length_edit_finished)
+        self.comboBox_theme.currentTextChanged.connect(self.theme_changed)
 
     @pyqtProperty(bool, notify=show_playback_changed) # type: ignore
     def show_playback(self) -> bool:
@@ -189,6 +191,7 @@ class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
         settings.setValue("duoInput", self.inputTypeButtonGroup.checkedId())
         settings.setValue("showPlayback", self.checkbox_showPlayback.checkState())
         settings.setValue("historyLength", self.spinBox_historyLength.value())
+        settings.setValue("theme", self.comboBox_theme.currentText())
 
     # method
     def restoreState(self, settings):
@@ -207,3 +210,11 @@ class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
         self.spinBox_historyLength.setValue(settings.value("historyLength", 30, type=int))
         # need to emit this because setValue doesn't emit editFinished
         self.history_length_changed.emit(self.spinBox_historyLength.value())
+        
+        # restore theme setting
+        theme_text = settings.value("theme", "System Default", type=str)
+        theme_index = self.comboBox_theme.findText(theme_text)
+        if theme_index >= 0:
+            self.comboBox_theme.setCurrentIndex(theme_index)
+        # emit the theme changed signal to apply the theme
+        self.theme_changed.emit(self.comboBox_theme.currentText())
