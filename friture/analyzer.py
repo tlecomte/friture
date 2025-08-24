@@ -49,6 +49,7 @@ from friture.tileLayout import TileLayout
 from friture.level_view_model import LevelViewModel
 from friture.level_data import LevelData
 from friture.levels import Levels_Widget
+from friture.octavespectrum import OctaveSpectrum_Widget
 from friture.store import GetStore, Store
 from friture.scope_data import Scope_Data
 from friture.axis import Axis
@@ -62,6 +63,7 @@ from friture.plotting.scaleDivision import ScaleDivision, Tick
 from friture.spectrogram_item import SpectrogramItem
 from friture.spectrogram_item_data import SpectrogramImageData
 from friture.spectrum_data import Spectrum_Data
+from friture.spl_data import SPLData
 from friture.plotFilledCurve import PlotFilledCurve
 from friture.filled_curve import FilledCurve
 from friture.qml_tools import qml_url, raise_if_error
@@ -107,6 +109,7 @@ class Friture(QMainWindow, ):
         qmlRegisterType(CoordinateTransform, 'Friture', 1, 0, 'CoordinateTransform')
         qmlRegisterType(Scope_Data, 'Friture', 1, 0, 'ScopeData')
         qmlRegisterType(Spectrum_Data, 'Friture', 1, 0, 'SpectrumData')
+        qmlRegisterType(SPLData, 'Friture', 1, 0, 'SPLData')
         qmlRegisterType(LevelData, 'Friture', 1, 0, 'LevelData')
         qmlRegisterType(LevelViewModel, 'Friture', 1, 0, 'LevelViewModel')
         qmlRegisterType(Axis, 'Friture', 1, 0, 'Axis')
@@ -126,6 +129,9 @@ class Friture(QMainWindow, ):
         qmlRegisterType(Sine_Generator_Settings_View_Model, 'Friture', 1, 0, 'Sine_Generator_Settings_View_Model')
 
         qmlRegisterSingletonType(Store, 'Friture', 1, 0, 'Store', lambda engine, script_engine: GetStore())
+        
+        self.original_calibration = [0, 0]
+        self.original_calibration_freqs = [0, 20000]
 
         # Setup the user interface
         self.ui = Ui_MainWindow()
@@ -340,6 +346,14 @@ class Friture(QMainWindow, ):
             self.playback_widget.start_recording()
             AudioBackend().restart()
             self.dockmanager.restart()
+    
+    def recalculate_calibration(self):
+        for dock in self.dockmanager.docks:
+            if not dock.audiowidget is None:
+                if hasattr(dock.audiowidget, "proc"):
+                    dock.audiowidget.proc.recalculate_calibration()
+                elif type(dock.audiowidget) == OctaveSpectrum_Widget:
+                    dock.audiowidget.filters.recalculate_calibration()
 
 
 def qt_message_handler(mode, context, message):

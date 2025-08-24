@@ -55,7 +55,7 @@ class OctaveSpectrum_Widget(QObject):
         self.PlotZoneSpect.setspecrange(self.spec_min, self.spec_max)
         self.PlotZoneSpect.setweighting(self.weighting)
 
-        self.filters = Octave_Filters(DEFAULT_BANDSPEROCTAVE)
+        self.filters = Octave_Filters(self, DEFAULT_BANDSPEROCTAVE)
         self.dispbuffers = [0] * DEFAULT_BANDSPEROCTAVE * NOCTAVE
 
         # set kernel and parameters for the smoothing filter
@@ -118,7 +118,7 @@ class OctaveSpectrum_Widget(QObject):
             w = self.filters.C
 
         epsilon = 1e-30
-        db_spectrogram = 10 * log10(sp + epsilon) + w
+        db_spectrogram = 10 * log10(sp + epsilon) + w + self.filters.calibration
         self.PlotZoneSpect.setdata(self.filters.flow, self.filters.fhigh, self.filters.f_nominal, db_spectrogram)
 
     # method

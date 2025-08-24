@@ -18,6 +18,7 @@
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
 from friture.spectrum import Spectrum_Widget
+from friture.spl import SPL_Widget
 from friture.spectrogram import Spectrogram_Widget
 from friture.octavespectrum import OctaveSpectrum_Widget
 from friture.scope import Scope_Widget
@@ -35,6 +36,7 @@ widgets = [
     {'Id': 6, "Class": Delay_Estimator_Widget, "Name": "Delay Estimator"},
     {'Id': 7, "Class": LongLevelWidget, "Name": "Long-time levels"},
     {'Id': 8, "Class": PitchTrackerWidget, "Name": "Pitch Tracker"},
+    {'Id': 9, "Class": SPL_Widget, "Name": "SPL"},
 ]
 
 

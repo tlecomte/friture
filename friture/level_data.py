@@ -24,12 +24,14 @@ from friture.iec import dB_to_IEC
 
 class LevelData(QtCore.QObject):
     level_rms_changed = QtCore.pyqtSignal(float)
+    level_spl_changed = QtCore.pyqtSignal(float)
     level_max_changed = QtCore.pyqtSignal(float)
 
     def __init__(self, parent=None):
         super().__init__(parent)
 
         self._level_rms = -30.
+        self._level_spl = -30.
         self._level_max = -30.
 
     @pyqtProperty(float, notify=level_rms_changed) # type: ignore
@@ -45,6 +47,20 @@ class LevelData(QtCore.QObject):
         if self._level_rms != level_rms:
             self._level_rms = level_rms
             self.level_rms_changed.emit(level_rms)
+
+    @pyqtProperty(float, notify=level_spl_changed) # type: ignore
+    def level_spl(self):
+        return self._level_spl
+
+    @pyqtProperty(float, notify=level_spl_changed) # type: ignore
+    def level_spl_iec(self):
+        return dB_to_IEC(self._level_spl)
+
+    @level_spl.setter # type: ignore
+    def level_spl(self, level_spl):
+        if self._level_spl != level_spl:
+            self._level_spl = level_spl
+            self.level_spl_changed.emit(level_spl)
 
     @pyqtProperty(float, notify=level_max_changed) # type: ignore
     def level_max(self):

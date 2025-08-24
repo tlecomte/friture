@@ -119,7 +119,7 @@ class LongLevelWidget(QObject):
         self.settings_dialog = LongLevels_Settings_Dialog(parent, self)
 
         # initialize the class instance that will do the fft
-        self.proc = audioproc()
+        self.proc = audioproc(self)
 
         self.level = None  # 1e-30
         self.level_rms = -200.

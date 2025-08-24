@@ -80,6 +80,28 @@ Rectangle {
             Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
             color: systemPalette.windowText
         }
+		
+		Text {
+            id: splValues
+            textFormat: Text.MarkdownText
+            text: level_view_model.two_channels ? "1: " + level_to_text(level_view_model.level_data_slow.level_spl) + "<br />2: " + level_to_text(level_view_model.level_data_slow_2.level_spl) : level_to_text(level_view_model.level_data_slow.level_spl)
+            font.pointSize: 14
+            font.bold: true
+            verticalAlignment: Text.AlignBottom
+            horizontalAlignment: Text.AlignRight
+            Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
+            color: systemPalette.windowText
+        }
+
+        Text {
+            id: splLegend
+            textFormat: Text.PlainText
+            text: "dB SPL"
+            verticalAlignment: Text.AlignTop
+            horizontalAlignment: Text.AlignRight
+            Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
+            color: systemPalette.windowText
+        }
 
         LevelsMeter {
             Layout.fillHeight: true
