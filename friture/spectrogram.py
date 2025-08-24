@@ -162,7 +162,7 @@ class Spectrogram_Widget(QObject):
             norm_spectrogram = self.scale_spectrogram(self.log_spectrogram(spn) + w)
 
             self.screen_resampler.set_height(self.PlotZoneImage.spectrogram_screen_height())
-            screen_rate_frac = Fraction(self.PlotZoneImage.spectrogram_screen_width(), int(self.timerange_s * 1000))
+            screen_rate_frac = Fraction(max(self.PlotZoneImage.spectrogram_screen_width(), 1), int(self.timerange_s * 1000))
             self.screen_resampler.set_ratio(self.sfft_rate_frac, screen_rate_frac)
             self.frequency_resampler.setnsamples(self.PlotZoneImage.spectrogram_screen_height())
 

@@ -59,7 +59,7 @@ class CanvasScaledSpectrogram(QtCore.QObject):
     # resize the pixmap and update the offsets accordingly
     def resize(self, width, height):
         oldWidth = int(self.pixmap.width() / 2)
-        if width != oldWidth:
+        if width != oldWidth and width > 0 and oldWidth > 0:
             self.write_offset = (self.write_offset % oldWidth) * width / oldWidth
             self.write_offset = self.write_offset % width  # to handle negative values
         self.pixmap = self.pixmap.scaled(2 * width, height, QtCore.Qt.IgnoreAspectRatio, QtCore.Qt.SmoothTransformation)
@@ -93,7 +93,7 @@ class CanvasScaledSpectrogram(QtCore.QObject):
         # Now, draw the image onto the widget pixmap, which has
         # the structure of a 2D ringbuffer
 
-        offset = self.write_offset % self.canvas_width
+        offset = self.write_offset % max(self.canvas_width, 1)
 
         # first copy, always complete
         source1 = QtCore.QRectF(0, 0, width, xyzs.shape[0])
@@ -129,7 +129,10 @@ class CanvasScaledSpectrogram(QtCore.QObject):
     def getpixmap(self):
         return self.pixmap
 
-    def getpixmapoffset(self, read_time: float, canvas_timerange: float) -> float:        
+    def getpixmapoffset(self, read_time: float, canvas_timerange: float) -> float:
+        if self.canvas_width <= 0:
+            return 0.0
+
         read_write_time_delay = read_time - self.last_write_time
         read_write_pixel_delay = self.canvas_width * read_write_time_delay / canvas_timerange
         return (self.write_offset + read_write_pixel_delay) % self.canvas_width

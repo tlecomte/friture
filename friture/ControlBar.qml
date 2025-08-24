@@ -28,7 +28,7 @@ RowLayout {
         ToolTip.text: "Select the type of audio widget"
         
         // replace with implicitContentWidthPolicy to either ComboBox.WidestText on Qt 6
-        width: 130
+        width: 140
         Layout.preferredWidth: width
         Layout.rightMargin: 5
     }

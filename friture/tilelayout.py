@@ -18,79 +18,55 @@
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
 import math
-from PyQt5.QtCore import QPoint, QRect, QSize, Qt
-from PyQt5.QtWidgets import QLayout, QSizePolicy
 
+from PyQt5.QtQuick import QQuickItem
 
-class TileLayout(QLayout):
-    def __init__(self, parent=None, margin=0, spacing=-1):
-        super(TileLayout, self).__init__(parent)
+class TileLayout(QQuickItem):
 
-        if parent is not None:
-            self.setContentsMargins(margin, margin, margin, margin)
+    def __init__(self, parent = None):
+        super().__init__(parent)
 
-        self.setSpacing(spacing)
+        self.setFlag(QQuickItem.ItemHasContents, False)
 
-        self.itemList = []
+        self.widthChanged.connect(self.updatePolish)
+        self.heightChanged.connect(self.updatePolish)
 
-    def __del__(self):
-        item = self.takeAt(0)
-        while item:
-            item = self.takeAt(0)
+    def itemChange(self, change, value):
+        if (change == QQuickItem.ItemChildAddedChange
+          or change == QQuickItem.ItemChildRemovedChange):
+            self.polish()
+    
+        return super().itemChange(change, value)
 
-    def addItem(self, item):
-        self.itemList.append(item)
+    def componentComplete(self):
+        self.polish()
+        return super().componentComplete()
+    
+    def movePrevious(self, index):
+        # move an item to the previous position in the layout
+        if index > 0:
+            children = self.childItems()
+            item = children[index]
+            item.stackBefore(children[index - 1])
+            self.polish()
+    
+    def moveNext(self, index):
+        # move an item to the next position in the layout
+        children = self.childItems()
+        if index < len(children) - 1:
+            item = children[index]
+            item.stackAfter(children[index + 1])
+            self.polish()
 
-    def count(self):
-        return len(self.itemList)
+    def updatePolish(self):
+        children = self.childItems()
+        childrenCount = len(children)
 
-    def itemAt(self, index):
-        if index >= 0 and index < len(self.itemList):
-            return self.itemList[index]
+        if childrenCount == 0:
+            return super().updatePolish()
 
-        return None
-
-    def takeAt(self, index):
-        if index >= 0 and index < len(self.itemList):
-            return self.itemList.pop(index)
-
-        return None
-
-    def expandingDirections(self):
-        # expand in both directions
-        return Qt.Orientations(Qt.Horizontal | Qt.Vertical)
-
-    def hasHeightForWidth(self):
-        return True
-
-    def heightForWidth(self, width):
-        height = self.doLayout(QRect(0, 0, width, 0), True)
-        return height
-
-    def setGeometry(self, rect):
-        super(TileLayout, self).setGeometry(rect)
-        self.doLayout(rect, False)
-
-    def sizeHint(self):
-        return self.minimumSize()
-
-    def minimumSize(self):
-        size = QSize()
-
-        for item in self.itemList:
-            size = size.expandedTo(item.minimumSize())
-
-        margin, _, _, _ = self.getContentsMargins()
-
-        size += QSize(2 * margin, 2 * margin)
-        return size
-
-    def doLayout(self, rect, testOnly):
-        if len(self.itemList) == 0:
-            return rect.height()
-
-        rowCount = math.ceil(math.sqrt(len(self.itemList)))
-        columnCount = math.ceil(len(self.itemList)/rowCount)
+        rowCount = math.ceil(math.sqrt(childrenCount))
+        columnCount = math.ceil(childrenCount/rowCount)
 
         # the square root produces overestimated results
         # reduce to the smallest count
@@ -98,11 +74,11 @@ class TileLayout(QLayout):
         n = 0
         while True:
             m += 1
-            if (rowCount-m)*(columnCount-n) < len(self.itemList):
+            if (rowCount-m)*(columnCount-n) < childrenCount:
                 m -= 1
                 break
             n += 1
-            if (rowCount-m)*(columnCount-n) < len(self.itemList):
+            if (rowCount-m)*(columnCount-n) < childrenCount:
                 n -= 1
                 break
 
@@ -113,7 +89,7 @@ class TileLayout(QLayout):
         lines = {rowIndex: columnCount for rowIndex in range(rowCount)}
 
         # split the overflow over the lines
-        overflow = rowCount*columnCount - len(self.itemList)
+        overflow = rowCount*columnCount - childrenCount
         while overflow > 0:
             for i in range(rowCount):
                 lines[i] = lines[i] - 1
@@ -121,24 +97,26 @@ class TileLayout(QLayout):
                 if overflow == 0:
                     break
 
-        rowHeight = rect.height()//rowCount
+        rowHeight = self.height()//rowCount
 
         # now iterate over the items
         i = 0
         for rowIndex in lines.keys():
             columnCount = lines[rowIndex]
-            columnWidth = rect.width()//columnCount
+            columnWidth = self.width()//columnCount
             for columnIndex in range(columnCount):
-                item = self.itemList[i]
-                x = rect.x() + columnIndex*columnWidth
-                y = rect.y() + rowIndex*rowHeight
+                item = self.childItems()[i]
+                x = self.x() + columnIndex*columnWidth
+                y = self.y() + rowIndex*rowHeight
 
-                if not testOnly:
-                    item.setGeometry(QRect(QPoint(x, y), QSize(columnWidth, rowHeight)))
+                item.setWidth(columnWidth)
+                item.setHeight(rowHeight)
+                item.setX(x)
+                item.setY(y)
 
                 i += 1
 
-        return rect.height()
+        return super().updatePolish()
 
 # example:
 # 1 => X
