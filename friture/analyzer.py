@@ -26,11 +26,14 @@ import platform
 import logging
 import logging.handlers
 
-from PyQt5 import QtCore
+from PyQt5 import QtCore, QtWidgets
 # specifically import from PyQt5.QtGui and QWidgets for startup time improvement :
 from PyQt5.QtWidgets import QMainWindow, QHBoxLayout, QVBoxLayout, QApplication, QSplashScreen
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtQml import QQmlEngine, qmlRegisterSingletonType, qmlRegisterType
+from PyQt5.QtQuickWidgets import QQuickWidget
+from PyQt5.QtCore import QObject
+
 import platformdirs
 
 # importing friture.exceptionhandler also installs a temporary exception hook
@@ -42,7 +45,7 @@ from friture.settings import Settings_Dialog  # Setting dialog
 from friture.audiobuffer import AudioBuffer  # audio ring buffer class
 from friture.audiobackend import AudioBackend  # audio backend class
 from friture.dockmanager import DockManager
-from friture.tilelayout import TileLayout
+from friture.tileLayout import TileLayout
 from friture.level_view_model import LevelViewModel
 from friture.level_data import LevelData
 from friture.levels import Levels_Widget
@@ -61,7 +64,7 @@ from friture.spectrogram_item_data import SpectrogramImageData
 from friture.spectrum_data import Spectrum_Data
 from friture.plotFilledCurve import PlotFilledCurve
 from friture.filled_curve import FilledCurve
-from friture.qml_tools import qml_url
+from friture.qml_tools import qml_url, raise_if_error
 from friture.generators.sine import Sine_Generator_Settings_View_Model
 from friture.generators.white import White_Generator_Settings_View_Model
 from friture.generators.pink import Pink_Generator_Settings_View_Model
@@ -115,6 +118,7 @@ class Friture(QMainWindow, ):
         qmlRegisterType(SpectrogramImageData, 'Friture', 1, 0, 'SpectrogramImageData')
         qmlRegisterType(ColorBar, 'Friture', 1, 0, 'ColorBar')
         qmlRegisterType(Tick, 'Friture', 1, 0, 'Tick')
+        qmlRegisterType(TileLayout, 'Friture', 1, 0, 'TileLayout')
         qmlRegisterType(Burst_Generator_Settings_View_Model, 'Friture', 1, 0, 'Burst_Generator_Settings_View_Model')
         qmlRegisterType(Pink_Generator_Settings_View_Model, 'Friture', 1, 0, 'Pink_Generator_Settings_View_Model')
         qmlRegisterType(White_Generator_Settings_View_Model, 'Friture', 1, 0, 'White_Generator_Settings_View_Model')
@@ -159,16 +163,25 @@ class Friture(QMainWindow, ):
         self.vboxLayout = QVBoxLayout()
         self.hboxLayout.addLayout(self.vboxLayout)
 
-        self.centralLayout = TileLayout()
-        self.centralLayout.setContentsMargins(0, 0, 0, 0)
-        self.vboxLayout.addLayout(self.centralLayout)
+        self.centralQuickWidget = QQuickWidget(self.qml_engine, self)
+        self.centralQuickWidget.setObjectName("centralQuickWidget")
+        self.centralQuickWidget.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        self.centralQuickWidget.setResizeMode(QQuickWidget.SizeRootObjectToView)
+        self.centralQuickWidget.setSource(qml_url("CentralWidget.qml"))
+        self.vboxLayout.addWidget(self.centralQuickWidget)
+
+        raise_if_error(self.centralQuickWidget)
+
+        central_widget_root = self.centralQuickWidget.rootObject()
+        self.main_grid_layout = central_widget_root.findChild(QObject, "main_tile_layout")
+        assert self.main_grid_layout is not None, "Main grid layout not found in CentralWidget.qml"
 
         self.playback_widget = PlaybackControlWidget(
             self, self.qml_engine, self.player)
         self.playback_widget.setVisible(self.settings_dialog.show_playback)
         self.vboxLayout.addWidget(self.playback_widget)
 
-        self.dockmanager = DockManager(self)
+        self.dockmanager = DockManager(self, self.main_grid_layout)
 
         # timer ticks
         self.display_timer.timeout.connect(self.dockmanager.canvasUpdate)

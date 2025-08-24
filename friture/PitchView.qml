@@ -10,6 +10,8 @@ Item {
     required property var viewModel
     required property string fixedFont
 
+    anchors.fill: parent
+
     Plot {
         id: plot
         scopedata: viewModel

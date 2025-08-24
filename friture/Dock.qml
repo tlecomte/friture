@@ -5,13 +5,12 @@ import QtQuick.Layouts 1.2
 Rectangle {
     SystemPalette { id: systemPalette; colorGroup: SystemPalette.Active }
     color: systemPalette.window
-    anchors.fill: parent
+
+    property string fixedFont
 
     ColumnLayout {
         id: root
         anchors.fill: parent
-
-        property string fixedFont
 
         Item {
             id: control_bar_container

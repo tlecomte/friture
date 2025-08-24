@@ -23,6 +23,7 @@ from PyQt5 import QtCore
 from PyQt5.QtWidgets import QMainWindow
 from friture.defaults import DEFAULT_DOCKS
 from friture.dock import Dock
+from friture.tileLayout import TileLayout
 
 from typing import Dict, List, Optional, TYPE_CHECKING
 if TYPE_CHECKING:
@@ -31,7 +32,7 @@ if TYPE_CHECKING:
 
 class DockManager(QtCore.QObject):
 
-    def __init__(self, parent: 'Friture') -> None:
+    def __init__(self, parent: 'Friture', dock_layout: TileLayout) -> None:
         super().__init__(parent)
         self._parent = parent
 
@@ -43,6 +44,8 @@ class DockManager(QtCore.QObject):
         self.docks: List[Dock] = []
         self.last_settings: Dict[int, QtCore.QSettings] = {}
         self.last_widget_stack: List[int] = []
+
+        self.dock_layout = dock_layout
 
     # slot
     def new_dock(self) -> None:
@@ -64,7 +67,6 @@ class DockManager(QtCore.QObject):
         new_dock = Dock(self._parent, name, self._parent.qml_engine, widget_id)
         if settings is not None:
             new_dock.restoreState(settings)
-        self._parent.centralLayout.addWidget(new_dock)
 
         self.docks += [new_dock]
 
@@ -76,8 +78,20 @@ class DockManager(QtCore.QObject):
         self.last_settings[dock.widgetId] = settings
         self.last_widget_stack.append(dock.widgetId)
 
-        self._parent.centralLayout.removeWidget(dock)
         self.docks.remove(dock)
+        dock.cleanup()
+    
+    def movePrevious(self, dock):
+        i = self.docks.index(dock)
+        if i > 0:
+            self.dock_layout.movePrevious(i)
+            self.docks.insert(i-1, self.docks.pop(i))
+
+    def moveNext(self, dock):
+        i = self.docks.index(dock)
+        if i < len(self.docks) - 1:
+            self.dock_layout.moveNext(i)
+            self.docks.insert(i+1, self.docks.pop(i))
 
     def saveState(self, settings):
         docknames = [dock.objectName() for dock in self.docks]
@@ -107,13 +121,10 @@ class DockManager(QtCore.QObject):
                 dock = Dock(self.parent(), name, self.parent().qml_engine, widgetId)
                 dock.restoreState(settings)
                 settings.endGroup()
-                self.parent().centralLayout.addWidget(dock)
                 self.docks.append(dock)
         else:
             self.logger.info("First launch, display a default set of docks")
             self.docks = [Dock(self.parent(), "Dock %d" % (i), self.parent().qml_engine, widgetId=widget_type) for i, widget_type in enumerate(DEFAULT_DOCKS)]
-            for dock in self.docks:
-                self.parent().centralLayout.addWidget(dock)
 
         # Ugh it seems QSettings encodes an empty stack the same as None, and
         # that counts as being set so it doesn't get the default, and hence the
@@ -130,8 +141,9 @@ class DockManager(QtCore.QObject):
         settings.endGroup()
 
     def canvasUpdate(self):
-        for dock in self.docks:
-            dock.canvasUpdate()
+        if self._parent.isVisible():
+            for dock in self.docks:
+                dock.canvasUpdate()
 
     def pause(self):
         for dock in self.docks:
