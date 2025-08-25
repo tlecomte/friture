@@ -23,6 +23,7 @@ from PyQt5.QtCore import pyqtSignal, pyqtProperty # type: ignore
 from PyQt5.QtQuick import QQuickItem, QSGGeometryNode, QSGGeometry, QSGNode, QSGVertexColorMaterial # type: ignore
 
 from friture.filled_curve import CurveType, FilledCurve
+from friture.store import GetStore
 
 class PlotFilledCurve(QQuickItem):
     curveChanged = pyqtSignal()
@@ -113,7 +114,11 @@ class PlotFilledCurve(QQuickItem):
             g = 255 * (1. - z)
             b = 255 * (1. - z)
 
-        a = 255 + 0.*y
+        # Add transparency to the bars - reduce alpha from 255 to about 180 for nice transparency
+        # Check the global transparency setting from store
+        store = GetStore()
+        alpha_value = 180 if store.transparency_enabled else 255
+        a = alpha_value + 0.*y
 
         x_left_plot = np.clip(x_left, 0., 1.) * self.width()
         x_right_plot = np.clip(x_right, 0., 1.) * self.width()

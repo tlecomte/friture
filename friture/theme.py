@@ -81,12 +81,18 @@ class ThemeManager:
                 border-radius: 5px;
                 margin-top: 1ex;
                 padding-top: 10px;
+                color: #ffffff;
             }
             
             QGroupBox::title {
                 subcontrol-origin: margin;
                 left: 10px;
                 padding: 0 5px 0 5px;
+                color: #ffffff;
+            }
+            
+            QLabel {
+                color: #ffffff;
             }
             
             /* Form controls styling for dark theme */
@@ -196,6 +202,50 @@ class ThemeManager:
             QRadioButton::indicator:checked {
                 background-color: #2a82da;
                 border-color: #2a82da;
+            }
+            
+            /* Tab widget styling */
+            QTabWidget::pane {
+                border: 1px solid #555555;
+                background-color: #353535;
+            }
+            
+            QTabBar::tab {
+                background-color: #2a2a2a;
+                color: #ffffff;
+                border: 1px solid #555555;
+                border-bottom-color: #555555;
+                border-top-left-radius: 4px;
+                border-top-right-radius: 4px;
+                min-width: 8ex;
+                padding: 8px;
+            }
+            
+            QTabBar::tab:selected {
+                background-color: #353535;
+                border-bottom-color: #353535;
+            }
+            
+            QTabBar::tab:hover {
+                background-color: #404040;
+            }
+            
+            /* Dialog buttons styling */
+            QPushButton {
+                background-color: #353535;
+                color: #ffffff;
+                border: 1px solid #555555;
+                border-radius: 4px;
+                padding: 6px 12px;
+                min-width: 80px;
+            }
+            
+            QPushButton:hover {
+                background-color: #404040;
+            }
+            
+            QPushButton:pressed {
+                background-color: #2a2a2a;
             }
         """
         self.app.setStyleSheet(dark_style)

@@ -200,6 +200,7 @@ class Friture(QMainWindow, ):
         self.settings_dialog.show_playback_changed.connect(self.show_playback_changed)
         self.settings_dialog.history_length_changed.connect(self.player.set_history_seconds)
         self.settings_dialog.theme_changed.connect(self.theme_changed)
+        self.settings_dialog.transparency_changed.connect(self.transparency_changed)
 
         # restore the settings and widgets geometries
         self.restoreAppState()
@@ -244,6 +245,10 @@ class Friture(QMainWindow, ):
     # slot
     def theme_changed(self, theme_name: str) -> None:
         apply_theme(theme_name)
+
+    # slot  
+    def transparency_changed(self, enabled: bool) -> None:
+        GetStore().transparency_enabled = enabled
 
     # slot
     def about_called(self):
@@ -329,6 +334,10 @@ class Friture(QMainWindow, ):
         settings.beginGroup("AudioBackend")
         self.settings_dialog.restoreState(settings)
         settings.endGroup()
+
+        # Restore transparency setting to store
+        transparency_enabled = settings.value("transparency", 2, type=int)  # Default to checked
+        GetStore().transparency_enabled = bool(transparency_enabled)
 
     # slot
     def timer_toggle(self):
