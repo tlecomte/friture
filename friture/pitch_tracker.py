@@ -28,7 +28,6 @@ import logging
 import math as m
 import numpy as np
 
-from scipy.interpolate import interp1d, CubicSpline
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import pyqtSignal, pyqtProperty # type: ignore
 from PyQt5.QtCore import QObject, QSettings, Qt
@@ -166,7 +165,6 @@ def calcKernel(f, freqList):
     k /= np.linalg.norm(k[k > 0])
 
     return k
-
 
 
 class PitchTrackerWidget(QtWidgets.QWidget):
@@ -445,11 +443,9 @@ class PitchTracker:
         freq_lin = np.arange(len(spectrum), dtype='float64')
         freq_lin *= float(self.sample_rate) / float(self.fft_size)
 
-        # Create a spline mapping from linear frequency to amplitude
-        spline_lin_to_log = interp1d(freq_lin, spectrum)
-
+        # Create spline mapping from linear frequency to amplitude
         # Apply this spline to the log-spaced frequencies and normalize
-        specLog = spline_lin_to_log(self.logSpacedFreqs)
+        specLog = np.interp(self.logSpacedFreqs, freq_lin, spectrum)
         specLogRMS = np.sqrt(np.mean(specLog**2))
         specLogNorm = specLog / specLogRMS
 
@@ -474,10 +470,8 @@ class PitchTracker:
             idxShift = 0
 
         # Create a mapping from indices to frequencies
-        spline_idx_to_freq = CubicSpline(np.arange(len(self.logSpacedFreqs)),self.logSpacedFreqs)
-
         # Apply spline to idxMax with a slight index shift
-        f0 = spline_idx_to_freq(idxMax + idxShift)
+        f0 = np.interp(idxMax + idxShift, np.arange(len(self.logSpacedFreqs)), self.logSpacedFreqs)
 
         # Check decibal value and confidence before output
         db = 10 * np.log10(specLog[idxMax] ** 2 / self.fft_size ** 2)
