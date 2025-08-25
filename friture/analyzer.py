@@ -45,7 +45,7 @@ from friture.settings import Settings_Dialog  # Setting dialog
 from friture.audiobuffer import AudioBuffer  # audio ring buffer class
 from friture.audiobackend import AudioBackend  # audio backend class
 from friture.dockmanager import DockManager
-from friture.tileLayout import TileLayout
+from friture.tilelayout import TileLayout
 from friture.level_view_model import LevelViewModel
 from friture.level_data import LevelData
 from friture.levels import Levels_Widget
