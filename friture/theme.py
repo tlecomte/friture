@@ -88,6 +88,115 @@ class ThemeManager:
                 left: 10px;
                 padding: 0 5px 0 5px;
             }
+            
+            /* Form controls styling for dark theme */
+            QComboBox {
+                background-color: #353535;
+                color: #ffffff;
+                border: 1px solid #555555;
+                border-radius: 4px;
+                padding: 4px;
+            }
+            
+            QComboBox:editable {
+                background-color: #191919;
+            }
+            
+            QComboBox:on {
+                padding-top: 3px;
+                padding-left: 4px;
+            }
+            
+            QComboBox::drop-down {
+                subcontrol-origin: padding;
+                subcontrol-position: top right;
+                width: 15px;
+                border-left-width: 1px;
+                border-left-color: #555555;
+                border-left-style: solid;
+                border-top-right-radius: 3px;
+                border-bottom-right-radius: 3px;
+                background-color: #353535;
+            }
+            
+            QComboBox::down-arrow {
+                width: 0;
+                height: 0;
+                border: 5px solid transparent;
+                border-top: 5px solid #ffffff;
+                margin-left: 2px;
+            }
+            
+            QComboBox QAbstractItemView {
+                background-color: #353535;
+                color: #ffffff;
+                border: 1px solid #555555;
+                selection-background-color: #2a82da;
+            }
+            
+            QSpinBox, QDoubleSpinBox {
+                background-color: #191919;
+                color: #ffffff;
+                border: 1px solid #555555;
+                border-radius: 4px;
+                padding: 4px;
+            }
+            
+            QSpinBox::up-button, QDoubleSpinBox::up-button {
+                subcontrol-origin: border;
+                subcontrol-position: top right;
+                width: 16px;
+                background-color: #353535;
+                border-left: 1px solid #555555;
+            }
+            
+            QSpinBox::down-button, QDoubleSpinBox::down-button {
+                subcontrol-origin: border;
+                subcontrol-position: bottom right;
+                width: 16px;
+                background-color: #353535;
+                border-left: 1px solid #555555;
+            }
+            
+            QCheckBox {
+                color: #ffffff;
+                spacing: 5px;
+            }
+            
+            QCheckBox::indicator {
+                width: 18px;
+                height: 18px;
+                background-color: #191919;
+                border: 1px solid #555555;
+                border-radius: 3px;
+            }
+            
+            QCheckBox::indicator:checked {
+                background-color: #2a82da;
+                border-color: #2a82da;
+            }
+            
+            QCheckBox::indicator:checked:hover {
+                background-color: #3a92ea;
+            }
+            
+            QRadioButton {
+                color: #ffffff;
+                spacing: 5px;
+            }
+            
+            QRadioButton::indicator {
+                width: 18px;
+                height: 18px;
+                background-color: #191919;
+                border: 1px solid #555555;
+                border-radius: 9px;
+            }
+            
+            QRadioButton::indicator:checked {
+                background-color: #2a82da;
+                border-color: #2a82da;
+            }
         """
         self.app.setStyleSheet(dark_style)
 
