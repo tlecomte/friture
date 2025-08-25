@@ -1,13 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2009 Timothée Lecomte    @pyqtProperty(bool, notify=show_playback_changed) # type: ignore
-    def show_playback(self) -> bool:
-        return bool(self.checkbox_showPlayback.checkState())
+# Copyright (C) 2009 Timothée Lecomte
 
-    @pyqtProperty(bool) # type: ignore
-    def transparency_enabled(self) -> bool:
-        return bool(self.checkbox_transparency.checkState())# This file is part of Friture.
+# This file is part of Friture.
 #
 # Friture is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License version 3 as published by
@@ -93,6 +89,10 @@ class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
     @pyqtProperty(bool, notify=show_playback_changed) # type: ignore
     def show_playback(self) -> bool:
         return bool(self.checkbox_showPlayback.checkState())
+
+    @pyqtProperty(bool) # type: ignore
+    def transparency_enabled(self) -> bool:
+        return bool(self.checkbox_transparency.checkState())
 
     # slot
     # used when no audio input device has been found, to exit immediately
