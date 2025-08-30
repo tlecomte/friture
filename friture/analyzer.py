@@ -29,8 +29,8 @@ import logging.handlers
 from PyQt5 import QtCore, QtWidgets
 # specifically import from PyQt5.QtGui and QWidgets for startup time improvement :
 from PyQt5.QtWidgets import QMainWindow, QHBoxLayout, QVBoxLayout, QApplication, QSplashScreen
-from PyQt5.QtGui import QPixmap
-from PyQt5.QtQml import QQmlEngine, qmlRegisterSingletonType, qmlRegisterType
+from PyQt5.QtGui import QPixmap, QFontDatabase
+from PyQt5.QtQml import QQmlEngine, qmlRegisterSingletonType, qmlRegisterType, QQmlComponent
 from PyQt5.QtQuickWidgets import QQuickWidget
 from PyQt5.QtCore import QObject
 
@@ -39,16 +39,18 @@ import platformdirs
 # importing friture.exceptionhandler also installs a temporary exception hook
 from friture.exceptionhandler import errorBox, fileexcepthook
 import friture
+from friture.playback.playback_control_view_model import PlaybackControlViewModel
 from friture.ui_friture import Ui_MainWindow
 from friture.about import About_Dialog  # About dialog
 from friture.settings import Settings_Dialog  # Setting dialog
 from friture.audiobuffer import AudioBuffer  # audio ring buffer class
 from friture.audiobackend import AudioBackend  # audio backend class
 from friture.dockmanager import DockManager
-from friture.tileLayout import TileLayout
+from friture.tilelayout import TileLayout
 from friture.level_view_model import LevelViewModel
 from friture.level_data import LevelData
 from friture.levels import Levels_Widget
+from friture.main_window_view_model import MainWindowViewModel
 from friture.store import GetStore, Store
 from friture.scope_data import Scope_Data
 from friture.axis import Axis
@@ -64,7 +66,7 @@ from friture.spectrogram_item_data import SpectrogramImageData
 from friture.spectrum_data import Spectrum_Data
 from friture.plotFilledCurve import PlotFilledCurve
 from friture.filled_curve import FilledCurve
-from friture.qml_tools import qml_url, raise_if_error
+from friture.qml_tools import qml_url, raise_if_error, component_raise_if_error
 from friture.generators.sine import Sine_Generator_Settings_View_Model
 from friture.generators.white import White_Generator_Settings_View_Model
 from friture.generators.pink import Pink_Generator_Settings_View_Model
@@ -109,6 +111,8 @@ class Friture(QMainWindow, ):
         qmlRegisterType(Spectrum_Data, 'Friture', 1, 0, 'SpectrumData')
         qmlRegisterType(LevelData, 'Friture', 1, 0, 'LevelData')
         qmlRegisterType(LevelViewModel, 'Friture', 1, 0, 'LevelViewModel')
+        qmlRegisterType(PlaybackControlViewModel, 'Friture', 1, 0, 'PlaybackControlViewModel')
+        qmlRegisterType(MainWindowViewModel, 'Friture', 1, 0, 'MainWindowViewModel')
         qmlRegisterType(Axis, 'Friture', 1, 0, 'Axis')
         qmlRegisterType(Curve, 'Friture', 1, 0, 'Curve')
         qmlRegisterType(FilledCurve, 'Friture', 1, 0, 'FilledCurve')
@@ -152,36 +156,44 @@ class Friture(QMainWindow, ):
         self.about_dialog = About_Dialog(self, self.slow_timer)
         self.settings_dialog = Settings_Dialog(self)
 
-        self.level_widget = Levels_Widget(self, self.qml_engine)
-        self.level_widget.set_buffer(self.audiobuffer)
-        self.audiobuffer.new_data_available.connect(self.level_widget.handle_new_data)
-
-        self.hboxLayout = QHBoxLayout(self.ui.centralwidget)
-        self.hboxLayout.setContentsMargins(0, 0, 0, 0)
-        self.hboxLayout.addWidget(self.level_widget)
-
-        self.vboxLayout = QVBoxLayout()
-        self.hboxLayout.addLayout(self.vboxLayout)
-
         self.centralQuickWidget = QQuickWidget(self.qml_engine, self)
         self.centralQuickWidget.setObjectName("centralQuickWidget")
         self.centralQuickWidget.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         self.centralQuickWidget.setResizeMode(QQuickWidget.SizeRootObjectToView)
-        self.centralQuickWidget.setSource(qml_url("CentralWidget.qml"))
-        self.vboxLayout.addWidget(self.centralQuickWidget)
+        self.centralQuickWidget.setSource(qml_url("FritureHost.qml"))
 
         raise_if_error(self.centralQuickWidget)
 
-        central_widget_root = self.centralQuickWidget.rootObject()
-        self.main_grid_layout = central_widget_root.findChild(QObject, "main_tile_layout")
-        assert self.main_grid_layout is not None, "Main grid layout not found in CentralWidget.qml"
+        self.hboxLayout = QHBoxLayout(self.ui.centralwidget)
+        self.hboxLayout.setContentsMargins(0, 0, 0, 0)
+        self.hboxLayout.addWidget(self.centralQuickWidget)
 
-        self.playback_widget = PlaybackControlWidget(
-            self, self.qml_engine, self.player)
-        self.playback_widget.setVisible(self.settings_dialog.show_playback)
-        self.vboxLayout.addWidget(self.playback_widget)
+        qml_component = QQmlComponent(self.qml_engine)
+        qml_component.loadUrl(qml_url("MainWindow.qml"))
+        component_raise_if_error(qml_component)
 
-        self.dockmanager = DockManager(self, self.main_grid_layout)
+        self._main_window_view_model = MainWindowViewModel(self.qml_engine)
+
+        context = self.qml_engine.rootContext()
+        central_widget_root = qml_component.createWithInitialProperties(
+            {
+                "main_window_view_model": self._main_window_view_model,
+                "fixedFont": QFontDatabase.systemFont(QFontDatabase.FixedFont).family()
+            },
+            context) # type: ignore
+        central_widget_root.setParent(self.qml_engine)
+        central_widget_root.setParentItem(self.centralQuickWidget.rootObject()) # type: ignore
+
+        self.main_tile_layout = central_widget_root.findChild(QObject, "main_tile_layout")
+        assert self.main_tile_layout is not None, "Main tile layout not found in CentralWidget.qml"
+
+        self.level_widget = Levels_Widget(self, self._main_window_view_model.level_view_model)
+        self.level_widget.set_buffer(self.audiobuffer)
+        self.audiobuffer.new_data_available.connect(self.level_widget.handle_new_data)
+
+        self.playback_widget = PlaybackControlWidget(self, self.player, self._main_window_view_model.playback_control_view_model)
+
+        self.dockmanager = DockManager(self, self.main_tile_layout)
 
         # timer ticks
         self.display_timer.timeout.connect(self.dockmanager.canvasUpdate)
@@ -193,7 +205,7 @@ class Friture(QMainWindow, ):
         self.ui.actionSettings.triggered.connect(self.settings_called)
         self.ui.actionAbout.triggered.connect(self.about_called)
         self.ui.actionNew_dock.triggered.connect(self.dockmanager.new_dock)
-        self.playback_widget.recording_toggled.connect(self.timer_toggle)
+        self.playback_widget.recording_toggled.connect(self.timer_changed)
 
         # settings changes
         self.settings_dialog.show_playback_changed.connect(self.show_playback_changed)
@@ -237,7 +249,7 @@ class Friture(QMainWindow, ):
         self.settings_dialog.show()
 
     def show_playback_changed(self, show: bool) -> None:
-        self.playback_widget.setVisible(show)
+        self._main_window_view_model.playback_control_enabled = show
 
     # slot
     def about_called(self):
@@ -341,6 +353,23 @@ class Friture(QMainWindow, ):
             AudioBackend().restart()
             self.dockmanager.restart()
 
+    # slot
+    def timer_changed(self, recording: bool):
+        if not recording and self.display_timer.isActive():
+            self.logger.info("Timer stop")
+            self.display_timer.stop()
+            self.ui.actionStart.setText("Start")
+            self.playback_widget.stop_recording()
+            AudioBackend().pause()
+            self.dockmanager.pause()
+
+        if recording and not self.display_timer.isActive():
+            self.logger.info("Timer start")
+            self.display_timer.start()
+            self.ui.actionStart.setText("Stop")
+            self.playback_widget.start_recording()
+            AudioBackend().restart()
+            self.dockmanager.restart()
 
 def qt_message_handler(mode, context, message):
     logger = logging.getLogger(__name__)

@@ -18,81 +18,60 @@
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
-from typing import Any
 
-from PyQt5.QtCore import pyqtSignal
-from PyQt5.QtGui import QPalette
-from PyQt5.QtWidgets import QSizePolicy, QWidget
-from PyQt5.QtQml import QQmlEngine
-from PyQt5.QtQuickWidgets import QQuickWidget
+from PyQt5.QtCore import pyqtSignal, QObject
 
-from friture.qml_tools import qml_url, raise_if_error
+from friture.playback.playback_control_view_model import PlaybackControlViewModel
 from friture.playback.player import Player
 
 logger = logging.getLogger(__name__)
 
-class PlaybackControlWidget(QQuickWidget):
-    recording_toggled = pyqtSignal()
+class PlaybackControlWidget(QObject):
+    recording_toggled = pyqtSignal(bool)
 
-    def __init__(self, parent: QWidget, engine: QQmlEngine, player: Player):
-        super().__init__(engine, parent)
-        self.statusChanged.connect(self.on_status_changed)
-        self.setResizeMode(QQuickWidget.SizeRootObjectToView)
-        self.setSizePolicy(
-            QSizePolicy.Expanding, QSizePolicy.Preferred
-        )
-        self.setClearColor(self.palette().color(QPalette.Window))
-        self.setSource(qml_url("playback/Control.qml"))
-        raise_if_error(self)
+    def __init__(self, parent: QObject, player: Player, playback_control_view_model: PlaybackControlViewModel) -> None:
+        super().__init__(parent)
 
-        self.root: Any = self.rootObject()
-        self.root.stopClicked.connect(self.on_stopped)
-        self.root.recordClicked.connect(self.on_record)
-        self.root.playClicked.connect(self.on_played)
-        self.root.positionChanged.connect(self.on_playback_position_changed)
-        self.root.setRecordingStartTime(-0.1)
+        self._playback_control_view_model = playback_control_view_model
+
+        self._playback_control_view_model.recording_changed.connect(self.on_recording_changed)
+        self._playback_control_view_model.playing_changed.connect(self.on_playing_changed)
+        self._playback_control_view_model.position_changed.connect(self.on_playback_position_changed)
 
         self.player = player
         self.player.stopped.connect(self.on_playback_stopped)
         self.player.recorded_length_changed.connect(self.on_recorded_len_changed)
         self.player.playback_time_changed.connect(self.on_playback_time_changed)
 
-
     def start_recording(self) -> None:
         if not self.player.is_stopped():
             self.player.stop()
-        self.root.showRecording()
+        self._playback_control_view_model.set_playing(False)
+        self._playback_control_view_model.set_recording(True)
 
     def stop_recording(self) -> None:
-        self.root.showStopped()
+        self._playback_control_view_model.set_playing(False)
+        self._playback_control_view_model.set_recording(False)
 
-    def on_status_changed(self, status: QQuickWidget.Status) -> None:
-        if status == QQuickWidget.Error:
-            for error in self.errors():
-                logger.error("QML error: " + error.toString())
+    def on_recording_changed(self, recording: bool) -> None:
+        self.recording_toggled.emit(recording)
 
-    def on_stopped(self) -> None:
-        if self.player.is_stopped():
-            self.recording_toggled.emit()
+    def on_playing_changed(self, playing: bool) -> None:
+        if playing:
+            self.player.play()
         else:
             self.player.stop()
 
-    def on_record(self) -> None:
-        self.recording_toggled.emit()
-
-    def on_played(self) -> None:
-        self.player.play()
-
     def on_playback_stopped(self) -> None:
-        self.root.showStopped()
-        self.root.setPlaybackPosition(self.player.play_start_time)
+        self._playback_control_view_model.set_playing(False)
+        self._playback_control_view_model.set_position(self.player.play_start_time)
 
     def on_playback_position_changed(self, value: float) -> None:
         self.player.play_start_time = value
 
     def on_recorded_len_changed(self, length: float) -> None:
         # Always give the slider a nonzero length even if nothing is recorded
-        self.root.setRecordingStartTime(-max(length, 0.1))
+        self._playback_control_view_model.set_recording_start_time(-max(length, 0.1))
 
     def on_playback_time_changed(self, time: float) -> None:
-        self.root.setPlaybackPosition(time)
+        self._playback_control_view_model.set_position(time)

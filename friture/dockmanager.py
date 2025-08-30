@@ -23,7 +23,7 @@ from PyQt5 import QtCore
 from PyQt5.QtWidgets import QMainWindow
 from friture.defaults import DEFAULT_DOCKS
 from friture.dock import Dock
-from friture.tileLayout import TileLayout
+from friture.tilelayout import TileLayout
 
 from typing import Dict, List, Optional, TYPE_CHECKING
 if TYPE_CHECKING:

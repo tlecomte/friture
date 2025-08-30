@@ -106,8 +106,8 @@ class TileLayout(QQuickItem):
             columnWidth = self.width()//columnCount
             for columnIndex in range(columnCount):
                 item = self.childItems()[i]
-                x = self.x() + columnIndex*columnWidth
-                y = self.y() + rowIndex*rowHeight
+                x = columnIndex*columnWidth
+                y = rowIndex*rowHeight
 
                 item.setWidth(columnWidth)
                 item.setHeight(rowHeight)
