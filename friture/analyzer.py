@@ -26,19 +26,20 @@ import platform
 import logging
 import logging.handlers
 
-from PyQt5 import QtCore, QtWidgets
+from PyQt5 import QtCore
 # specifically import from PyQt5.QtGui and QWidgets for startup time improvement :
-from PyQt5.QtWidgets import QMainWindow, QHBoxLayout, QVBoxLayout, QApplication, QSplashScreen
+from PyQt5.QtWidgets import QMainWindow, QApplication, QSplashScreen, QWidget
 from PyQt5.QtGui import QPixmap, QFontDatabase
-from PyQt5.QtQml import QQmlEngine, qmlRegisterSingletonType, qmlRegisterType, QQmlComponent
-from PyQt5.QtQuickWidgets import QQuickWidget
+from PyQt5.QtQml import QQmlEngine, qmlRegisterSingletonType, qmlRegisterType
 from PyQt5.QtCore import QObject
+from PyQt5.QtQuick import QQuickView
 
 import platformdirs
 
 # importing friture.exceptionhandler also installs a temporary exception hook
 from friture.exceptionhandler import errorBox, fileexcepthook
 import friture
+from friture.main_toolbar_view_model import MainToolbarViewModel
 from friture.playback.playback_control_view_model import PlaybackControlViewModel
 from friture.ui_friture import Ui_MainWindow
 from friture.about import About_Dialog  # About dialog
@@ -66,7 +67,7 @@ from friture.spectrogram_item_data import SpectrogramImageData
 from friture.spectrum_data import Spectrum_Data
 from friture.plotFilledCurve import PlotFilledCurve
 from friture.filled_curve import FilledCurve
-from friture.qml_tools import qml_url, raise_if_error, component_raise_if_error
+from friture.qml_tools import qml_url, view_raise_if_error
 from friture.generators.sine import Sine_Generator_Settings_View_Model
 from friture.generators.white import White_Generator_Settings_View_Model
 from friture.generators.pink import Pink_Generator_Settings_View_Model
@@ -113,6 +114,7 @@ class Friture(QMainWindow, ):
         qmlRegisterType(LevelViewModel, 'Friture', 1, 0, 'LevelViewModel')
         qmlRegisterType(PlaybackControlViewModel, 'Friture', 1, 0, 'PlaybackControlViewModel')
         qmlRegisterType(MainWindowViewModel, 'Friture', 1, 0, 'MainWindowViewModel')
+        qmlRegisterType(MainToolbarViewModel, 'Friture', 1, 0, 'MainToolbarViewModel')
         qmlRegisterType(Axis, 'Friture', 1, 0, 'Axis')
         qmlRegisterType(Curve, 'Friture', 1, 0, 'Curve')
         qmlRegisterType(FilledCurve, 'Friture', 1, 0, 'FilledCurve')
@@ -156,35 +158,22 @@ class Friture(QMainWindow, ):
         self.about_dialog = About_Dialog(self, self.slow_timer)
         self.settings_dialog = Settings_Dialog(self)
 
-        self.centralQuickWidget = QQuickWidget(self.qml_engine, self)
-        self.centralQuickWidget.setObjectName("centralQuickWidget")
-        self.centralQuickWidget.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
-        self.centralQuickWidget.setResizeMode(QQuickWidget.SizeRootObjectToView)
-        self.centralQuickWidget.setSource(qml_url("FritureHost.qml"))
-
-        raise_if_error(self.centralQuickWidget)
-
-        self.hboxLayout = QHBoxLayout(self.ui.centralwidget)
-        self.hboxLayout.setContentsMargins(0, 0, 0, 0)
-        self.hboxLayout.addWidget(self.centralQuickWidget)
-
-        qml_component = QQmlComponent(self.qml_engine)
-        qml_component.loadUrl(qml_url("MainWindow.qml"))
-        component_raise_if_error(qml_component)
-
         self._main_window_view_model = MainWindowViewModel(self.qml_engine)
 
-        context = self.qml_engine.rootContext()
-        central_widget_root = qml_component.createWithInitialProperties(
-            {
-                "main_window_view_model": self._main_window_view_model,
-                "fixedFont": QFontDatabase.systemFont(QFontDatabase.FixedFont).family()
-            },
-            context) # type: ignore
-        central_widget_root.setParent(self.qml_engine)
-        central_widget_root.setParentItem(self.centralQuickWidget.rootObject()) # type: ignore
+        self.quick_view = QQuickView(self.qml_engine, None)
+        self.quick_view.setResizeMode(QQuickView.SizeRootObjectToView)
+        self.quick_view.setInitialProperties({
+            "main_window_view_model": self._main_window_view_model,
+            "fixedFont": QFontDatabase.systemFont(QFontDatabase.FixedFont).family()
+        })
+        self.quick_view.setSource(qml_url("FritureMainWindow.qml"))
 
-        self.main_tile_layout = central_widget_root.findChild(QObject, "main_tile_layout")
+        view_raise_if_error(self.quick_view)
+
+        self.quick_container = QWidget.createWindowContainer(self.quick_view, self)
+        self.setCentralWidget(self.quick_container)
+
+        self.main_tile_layout = self.quick_view.findChild(QObject, "main_tile_layout")
         assert self.main_tile_layout is not None, "Main tile layout not found in CentralWidget.qml"
 
         self.level_widget = Levels_Widget(self, self._main_window_view_model.level_view_model)
@@ -201,10 +190,10 @@ class Friture(QMainWindow, ):
         self.display_timer.timeout.connect(AudioBackend().fetchAudioData)
 
         # toolbar clicks
-        self.ui.actionStart.triggered.connect(self.timer_toggle)
-        self.ui.actionSettings.triggered.connect(self.settings_called)
-        self.ui.actionAbout.triggered.connect(self.about_called)
-        self.ui.actionNew_dock.triggered.connect(self.dockmanager.new_dock)
+        self._main_window_view_model.toolbar_view_model.recording_clicked.connect(self.timer_toggle)
+        self._main_window_view_model.toolbar_view_model.new_dock_clicked.connect(self.dockmanager.new_dock)
+        self._main_window_view_model.toolbar_view_model.settings_clicked.connect(self.settings_called)
+        self._main_window_view_model.toolbar_view_model.about_clicked.connect(self.about_called)
         self.playback_widget.recording_toggled.connect(self.timer_changed)
 
         # settings changes
@@ -213,15 +202,6 @@ class Friture(QMainWindow, ):
 
         # restore the settings and widgets geometries
         self.restoreAppState()
-
-        # make sure the toolbar is shown
-        # in case it was closed by mistake (before it was made impossible)
-        self.ui.toolBar.setVisible(True)
-
-        # prevent from hiding or moving the toolbar
-        self.ui.toolBar.toggleViewAction().setVisible(False)
-        self.ui.toolBar.setMovable(False)
-        self.ui.toolBar.setFloatable(False)
 
         # start timers
         self.timer_toggle()
@@ -341,14 +321,14 @@ class Friture(QMainWindow, ):
         if self.display_timer.isActive():
             self.logger.info("Timer stop")
             self.display_timer.stop()
-            self.ui.actionStart.setText("Start")
+            self._main_window_view_model.toolbar_view_model.recording = False
             self.playback_widget.stop_recording()
             AudioBackend().pause()
             self.dockmanager.pause()
         else:
             self.logger.info("Timer start")
             self.display_timer.start()
-            self.ui.actionStart.setText("Stop")
+            self._main_window_view_model.toolbar_view_model.recording = True
             self.playback_widget.start_recording()
             AudioBackend().restart()
             self.dockmanager.restart()
@@ -358,7 +338,7 @@ class Friture(QMainWindow, ):
         if not recording and self.display_timer.isActive():
             self.logger.info("Timer stop")
             self.display_timer.stop()
-            self.ui.actionStart.setText("Start")
+            self._main_window_view_model.toolbar_view_model.recording = False
             self.playback_widget.stop_recording()
             AudioBackend().pause()
             self.dockmanager.pause()
@@ -366,7 +346,7 @@ class Friture(QMainWindow, ):
         if recording and not self.display_timer.isActive():
             self.logger.info("Timer start")
             self.display_timer.start()
-            self.ui.actionStart.setText("Stop")
+            self._main_window_view_model.toolbar_view_model.recording = True
             self.playback_widget.start_recording()
             AudioBackend().restart()
             self.dockmanager.restart()
