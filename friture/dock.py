@@ -69,7 +69,7 @@ class Dock(QObject):
         context = self.qml_engine.rootContext()
         self.dock_qml = dock_component.createWithInitialProperties({}, context)
         self.dock_qml.setParent(self.qml_engine)
-        self.dock_qml.setParentItem(self.parent().main_grid_layout) # type: ignore
+        self.dock_qml.setParentItem(self.parent().main_tile_layout) # type: ignore
         
         initialProperties = {"viewModel": self.controlbar_viewmodel}
         component = QQmlComponent(self.qml_engine)

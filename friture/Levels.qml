@@ -8,13 +8,8 @@ Rectangle {
     SystemPalette { id: systemPalette; colorGroup: SystemPalette.Active }
     color: systemPalette.window
 
-    property var stateId
-    property LevelViewModel level_view_model: Store.dock_states[stateId]
-
-    property string fixedFont
-
-    // parent here will be unset on exit
-    height: parent ? parent.height : 0
+    required property LevelViewModel level_view_model
+    required property string fixedFont
 
     // make width dependent on the text labels
     // but do not bind directly to their widths

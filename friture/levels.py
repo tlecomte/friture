@@ -19,62 +19,32 @@
 
 """Level widget that displays peak and RMS levels for 1 or 2 ports."""
 
-from PyQt5 import QtWidgets
-from PyQt5.QtQml import QQmlComponent
-from PyQt5.QtQuick import QQuickWindow # type: ignore
-from PyQt5.QtGui import QFontDatabase
+from PyQt5.QtCore import QObject
 import numpy as np
 
-from friture.store import GetStore
 from friture.levels_settings import Levels_Settings_Dialog  # settings dialog
 from friture.audioproc import audioproc
-from friture.level_view_model import LevelViewModel
 from friture.iec import dB_to_IEC
 from friture_extensions.exp_smoothing_conv import pyx_exp_smoothed_value
 from friture.audiobackend import SAMPLING_RATE
-from friture.qml_tools import qml_url, raise_if_error
 
 SMOOTH_DISPLAY_TIMER_PERIOD_MS = 25
 LEVEL_TEXT_LABEL_PERIOD_MS = 250
 
 LEVEL_TEXT_LABEL_STEPS = LEVEL_TEXT_LABEL_PERIOD_MS / SMOOTH_DISPLAY_TIMER_PERIOD_MS
 
-class Levels_Widget(QtWidgets.QWidget):
+class Levels_Widget(QObject):
 
-    def __init__(self, parent, engine):
+    def __init__(self, parent, view_model):
         super().__init__(parent)
-        self.setObjectName("Levels_Widget")
 
-        self.gridLayout = QtWidgets.QVBoxLayout(self)
-        self.gridLayout.setObjectName("gridLayout")
-
-        store = GetStore()
-        self.level_view_model = LevelViewModel(store)
-        store._dock_states.append(self.level_view_model)
-        state_id = len(store._dock_states) - 1
-
-        self.quickWindow = QQuickWindow()
-        component = QQmlComponent(engine, qml_url("Levels.qml"), self)
-        raise_if_error(component)
-
-        fixedFont = QFontDatabase.systemFont(QFontDatabase.FixedFont)
-
-        engineContext = engine.rootContext()
-        initialProperties = {"parent": self.quickWindow.contentItem(), "stateId": state_id, "fixedFont": fixedFont }
-        self.qmlObject = component.createWithInitialProperties(initialProperties, engineContext)
-        self.qmlObject.setParent(self.quickWindow)
-
-        self.quickWidget = QtWidgets.QWidget.createWindowContainer(self.quickWindow, self)
-        self.quickWidget.setSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Expanding)
-        self.gridLayout.addWidget(self.quickWidget)
-
-        self.qmlObject.widthChanged.connect(self.onWidthChanged)
-        self.onWidthChanged()
+        self._parent = parent
+        self.level_view_model = view_model
 
         self.audiobuffer = None
 
         # initialize the settings dialog
-        self.settings_dialog = Levels_Settings_Dialog(self)
+        self.settings_dialog = Levels_Settings_Dialog(parent)
 
         # initialize the class instance that will do the fft
         self.proc = audioproc()
@@ -106,9 +76,6 @@ class Levels_Widget(QtWidgets.QWidget):
         self.two_channels = False
 
         self.i = 0
-
-    def onWidthChanged(self):
-        self.quickWidget.setFixedWidth(int(self.qmlObject.width()))
 
     # method
     def set_buffer(self, buffer):
@@ -165,7 +132,7 @@ class Levels_Widget(QtWidgets.QWidget):
 
     # method
     def canvasUpdate(self):
-        if not self.isVisible():
+        if not self._parent.isVisible():
             return
 
         self.i += 1
