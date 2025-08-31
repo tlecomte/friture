@@ -21,6 +21,7 @@ from PyQt5 import QtCore
 from PyQt5.QtCore import pyqtProperty, pyqtSignal
 
 from friture.level_view_model import LevelViewModel
+from friture.main_toolbar_view_model import MainToolbarViewModel
 from friture.playback.playback_control_view_model import PlaybackControlViewModel
 
 class MainWindowViewModel(QtCore.QObject):
@@ -29,9 +30,14 @@ class MainWindowViewModel(QtCore.QObject):
     def __init__(self, parent=None):
         super().__init__(parent)
 
+        self._toolbar_view_model = MainToolbarViewModel(self)
         self._level_view_model = LevelViewModel(self)
         self._playback_control_view_model = PlaybackControlViewModel(self)
         self._playback_control_enabled = False
+
+    @pyqtProperty(MainToolbarViewModel, constant=True) # type: ignore
+    def toolbar_view_model(self):
+        return self._toolbar_view_model
 
     @pyqtProperty(LevelViewModel, constant=True) # type: ignore
     def level_view_model(self):

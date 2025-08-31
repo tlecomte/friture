@@ -8,7 +8,6 @@ Rectangle {
     id: main_window
     SystemPalette { id: systemPalette; colorGroup: SystemPalette.Active }
     color: systemPalette.window
-    anchors.fill: parent
 
     required property MainWindowViewModel main_window_view_model
     required property string fixedFont
