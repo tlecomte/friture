@@ -135,10 +135,9 @@ See [pyproject.toml](pyproject.toml)
 
 ## UI and resource files
 
-If `friture.ui` or `resource.qrc` are changed, the corresponding python files need to be rebuilt:
+If `settings.ui` or `resource.qrc` are changed, the corresponding python files need to be rebuilt:
 
 ```
-pyuic5 ui/friture.ui --from-imports > friture/ui_friture.py
 pyuic5 ui/settings.ui --from-imports > friture/ui_settings.py
 pyrcc5 resources/friture.qrc -o friture/friture_rc.py
 ```
