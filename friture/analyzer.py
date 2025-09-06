@@ -155,10 +155,10 @@ class Friture(QMainWindow, ):
         self.slow_timer = QtCore.QTimer()
         self.slow_timer.setInterval(SLOW_TIMER_PERIOD_MS)  # constant timing
 
-        self.about_dialog = About_Dialog(self, self.slow_timer)
-        self.settings_dialog = Settings_Dialog(self)
-
         self._main_window_view_model = MainWindowViewModel(self.qml_engine)
+
+        self.about_dialog = About_Dialog(self, self.slow_timer)
+        self.settings_dialog = Settings_Dialog(self, self._main_window_view_model.toolbar_view_model)
 
         self.quick_view = QQuickView(self.qml_engine, None)
         self.quick_view.setResizeMode(QQuickView.SizeRootObjectToView)

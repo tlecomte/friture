@@ -21,7 +21,6 @@ Rectangle { // eventually move to ApplicationWindow
             Layout.fillWidth: true // remove once we use ApplicationWindow
 
             RowLayout {
-                anchors.fill: toolBar
                 spacing: 0
 
                 ToolButton {
