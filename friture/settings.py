@@ -23,6 +23,7 @@ import logging
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtCore import pyqtSignal, pyqtProperty
 from friture.audiobackend import AudioBackend
+from friture.main_toolbar_view_model import MainToolbarViewModel
 from friture.ui_settings import Ui_Settings_Dialog
 
 no_input_device_title = "No audio input device found"
@@ -39,11 +40,13 @@ class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
     show_playback_changed = pyqtSignal(bool)
     history_length_changed = pyqtSignal(int)
 
-    def __init__(self, parent):
+    def __init__(self, parent, toolbar_view_model: MainToolbarViewModel):
         QtWidgets.QDialog.__init__(self, parent)
         Ui_Settings_Dialog.__init__(self)
 
         self.logger = logging.getLogger(__name__)
+
+        self._toolbar_view_model = toolbar_view_model
 
         # Setup the user interface
         self.setupUi(self)
@@ -93,7 +96,7 @@ class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
 
     # slot
     def input_device_changed(self, index):
-        self.parent().ui.actionStart.setChecked(False)
+        self._toolbar_view_model.recording = False
 
         success, index = AudioBackend().select_input_device(index)
 
@@ -121,11 +124,11 @@ class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
         second_channel = AudioBackend().get_current_second_channel()
         self.comboBox_secondChannel.setCurrentIndex(second_channel)
 
-        self.parent().ui.actionStart.setChecked(True)
+        self._toolbar_view_model.recording = True
 
     # slot
     def first_channel_changed(self, index):
-        self.parent().ui.actionStart.setChecked(False)
+        self._toolbar_view_model.recording = False
 
         success, index = AudioBackend().select_first_channel(index)
 
@@ -138,11 +141,11 @@ class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
             error_message.setWindowTitle("Input device error")
             error_message.showMessage("Impossible to use the selected channel as the first channel, reverting to the previous one")
 
-        self.parent().ui.actionStart.setChecked(True)
+        self._toolbar_view_model.recording = True
 
     # slot
     def second_channel_changed(self, index):
-        self.parent().ui.actionStart.setChecked(False)
+        self._toolbar_view_model.recording = False
 
         success, index = AudioBackend().select_second_channel(index)
 
@@ -155,7 +158,7 @@ class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
             error_message.setWindowTitle("Input device error")
             error_message.showMessage("Impossible to use the selected channel as the second channel, reverting to the previous one")
 
-        self.parent().ui.actionStart.setChecked(True)
+        self._toolbar_view_model.recording = True
 
     # slot
     def single_input_type_selected(self, checked):
