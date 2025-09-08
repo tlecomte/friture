@@ -492,10 +492,7 @@ def main():
     window = Friture()
     window.show()
     if not program_arguments.no_splash:
-        if platform.system() == "Linux":
-            splash.hide()
-        else:
-            splash.finish(window)
+        splash.hide()
 
     profile = "no"  # "python" or "kcachegrind" or anything else to disable
 
