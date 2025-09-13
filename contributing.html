@@ -45,7 +45,7 @@
         <h2>Bugs, feature requests, comments</h2>
         <p>If you encounter any problems while installing or running Friture, please report them on the <a href="https://github.com/tlecomte/friture/issues">Github Issues page</a>.</p>
 
-        <p>Feature requests and other comments can be posted on Github too.
+        <p>Feature requests and other comments can be posted as Issues on Github too.
 
         <h2>Documentation</h2>
         <p>There is not much documentation about Friture right now. You can contribute in 2 ways:</p>
@@ -79,7 +79,7 @@
         <a href="https://cython.org">Cython</a>, a programming language that provides
         C-extensions for Python.</p>
 
-        <p>Most graphical operations (apart from simple widgets and general application design) are performed with <a href="https://www.opengl.org">OpenGL</a> (using the <a href="http://pyopengl.sourceforge.net">PyOpenGL</a> Python bindings).</p>
+        <p>Most graphical operations are implemented in QML and QtQuick.</p>
 
         <p>Internally, Friture is designed around a 25-ms timer that periodically allows the various widgets to update their contents for a smooth visual result. Meanwhile, the PortAudio system invokes a callback that pushes the fresh audio data to a ringbuffer that can be accessed by the widgets.</p>
     </div>
