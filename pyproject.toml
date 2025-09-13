@@ -37,7 +37,7 @@ dependencies = [
     "docutils==0.22",
     "numpy==2.3.2",
     "PyQt5==5.15.11",
-    "platformdirs==4.3.8",
+    "platformdirs==4.4.0",
     "pyrr==0.10.3",
     "pyinstaller==6.15.0"
 ]
