@@ -28,7 +28,6 @@ Rectangle { // eventually move to ApplicationWindow
                     checkable: true
                     checked: mainWindow.main_window_view_model.toolbar_view_model.recording
                     icon.source: startButton.checked ? "qrc:/images-src/stop.svg" : "qrc:/images-src/start.svg"
-                    icon.color: undefined
                     text: startButton.checked ? qsTr("Stop") : qsTr("Start")
                     ToolTip.text: qsTr("Start/Stop")
                     icon.height: 32
@@ -41,7 +40,6 @@ Rectangle { // eventually move to ApplicationWindow
                 ToolButton {
                     id: newDockButton
                     icon.source: "qrc:/images-src/new-dock.svg"
-                    icon.color: undefined
                     text: qsTr("New dock")
                     ToolTip.text: qsTr("Add a new dock to Friture window")
                     icon.height: 32
@@ -53,7 +51,6 @@ Rectangle { // eventually move to ApplicationWindow
                 ToolButton {
                     id: settingsButton
                     icon.source: "qrc:/images-src/tools.svg"
-                    icon.color: undefined
                     text: qsTr("Settings")
                     ToolTip.text: qsTr("Display settings dialog")
                     icon.height: 32
@@ -65,7 +62,6 @@ Rectangle { // eventually move to ApplicationWindow
                 ToolButton {
                     id: aboutButton
                     icon.source: "qrc:/images-src/window-icon.svg"
-                    icon.color: undefined
                     text: qsTr("About Friture")
                     icon.height: 32
                     icon.width: 32
