@@ -18,7 +18,7 @@
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
 from PyQt5.QtCore import QObject
-from numpy import log10, argmax, zeros, arange, floor, float64
+from numpy import log10, argmax, zeros, arange, floor, float64, ones
 from friture.audioproc import audioproc  # audio processing class
 from friture.spectrum_settings import (Spectrum_Settings_Dialog,  # settings dialog
                                        DEFAULT_FFT_SIZE,
@@ -105,11 +105,21 @@ class Spectrum_Widget(QObject):
         # for pitch detection are good.
         product_count = 3
   
-        # Downsample and multiply
         harmonic_length = sp.shape[0] // product_count
-        res = sp[:harmonic_length].copy()
-        for i in range(2, product_count + 1):
-            res *= sp[::i][:harmonic_length]
+
+        # common case: product_count == 3 — multiply the three slices
+        # directly. This avoids allocating a temporary ones array and still
+        # doesn't make copies of the original `sp` beyond NumPy's routine
+        # temporary results for the elementwise multiplication.
+        if product_count == 3:
+            # Downsample and multiply
+            res = (sp[:harmonic_length]
+                   * sp[::2][:harmonic_length]
+                   * sp[::3][:harmonic_length])
+        else:
+            res = ones(harmonic_length, dtype=sp.dtype)
+            for i in range(1, product_count + 1):
+                res *= sp[::i][:harmonic_length]
         return res
 
     def handle_new_data(self, floatdata):
