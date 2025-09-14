@@ -190,7 +190,7 @@ class Spectrum_Settings_Dialog(QtWidgets.QDialog):
             response_time = 1.
         elif index == 4:
             response_time = 5.            
-        self.logger.info("responsetimechanged slot %d %d", index, response_time)
+        self.logger.info("responsetimechanged slot %d %f", index, response_time)
         self.view_model.setresponsetime(response_time)
 
     # method

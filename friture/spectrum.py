@@ -107,7 +107,7 @@ class Spectrum_Widget(QObject):
   
         # Downsample and multiply
         harmonic_length = sp.shape[0] // product_count
-        res = sp[:harmonic_length]
+        res = sp[:harmonic_length].copy()
         for i in range(2, product_count + 1):
             res *= sp[::i][:harmonic_length]
         return res
@@ -191,7 +191,14 @@ class Spectrum_Widget(QObject):
         self.response_time = response_time
 
         # an exponential smoothing filter is a simple IIR filter
-        # s_i = alpha*x_i + (1-alpha)*s_{i-1}
+        # y_i     = a*x_i     + (1-a)*y_{i-1}
+        #
+        # we can unroll the recurrence a bit:
+        # y_{i+1} = a*x_{i+1} + (1-a)*y_i
+        #         = a*x_{i+1} + (1-a)*a*x_i + (1-a)^2*y_{i-1}
+        # y_{i+2} = a*x_{i+2} + (1-a)*y_{i+1}
+        #         = a*x_{i+2} + (1-a)*a*x_{i+1} + (1-a)^2*a*x_i + (1-a)^3*y_{i-1}
+        # ...
         # we compute alpha so that the N most recent samples represent 100*w percent of the output
         w = 0.65
         delta_n = self.fft_size * (1. - self.overlap)
