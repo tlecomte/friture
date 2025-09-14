@@ -452,7 +452,8 @@ def main():
         logger.info("Applying Windows-specific setup")
 
         # enable automatic scaling for high-DPI screens
-        os.environ["QT_AUTO_SCREEN_SCALE_FACTOR"] = "1"
+        if "QT_AUTO_SCREEN_SCALE_FACTOR" not in os.environ:
+            os.environ["QT_AUTO_SCREEN_SCALE_FACTOR"] = "1"
 
         # set the App ID for Windows 7 to properly display the icon in the
         # taskbar.
@@ -479,7 +480,8 @@ def main():
     # Set the style for Qt Quick Controls
     # We choose the Fusion style as it is a desktop-oriented style
     # It uses the standard system palettes to provide colors that match the desktop environment.
-    os.environ["QT_QUICK_CONTROLS_STYLE"] = "Fusion"
+    if "QT_QUICK_CONTROLS_STYLE" not in os.environ:
+        os.environ["QT_QUICK_CONTROLS_STYLE"] = "Fusion"
 
     # Splash screen
     if not program_arguments.no_splash:
