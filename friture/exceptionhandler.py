@@ -40,20 +40,17 @@ def fileexcepthook(exception_type, exception_value, traceback_object):
     logFileName = "friture.log.txt"
     logDir = platformdirs.user_log_dir("Friture", "")
 
-    email = "contact@friture.org"
-
     notice = """
         <h1>Oops! Something went wrong!</h1>
         <p>Sorry, there was an error we could not handle.</p>
         <p>You can choose to abort, or to ignore the error and try to continue
         (this is not guaranteed to work).</p>
         <h2>Please help us fix it!</h2>\n\n
-        <p>Please contact us directly via email at <a href="mailto:{email}?Subject=Friture%%20acrash report">{email}</a>
+        <p>Please create an issue on <a href="https://github.com/tlecomte/friture/issues">https://github.com/tlecomte/friture/issues</a>
         and include the log file named <i>{logFileName}</i> from the following folder:</p>
         <p><a href="file:///{logDir}">{logDir}1</a></p>
-        <p>Alternatively, if you have a GitHub account, you can create a new issue on <a href="https://github.com/tlecomte/friture/issues">https://github.com/tlecomte/friture/issues</a></p>
         <h3>Error details</h3>""" \
-        .format(email = email, logFileName = logFileName, logDir = logDir)
+        .format(logFileName = logFileName, logDir = logDir)
 
     msg = notice + timeString + ' (%s)' % versionInfo + '<br>' + exceptionText.replace("\r\n", "\n").replace("\n", "<br>").replace(" ", '&nbsp;')
 

@@ -29,10 +29,11 @@ aboutText = """
 <p> <b>Friture %s</b> (dated %s)</p>
 <p> Friture is an application for real-time audio analysis.</p>
 <p> License is GPLv3.</p>
-<p> Homepage: <a href="http://friture.org">http://friture.org</a></p>
-<p> <a href="http://friture.org/privacy.html">Privacy Policy</a></p>
-<p> Send comments, ideas and bug reports to: <a href="mailto:contact@friture.org">contact@friture.org</a></p>
-<p> Splash screen photo credit: <a href="http://www.flickr.com/photos/visual_dichotomy/3623619145/">visual.dichotomy</a> (CC BY 2.0)</p>
+<p> Homepage: <a href="https://friture.org">https://friture.org</a></p>
+<p> <a href="https://friture.org/privacy.html">Privacy Policy</a></p>
+<p> Submit ideas and bug reports as <a href="https://github.com/tlecomte/friture/issues">Issues</a> on <a href="https://github.com/tlecomte/friture">Friture GitHub project</a>.</p>
+<p> Discuss Friture on <a href="https://github.com/tlecomte/friture/discussions">GitHub Discussions</a>.</p>
+<p> Splash screen photo credit: <a href="https://www.flickr.com/photos/visual_dichotomy/3623619145/">visual.dichotomy</a> (CC BY 2.0)</p>
 <p>This instance of Friture runs thanks to the following external projects:</p>
 
 <ul>
