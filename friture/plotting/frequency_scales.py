@@ -222,6 +222,43 @@ class Octave(object):
         return major_ticks, minor_ticks
 
 
+class OctaveC(object):
+    '''
+    A log2 scale with major ticks at the C of each octave.
+    '''
+    NAME = 'OctaveC'
+
+    @staticmethod
+    def transform(frequency: float) -> float:
+        return np.log2(np.fmax(frequency, 1e-20))
+
+    @staticmethod
+    def inverse(logs: float) -> float:
+        return 2 ** logs
+
+    @staticmethod
+    def ticks(scale_min, scale_max) -> Tuple[List[float], List[float]]:
+        if scale_min > scale_max:
+            scale_min, scale_max = (scale_max, scale_min)
+        scale_min = max(1e-20, scale_min)
+        scale_max = max(1e-20, scale_max)
+
+        # Relative to C4 ~= 261.63Hz
+        c4 = 220 * 2**(3/12)
+        min_C = ceil(np.log2(scale_min / c4))
+        max_C = floor(np.log2(scale_max / c4))
+        major_ticks = [ c4 * (2 ** i) for i in range(min_C, max_C + 1)]
+
+        notes = 2**(np.arange(0, 12) / 12)
+        minor_ticks = [c4 * (2 ** a) * t
+            for a in range(min_C - 1, max_C + 1)
+            for t in notes]
+        minor_ticks = [t for t in minor_ticks
+            if t >= scale_min and t <= scale_max]
+
+        return major_ticks, minor_ticks
+
+
 class Mel(object):
     NAME = 'Mel'
 
