@@ -65,6 +65,8 @@ Rectangle {
             vertical_axis: scopedata.vertical_axis
             horizontal_axis: scopedata.horizontal_axis
 
+            annotations: (scopedata.target_frequencies !== undefined) ? scopedata.target_frequencies : []
+
             Item {
                 id: plotItemPlaceholder
                 anchors.fill: parent

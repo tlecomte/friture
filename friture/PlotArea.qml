@@ -11,6 +11,8 @@ Item {
     required property Axis vertical_axis
     required property Axis horizontal_axis
 
+    property var annotations: []
+
     default property alias content: plotItemPlaceholder.children
 
     PlotBackground {
@@ -29,6 +31,23 @@ Item {
     Item {
         id: plotItemPlaceholder
         anchors.fill: parent
+    }
+
+    Repeater {
+        id: annotationRepeater
+        anchors.fill: parent
+
+        model: scopePlotArea.annotations
+
+        Rectangle {
+            width: parent.width
+            height: 1
+            color: "red"
+            y: (1.0 - scopePlotArea.vertical_axis.coordinate_transform.toScreen(modelData)) * parent.height
+
+            visible: modelData >= scopePlotArea.vertical_axis.min && modelData <= scopePlotArea.vertical_axis.max
+        }
+
     }
 
     Rectangle {
