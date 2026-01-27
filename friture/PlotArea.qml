@@ -40,12 +40,11 @@ Item {
         model: scopePlotArea.annotations
 
         Rectangle {
+            x: 0
+            y: parent.height * (1. - scopePlotArea.vertical_axis.coordinate_transform.toScreen(modelData) )
             width: parent.width
             height: 1
-            color: "red"
-            y: (1.0 - scopePlotArea.vertical_axis.coordinate_transform.toScreen(modelData)) * parent.height
-
-            visible: modelData >= scopePlotArea.vertical_axis.min && modelData <= scopePlotArea.vertical_axis.max
+            color: "magenta"
         }
 
     }
