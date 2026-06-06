@@ -39,6 +39,7 @@ Friture will now exit.
 class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
     show_playback_changed = pyqtSignal(bool)
     history_length_changed = pyqtSignal(int)
+    theme_changed = pyqtSignal(int)
 
     def __init__(self, parent, toolbar_view_model: MainToolbarViewModel):
         QtWidgets.QDialog.__init__(self, parent)
@@ -84,6 +85,7 @@ class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
         self.radioButton_duo.toggled.connect(self.duo_input_type_selected)
         self.checkbox_showPlayback.stateChanged.connect(self.show_playback_checkbox_changed)
         self.spinBox_historyLength.editingFinished.connect(self.history_length_edit_finished)
+        self.comboBox_theme.currentIndexChanged.connect(self.theme_combo_changed)
 
     @pyqtProperty(bool, notify=show_playback_changed) # type: ignore
     def show_playback(self) -> bool:
@@ -182,6 +184,10 @@ class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
     def history_length_edit_finished(self) -> None:
         self.history_length_changed.emit(self.spinBox_historyLength.value())
 
+    # slot
+    def theme_combo_changed(self, index: int) -> None:
+        self.theme_changed.emit(index)
+
     # method
     def saveState(self, settings):
         # for the input device, we search by name instead of index, since
@@ -192,6 +198,7 @@ class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
         settings.setValue("duoInput", self.inputTypeButtonGroup.checkedId())
         settings.setValue("showPlayback", self.checkbox_showPlayback.checkState())
         settings.setValue("historyLength", self.spinBox_historyLength.value())
+        settings.setValue("theme", self.comboBox_theme.currentIndex())
 
     # method
     def restoreState(self, settings):
@@ -210,3 +217,7 @@ class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
         self.spinBox_historyLength.setValue(settings.value("historyLength", 30, type=int))
         # need to emit this because setValue doesn't emit editFinished
         self.history_length_changed.emit(self.spinBox_historyLength.value())
+
+        theme_index = settings.value("theme", 0, type=int)
+        self.comboBox_theme.setCurrentIndex(theme_index)
+        self.theme_changed.emit(theme_index)

@@ -82,11 +82,14 @@ def octave_filter_bank(forward, feedback, x, zis=None):
 # filter for the octave
 
 
-def octave_filter_bank_decimation(blow, alow, forward, feedback, x, zis):
+def octave_filter_bank_decimation(blow, alow, forward, feedback, x, zis=None):
     # This function filters the waveform x with the array of filters
     # specified by the forward and feedback parameters. Each row
     # of the forward and feedback parameters are the parameters
     # to the Matlab builtin function "filter".
+    if zis is None:
+        zis = octave_filter_bank_decimation_filtic(blow, alow, forward, feedback)
+
     bands_per_octave = len(forward)
     filter_count = NOCTAVE * bands_per_octave
 
@@ -102,7 +105,10 @@ def octave_filter_bank_decimation(blow, alow, forward, feedback, x, zis):
 
     for j in range(0, NOCTAVE):
         for i in range(0, bands_per_octave)[::-1]:
-            filt, zf = pyx_lfilter_float64_1D(forward[i], feedback[i], x_dec, zis[m])
+            filt, zf = pyx_lfilter_float64_1D(array(forward[i], dtype='float64'), 
+                                              array(feedback[i], dtype='float64'), 
+                                              array(x_dec, dtype='float64'), 
+                                              array(zis[m], dtype='float64'))
             m += 1
             # zf can be reused to restart the filter
             zfs += [zf]

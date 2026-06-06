@@ -3,16 +3,26 @@ import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.2
 import Friture 1.0
 
-Rectangle { // eventually move to ApplicationWindow
+Control { // eventually move to ApplicationWindow
     id: mainWindow
     anchors.fill: parent
+    
+    // Explicitly bind the Qt Quick Controls 2 palette to the actual Python QApplication palette!
+    // This perfectly fixes Light/Dark theme rendering and native hover states without custom hardcoded colors.
+    palette.window: main_window_view_model.window_color
+    palette.windowText: main_window_view_model.window_text_color
+    palette.base: main_window_view_model.base_color
+    palette.text: main_window_view_model.text_color
+    palette.button: main_window_view_model.button_color
+    palette.buttonText: main_window_view_model.button_text_color
+
     // title: qsTr("Friture") // ApplicationWindow
     // icon.source: "qrc:/images-src/window-icon.svg" // ApplicationWindow
 
     required property MainWindowViewModel main_window_view_model
     required property string fixedFont
 
-    ColumnLayout { // remove once we use ApplicationWindow
+    contentItem: ColumnLayout { // remove once we use ApplicationWindow
         anchors.fill: parent
         spacing: 0
 
