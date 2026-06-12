@@ -18,7 +18,7 @@
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
 from PyQt5.QtCore import QObject
-from numpy import log10, argmax, zeros, arange, floor, float64, ones
+from numpy import log10, argmax, zeros, arange, float64, ones
 from friture.audioproc import audioproc  # audio processing class
 from friture.spectrum_settings import (Spectrum_Settings_Dialog,  # settings dialog
                                        DEFAULT_FFT_SIZE,
@@ -33,6 +33,7 @@ from friture.spectrum_settings import (Spectrum_Settings_Dialog,  # settings dia
 import friture.plotting.frequency_scales as fscales
 
 from friture.audiobackend import SAMPLING_RATE
+from friture.ring_buffer_frame_reader import RingBufferFrameReader
 from friture.spectrumPlotWidget import SpectrumPlotWidget
 from friture_extensions.exp_smoothing_conv import pyx_exp_smoothed_value_numpy
 
@@ -62,10 +63,10 @@ class Spectrum_Widget(QObject):
         self.update_weighting()
         self.freq = self.proc.get_freq_scale()
 
-        self.old_index = 0
-        self.overlap = 3. / 4.
-
         self.update_display_buffers()
+
+        self.overlap = 3. / 4.
+        self._frame_reader = RingBufferFrameReader(self.fft_size, self.overlap)
 
         # set kernel and parameters for the smoothing filter
         self.setresponsetime(self.response_time)
@@ -90,7 +91,7 @@ class Spectrum_Widget(QObject):
     # method
     def set_buffer(self, buffer):
         self.audiobuffer = buffer
-        self.old_index = self.audiobuffer.ringbuffer.offset
+        self._frame_reader.set_buffer(buffer)
 
     def log_spectrogram(self, sp):
         # Note: implementing the log10 of the array in Cython did not bring
@@ -123,36 +124,20 @@ class Spectrum_Widget(QObject):
         return res
 
     def handle_new_data(self, floatdata):
-        # we need to maintain an index of where we are in the buffer
-        index = self.audiobuffer.ringbuffer.offset
-
-        available = index - self.old_index
-
-        if available < 0:
-            # ringbuffer must have grown or something...
-            available = 0
-            self.old_index = index
-
-        # if we have enough data to add a frequency column in the time-frequency plane, compute it
-        needed = self.fft_size * (1. - self.overlap)
-        realizable = int(floor(available / needed))
+        del floatdata  # spectrum reads aligned frames from the ring buffer
+        frames = list(self._frame_reader.iter_frames())
+        realizable = len(frames)
 
         if realizable > 0:
             sp1n = zeros((len(self.freq), realizable), dtype=float64)
             sp2n = zeros((len(self.freq), realizable), dtype=float64)
 
-            for i in range(realizable):
-                floatdata = self.audiobuffer.data_indexed(self.old_index, self.fft_size)
+            last_frame = frames[-1]
+            for i, frame in enumerate(frames):
+                sp1n[:, i] = self.proc.analyzelive(frame[0, :])
 
-                # first channel
-                # FFT transform
-                sp1n[:, i] = self.proc.analyzelive(floatdata[0, :])
-
-                if self.dual_channels and floatdata.shape[0] > 1:
-                    # second channel for comparison
-                    sp2n[:, i] = self.proc.analyzelive(floatdata[1, :])
-
-                self.old_index += int(needed)
+                if self.dual_channels and frame.shape[0] > 1:
+                    sp2n[:, i] = self.proc.analyzelive(frame[1, :])
 
             # compute the widget data
             sp1 = pyx_exp_smoothed_value_numpy(self.kernel, self.alpha, sp1n, self.dispbuffers1)
@@ -165,7 +150,7 @@ class Spectrum_Widget(QObject):
             sp2.shape = self.freq.shape
             self.w.shape = self.freq.shape
 
-            if self.dual_channels and floatdata.shape[0] > 1:
+            if self.dual_channels and last_frame.shape[0] > 1:
                 dB_spectrogram = self.log_spectrogram(sp2) - self.log_spectrogram(sp1)
             else:
                 dB_spectrogram = self.log_spectrogram(sp1) + self.w
@@ -250,6 +235,9 @@ class Spectrum_Widget(QObject):
 
     def setfftsize(self, fft_size):
         self.fft_size = fft_size
+        self._frame_reader.set_frame_size(self.fft_size)
+        if self.audiobuffer is not None:
+            self._frame_reader.set_buffer(self.audiobuffer)
         self.proc.set_fftsize(self.fft_size)
         self.freq = self.proc.get_freq_scale()
         self.update_display_buffers()

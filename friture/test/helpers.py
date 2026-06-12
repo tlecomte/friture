@@ -2,7 +2,12 @@
 
 # Copyright (C) 2024 Celeste Sinéad
 
-# Shared helpers for Friture integration tests (not a test module).
+"""Shared helpers for Friture integration tests (not a test module).
+
+Use ``AudioHarness`` to push synthetic audio through ``AudioBuffer`` the same
+way live ingest does. Use ``wire_dock_analysis_widget`` to connect a widget
+with the same signals ``Dock`` uses in production.
+"""
 
 import os
 import tempfile
@@ -13,6 +18,12 @@ from PyQt5.QtWidgets import QApplication, QWidget
 
 from friture.audiobackend import SAMPLING_RATE
 from friture.audiobuffer import AudioBuffer
+
+
+def wire_dock_analysis_widget(widget, buffer: AudioBuffer) -> None:
+    """Mirror ``Dock.widget_select`` audio wiring for tests."""
+    widget.set_buffer(buffer)
+    buffer.new_data_available.connect(widget.handle_new_data)
 
 
 def ensure_qapplication() -> QApplication:

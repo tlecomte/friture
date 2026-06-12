@@ -22,6 +22,19 @@ Single-context repo:
 └── friture/            ← application source
 ```
 
+## Dock analysis widget
+
+Dock-hosted analyzers implement **`DockAnalysisWidget`** (`friture/dock_analysis_widget.py`):
+
+- `set_buffer` / `handle_new_data` — audio path from shared `AudioBuffer`
+- `canvasUpdate` — display timer refresh (~25 ms)
+- `pause` / `restart` — optional; `Dock` skips if missing
+- `saveState` / `restoreState` / `settings_called` / `qml_file_name` / `view_model`
+
+FFT-style docks should read history via **`RingBufferFrameReader`** (`friture/ring_buffer_frame_reader.py`). Chunk-only docks (levels, octave spectrum) may consume the latest `floatdata` chunk directly.
+
+Integration tests: **`AudioHarness`** + **`wire_dock_analysis_widget`** in `friture/test/helpers.py`.
+
 ## Use the glossary's vocabulary
 
 When your output names a domain concept (in an issue title, a refactor proposal, a hypothesis, a test name), use the term as defined in `CONTEXT.md`. Don't drift to synonyms the glossary explicitly avoids.

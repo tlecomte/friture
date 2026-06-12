@@ -27,6 +27,7 @@ from PyQt5.QtCore import QObject, QSettings
 from friture.qml_tools import component_raise_if_error, qml_url
 from friture.widgetdict import getWidgetById, widgetIds
 from friture.controlbar_viewmodel import ControlBarViewModel
+from friture.dock_analysis_widget import DockAnalysisWidget
 
 from typing import Optional, TYPE_CHECKING
 if TYPE_CHECKING:
@@ -89,7 +90,7 @@ class Dock(QObject):
         assert self.audio_widget_container is not None, "Audio widget container not found in Dock.qml"
 
         self.widgetId: Optional[int] = None
-        self.audiowidget: Optional[QObject] = None
+        self.audiowidget: Optional[DockAnalysisWidget] = None
         self.audio_widget_qml: Optional[QQuickItem] = None
 
         if widgetId is None:
@@ -166,19 +167,16 @@ class Dock(QObject):
 
         initialProperties = {
             "fixedFont": QFontDatabase.systemFont(QFontDatabase.FixedFont).family(),
-            "viewModel": self.audiowidget.view_model(), # type: ignore
+            "viewModel": self.audiowidget.view_model(),
         }
 
-        # audiowidget is duck typed for this:
-        self.audiowidget.set_buffer(self.audiobuffer) # type: ignore
-        self.audiobuffer.new_data_available.connect(
-            self.audiowidget.handle_new_data) # type: ignore
+        self.audiowidget.set_buffer(self.audiobuffer)
+        self.audiobuffer.new_data_available.connect(self.audiowidget.handle_new_data)
         if widgetId in self.dockmanager.last_settings:
-            self.audiowidget.restoreState( # type: ignore
-                self.dockmanager.last_settings[widgetId])
+            self.audiowidget.restoreState(self.dockmanager.last_settings[widgetId])
 
         component = QQmlComponent(self.qml_engine)
-        component.loadUrl(qml_url(self.audiowidget.qml_file_name())) # type: ignore
+        component.loadUrl(qml_url(self.audiowidget.qml_file_name()))
 
         component_raise_if_error(component)
         component.statusChanged.connect(self.on_status_changed)
@@ -204,11 +202,15 @@ class Dock(QObject):
 
     def pause(self):
         if self.audiowidget is not None:
-            self.audiowidget.pause()
+            pause = getattr(self.audiowidget, "pause", None)
+            if pause is not None:
+                pause()
 
     def restart(self):
         if self.audiowidget is not None:
-            self.audiowidget.restart()
+            restart = getattr(self.audiowidget, "restart", None)
+            if restart is not None:
+                restart()
 
     # slot
     def settings_slot(self, checked):

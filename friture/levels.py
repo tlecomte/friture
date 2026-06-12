@@ -27,6 +27,7 @@ from friture.audioproc import audioproc
 from friture.iec import dB_to_IEC
 from friture_extensions.exp_smoothing_conv import pyx_exp_smoothed_value
 from friture.audiobackend import SAMPLING_RATE
+from friture.dock_analysis_widget import stereo_mode_from_chunk
 
 SMOOTH_DISPLAY_TIMER_PERIOD_MS = 25
 LEVEL_TEXT_LABEL_PERIOD_MS = 250
@@ -82,12 +83,10 @@ class Levels_Widget(QObject):
         self.audiobuffer = buffer
 
     def handle_new_data(self, floatdata):
-        if floatdata.shape[0] > 1 and not self.two_channels:
-            self.two_channels = True
-            self.level_view_model.two_channels = True
-        elif floatdata.shape[0] == 1 and self.two_channels:
-            self.two_channels = False
-            self.level_view_model.two_channels = False
+        updated = stereo_mode_from_chunk(floatdata, self.two_channels)
+        if updated != self.two_channels:
+            self.two_channels = updated
+            self.level_view_model.two_channels = updated
 
         # first channel
         y1 = floatdata[0, :]
