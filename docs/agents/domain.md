@@ -31,7 +31,7 @@ Dock-hosted analyzers implement **`DockAnalysisWidget`** (`friture/dock_analysis
 - `pause` / `restart` — optional; `Dock` skips if missing
 - `saveState` / `restoreState` / `settings_called` / `qml_file_name` / `view_model`
 
-FFT-style docks should read history via **`RingBufferFrameReader`** (`friture/ring_buffer_frame_reader.py`). Chunk-only docks (levels, octave spectrum) may consume the latest `floatdata` chunk directly.
+FFT-style docks should read history via **`RingBufferFrameReader`** (`friture/ring_buffer_frame_reader.py`). Spectrum FFT/smoothing/peak logic lives in **`SpectrumFrameAnalyzer`** (`friture/spectrum_frame_analyzer.py`) — test without Qt. Chunk-only docks (levels, octave spectrum) may consume the latest `floatdata` chunk directly.
 
 Integration tests: **`AudioHarness`** + **`wire_dock_analysis_widget`** in `friture/test/helpers.py`.
 
