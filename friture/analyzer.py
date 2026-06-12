@@ -45,7 +45,7 @@ from friture.ui_friture import Ui_MainWindow
 from friture.about import About_Dialog  # About dialog
 from friture.settings import Settings_Dialog, splash_enabled  # Setting dialog
 from friture.audiobuffer import AudioBuffer  # audio ring buffer class
-from friture.audiobackend import AudioBackend  # audio backend class
+from friture.audio_ingest import get_audio_ingest
 from friture.dockmanager import DockManager
 from friture.tilelayout import TileLayout
 from friture.level_view_model import LevelViewModel
@@ -177,9 +177,8 @@ class Friture(QMainWindow, ):
         # Initialize the audio data ring buffer
         self.audiobuffer = AudioBuffer()
 
-        # Initialize the audio backend
-        # signal containing new data from the audio callback thread, processed as numpy array
-        AudioBackend().new_data_available.connect(self.audiobuffer.handle_new_data)
+        self.audio_ingest = get_audio_ingest()
+        self.audio_ingest.new_data_available.connect(self.audiobuffer.handle_new_data)
 
         self.player = Player(self)
         self.audiobuffer.new_data_available.connect(self.player.handle_new_data)
@@ -224,7 +223,7 @@ class Friture(QMainWindow, ):
         # timer ticks
         self.display_timer.timeout.connect(self.dockmanager.canvasUpdate)
         self.display_timer.timeout.connect(self.level_widget.canvasUpdate)
-        self.display_timer.timeout.connect(AudioBackend().fetchAudioData)
+        self.display_timer.timeout.connect(self.audio_ingest.fetchAudioData)
 
         # toolbar clicks
         self._main_window_view_model.toolbar_view_model.recording_clicked.connect(self.timer_toggle)
@@ -274,7 +273,7 @@ class Friture(QMainWindow, ):
 
     # event handler
     def closeEvent(self, event):
-        AudioBackend().close()
+        self.audio_ingest.close()
         self.saveAppState()
         event.accept()
 
@@ -360,14 +359,14 @@ class Friture(QMainWindow, ):
             self.display_timer.stop()
             self._main_window_view_model.toolbar_view_model.recording = False
             self.playback_widget.stop_recording()
-            AudioBackend().pause()
+            self.audio_ingest.pause()
             self.dockmanager.pause()
         else:
             self.logger.info("Timer start")
             self.display_timer.start()
             self._main_window_view_model.toolbar_view_model.recording = True
             self.playback_widget.start_recording()
-            AudioBackend().restart()
+            self.audio_ingest.restart()
             self.dockmanager.restart()
 
     # slot
@@ -377,7 +376,7 @@ class Friture(QMainWindow, ):
             self.display_timer.stop()
             self._main_window_view_model.toolbar_view_model.recording = False
             self.playback_widget.stop_recording()
-            AudioBackend().pause()
+            self.audio_ingest.pause()
             self.dockmanager.pause()
 
         if recording and not self.display_timer.isActive():
@@ -385,7 +384,7 @@ class Friture(QMainWindow, ):
             self.display_timer.start()
             self._main_window_view_model.toolbar_view_model.recording = True
             self.playback_widget.start_recording()
-            AudioBackend().restart()
+            self.audio_ingest.restart()
             self.dockmanager.restart()
 
 def qt_message_handler(mode, context, message):

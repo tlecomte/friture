@@ -56,7 +56,7 @@ class SettingsDialogBootstrapTest(unittest.TestCase):
         backend.get_readable_current_channels.return_value = ["Ch 1"]
         backend.get_readable_current_device.return_value = 0
 
-        with patch("friture.settings.AudioBackend", return_value=backend):
+        with patch("friture.settings.get_audio_ingest", return_value=backend):
             dialog = Settings_Dialog(parent, toolbar)
 
         self.assertEqual(dialog.comboBox_inputDevice.count(), 1)
