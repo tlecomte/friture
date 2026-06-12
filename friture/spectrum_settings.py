@@ -21,6 +21,7 @@ import logging
 
 from PyQt5 import QtWidgets
 from friture.audiobackend import SAMPLING_RATE
+from friture.settings_dialog_layout import create_form_layout
 import friture.plotting.frequency_scales as fscales
 
 # shared with spectrum_settings.py
@@ -48,7 +49,7 @@ class Spectrum_Settings_Dialog(QtWidgets.QDialog):
 
         self.setWindowTitle("Spectrum settings")
 
-        self.formLayout = QtWidgets.QFormLayout(self)
+        self.formLayout = create_form_layout(self)
 
         self.comboBox_dual_channel = QtWidgets.QComboBox(self)
         self.comboBox_dual_channel.setObjectName("dual")
@@ -144,8 +145,6 @@ class Spectrum_Settings_Dialog(QtWidgets.QDialog):
         self.formLayout.addRow("Response time:", self.comboBox_response_time)
         self.formLayout.addRow("Display max-frequency label:", self.checkBox_showFreqLabels)
         self.formLayout.addRow("Display pitch label:", self.checkBox_showPitchLabel)
-
-        self.setLayout(self.formLayout)
 
         self.comboBox_dual_channel.currentIndexChanged.connect(self.dualchannelchanged)
         self.comboBox_fftsize.currentIndexChanged.connect(self.fftsizechanged)

@@ -36,6 +36,14 @@ Friture will now exit.
 """
 
 
+def splash_enabled() -> bool:
+    settings = QtCore.QSettings("Friture", "Friture")
+    settings.beginGroup("AudioBackend")
+    enabled = settings.value("showSplash", True, type=bool)
+    settings.endGroup()
+    return enabled
+
+
 class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
     show_playback_changed = pyqtSignal(bool)
     history_length_changed = pyqtSignal(int)
@@ -84,6 +92,8 @@ class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
         self.radioButton_duo.toggled.connect(self.duo_input_type_selected)
         self.checkbox_showPlayback.stateChanged.connect(self.show_playback_checkbox_changed)
         self.spinBox_historyLength.editingFinished.connect(self.history_length_edit_finished)
+
+        self.buttonBox.rejected.connect(self.close)
 
     @pyqtProperty(bool, notify=show_playback_changed) # type: ignore
     def show_playback(self) -> bool:
@@ -192,6 +202,7 @@ class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
         settings.setValue("duoInput", self.inputTypeButtonGroup.checkedId())
         settings.setValue("showPlayback", self.checkbox_showPlayback.checkState())
         settings.setValue("historyLength", self.spinBox_historyLength.value())
+        settings.setValue("showSplash", self.checkbox_showSplash.isChecked())
 
     # method
     def restoreState(self, settings):
@@ -208,5 +219,6 @@ class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
             self.inputTypeButtonGroup.button(duo_input_id).setChecked(True)
         self.checkbox_showPlayback.setCheckState(settings.value("showPlayback", 0, type=int))
         self.spinBox_historyLength.setValue(settings.value("historyLength", 30, type=int))
+        self.checkbox_showSplash.setChecked(settings.value("showSplash", True, type=bool))
         # need to emit this because setValue doesn't emit editFinished
         self.history_length_changed.emit(self.spinBox_historyLength.value())

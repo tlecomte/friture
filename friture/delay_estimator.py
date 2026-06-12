@@ -23,6 +23,7 @@ import numpy
 
 from friture import generated_filters
 from friture.delay_estimator_view_model import Delay_Estimator_View_Model
+from friture.settings_dialog_layout import create_form_layout
 from .audiobackend import SAMPLING_RATE
 from .ringbuffer import RingBuffer
 from .signal.decimate import decimate_multiple, decimate_multiple_filtic
@@ -217,7 +218,7 @@ class Delay_Estimator_Settings_Dialog(QtWidgets.QDialog):
 
         self.setWindowTitle("Delay estimator settings")
 
-        self.form_layout = QtWidgets.QFormLayout(self)
+        self.form_layout = create_form_layout(self)
 
         self.double_spinbox_delayrange = QtWidgets.QDoubleSpinBox(self)
         self.double_spinbox_delayrange.setDecimals(1)
@@ -228,8 +229,6 @@ class Delay_Estimator_Settings_Dialog(QtWidgets.QDialog):
         self.double_spinbox_delayrange.setSuffix(" s")
 
         self.form_layout.addRow("Delay range (maximum delay that is reliably estimated):", self.double_spinbox_delayrange)
-
-        self.setLayout(self.form_layout)
 
         self.double_spinbox_delayrange.valueChanged.connect(view_model.set_delayrange)
 

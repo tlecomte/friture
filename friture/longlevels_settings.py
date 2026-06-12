@@ -19,6 +19,7 @@
 
 from PyQt5 import QtWidgets
 from friture.audiobackend import SAMPLING_RATE
+from friture.settings_dialog_layout import create_form_layout
 
 DEFAULT_MAXTIME = 600
 #DEFAULT_MINTIME = 20
@@ -35,7 +36,7 @@ class LongLevels_Settings_Dialog(QtWidgets.QDialog):
 
         self.setWindowTitle("Long levels settings")
 
-        self.formLayout = QtWidgets.QFormLayout(self)
+        self.formLayout = create_form_layout(self)
 
         self.spinBox_specmin = QtWidgets.QSpinBox(self)
         self.spinBox_specmin.setKeyboardTracking(False)
@@ -74,8 +75,6 @@ class LongLevels_Settings_Dialog(QtWidgets.QDialog):
         self.formLayout.addRow("Min:", self.spinBox_specmin)
         self.formLayout.addRow("Response Time", self.spinBox_resptime)
         self.formLayout.addRow("Time Range:", self.spinBox_timemax)
-
-        self.setLayout(self.formLayout)
 
         self.spinBox_specmin.valueChanged.connect(view_model.setmin)
         self.spinBox_specmax.valueChanged.connect(view_model.setmax)

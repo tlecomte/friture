@@ -19,6 +19,7 @@
 
 import sys
 import logging
+import os
 import time
 import traceback
 import friture
@@ -39,6 +40,7 @@ def fileexcepthook(exception_type, exception_value, traceback_object):
     # same as in analyzer.py
     logFileName = "friture.log.txt"
     logDir = platformdirs.user_log_dir("Friture", "")
+    logFilePath = os.path.join(logDir, logFileName)
 
     notice = """
         <h1>Oops! Something went wrong!</h1>
@@ -47,10 +49,10 @@ def fileexcepthook(exception_type, exception_value, traceback_object):
         (this is not guaranteed to work).</p>
         <h2>Please help us fix it!</h2>\n\n
         <p>Please create an issue on <a href="https://github.com/tlecomte/friture/issues">https://github.com/tlecomte/friture/issues</a>
-        and include the log file named <i>{logFileName}</i> from the following folder:</p>
-        <p><a href="file:///{logDir}">{logDir}1</a></p>
+        and include the log file:</p>
+        <p><a href="file:///{logFilePath}">{logFilePath}</a></p>
         <h3>Error details</h3>""" \
-        .format(logFileName = logFileName, logDir = logDir)
+        .format(logFilePath=logFilePath)
 
     msg = notice + timeString + ' (%s)' % versionInfo + '<br>' + exceptionText.replace("\r\n", "\n").replace("\n", "<br>").replace(" ", '&nbsp;')
 

@@ -185,6 +185,32 @@
     </widget>
    </item>
    <item>
+    <widget class="QGroupBox" name="startupGroup">
+     <property name="title">
+      <string>Startup</string>
+     </property>
+     <layout class="QFormLayout" name="formLayout_startup">
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_showSplash">
+        <property name="text">
+         <string>Show splash screen on launch</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QCheckBox" name="checkbox_showSplash">
+        <property name="text">
+         <string/>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
     <spacer name="verticalSpacer_3">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -196,6 +222,13 @@
       </size>
      </property>
     </spacer>
+   </item>
+   <item>
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Close</set>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>

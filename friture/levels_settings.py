@@ -18,6 +18,7 @@
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
 from PyQt5 import QtWidgets
+from friture.settings_dialog_layout import create_form_layout
 
 
 class Levels_Settings_Dialog(QtWidgets.QDialog):
@@ -27,7 +28,7 @@ class Levels_Settings_Dialog(QtWidgets.QDialog):
 
         self.setWindowTitle("Levels settings")
 
-        self.formLayout = QtWidgets.QFormLayout(self)
+        self.formLayout = create_form_layout(self)
 
         # self.doubleSpinBox_timerange = QtWidgets.QDoubleSpinBox(self)
         # self.doubleSpinBox_timerange.setDecimals(1)
@@ -39,8 +40,6 @@ class Levels_Settings_Dialog(QtWidgets.QDialog):
 
         # self.formLayout.addRow("Time range:", self.doubleSpinBox_timerange)
         self.formLayout.addRow("No settings for the levels.", None)
-
-        self.setLayout(self.formLayout)
 
         # self.doubleSpinBox_timerange.valueChanged.connect(self.parent().timerangechanged)
 

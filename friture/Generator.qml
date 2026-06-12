@@ -31,6 +31,7 @@ Rectangle {
             checked: viewModel.isPlaying
             onCheckedChanged: viewModel.isPlaying = checked
             icon.source: viewModel.isPlaying ? "qrc:/images-src/stop.svg" : "qrc:/images-src/start.svg"
+            icon.color: systemPalette.windowText
         }
 
         SineSettings {

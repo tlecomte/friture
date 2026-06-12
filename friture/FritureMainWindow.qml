@@ -6,11 +6,13 @@ import Friture 1.0
 Rectangle { // eventually move to ApplicationWindow
     id: mainWindow
     anchors.fill: parent
-    // title: qsTr("Friture") // ApplicationWindow
-    // icon.source: "qrc:/images-src/window-icon.svg" // ApplicationWindow
 
     required property MainWindowViewModel main_window_view_model
     required property string fixedFont
+
+    SystemPalette { id: systemPalette; colorGroup: SystemPalette.Active }
+
+    color: systemPalette.window
 
     ColumnLayout { // remove once we use ApplicationWindow
         anchors.fill: parent
@@ -32,6 +34,7 @@ Rectangle { // eventually move to ApplicationWindow
                     ToolTip.text: qsTr("Start/Stop")
                     icon.height: 32
                     icon.width: 32
+                    icon.color: systemPalette.windowText
                     //shortcut: "Space"
                     onClicked: {
                         mainWindow.main_window_view_model.toolbar_view_model.recording_toggle()
@@ -44,6 +47,7 @@ Rectangle { // eventually move to ApplicationWindow
                     ToolTip.text: qsTr("Add a new dock to Friture window")
                     icon.height: 32
                     icon.width: 32
+                    icon.color: systemPalette.windowText
                     onClicked: {
                         mainWindow.main_window_view_model.toolbar_view_model.new_dock()
                     }
@@ -55,6 +59,7 @@ Rectangle { // eventually move to ApplicationWindow
                     ToolTip.text: qsTr("Display settings dialog")
                     icon.height: 32
                     icon.width: 32
+                    icon.color: systemPalette.windowText
                     onClicked: {
                         mainWindow.main_window_view_model.toolbar_view_model.settings()
                     }
@@ -65,6 +70,7 @@ Rectangle { // eventually move to ApplicationWindow
                     text: qsTr("About Friture")
                     icon.height: 32
                     icon.width: 32
+                    icon.color: systemPalette.windowText
                     onClicked: {
                         mainWindow.main_window_view_model.toolbar_view_model.about()
                     }

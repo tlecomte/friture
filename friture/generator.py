@@ -24,6 +24,7 @@ from PyQt5.QtCore import QObject, pyqtProperty, pyqtSignal
 import numpy as np
 import sounddevice
 from friture.audiobackend import SAMPLING_RATE, AudioBackend
+from friture.settings_dialog_layout import create_form_layout
 from friture.generators.sweep import SweepGenerator, Sweep_Generator_Settings_View_Model
 from friture.generators.sine import SineGenerator, Sine_Generator_Settings_View_Model
 from friture.generators.burst import BurstGenerator, Burst_Generator_Settings_View_Model
@@ -338,14 +339,12 @@ class Generator_Settings_Dialog(QtWidgets.QDialog):
 
         self.setWindowTitle("Generator settings")
 
-        self.form_layout = QtWidgets.QFormLayout(self)
+        self.form_layout = create_form_layout(self)
 
         self.combobox_output_device = QtWidgets.QComboBox(self)
         self.combobox_output_device.setObjectName("comboBox_outputDevice")
 
         self.form_layout.addRow("Select the output device:", self.combobox_output_device)
-
-        self.setLayout(self.form_layout)
 
         for device in devices:
             self.combobox_output_device.addItem(device)

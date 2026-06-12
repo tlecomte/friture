@@ -26,6 +26,7 @@ from numpy import log10, where, sign, arange, zeros
 
 from friture.store import GetStore
 from friture.audiobackend import SAMPLING_RATE
+from friture.settings_dialog_layout import create_form_layout
 from friture.scope_data import Scope_Data
 from friture.curve import Curve
 
@@ -169,7 +170,7 @@ class Scope_Settings_Dialog(QtWidgets.QDialog):
 
         self.setWindowTitle("Scope settings")
 
-        self.formLayout = QtWidgets.QFormLayout(self)
+        self.formLayout = create_form_layout(self)
 
         self.doubleSpinBox_timerange = QtWidgets.QDoubleSpinBox(self)
         self.doubleSpinBox_timerange.setDecimals(1)
@@ -180,8 +181,6 @@ class Scope_Settings_Dialog(QtWidgets.QDialog):
         self.doubleSpinBox_timerange.setSuffix(" ms")
 
         self.formLayout.addRow("Time range:", self.doubleSpinBox_timerange)
-
-        self.setLayout(self.formLayout)
 
         self.doubleSpinBox_timerange.valueChanged.connect(view_model.set_timerange)
 
