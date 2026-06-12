@@ -27,6 +27,6 @@ if __name__ == '__main__':
     logging.basicConfig(level=logging.WARNING)
     np.set_printoptions(threshold=1024)
     loader = unittest.TestLoader()
-    suite = loader.discover(os.path.dirname(__file__), '*.py')
+    suite = loader.discover(os.path.dirname(__file__), pattern="test_*.py")
     result = unittest.TextTestRunner(verbosity=2).run(suite)
     raise SystemExit(0 if result.wasSuccessful() else 1)
