@@ -26,7 +26,8 @@ jobs:
           libxkbcommon-x11-0 \
           libxcb-xinerama0 \
           libasound2-dev \
-          libjack-dev
+          libjack-dev \
+          libportaudio2
 
     - name: Run unit tests with coverage
       run: bash ./.github/workflows/test-linux.sh
