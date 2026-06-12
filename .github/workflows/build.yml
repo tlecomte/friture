@@ -9,6 +9,28 @@ on:
   pull_request:
 
 jobs:
+  test-linux:
+    runs-on: ubuntu-22.04
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v5
+
+    - name: Set up Python
+      uses: actions/setup-python@v6
+
+    - name: Install Qt and audio build dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          libxkbcommon-x11-0 \
+          libxcb-xinerama0 \
+          libasound2-dev \
+          libjack-dev
+
+    - name: Run unit tests with coverage
+      run: bash ./.github/workflows/test-linux.sh
+
   build-windows:
     runs-on: windows-2022
 

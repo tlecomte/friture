@@ -21,6 +21,7 @@ import logging
 
 from PyQt5 import QtWidgets
 from friture.audiobackend import SAMPLING_RATE
+from friture.settings_dialog_layout import create_form_layout
 import friture.plotting.frequency_scales as fscales
 
 # shared with spectrogram.py
@@ -45,7 +46,7 @@ class Spectrogram_Settings_Dialog(QtWidgets.QDialog):
 
         self.setWindowTitle("Spectrogram settings")
 
-        self.formLayout = QtWidgets.QFormLayout(self)
+        self.formLayout = create_form_layout(self)
 
         self.doubleSpinBox_timerange = QtWidgets.QDoubleSpinBox(self)
         self.doubleSpinBox_timerange.setDecimals(1)
@@ -123,8 +124,6 @@ class Spectrogram_Settings_Dialog(QtWidgets.QDialog):
         self.formLayout.addRow("Min color:", self.spinBox_specmin)
         self.formLayout.addRow("Max color:", self.spinBox_specmax)
         self.formLayout.addRow("Middle-ear weighting:", self.comboBox_weighting)
-
-        self.setLayout(self.formLayout)
 
         self.comboBox_fftsize.currentIndexChanged.connect(self.fftsizechanged)
         self.comboBox_freqscale.currentIndexChanged.connect(self.freqscalechanged)

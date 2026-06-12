@@ -41,6 +41,7 @@ Notepad++
 .qt_for_python
 
 .mypy_cache
+.coverage
 
 # Macos
 .DS_Store

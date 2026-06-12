@@ -22,6 +22,7 @@ from PyQt5.QtCore import QSettings
 from typing import Any
 
 from friture.audiobackend import SAMPLING_RATE
+from friture.settings_dialog_layout import create_form_layout
 
 # Pitch tracker defaults:
 DEFAULT_FFT_SIZE = 4096
@@ -37,7 +38,7 @@ class PitchTrackerSettingsDialog(QtWidgets.QDialog):
     def __init__(self, parent: QtWidgets.QWidget, view_model: Any) -> None:
         super().__init__(parent)
         self.setWindowTitle("Pitch Tracker Settings")
-        self.form_layout = QtWidgets.QFormLayout(self)
+        self.form_layout = create_form_layout(self)
 
         self.min_freq = QtWidgets.QSpinBox(self)
         self.min_freq.setMinimum(10)
@@ -88,8 +89,6 @@ class PitchTrackerSettingsDialog(QtWidgets.QDialog):
         self.min_db.setObjectName("min_db")
         self.min_db.valueChanged.connect(view_model.set_min_db) # type: ignore
         self.form_layout.addRow("Min Amplitude:", self.min_db)
-
-        self.setLayout(self.form_layout)
 
     def save_state(self, settings: QSettings) -> None:
         settings.setValue("min_freq", self.min_freq.value())

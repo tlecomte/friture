@@ -28,4 +28,5 @@ if __name__ == '__main__':
     np.set_printoptions(threshold=1024)
     loader = unittest.TestLoader()
     suite = loader.discover(os.path.dirname(__file__), '*.py')
-    unittest.TextTestRunner(verbosity=2).run(suite)
+    result = unittest.TextTestRunner(verbosity=2).run(suite)
+    raise SystemExit(0 if result.wasSuccessful() else 1)

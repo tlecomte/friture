@@ -20,6 +20,7 @@
 import logging
 
 from PyQt5 import QtWidgets
+from friture.settings_dialog_layout import create_form_layout
 
 # shared with octavespectrum.py
 DEFAULT_SPEC_MIN = -80
@@ -42,7 +43,7 @@ class OctaveSpectrum_Settings_Dialog(QtWidgets.QDialog):
 
         self.setWindowTitle("Octave Spectrum settings")
 
-        self.formLayout = QtWidgets.QFormLayout(self)
+        self.formLayout = create_form_layout(self)
 
         self.comboBox_bandsperoctave = QtWidgets.QComboBox(self)
         self.comboBox_bandsperoctave.setObjectName("comboBox_bandsperoctave")
@@ -91,8 +92,6 @@ class OctaveSpectrum_Settings_Dialog(QtWidgets.QDialog):
         self.formLayout.addRow("Max:", self.spinBox_specmax)
         self.formLayout.addRow("Middle-ear weighting:", self.comboBox_weighting)
         self.formLayout.addRow("Response time:", self.comboBox_response_time)
-
-        self.setLayout(self.formLayout)
 
         self.comboBox_bandsperoctave.currentIndexChanged.connect(self.bandsperoctavechanged)
         self.spinBox_specmin.valueChanged.connect(view_model.setmin)

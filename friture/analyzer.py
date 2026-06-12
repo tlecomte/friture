@@ -43,7 +43,7 @@ from friture.main_toolbar_view_model import MainToolbarViewModel
 from friture.playback.playback_control_view_model import PlaybackControlViewModel
 from friture.ui_friture import Ui_MainWindow
 from friture.about import About_Dialog  # About dialog
-from friture.settings import Settings_Dialog  # Setting dialog
+from friture.settings import Settings_Dialog, splash_enabled  # Setting dialog
 from friture.audiobuffer import AudioBuffer  # audio ring buffer class
 from friture.audiobackend import AudioBackend  # audio backend class
 from friture.dockmanager import DockManager
@@ -82,6 +82,43 @@ SMOOTH_DISPLAY_TIMER_PERIOD_MS = 10
 # Text has to be refreshed slowly in order to be readable.
 # (and text painting is costly)
 SLOW_TIMER_PERIOD_MS = 1000
+
+
+def _linux_apply_dark_palette(app: QApplication, logger: logging.Logger) -> None:
+    from PyQt5.QtGui import QPalette, QColor
+
+    if os.environ.get("FRITURE_LIGHT_THEME", "").lower() in ("1", "true", "yes"):
+        return
+
+    style_override = os.environ.get("QT_STYLE_OVERRIDE", "").lower()
+    current_style = app.style().objectName().lower()
+    if style_override == "kvantum" and current_style == "kvantum":
+        logger.info("Using system Kvantum theme")
+        return
+
+    if style_override == "kvantum" and current_style != "kvantum":
+        logger.warning(
+            "Qt style '%s' is not available in this PyQt5 build; applying Friture dark palette",
+            style_override,
+        )
+    else:
+        logger.info("Applying Friture dark palette")
+
+    dark = QPalette()
+    dark.setColor(QPalette.Window, QColor(61, 61, 62))
+    dark.setColor(QPalette.WindowText, QColor(240, 240, 240))
+    dark.setColor(QPalette.Base, QColor(46, 46, 46))
+    dark.setColor(QPalette.AlternateBase, QColor(61, 61, 62))
+    dark.setColor(QPalette.ToolTipBase, QColor(240, 240, 240))
+    dark.setColor(QPalette.ToolTipText, QColor(46, 46, 46))
+    dark.setColor(QPalette.Text, QColor(240, 240, 240))
+    dark.setColor(QPalette.Button, QColor(61, 61, 62))
+    dark.setColor(QPalette.ButtonText, QColor(240, 240, 240))
+    dark.setColor(QPalette.BrightText, QColor(255, 80, 80))
+    dark.setColor(QPalette.Link, QColor(80, 160, 255))
+    dark.setColor(QPalette.Highlight, QColor(42, 130, 218))
+    dark.setColor(QPalette.HighlightedText, QColor(240, 240, 240))
+    app.setPalette(dark)
 
 
 class Friture(QMainWindow, ):
@@ -399,7 +436,7 @@ def main():
     parser.add_argument(
         "--no-splash",
         action="store_true",
-        help="Disable the splash screen on startup")
+        help="Disable the splash screen for this launch (overrides Settings)")
 
     program_arguments, remaining_arguments = parser.parse_known_args()
     remaining_arguments.insert(0, sys.argv[0])
@@ -476,6 +513,7 @@ def main():
     if platform.system() == "Linux":
         if "PIPEWIRE_ALSA" not in os.environ:
             os.environ['PIPEWIRE_ALSA'] = '{ application.name = "Friture" }'
+        _linux_apply_dark_palette(app, logger)
 
     # Set the style for Qt Quick Controls
     # We choose the Fusion style as it is a desktop-oriented style
@@ -484,7 +522,9 @@ def main():
         os.environ["QT_QUICK_CONTROLS_STYLE"] = "Fusion"
 
     # Splash screen
-    if not program_arguments.no_splash:
+    show_splash = splash_enabled() and not program_arguments.no_splash
+    splash = None
+    if show_splash:
         pixmap = QPixmap(":/images/splash.png")
         splash = QSplashScreen(pixmap)
         splash.show()
@@ -493,7 +533,7 @@ def main():
 
     window = Friture()
     window.show()
-    if not program_arguments.no_splash:
+    if splash is not None:
         splash.hide()
 
     profile = "no"  # "python" or "kcachegrind" or anything else to disable
