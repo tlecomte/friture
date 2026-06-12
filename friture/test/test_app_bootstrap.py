@@ -5,11 +5,11 @@
 import logging
 import os
 import unittest
-from unittest.mock import MagicMock
 
 from PyQt5.QtWidgets import QApplication
 
 from friture.analyzer import _linux_apply_dark_palette
+from friture.main_toolbar_view_model import MainToolbarViewModel
 from friture.test.helpers import IsolatedQSettings, ensure_qapplication
 
 
@@ -39,25 +39,17 @@ class AnalyzerBootstrapTest(unittest.TestCase):
 
 
 class SettingsDialogBootstrapTest(unittest.TestCase):
-    def test_settings_dialog_opens_with_mocked_audio_backend(self) -> None:
-        from unittest.mock import patch
-
+    def test_settings_dialog_opens_with_injected_catalog(self) -> None:
         from PyQt5.QtWidgets import QWidget
 
-        from friture.main_toolbar_view_model import MainToolbarViewModel
         from friture.settings import Settings_Dialog
+        from friture.test.test_input_device_catalog import make_catalog
 
         ensure_qapplication()
         parent = QWidget()
         toolbar = MainToolbarViewModel()
 
-        backend = MagicMock()
-        backend.get_readable_devices_list.return_value = ["Test Input"]
-        backend.get_readable_current_channels.return_value = ["Ch 1"]
-        backend.get_readable_current_device.return_value = 0
-
-        with patch("friture.settings.get_audio_ingest", return_value=backend):
-            dialog = Settings_Dialog(parent, toolbar)
+        dialog = Settings_Dialog(parent, toolbar, catalog=make_catalog(["Test Input"]))
 
         self.assertEqual(dialog.comboBox_inputDevice.count(), 1)
         self.assertTrue(dialog.checkbox_showSplash.isChecked())
