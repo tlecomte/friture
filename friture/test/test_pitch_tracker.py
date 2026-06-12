@@ -154,3 +154,19 @@ class PitchTrackerWidgetTest(unittest.TestCase):
         self.assertEqual(view_model.note, "A4")
         self.assertFalse(np.isnan(view_model._pitch))
         self.assertAlmostEqual(view_model._pitch, 440.0, delta=5.0)
+
+    def test_handle_new_data_leaves_silent_display_empty(self) -> None:
+        buffer = AudioBuffer()
+        self.widget.set_buffer(buffer)
+        self.widget.settings_dialog.conf.setValue(0.3)
+        self.widget.settings_dialog.min_db.setValue(-80.0)
+
+        fft_size = self.widget.tracker.fft_size
+        silence = np.zeros((1, fft_size))
+
+        buffer.handle_new_data(silence, fft_size / SAMPLING_RATE, None)
+        self.widget.handle_new_data(silence)
+
+        view_model = self.widget.view_model()
+        self.assertEqual(view_model.pitch, "--")
+        self.assertEqual(view_model.note, "--")
