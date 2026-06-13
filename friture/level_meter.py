@@ -11,8 +11,8 @@ import numpy as np
 
 from friture.audiobackend import SAMPLING_RATE
 from friture.dock_analysis_widget import stereo_mode_from_chunk
-from friture.iec import dB_to_IEC
-from friture.freq_weighting import WeightingFilter
+from friture.iec import level_db_to_meter_fraction, meter_level_for_bar
+from friture.freq_weighting import DEFAULT_WEIGHTING, WeightingFilter
 from friture.level_calibration import LevelCalibration, apply_calibration
 from friture.level_view_model import LevelViewModel
 from friture_extensions.exp_smoothing_conv import pyx_exp_smoothed_value
@@ -67,6 +67,13 @@ class LevelMeterProcessor:
     def set_response_time_s(self, response_time_s: float) -> None:
         self.response_time_s = response_time_s
         self._alpha, self._kernel = _smoothing_kernel(response_time_s)
+
+    def reset_smoothing(self) -> None:
+        self._old_rms = 1e-30
+        self._old_max = 1e-30
+        self._old_rms_2 = 1e-30
+        self._old_max_2 = 1e-30
+        self.last_raw_rms_db = -120.0
 
     def handle_new_data(
         self,
@@ -139,10 +146,19 @@ class LevelMeterProcessor:
         ballistic,
         calibration: LevelCalibration,
     ) -> None:
+        level_data.level_rms_raw = raw_rms_db
+        level_data.level_max_raw = raw_max_db
         level_data.level_rms = apply_calibration(raw_rms_db, calibration.offset_db)
         level_data.level_max = apply_calibration(raw_max_db, calibration.offset_db)
-        ballistic.peak_iec = dB_to_IEC(
-            max(level_data.level_max, level_data.level_rms)
+        meter_rms_db = meter_level_for_bar(
+            level_data.level_rms, raw_rms_db, calibration.unit_label
+        )
+        meter_max_db = meter_level_for_bar(
+            level_data.level_max, raw_max_db, calibration.unit_label
+        )
+        peak_db = max(meter_max_db, meter_rms_db)
+        ballistic.peak_iec = level_db_to_meter_fraction(
+            peak_db, calibration.unit_label
         )
 
     def canvas_update(self, view_model: LevelViewModel, parent_visible: bool) -> None:
@@ -161,3 +177,105 @@ class LevelMeterProcessor:
                     view_model.level_data_2.level_max
                 )
         self._canvas_step %= LEVEL_TEXT_LABEL_STEPS
+
+
+MIN_CALIBRATION_RAW_DB = -90.0
+DEFAULT_CALIBRATION_WINDOW_SAMPLES = 4096
+
+
+def measure_raw_rms_db(
+    samples: np.ndarray,
+    *,
+    weighting: int = DEFAULT_WEIGHTING,
+) -> float:
+    if samples.size == 0:
+        return -120.0
+    weighting_filter = WeightingFilter()
+    weighting_filter.set_weighting(weighting)
+    weighted = weighting_filter.apply(np.asarray(samples, dtype=float), channel=1)
+    mean_square = float(np.mean(weighted * weighted))
+    return float(10.0 * np.log10(mean_square + 1e-80))
+
+
+def raw_rms_db_from_buffer(
+    buffer,
+    *,
+    num_samples: int = DEFAULT_CALIBRATION_WINDOW_SAMPLES,
+    weighting: int = DEFAULT_WEIGHTING,
+) -> float:
+    if buffer is None:
+        return -120.0
+
+    available = buffer.ringbuffer.offset
+    if available <= 0:
+        return -120.0
+
+    length = min(num_samples, available)
+    data = buffer.data(length)
+    if data.shape[1] == 0:
+        return -120.0
+
+    return max(
+        measure_raw_rms_db(data[channel], weighting=weighting)
+        for channel in range(data.shape[0])
+    )
+
+
+def calibration_signal_too_quiet(raw_rms_db: float) -> bool:
+    return raw_rms_db <= MIN_CALIBRATION_RAW_DB
+
+
+def calibration_raw_rms_db(
+    buffer,
+    *,
+    live_raw_rms_db: float | None = None,
+    meter: LevelMeterProcessor | None = None,
+    num_samples: int = DEFAULT_CALIBRATION_WINDOW_SAMPLES,
+    weighting: int = DEFAULT_WEIGHTING,
+) -> float:
+    """Best current raw RMS for calibration: buffer window or live meter, whichever is louder."""
+    from_buffer = raw_rms_db_from_buffer(
+        buffer,
+        num_samples=num_samples,
+        weighting=weighting,
+    )
+    if meter is not None:
+        live_raw_rms_db = meter.last_raw_rms_db
+    if live_raw_rms_db is None:
+        return from_buffer
+    return max(from_buffer, live_raw_rms_db)
+
+
+def calibration_quiet_message(
+    raw_rms_db: float,
+    *,
+    offset_db: float = 0.0,
+    unit_label: str = "dB FS",
+) -> str:
+    lines = [
+        "No usable input signal for calibration.",
+        "",
+        f"Current raw level is {raw_rms_db:.1f} dBFS.",
+    ]
+    if abs(offset_db) > 0.1:
+        apparent_db = raw_rms_db + offset_db
+        lines.extend(
+            [
+                f"Current calibration offset is {offset_db:.1f} dB ({unit_label}).",
+                f"Meters and graphs may show about {apparent_db:.1f} {unit_label}, "
+                "but that comes from the offset—not from input level.",
+                "",
+                "Reset the offset to 0 if no calibrator is connected, then calibrate "
+                "again once a reference tone is present (typically above -60 dBFS raw).",
+            ]
+        )
+    else:
+        lines.extend(
+            [
+                "",
+                "Apply a calibrator or test tone (typically above -60 dBFS raw), "
+                "then try again.",
+            ]
+        )
+    return "\n".join(lines)
+

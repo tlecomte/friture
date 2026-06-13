@@ -10,28 +10,17 @@ Item {
 
     required property int topOffset
     required property bool twoChannels
+    required property string unitLabel
 
-    ListModel {
-        id: scaleModel
-
-        ListElement { dB: 0 }
-        ListElement { dB: -3 }
-        ListElement { dB: -6 }
-        ListElement { dB: -10 }
-        ListElement { dB: -20 }
-        ListElement { dB: -30 }
-        ListElement { dB: -40 }
-        ListElement { dB: -50 }
-        ListElement { dB: -60 }
-    }
+    readonly property var scaleDbValues: IECFunctions.meterScaleTicks(unitLabel)
 
     Repeater {
-        model: scaleModel
+        model: scaleDbValues
 
         Item {
             implicitWidth: 16
             x: 0
-            y: pathY(dB)
+            y: pathY(modelData)
 
             Shape {
                 ShapePath {
@@ -44,7 +33,7 @@ Item {
             }
 
             Text {
-                text: Math.abs(dB)
+                text: Math.abs(modelData)
                 font.pointSize: 6
                 x: 0
                 width: 16
@@ -68,8 +57,8 @@ Item {
             }
 
             function pathY(dB) {
-                var iec = IECFunctions.dB_to_IEC(dB);
-                return Math.round((metersLayout.height - meterScale.topOffset) * (1. - iec) + meterScale.topOffset)
+                var fraction = IECFunctions.level_db_to_meter_fraction(dB, unitLabel);
+                return Math.round((metersLayout.height - meterScale.topOffset) * (1. - fraction) + meterScale.topOffset)
             }
         }
     }

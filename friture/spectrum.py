@@ -18,6 +18,7 @@
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
 from PyQt5.QtCore import QObject
+from friture.calibrated_display_range import CalibratedDisplayRangeMixin
 from friture.spectrum_settings import (Spectrum_Settings_Dialog,  # settings dialog
                                        DEFAULT_FFT_SIZE,
                                        DEFAULT_FREQ_SCALE,
@@ -33,9 +34,10 @@ import friture.plotting.frequency_scales as fscales
 from friture.ring_buffer_frame_reader import RingBufferFrameReader
 from friture.spectrumPlotWidget import SpectrumPlotWidget
 from friture.spectrum_frame_analyzer import SpectrumFrameAnalyzer
+from friture.global_frequency_calibration import frequency_adjustment_db_for_owner
 
 
-class Spectrum_Widget(QObject):
+class Spectrum_Widget(QObject, CalibratedDisplayRangeMixin):
 
     def __init__(self, parent):
         super().__init__(parent)
@@ -44,8 +46,6 @@ class Spectrum_Widget(QObject):
         self.PlotZoneSpect = SpectrumPlotWidget(self)
 
         fft_size = 2 ** DEFAULT_FFT_SIZE * 32
-        self.spec_min = DEFAULT_SPEC_MIN
-        self.spec_max = DEFAULT_SPEC_MAX
         self.minfreq = DEFAULT_MINFREQ
         self.maxfreq = DEFAULT_MAXFREQ
 
@@ -62,7 +62,7 @@ class Spectrum_Widget(QObject):
 
         self.PlotZoneSpect.setfreqscale(fscales.Mel) # matches DEFAULT_FREQ_SCALE = 2 #Mel
         self.PlotZoneSpect.setfreqrange(self.minfreq, self.maxfreq)
-        self.PlotZoneSpect.setspecrange(self.spec_min, self.spec_max)
+        self.init_calibrated_display_range(parent, DEFAULT_SPEC_MIN, DEFAULT_SPEC_MAX)
         self.PlotZoneSpect.setweighting(DEFAULT_WEIGHTING)
         self.PlotZoneSpect.set_peaks_enabled(True)
         self.PlotZoneSpect.set_baseline_displayUnits(0.)
@@ -121,9 +121,10 @@ class Spectrum_Widget(QObject):
         del floatdata
         result = self._analyzer.process_frames(list(self._frame_reader.iter_frames()))
         if result is not None:
+            adjustment = frequency_adjustment_db_for_owner(self, result.freq)
             self.PlotZoneSpect.setdata(
                 result.freq,
-                result.db_spectrogram,
+                result.db_spectrogram + adjustment,
                 result.fmax_hz,
                 result.fpitch_hz,
             )
@@ -163,12 +164,13 @@ class Spectrum_Widget(QObject):
             self._frame_reader.set_buffer(self.audiobuffer)
 
     def setmin(self, value):
-        self.spec_min = value
-        self.PlotZoneSpect.setspecrange(self.spec_min, self.spec_max)
+        self.set_base_spec_min(value)
 
     def setmax(self, value):
-        self.spec_max = value
-        self.PlotZoneSpect.setspecrange(self.spec_min, self.spec_max)
+        self.set_base_spec_max(value)
+
+    def _apply_calibrated_spec_range(self, spec_min: float, spec_max: float) -> None:
+        self.PlotZoneSpect.setspecrange(spec_min, spec_max)
 
     def setweighting(self, weighting):
         self.weighting = weighting

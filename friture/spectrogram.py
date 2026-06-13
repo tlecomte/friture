@@ -21,6 +21,7 @@
 
 from PyQt5.QtCore import QObject
 from numpy import log10, floor, zeros, float64, tile, array, ndarray
+from friture.calibrated_display_range import CalibratedDisplayRangeMixin
 from friture.audiobuffer import AudioBuffer
 from friture.imageplot import ImagePlot
 from friture.audioproc import audioproc
@@ -39,11 +40,13 @@ from friture.spectrogram_settings import (Spectrogram_Settings_Dialog,  # settin
                                           DEFAULT_WEIGHTING)
 import friture.plotting.frequency_scales as fscales
 
+from friture.global_frequency_calibration import frequency_adjustment_db_for_owner
+
 from friture.audiobackend import SAMPLING_RATE, FRAMES_PER_BUFFER, AudioBackend
 from fractions import Fraction
 
 
-class Spectrogram_Widget(QObject):
+class Spectrogram_Widget(QObject, CalibratedDisplayRangeMixin):
 
     def __init__(self, parent):
         super().__init__(parent)
@@ -74,8 +77,6 @@ class Spectrogram_Widget(QObject):
         self.minfreq = DEFAULT_MINFREQ
         self.fft_size = 2 ** DEFAULT_FFT_SIZE * 32
         self.proc.set_fftsize(self.fft_size)
-        self.spec_min = DEFAULT_SPEC_MIN
-        self.spec_max = DEFAULT_SPEC_MAX
         self.weighting = DEFAULT_WEIGHTING
 
         self.update_weighting()
@@ -93,7 +94,7 @@ class Spectrogram_Widget(QObject):
         self.dT_s = self.fft_size * (1. - self.overlap) / float(SAMPLING_RATE)
 
         self.PlotZoneImage.setfreqrange(self.minfreq, self.maxfreq)
-        self.PlotZoneImage.setspecrange(self.spec_min, self.spec_max)
+        self.init_calibrated_display_range(parent, DEFAULT_SPEC_MIN, DEFAULT_SPEC_MAX)
         self.PlotZoneImage.setweighting(self.weighting)
         self.PlotZoneImage.settimerange(self.timerange_s, self.dT_s)
         self.update_jitter()
@@ -159,7 +160,9 @@ class Spectrogram_Widget(QObject):
                 self.old_index += int(needed)
 
             w = tile(self.w, (1, realizable))
-            norm_spectrogram = self.scale_spectrogram(self.log_spectrogram(spn) + w)
+            raw_db = self.log_spectrogram(spn) + w
+            adjustment = frequency_adjustment_db_for_owner(self, self.freq).reshape(-1, 1)
+            norm_spectrogram = self.scale_spectrogram(raw_db + adjustment)
 
             self.screen_resampler.set_height(self.PlotZoneImage.spectrogram_screen_height())
             screen_rate_frac = Fraction(max(self.PlotZoneImage.spectrogram_screen_width(), 1), int(self.timerange_s * 1000))
@@ -234,12 +237,13 @@ class Spectrogram_Widget(QObject):
         self.update_jitter()
 
     def setmin(self, value):
-        self.spec_min = value
-        self.PlotZoneImage.setspecrange(self.spec_min, self.spec_max)
+        self.set_base_spec_min(value)
 
     def setmax(self, value):
-        self.spec_max = value
-        self.PlotZoneImage.setspecrange(self.spec_min, self.spec_max)
+        self.set_base_spec_max(value)
+
+    def _apply_calibrated_spec_range(self, spec_min: float, spec_max: float) -> None:
+        self.PlotZoneImage.setspecrange(spec_min, spec_max)
 
     def setweighting(self, weighting):
         self.weighting = weighting

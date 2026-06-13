@@ -23,8 +23,8 @@ Rectangle {
         SingleMeter {
             Layout.fillHeight: true
             Layout.alignment: Qt.AlignLeft
-            levelMax: ready ? level_view_model.level_data.level_max : -150
-            levelRms: ready ? level_view_model.level_data.level_rms : -150
+            levelMaxIec: ready ? level_view_model.level_data.level_max_iec : 0
+            levelRmsIec: ready ? level_view_model.level_data.level_rms_iec : 0
             topOffset: metersLayout.topOffset
             levelIECMaxBallistic: ready ? level_view_model.level_data_ballistic.peak_iec : 0
         }
@@ -34,14 +34,15 @@ Rectangle {
             Layout.alignment: Qt.AlignLeft
             topOffset: metersLayout.topOffset
             twoChannels: ready && level_view_model.two_channels
+            unitLabel: ready ? level_view_model.unit_label : "dB FS"
         }
 
         SingleMeter {
             visible: ready && level_view_model.two_channels
             Layout.fillHeight: true
             Layout.alignment: Qt.AlignLeft
-            levelMax: ready ? level_view_model.level_data_2.level_max : -150
-            levelRms: ready ? level_view_model.level_data_2.level_rms : -150
+            levelMaxIec: ready ? level_view_model.level_data_2.level_max_iec : 0
+            levelRmsIec: ready ? level_view_model.level_data_2.level_rms_iec : 0
             topOffset: metersLayout.topOffset
             levelIECMaxBallistic: ready ? level_view_model.level_data_ballistic_2.peak_iec : 0
         }
