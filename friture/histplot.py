@@ -24,6 +24,7 @@ import numpy
 from friture.filled_curve import CurveType, FilledCurve
 from friture.histplot_data import HistPlot_Data
 from friture.plotting.coordinateTransform import CoordinateTransform
+from friture.reference_overlay_plot import ReferenceOverlayPlot
 import friture.plotting.frequency_scales as fscales
 from friture.pitch_tracker import format_frequency
 from friture.store import GetStore
@@ -68,6 +69,13 @@ class HistPlot(QObject):
         self.normHorizontalScaleTransform.setScale(fscales.Logarithmic)
         self._histplot_data.horizontal_axis.setScale(fscales.Logarithmic)
 
+        self._reference_overlay = ReferenceOverlayPlot(
+            self._histplot_data,
+            self.normHorizontalScaleTransform,
+            self.normVerticalScaleTransform,
+            display_mode="octave",
+        )
+
     def qml_file_name(self):
         return "HistPlot.qml"
     
@@ -75,6 +83,8 @@ class HistPlot(QObject):
         return self._histplot_data
 
     def setdata(self, fl, fh, fc, y):
+        center_hz = numpy.sqrt(numpy.asarray(fl, dtype=float) * numpy.asarray(fh, dtype=float))
+        self._reference_overlay.set_frequencies_hz(center_hz)
         if not self.paused:
             M = numpy.max(y)
             m = self.normVerticalScaleTransform.coord_min
@@ -135,6 +145,13 @@ class HistPlot(QObject):
 
         self._histplot_data.vertical_axis.setRange(spec_min, spec_max)
         self.normVerticalScaleTransform.setRange(spec_min, spec_max)
+        self._reference_overlay.refresh()
+
+    def set_reference_preset(self, preset: int) -> None:
+        self._reference_overlay.set_preset(preset)
+
+    def set_reference_offset_db(self, offset_db: float) -> None:
+        self._reference_overlay.set_offset_db(offset_db)
 
     def setweighting(self, weighting):
         if weighting == 0:

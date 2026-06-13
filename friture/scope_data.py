@@ -28,11 +28,15 @@ class Scope_Data(QtCore.QObject):
     show_color_axis_changed = QtCore.pyqtSignal(bool)
     show_legend_changed = QtCore.pyqtSignal(bool)
     plot_items_changed = QtCore.pyqtSignal()
+    reference_overlay_changed = QtCore.pyqtSignal()
+    reference_overlay_visible_changed = QtCore.pyqtSignal(bool)
 
     def __init__(self, parent=None):
         super().__init__(parent)
 
         self._plot_items = []
+        self._reference_overlay = Curve(self)
+        self._reference_overlay_visible = False
         self._horizontal_axis = Axis(self)
         self._vertical_axis = Axis(self)
         self._color_axis = Axis(self)
@@ -87,3 +91,21 @@ class Scope_Data(QtCore.QObject):
         if self._show_legend != show_legend:
             self._show_legend = show_legend
             self.show_legend_changed.emit(show_legend)
+
+    @pyqtProperty(Curve, notify=reference_overlay_changed)  # type: ignore
+    def reference_overlay(self):
+        return self._reference_overlay
+
+    def set_reference_overlay(self, curve: Curve) -> None:
+        if self._reference_overlay is not curve:
+            self._reference_overlay = curve
+            self.reference_overlay_changed.emit()
+
+    @pyqtProperty(bool, notify=reference_overlay_visible_changed)  # type: ignore
+    def reference_overlay_visible(self):
+        return self._reference_overlay_visible
+
+    def set_reference_overlay_visible(self, visible: bool) -> None:
+        if self._reference_overlay_visible != visible:
+            self._reference_overlay_visible = visible
+            self.reference_overlay_visible_changed.emit(visible)

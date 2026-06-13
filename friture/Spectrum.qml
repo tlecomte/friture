@@ -10,6 +10,13 @@ Plot {
 
     scopedata: viewModel
 
+    PlotCurve {
+        visible: scopedata.reference_overlay_visible
+        anchors.fill: parent
+        color: "#888888"
+        curve: scopedata.reference_overlay
+    }
+
     Repeater {
         model: scopedata.plot_items
 

@@ -22,6 +22,7 @@ import logging
 from PyQt5 import QtWidgets
 from friture.audiobackend import SAMPLING_RATE
 from friture.settings_dialog_layout import create_form_layout
+from friture.reference_settings_rows import ReferenceOverlaySettingsRows
 import friture.plotting.frequency_scales as fscales
 
 # shared with spectrum_settings.py
@@ -134,6 +135,8 @@ class Spectrum_Settings_Dialog(QtWidgets.QDialog):
         self.checkBox_showPitchLabel.setObjectName("showPitchLabels")
         self.checkBox_showPitchLabel.setChecked(DEFAULT_SHOW_PITCH_LABELS)
 
+        self._reference_rows = ReferenceOverlaySettingsRows(self.formLayout)
+
         self.formLayout.addRow("Measurement type:", self.comboBox_dual_channel)
         self.formLayout.addRow("FFT Size:", self.comboBox_fftsize)
         self.formLayout.addRow("Frequency scale:", self.comboBox_freqscale)
@@ -157,6 +160,12 @@ class Spectrum_Settings_Dialog(QtWidgets.QDialog):
         self.comboBox_response_time.currentIndexChanged.connect(self.responsetimechanged)
         self.checkBox_showFreqLabels.toggled.connect(self.view_model.setShowFreqLabel)
         self.checkBox_showPitchLabel.toggled.connect(self.view_model.setShowPitchLabel)
+        self._reference_rows.comboBox_reference.currentIndexChanged.connect(
+            self.view_model.set_reference_preset
+        )
+        self._reference_rows.doubleSpinBox_reference_offset.valueChanged.connect(
+            self.view_model.set_reference_offset_db
+        )
 
     # slot
     def dualchannelchanged(self, index):
@@ -204,6 +213,7 @@ class Spectrum_Settings_Dialog(QtWidgets.QDialog):
         settings.setValue("responseTime", self.comboBox_response_time.currentIndex())
         settings.setValue("showFreqLabels", self.checkBox_showFreqLabels.isChecked())
         settings.setValue("showPitchLabel", self.checkBox_showPitchLabel.isChecked())
+        self._reference_rows.save_state(settings)
 
     # method
     def restoreState(self, settings):
@@ -227,3 +237,4 @@ class Spectrum_Settings_Dialog(QtWidgets.QDialog):
         self.checkBox_showFreqLabels.setChecked(showFreqLabels)
         showPitchLabel = settings.value("showPitchLabel", DEFAULT_SHOW_PITCH_LABELS, type=bool)
         self.checkBox_showPitchLabel.setChecked(showPitchLabel)
+        self._reference_rows.restore_state(settings)

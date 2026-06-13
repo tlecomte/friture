@@ -191,6 +191,12 @@ class Spectrum_Widget(QObject, CalibratedDisplayRangeMixin):
     def setShowPitchLabel(self, showPitchLabel):
         self.PlotZoneSpect.setShowPitchLabel(showPitchLabel)
 
+    def set_reference_preset(self, preset: int) -> None:
+        self.PlotZoneSpect.set_reference_preset(preset)
+
+    def set_reference_offset_db(self, offset_db: float) -> None:
+        self.PlotZoneSpect.set_reference_offset_db(offset_db)
+
     def settings_called(self, checked):
         self.settings_dialog.show()
 
