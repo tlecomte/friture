@@ -10,13 +10,6 @@ Plot {
 
     scopedata: viewModel
 
-    PlotCurve {
-        visible: scopedata.reference_overlay_visible
-        anchors.fill: parent
-        color: "#888888"
-        curve: scopedata.reference_overlay
-    }
-
     Repeater {
         model: scopedata.plot_items
 
@@ -24,7 +17,14 @@ Plot {
             anchors.fill: parent
             curve: modelData
         }
-    }    
+    }
+
+    PlotCurve {
+        visible: scopedata.reference_overlay_visible
+        anchors.fill: parent
+        color: "#888888"
+        curve: scopedata.reference_overlay
+    }
 
     Item {
         visible: scopedata.bar_labels_x_distance * parent.width > fontMetrics.boundingRect("100").height

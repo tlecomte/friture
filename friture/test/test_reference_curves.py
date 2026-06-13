@@ -44,15 +44,15 @@ class ReferenceCurvesTest(unittest.TestCase):
 
         self.assertAlmostEqual(curve[0], 12.5)
 
-    def test_pink_fft_rises_with_frequency(self) -> None:
+    def test_pink_fft_falls_with_frequency(self) -> None:
         freqs = np.array([100.0, 1000.0, 10000.0])
 
         curve = reference_curve_db(REFERENCE_PINK, freqs, display_mode="fft")
 
         self.assertAlmostEqual(curve[1], 0.0, places=1)
-        self.assertLess(curve[0], curve[1])
-        self.assertGreater(curve[2], curve[1])
-        self.assertAlmostEqual(curve[2] - curve[0], 20.0, delta=0.5)
+        self.assertGreater(curve[0], curve[1])
+        self.assertLess(curve[2], curve[1])
+        self.assertAlmostEqual(curve[0] - curve[2], 20.0, delta=0.5)
 
     def test_pink_octave_is_flat(self) -> None:
         freqs = np.array([125.0, 1000.0, 8000.0])

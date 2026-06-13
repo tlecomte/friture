@@ -45,7 +45,7 @@ def _pink_fft_db(
 ) -> np.ndarray:
     freqs = np.maximum(np.asarray(frequencies_hz, dtype=float), 1e-20)
     anchor = max(anchor_freq_hz, 1e-20)
-    return 10.0 * np.log10(freqs / anchor)
+    return -10.0 * np.log10(freqs / anchor)
 
 
 def _house_db(frequencies_hz: np.ndarray) -> np.ndarray:
