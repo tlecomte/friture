@@ -25,6 +25,9 @@ from friture.generator import Generator_Widget
 from friture.delay_estimator import Delay_Estimator_Widget
 from friture.longlevels import LongLevelWidget
 from friture.pitch_tracker import PitchTrackerWidget
+from friture.db_levels_dock import DbLevelsDockWidget
+
+DB_LEVELS_WIDGET_ID = 9
 
 widgets = [
     {'Id': 1, "Class": Scope_Widget, "Name": "Scope"},
@@ -35,6 +38,7 @@ widgets = [
     {'Id': 6, "Class": Delay_Estimator_Widget, "Name": "Delay Estimator"},
     {'Id': 7, "Class": LongLevelWidget, "Name": "Long-time levels"},
     {'Id': 8, "Class": PitchTrackerWidget, "Name": "Pitch Tracker"},
+    {'Id': DB_LEVELS_WIDGET_ID, "Class": DbLevelsDockWidget, "Name": "dB levels"},
 ]
 
 

@@ -21,7 +21,8 @@ RowLayout {
             "Generator",
             "Delay Estimator",
             "Long-time levels",
-            "Pitch Tracker"
+            "Pitch Tracker",
+            "dB levels"
         ]
         currentIndex: viewModel.currentIndex
         onCurrentIndexChanged: viewModel.currentIndex = currentIndex

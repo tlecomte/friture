@@ -32,3 +32,19 @@ def dB_to_IEC(dB):
         return (dB + 30.0) * 0.02 + 0.3
     else:  # if dB < 0.0
         return (dB + 20.0) * 0.025 + 0.5
+
+
+def iec_to_dB(iec):
+    if iec <= 0.0:
+        return -70.0
+    if iec <= 0.025:
+        return iec / 0.0025 - 70.0
+    if iec <= 0.075:
+        return (iec - 0.025) / 0.005 - 60.0
+    if iec <= 0.15:
+        return (iec - 0.075) / 0.0075 - 50.0
+    if iec <= 0.3:
+        return (iec - 0.15) / 0.015 - 40.0
+    if iec <= 0.5:
+        return (iec - 0.3) / 0.02 - 30.0
+    return (iec - 0.5) / 0.025 - 20.0
