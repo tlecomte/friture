@@ -7,8 +7,8 @@ Rectangle {
     color: "black"
     implicitWidth: 16
 
-    required property double levelMax
-    required property double levelRms
+    required property double levelMaxIec
+    required property double levelRmsIec
     required property double levelIECMaxBallistic
     required property int topOffset
 
@@ -30,7 +30,7 @@ Rectangle {
 
     Item {
         implicitWidth: parent.width
-        implicitHeight: IECFunctions.dB_to_IEC(levelMax) * (parent.height - topOffset)
+        implicitHeight: levelMaxIec * (parent.height - topOffset)
         anchors.bottom: parent.bottom
         clip: true
 
@@ -46,7 +46,7 @@ Rectangle {
 
     Item {
         implicitWidth: parent.width
-        implicitHeight: IECFunctions.dB_to_IEC(levelRms) * (parent.height - topOffset)
+        implicitHeight: levelRmsIec * (parent.height - topOffset)
         anchors.bottom: parent.bottom
         clip: true
 

@@ -35,10 +35,13 @@ class IngestLevelsWidgetTest(unittest.TestCase):
         from friture.level_view_model import LevelViewModel
         from friture.levels import Levels_Widget
 
+        from friture.test.helpers import attach_global_calibration, make_parent_widget
+
         ensure_qapplication()
-        parent = __import__("friture.test.helpers", fromlist=["make_parent_widget"]).make_parent_widget()
+        parent = make_parent_widget()
+        attach_global_calibration(parent)
         view_model = LevelViewModel()
-        widget = Levels_Widget(parent, view_model)
+        widget = Levels_Widget(parent, view_model, parent.global_calibration)
         buffer = __import__("friture.audiobuffer", fromlist=["AudioBuffer"]).AudioBuffer()
         widget.set_buffer(buffer)
         ingest = TestAudioIngest(frequency_hz=440.0, amplitude=0.8)

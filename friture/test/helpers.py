@@ -18,6 +18,13 @@ from PyQt5.QtWidgets import QApplication, QWidget
 
 from friture.audiobackend import SAMPLING_RATE
 from friture.audiobuffer import AudioBuffer
+from friture.global_calibration import GlobalCalibrationService
+
+
+def attach_global_calibration(parent: QWidget) -> GlobalCalibrationService:
+    service = GlobalCalibrationService(parent)
+    parent.global_calibration = service
+    return service
 
 
 def wire_dock_analysis_widget(widget, buffer: AudioBuffer) -> None:

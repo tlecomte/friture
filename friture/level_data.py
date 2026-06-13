@@ -20,7 +20,7 @@
 from PyQt5 import QtCore
 from PyQt5.QtCore import pyqtProperty
 
-from friture.iec import dB_to_IEC
+from friture.iec import level_db_to_meter_fraction, meter_level_for_bar
 
 class LevelData(QtCore.QObject):
     level_rms_changed = QtCore.pyqtSignal(float)
@@ -31,6 +31,8 @@ class LevelData(QtCore.QObject):
 
         self._level_rms = -30.
         self._level_max = -30.
+        self._level_rms_raw = -30.
+        self._level_max_raw = -30.
 
     @pyqtProperty(float, notify=level_rms_changed) # type: ignore
     def level_rms(self):
@@ -38,7 +40,11 @@ class LevelData(QtCore.QObject):
 
     @pyqtProperty(float, notify=level_rms_changed) # type: ignore
     def level_rms_iec(self):
-        return dB_to_IEC(self._level_rms)
+        unit_label = self._meter_unit_label()
+        meter_db = meter_level_for_bar(
+            self._level_rms, self._level_rms_raw, unit_label
+        )
+        return level_db_to_meter_fraction(meter_db, unit_label)
 
     @level_rms.setter # type: ignore
     def level_rms(self, level_rms):
@@ -52,10 +58,37 @@ class LevelData(QtCore.QObject):
 
     @pyqtProperty(float, notify=level_max_changed) # type: ignore
     def level_max_iec(self):
-        return dB_to_IEC(self._level_max)
+        unit_label = self._meter_unit_label()
+        meter_db = meter_level_for_bar(
+            self._level_max, self._level_max_raw, unit_label
+        )
+        return level_db_to_meter_fraction(meter_db, unit_label)
 
     @level_max.setter # type: ignore
     def level_max(self, level_max):
         if self._level_max != level_max:
             self._level_max = level_max
             self.level_max_changed.emit(level_max)
+
+    @property
+    def level_rms_raw(self) -> float:
+        return self._level_rms_raw
+
+    @level_rms_raw.setter
+    def level_rms_raw(self, level_rms_raw: float) -> None:
+        self._level_rms_raw = level_rms_raw
+
+    @property
+    def level_max_raw(self) -> float:
+        return self._level_max_raw
+
+    @level_max_raw.setter
+    def level_max_raw(self, level_max_raw: float) -> None:
+        self._level_max_raw = level_max_raw
+
+    def _meter_unit_label(self) -> str:
+        parent = self.parent()
+        unit_label = getattr(parent, "unit_label", None)
+        if unit_label:
+            return unit_label
+        return "dB FS"

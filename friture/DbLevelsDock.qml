@@ -12,79 +12,34 @@ Rectangle {
     required property string fixedFont
 
     readonly property int captionSize: Math.max(11, Math.round(Math.min(width, height) / 22))
-    readonly property int valuePixelSize: Math.max(
+    readonly property int monoValuePixelSize: Math.max(
         32, Math.min(Math.floor(Math.min(width, height) / 3.5), 200))
+    readonly property int stereoValuePixelSize: fitValuePixelSize(stereoSampleText())
 
-    ColumnLayout {
-        anchors.fill: parent
-        anchors.margins: Math.max(10, Math.min(width, height) * 0.04)
-        spacing: Math.max(6, height * 0.02)
+    readonly property real layoutMargin: Math.max(10, Math.min(width, height) * 0.04)
+    readonly property real layoutSpacing: Math.max(6, height * 0.02)
 
-        Text {
-            text: "PEAK · " + viewModel.unit_label + viewModel.weighting_suffix
-            font.family: fixedFont
-            font.pixelSize: captionSize
-            font.capitalization: Font.AllUppercase
-            color: systemPalette.windowText
-            opacity: 0.85
-            Layout.fillWidth: true
-            horizontalAlignment: Text.AlignHCenter
-        }
-
-        Text {
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            Layout.minimumHeight: 48
-            font.pixelSize: valuePixelSize
-            font.bold: true
-            font.family: fixedFont
-            color: systemPalette.windowText
-            horizontalAlignment: Text.AlignHCenter
-            verticalAlignment: Text.AlignVCenter
-            text: peakText()
-        }
-
-        Text {
-            text: "RMS · " + viewModel.unit_label + viewModel.weighting_suffix
-            font.family: fixedFont
-            font.pixelSize: captionSize
-            font.capitalization: Font.AllUppercase
-            color: systemPalette.windowText
-            opacity: 0.85
-            Layout.fillWidth: true
-            horizontalAlignment: Text.AlignHCenter
-        }
-
-        Text {
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            Layout.minimumHeight: 48
-            font.pixelSize: valuePixelSize
-            font.bold: true
-            font.family: fixedFont
-            color: systemPalette.windowText
-            horizontalAlignment: Text.AlignHCenter
-            verticalAlignment: Text.AlignVCenter
-            text: rmsText()
-        }
+    FontMetrics {
+        id: valueFontMetrics
+        font.family: fixedFont
+        font.bold: true
     }
 
-    function peakText() {
-        if (viewModel.two_channels) {
-            return level_to_text(viewModel.level_data_slow.level_max)
-                + "  ·  "
-                + level_to_text(viewModel.level_data_slow_2.level_max);
-        }
-        return level_to_text(viewModel.level_data_slow.level_max);
+    function stereoSampleText() {
+        return level_to_text(viewModel.level_data_slow.level_max)
+            + level_to_text(viewModel.level_data_slow_2.level_max);
     }
 
-    function rmsText() {
-        if (viewModel.two_channels) {
-            return level_to_text(viewModel.level_data_slow.level_rms)
-                + "  ·  "
-                + level_to_text(viewModel.level_data_slow_2.level_rms);
+    function fitValuePixelSize(sampleText) {
+        var margin = layoutMargin;
+        var columnWidth = Math.max(40, (width - 2 * margin) / 3);
+        var size = Math.max(24, Math.min(Math.floor(Math.min(width, height) / 5.5), 120));
+        valueFontMetrics.font.pixelSize = size;
+        while (size > 20 && valueFontMetrics.advanceWidth(sampleText) > columnWidth * 0.9) {
+            size -= 2;
+            valueFontMetrics.font.pixelSize = size;
         }
-        return level_to_text(viewModel.level_data_slow.level_rms);
+        return size;
     }
 
     function level_to_text(dB) {
@@ -92,5 +47,153 @@ Rectangle {
             return "-Inf";
         }
         return dB.toFixed(1);
+    }
+
+    function peakCaption() {
+        return "PEAK · " + viewModel.unit_label + viewModel.weighting_suffix;
+    }
+
+    function rmsCaption() {
+        return "RMS · " + viewModel.unit_label + viewModel.weighting_suffix;
+    }
+
+    // Single input: large centered readout
+    ColumnLayout {
+        visible: !viewModel.two_channels
+        anchors.fill: parent
+        anchors.margins: layoutMargin
+        spacing: layoutSpacing
+
+        Text {
+            text: peakCaption()
+            font.family: fixedFont
+            font.pixelSize: captionSize
+            font.capitalization: Font.AllUppercase
+            color: systemPalette.windowText
+            opacity: 0.85
+            Layout.fillWidth: true
+            horizontalAlignment: Text.AlignHCenter
+        }
+
+        Text {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            Layout.minimumHeight: 48
+            font.pixelSize: monoValuePixelSize
+            font.bold: true
+            font.family: fixedFont
+            color: systemPalette.windowText
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+            text: level_to_text(viewModel.level_data_slow.level_max)
+        }
+
+        Text {
+            text: rmsCaption()
+            font.family: fixedFont
+            font.pixelSize: captionSize
+            font.capitalization: Font.AllUppercase
+            color: systemPalette.windowText
+            opacity: 0.85
+            Layout.fillWidth: true
+            horizontalAlignment: Text.AlignHCenter
+        }
+
+        Text {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            Layout.minimumHeight: 48
+            font.pixelSize: monoValuePixelSize
+            font.bold: true
+            font.family: fixedFont
+            color: systemPalette.windowText
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+            text: level_to_text(viewModel.level_data_slow.level_rms)
+        }
+    }
+
+    // Two inputs: one column per channel, captions in the middle
+    GridLayout {
+        visible: viewModel.two_channels
+        anchors.fill: parent
+        anchors.margins: layoutMargin
+        columns: 3
+        rowSpacing: layoutSpacing
+        columnSpacing: 4
+
+        Text {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            Layout.minimumHeight: 48
+            font.pixelSize: stereoValuePixelSize
+            font.bold: true
+            font.family: fixedFont
+            color: systemPalette.windowText
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+            text: level_to_text(viewModel.level_data_slow.level_max)
+        }
+
+        Text {
+            text: peakCaption()
+            font.family: fixedFont
+            font.pixelSize: captionSize
+            font.capitalization: Font.AllUppercase
+            color: systemPalette.windowText
+            opacity: 0.85
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+        }
+
+        Text {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            Layout.minimumHeight: 48
+            font.pixelSize: stereoValuePixelSize
+            font.bold: true
+            font.family: fixedFont
+            color: systemPalette.windowText
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+            text: level_to_text(viewModel.level_data_slow_2.level_max)
+        }
+
+        Text {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            Layout.minimumHeight: 48
+            font.pixelSize: stereoValuePixelSize
+            font.bold: true
+            font.family: fixedFont
+            color: systemPalette.windowText
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+            text: level_to_text(viewModel.level_data_slow.level_rms)
+        }
+
+        Text {
+            text: rmsCaption()
+            font.family: fixedFont
+            font.pixelSize: captionSize
+            font.capitalization: Font.AllUppercase
+            color: systemPalette.windowText
+            opacity: 0.85
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+        }
+
+        Text {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            Layout.minimumHeight: 48
+            font.pixelSize: stereoValuePixelSize
+            font.bold: true
+            font.family: fixedFont
+            color: systemPalette.windowText
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+            text: level_to_text(viewModel.level_data_slow_2.level_rms)
+        }
     }
 }

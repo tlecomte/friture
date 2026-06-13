@@ -29,11 +29,8 @@ from friture.longlevels_settings import (LongLevels_Settings_Dialog,
                                          DEFAULT_MAXTIME,
                                          DEFAULT_RESPONSE_TIME,
                                          DEFAULT_UNIT_LABEL)
-from friture.level_calibration import (
-    LevelCalibration,
-    apply_calibration,
-    calibration_offset_for_target,
-)
+from friture.calibration_override import CalibrationOverrideMixin
+from friture.level_calibration import apply_calibration
 from friture.audioproc import audioproc
 from .signal.decimate import decimate
 from .ringbuffer import RingBuffer
@@ -97,12 +94,13 @@ class Subsampler:
         return x_dec
 
 
-class LongLevelWidget(QObject):
+class LongLevelWidget(QObject, CalibrationOverrideMixin):
 
     def __init__(self, parent):
         super().__init__(parent)
 
         self.logger = logging.getLogger(__name__)
+        self.init_calibration_override(parent)
 
         self._long_levels_data = Scope_Data(GetStore())
 
@@ -115,7 +113,7 @@ class LongLevelWidget(QObject):
         self._long_levels_data.horizontal_axis.name = "Time (sec)"
         self._long_levels_data.horizontal_axis.setTrackerFormatter(lambda x: "%#.3g sec" % (x))
 
-        self.calibration = LevelCalibration(unit_label=DEFAULT_UNIT_LABEL)
+        self.calibration = self.local_calibration  # compat for settings/tests
         self.last_raw_rms_db = -200.0
 
         self.level_min = DEFAULT_LEVEL_MIN
@@ -148,29 +146,31 @@ class LongLevelWidget(QObject):
 
         self._sync_calibration_display()
 
+    def on_effective_calibration_changed(self) -> None:
+        self._sync_calibration_display()
+        self._refresh_curve()
+
     def _sync_calibration_display(self) -> None:
-        unit = self.calibration.unit_label
+        unit = self.effective_calibration().unit_label
         self._long_levels_data.vertical_axis.name = f"Level ({unit} RMS)"
         self._long_levels_data.vertical_axis.setTrackerFormatter(
             lambda value, label=unit: "%#.3g %s" % (value, label)
         )
 
     def set_calibration_offset(self, offset_db: float) -> None:
-        self.calibration.offset_db = offset_db
-        self._refresh_curve()
+        self.set_local_calibration_offset(offset_db)
 
     def set_unit_label(self, unit_label: str) -> None:
-        self.calibration.unit_label = unit_label
-        self._sync_calibration_display()
+        self.set_local_unit_label(unit_label)
 
     def set_reference_note(self, note: str) -> None:
-        self.calibration.reference_note = note
+        self.set_local_reference_note(note)
 
     def calibrate_to_target(self, target_db: float) -> None:
-        self.calibration.offset_db = calibration_offset_for_target(
-            self.last_raw_rms_db, target_db
-        )
-        self._refresh_curve()
+        from friture.level_meter import raw_rms_db_from_buffer
+
+        raw_rms_db = raw_rms_db_from_buffer(self.audiobuffer)
+        self.calibrate_local_to_target(raw_rms_db, target_db)
 
     def _refresh_curve(self) -> None:
         if not getattr(self, "length_samples", 0):
@@ -181,7 +181,7 @@ class LongLevelWidget(QObject):
 
         raw_levels = self.ringbuffer.data(self.length_samples)
         display_levels = apply_calibration(
-            raw_levels[0, :], self.calibration.offset_db
+            raw_levels[0, :], self.effective_calibration().offset_db
         )
         scaled_t = self.time / self.length_seconds
         scaled_y = np.clip(
@@ -235,7 +235,9 @@ class LongLevelWidget(QObject):
 
                 raw_rms = 10.0 * np.log10(max(self.level, 1e-150))
                 self.last_raw_rms_db = raw_rms
-                self.level_rms = apply_calibration(raw_rms, self.calibration.offset_db)
+                self.level_rms = apply_calibration(
+                    raw_rms, self.effective_calibration().offset_db
+                )
 
                 l = np.array([raw_rms])
                 l.shape = (1, 1)
@@ -286,25 +288,15 @@ class LongLevelWidget(QObject):
 
     # slot
     def settings_called(self, checked):
+        self.settings_dialog.sync_from_widget()
         self.settings_dialog.show()
 
     # method
     def saveState(self, settings):
         self.settings_dialog.saveState(settings)
-        settings.setValue("offsetDb", self.calibration.offset_db)
-        settings.setValue("unitLabel", self.calibration.unit_label)
-        settings.setValue("referenceNote", self.calibration.reference_note)
+        self.save_calibration_override_state(settings)
 
     def restoreState(self, settings):
         self.settings_dialog.restoreState(settings)
-        self.calibration.offset_db = settings.value(
-            "offsetDb", self.calibration.offset_db, type=float
-        )
-        self.calibration.unit_label = settings.value(
-            "unitLabel", self.calibration.unit_label, type=str
-        )
-        self.calibration.reference_note = settings.value(
-            "referenceNote", self.calibration.reference_note, type=str
-        )
-        self._sync_calibration_display()
-        self._refresh_curve()
+        self.restore_calibration_override_state(settings)
+        self.on_effective_calibration_changed()

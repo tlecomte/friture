@@ -20,6 +20,7 @@
 from PyQt5.QtCore import QObject
 from numpy import log10, array, arange
 
+from friture.calibrated_display_range import CalibratedDisplayRangeMixin
 from friture.histplot import HistPlot
 from friture.octavefilters import Octave_Filters
 from friture.octavespectrum_settings import (OctaveSpectrum_Settings_Dialog,  # settings dialog
@@ -35,10 +36,12 @@ from friture_extensions.exp_smoothing_conv import pyx_exp_smoothed_value
 
 from friture.audiobackend import SAMPLING_RATE
 
+from friture.global_frequency_calibration import frequency_adjustment_db_for_owner
+
 SMOOTH_DISPLAY_TIMER_PERIOD_MS = 25
 
 
-class OctaveSpectrum_Widget(QObject):
+class OctaveSpectrum_Widget(QObject, CalibratedDisplayRangeMixin):
 
     def __init__(self, parent):
         super().__init__(parent)
@@ -47,12 +50,10 @@ class OctaveSpectrum_Widget(QObject):
 
         self.PlotZoneSpect = HistPlot(self)
 
-        self.spec_min = DEFAULT_SPEC_MIN
-        self.spec_max = DEFAULT_SPEC_MAX
         self.weighting = DEFAULT_WEIGHTING
         self.response_time = DEFAULT_RESPONSE_TIME
 
-        self.PlotZoneSpect.setspecrange(self.spec_min, self.spec_max)
+        self.init_calibrated_display_range(parent, DEFAULT_SPEC_MIN, DEFAULT_SPEC_MAX)
         self.PlotZoneSpect.setweighting(self.weighting)
 
         self.filters = Octave_Filters(DEFAULT_BANDSPEROCTAVE)
@@ -119,6 +120,8 @@ class OctaveSpectrum_Widget(QObject):
 
         epsilon = 1e-30
         db_spectrogram = 10 * log10(sp + epsilon) + w
+        adjustment = frequency_adjustment_db_for_owner(self, self.filters.fi)
+        db_spectrogram = db_spectrogram + adjustment
         self.PlotZoneSpect.setdata(self.filters.flow, self.filters.fhigh, self.filters.f_nominal, db_spectrogram)
 
     # method
@@ -126,12 +129,13 @@ class OctaveSpectrum_Widget(QObject):
         self.PlotZoneSpect.draw()
 
     def setmin(self, value):
-        self.spec_min = value
-        self.PlotZoneSpect.setspecrange(self.spec_min, self.spec_max)
+        self.set_base_spec_min(value)
 
     def setmax(self, value):
-        self.spec_max = value
-        self.PlotZoneSpect.setspecrange(self.spec_min, self.spec_max)
+        self.set_base_spec_max(value)
+
+    def _apply_calibrated_spec_range(self, spec_min: float, spec_max: float) -> None:
+        self.PlotZoneSpect.setspecrange(spec_min, spec_max)
 
     def setweighting(self, weighting):
         self.weighting = weighting
