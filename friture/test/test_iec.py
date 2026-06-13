@@ -18,7 +18,7 @@
 
 import unittest
 
-from friture.iec import dB_to_IEC
+from friture.iec import dB_to_IEC, iec_to_dB
 
 
 class IECTest(unittest.TestCase):
@@ -38,3 +38,7 @@ class IECTest(unittest.TestCase):
         boundaries = [-70.0, -60.0, -50.0, -40.0, -30.0, -20.0]
         for dB in boundaries:
             self.assertAlmostEqual(dB_to_IEC(dB - 1e-9), dB_to_IEC(dB))
+
+    def test_iec_to_dB_inverts_dB_to_IEC(self) -> None:
+        for dB in [-65.0, -39.0, -10.0, 0.0]:
+            self.assertAlmostEqual(iec_to_dB(dB_to_IEC(dB)), dB, places=5)

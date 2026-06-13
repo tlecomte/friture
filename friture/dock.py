@@ -137,9 +137,11 @@ class Dock(QObject):
             return
         
         if self.audio_widget_qml is not None:
-            self.audio_widget_qml.setParentItem(None) # type: ignore
-            self.audio_widget_qml.deleteLater()
+            old_qml = self.audio_widget_qml
             self.audio_widget_qml = None
+            old_qml.setParentItem(None)  # type: ignore
+            old_qml.setParent(None)
+            old_qml.deleteLater()
 
         if self.audiowidget is not None:
             settings = QSettings()
@@ -182,10 +184,25 @@ class Dock(QObject):
         component.statusChanged.connect(self.on_status_changed)
 
         qml_context = self.qml_engine.rootContext()
-        self.audio_widget_qml = component.createWithInitialProperties(initialProperties, qml_context) # type: ignore
-        self.audio_widget_qml.setParent(self.qml_engine) # type: ignore
-        self.audio_widget_qml.setParentItem(self.audio_widget_container) # type: ignore
-        self.audio_widget_qml.setProperty("anchors.fill", self.audio_widget_container) # type: ignore
+        self.audio_widget_qml = component.createWithInitialProperties(initialProperties, qml_context)  # type: ignore
+        component_raise_if_error(component)
+        if self.audio_widget_qml is None:
+            raise Exception("Failed to create QML for widget %s" % widget_descriptor["Name"])
+        self.audio_widget_qml.setParent(self.qml_engine)  # type: ignore
+        self.audio_widget_qml.setParentItem(self.audio_widget_container)  # type: ignore
+        compact = getattr(self.audiowidget, "compact_in_tile", None)
+        if compact is not None and compact():
+            self.audio_widget_qml.setProperty("anchors.top", self.audio_widget_container)  # type: ignore
+            self.audio_widget_qml.setProperty("anchors.right", self.audio_widget_container)  # type: ignore
+            self.audio_widget_qml.setProperty("anchors.left", None)  # type: ignore
+            self.audio_widget_qml.setProperty("anchors.bottom", None)  # type: ignore
+            self.audio_widget_qml.setProperty("anchors.fill", None)  # type: ignore
+        else:
+            self.audio_widget_qml.setProperty("anchors.top", None)  # type: ignore
+            self.audio_widget_qml.setProperty("anchors.right", None)  # type: ignore
+            self.audio_widget_qml.setProperty("anchors.left", None)  # type: ignore
+            self.audio_widget_qml.setProperty("anchors.bottom", None)  # type: ignore
+            self.audio_widget_qml.setProperty("anchors.fill", self.audio_widget_container)  # type: ignore
 
         index = widgetIds().index(widgetId)
         self.controlbar_viewmodel.setCurrentIndex(index)

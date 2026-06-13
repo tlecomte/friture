@@ -25,6 +25,7 @@ Rectangle {
             Layout.fillWidth: true
             Layout.fillHeight: true
             Layout.margins: 5
+            clip: true
         }
     }
 }

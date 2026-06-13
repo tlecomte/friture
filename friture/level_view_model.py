@@ -25,11 +25,15 @@ from friture.level_data import LevelData
 
 class LevelViewModel(QtCore.QObject):
     two_channels_changed = QtCore.pyqtSignal(bool)
+    unit_label_changed = QtCore.pyqtSignal(str)
+    weighting_suffix_changed = QtCore.pyqtSignal(str)
 
     def __init__(self, parent=None):
         super().__init__(parent)
 
         self._two_channels = False
+        self._unit_label = "dBFS"
+        self._weighting_suffix = ""
 
         self._level_data = LevelData(self)
         self._level_data_2 = LevelData(self)
@@ -47,6 +51,26 @@ class LevelViewModel(QtCore.QObject):
         if self._two_channels != two_channels:
             self._two_channels = two_channels
             self.two_channels_changed.emit(two_channels)
+
+    @pyqtProperty(str, notify=unit_label_changed)  # type: ignore
+    def unit_label(self) -> str:
+        return self._unit_label
+
+    @unit_label.setter  # type: ignore
+    def unit_label(self, unit_label: str) -> None:
+        if self._unit_label != unit_label:
+            self._unit_label = unit_label
+            self.unit_label_changed.emit(unit_label)
+
+    @pyqtProperty(str, notify=weighting_suffix_changed)  # type: ignore
+    def weighting_suffix(self) -> str:
+        return self._weighting_suffix
+
+    @weighting_suffix.setter  # type: ignore
+    def weighting_suffix(self, weighting_suffix: str) -> None:
+        if self._weighting_suffix != weighting_suffix:
+            self._weighting_suffix = weighting_suffix
+            self.weighting_suffix_changed.emit(weighting_suffix)
 
     @pyqtProperty(LevelData, constant = True) # type: ignore
     def level_data(self):

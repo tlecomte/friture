@@ -27,7 +27,13 @@ from friture.longlevels_settings import (LongLevels_Settings_Dialog,
                                          DEFAULT_LEVEL_MIN,
                                          DEFAULT_LEVEL_MAX,
                                          DEFAULT_MAXTIME,
-                                         DEFAULT_RESPONSE_TIME)
+                                         DEFAULT_RESPONSE_TIME,
+                                         DEFAULT_UNIT_LABEL)
+from friture.level_calibration import (
+    LevelCalibration,
+    apply_calibration,
+    calibration_offset_for_target,
+)
 from friture.audioproc import audioproc
 from .signal.decimate import decimate
 from .ringbuffer import RingBuffer
@@ -109,6 +115,9 @@ class LongLevelWidget(QObject):
         self._long_levels_data.horizontal_axis.name = "Time (sec)"
         self._long_levels_data.horizontal_axis.setTrackerFormatter(lambda x: "%#.3g sec" % (x))
 
+        self.calibration = LevelCalibration(unit_label=DEFAULT_UNIT_LABEL)
+        self.last_raw_rms_db = -200.0
+
         self.level_min = DEFAULT_LEVEL_MIN
         self.level_max = DEFAULT_LEVEL_MAX
         self._long_levels_data.vertical_axis.setRange(self.level_min, self.level_max)
@@ -136,6 +145,53 @@ class LongLevelWidget(QObject):
 
         # ringbuffer for the subsampled data
         self.ringbuffer = RingBuffer()
+
+        self._sync_calibration_display()
+
+    def _sync_calibration_display(self) -> None:
+        unit = self.calibration.unit_label
+        self._long_levels_data.vertical_axis.name = f"Level ({unit} RMS)"
+        self._long_levels_data.vertical_axis.setTrackerFormatter(
+            lambda value, label=unit: "%#.3g %s" % (value, label)
+        )
+
+    def set_calibration_offset(self, offset_db: float) -> None:
+        self.calibration.offset_db = offset_db
+        self._refresh_curve()
+
+    def set_unit_label(self, unit_label: str) -> None:
+        self.calibration.unit_label = unit_label
+        self._sync_calibration_display()
+
+    def set_reference_note(self, note: str) -> None:
+        self.calibration.reference_note = note
+
+    def calibrate_to_target(self, target_db: float) -> None:
+        self.calibration.offset_db = calibration_offset_for_target(
+            self.last_raw_rms_db, target_db
+        )
+        self._refresh_curve()
+
+    def _refresh_curve(self) -> None:
+        if not getattr(self, "length_samples", 0):
+            return
+        time = getattr(self, "time", None)
+        if time is None:
+            return
+
+        raw_levels = self.ringbuffer.data(self.length_samples)
+        display_levels = apply_calibration(
+            raw_levels[0, :], self.calibration.offset_db
+        )
+        scaled_t = self.time / self.length_seconds
+        scaled_y = np.clip(
+            1.0
+            - (display_levels - self.level_min)
+            / (self.level_max - self.level_min),
+            0.0,
+            1.0,
+        )
+        self._curve.setData(scaled_t, scaled_y)
 
     def qml_file_name(self):
         return "Scope.qml"
@@ -177,9 +233,11 @@ class LongLevelWidget(QObject):
 
                 self.level, self.zf = pyx_lfilter_float64_1D(self.b, self.a, y0_squared_dec, self.zf)
 
-                self.level_rms = 10. * np.log10(max(self.level, 1e-150))
+                raw_rms = 10.0 * np.log10(max(self.level, 1e-150))
+                self.last_raw_rms_db = raw_rms
+                self.level_rms = apply_calibration(raw_rms, self.calibration.offset_db)
 
-                l = np.array([self.level_rms])
+                l = np.array([raw_rms])
                 l.shape = (1, 1)
 
                 self.ringbuffer.push(l, 0)
@@ -187,12 +245,7 @@ class LongLevelWidget(QObject):
                 self.old_index += needed
 
             self.time = np.arange(self.length_samples) / self.subsampled_sampling_rate
-
-            levels = self.ringbuffer.data(self.length_samples)
-
-            scaled_t = self.time / self.length_seconds
-            scaled_y = np.clip(1. - (levels[0, :] - self.level_min) / (self.level_max - self.level_min), 0., 1.)
-            self._curve.setData(scaled_t, scaled_y)
+            self._refresh_curve()
 
     # method
     def canvasUpdate(self):
@@ -202,10 +255,12 @@ class LongLevelWidget(QObject):
     def setmin(self, value):
         self.level_min = value
         self._long_levels_data.vertical_axis.setRange(self.level_min, self.level_max)
+        self._refresh_curve()
         
     def setmax(self, value):
         self.level_max = value
         self._long_levels_data.vertical_axis.setRange(self.level_min, self.level_max)
+        self._refresh_curve()
 
     def setduration(self, value):
         self.length_seconds = value
@@ -236,7 +291,20 @@ class LongLevelWidget(QObject):
     # method
     def saveState(self, settings):
         self.settings_dialog.saveState(settings)
+        settings.setValue("offsetDb", self.calibration.offset_db)
+        settings.setValue("unitLabel", self.calibration.unit_label)
+        settings.setValue("referenceNote", self.calibration.reference_note)
 
-    # method
     def restoreState(self, settings):
         self.settings_dialog.restoreState(settings)
+        self.calibration.offset_db = settings.value(
+            "offsetDb", self.calibration.offset_db, type=float
+        )
+        self.calibration.unit_label = settings.value(
+            "unitLabel", self.calibration.unit_label, type=str
+        )
+        self.calibration.reference_note = settings.value(
+            "referenceNote", self.calibration.reference_note, type=str
+        )
+        self._sync_calibration_display()
+        self._refresh_curve()

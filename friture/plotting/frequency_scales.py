@@ -62,6 +62,26 @@ def roundWithPrecision(x, prec):
     return candidates[i]
 
 
+class IEC(object):
+    NAME = "IEC"
+
+    @staticmethod
+    def transform(dB: float) -> float:
+        from friture.iec import dB_to_IEC
+
+        return dB_to_IEC(dB)
+
+    @staticmethod
+    def inverse(iec: float) -> float:
+        from friture.iec import iec_to_dB
+
+        return iec_to_dB(iec)
+
+    @staticmethod
+    def ticks(scale_min, scale_max) -> tuple[list[float], list[float]]:
+        return Linear.ticks(scale_min, scale_max)
+
+
 class Linear(object):
     NAME = 'Linear'
 

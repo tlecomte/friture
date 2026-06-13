@@ -21,7 +21,7 @@ class AnalyzerBootstrapTest(unittest.TestCase):
 
         _linux_apply_dark_palette(app, logging.getLogger("test"))
 
-        self.assertEqual(app.palette().color(app.palette().Window).name(), "#3d3d3e")
+        self.assertEqual(app.palette().color(app.palette().Window).name(), "#141415")
 
     def test_dark_palette_skipped_when_light_theme_forced(self) -> None:
         ensure_qapplication()
