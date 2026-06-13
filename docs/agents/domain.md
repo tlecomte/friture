@@ -33,7 +33,9 @@ Dock-hosted analyzers implement **`DockAnalysisWidget`** (`friture/dock_analysis
 
 FFT-style docks should read history via **`RingBufferFrameReader`** (`friture/ring_buffer_frame_reader.py`). Spectrum FFT/smoothing/peak logic lives in **`SpectrumFrameAnalyzer`** (`friture/spectrum_frame_analyzer.py`) — test without Qt. Chunk-only docks (levels, octave spectrum) may consume the latest `floatdata` chunk directly.
 
-Integration tests: **`AudioHarness`** + **`wire_dock_analysis_widget`** in `friture/test/helpers.py`.
+Integration tests should use ``AudioHarness`` + ``wire_dock_analysis_widget``
+in `friture/test/helpers.py`. Settings tests inject ``InputDeviceCatalog`` directly
+(see `friture/input_device_catalog.py`) — no need to patch ``get_audio_ingest``.
 
 ## Use the glossary's vocabulary
 

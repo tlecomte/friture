@@ -43,6 +43,7 @@ from friture.main_toolbar_view_model import MainToolbarViewModel
 from friture.playback.playback_control_view_model import PlaybackControlViewModel
 from friture.ui_friture import Ui_MainWindow
 from friture.about import About_Dialog  # About dialog
+from friture.input_device_catalog import require_input_devices
 from friture.settings import Settings_Dialog, splash_enabled  # Setting dialog
 from friture.audiobuffer import AudioBuffer  # audio ring buffer class
 from friture.audio_ingest import get_audio_ingest
@@ -194,7 +195,12 @@ class Friture(QMainWindow, ):
         self._main_window_view_model = MainWindowViewModel(self.qml_engine)
 
         self.about_dialog = About_Dialog(self, self.slow_timer)
-        self.settings_dialog = Settings_Dialog(self, self._main_window_view_model.toolbar_view_model)
+        self.settings_dialog = Settings_Dialog(
+            self,
+            self._main_window_view_model.toolbar_view_model,
+            catalog=self.audio_ingest,
+        )
+        require_input_devices(self, self.audio_ingest)
 
         self.quick_view = QQuickView(self.qml_engine, None)
         self.quick_view.setResizeMode(QQuickView.SizeRootObjectToView)
