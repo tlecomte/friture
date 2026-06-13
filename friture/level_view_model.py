@@ -32,7 +32,7 @@ class LevelViewModel(QtCore.QObject):
         super().__init__(parent)
 
         self._two_channels = False
-        self._unit_label = "dBFS"
+        self._unit_label = "dB FS"
         self._weighting_suffix = ""
 
         self._level_data = LevelData(self)
@@ -61,6 +61,17 @@ class LevelViewModel(QtCore.QObject):
         if self._unit_label != unit_label:
             self._unit_label = unit_label
             self.unit_label_changed.emit(unit_label)
+            self._refresh_meter_iec_display()
+
+    def _refresh_meter_iec_display(self) -> None:
+        for level_data in (
+            self._level_data,
+            self._level_data_2,
+            self._level_data_slow,
+            self._level_data_slow_2,
+        ):
+            level_data.level_rms_changed.emit(level_data.level_rms)
+            level_data.level_max_changed.emit(level_data.level_max)
 
     @pyqtProperty(str, notify=weighting_suffix_changed)  # type: ignore
     def weighting_suffix(self) -> str:

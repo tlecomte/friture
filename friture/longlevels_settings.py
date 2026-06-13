@@ -3,22 +3,15 @@
 
 # Copyright (C) 2009 Timoth?Lecomte
 
-# This file is part of Friture.
-#
-# Friture is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License version 3 as published by
-# the Free Software Foundation.
-#
-# Friture is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with Friture.  If not, see <http://www.gnu.org/licenses/>.
-
 from PyQt5 import QtWidgets
 
+from friture.calibration_settings_panel import CalibrationFormRows
+from friture.level_calibration import read_settings_float, unit_label_for_calibration_target, write_settings_float
+from friture.level_meter import (
+    calibration_quiet_message,
+    calibration_raw_rms_db,
+    calibration_signal_too_quiet,
+)
 from friture.settings_dialog_layout import create_form_layout
 
 DEFAULT_MAXTIME = 600
@@ -73,60 +66,89 @@ class LongLevels_Settings_Dialog(QtWidgets.QDialog):
         self.spinBox_timemax.setObjectName("longlevels_timemax")
         self.spinBox_timemax.setSuffix(" sec")
 
-        self.doubleSpinBox_offset = QtWidgets.QDoubleSpinBox(self)
-        self.doubleSpinBox_offset.setDecimals(1)
-        self.doubleSpinBox_offset.setRange(-200.0, 200.0)
-        self.doubleSpinBox_offset.setValue(DEFAULT_CALIBRATION_OFFSET_DB)
-        self.doubleSpinBox_offset.setSuffix(" dB")
-
-        self.comboBox_unit = QtWidgets.QComboBox(self)
-        for unit in UNIT_PRESETS:
-            self.comboBox_unit.addItem(unit)
-        self.comboBox_unit.setCurrentText(DEFAULT_UNIT_LABEL)
-
-        self.lineEdit_reference = QtWidgets.QLineEdit(self)
-        self.lineEdit_reference.setPlaceholderText("Optional calibration note")
-
-        self.button_calibrate = QtWidgets.QPushButton("Calibrate from current reading…", self)
-        self.button_calibrate.clicked.connect(self._calibrate_from_current)
-
         self.formLayout.addRow("Max:", self.spinBox_specmax)
         self.formLayout.addRow("Min:", self.spinBox_specmin)
         self.formLayout.addRow("Response Time", self.spinBox_resptime)
         self.formLayout.addRow("Time Range:", self.spinBox_timemax)
-        self.formLayout.addRow("Calibration offset:", self.doubleSpinBox_offset)
-        self.formLayout.addRow("Unit label:", self.comboBox_unit)
-        self.formLayout.addRow("Reference note:", self.lineEdit_reference)
-        self.formLayout.addRow("", self.button_calibrate)
+
+        self.calibration_rows = CalibrationFormRows(
+            self.formLayout, include_use_global=True
+        )
+        self.calibration_rows.checkBox_use_global.toggled.connect(
+            self._widget.set_use_global_calibration
+        )
+        self.calibration_rows.doubleSpinBox_offset.valueChanged.connect(
+            self._widget.set_calibration_offset
+        )
+        self.calibration_rows.comboBox_unit.currentTextChanged.connect(
+            self._widget.set_unit_label
+        )
+        self.calibration_rows.lineEdit_reference.textChanged.connect(
+            self._widget.set_reference_note
+        )
+        self.calibration_rows.button_calibrate.clicked.connect(self._calibrate_from_current)
 
         self.spinBox_specmin.valueChanged.connect(view_model.setmin)
         self.spinBox_specmax.valueChanged.connect(view_model.setmax)
         self.spinBox_resptime.valueChanged.connect(view_model.setresptime)
         self.spinBox_timemax.valueChanged.connect(view_model.setduration)
-        self.doubleSpinBox_offset.valueChanged.connect(view_model.set_calibration_offset)
-        self.comboBox_unit.currentTextChanged.connect(view_model.set_unit_label)
-        self.lineEdit_reference.textChanged.connect(view_model.set_reference_note)
+
+    def sync_from_widget(self) -> None:
+        self.calibration_rows.set_use_global(self._widget.use_global_calibration)
+        self.calibration_rows.load(
+            self._widget.local_calibration.offset_db,
+            self._widget.local_calibration.unit_label,
+            self._widget.local_calibration.reference_note,
+        )
 
     def _calibrate_from_current(self) -> None:
+        raw_rms_db = calibration_raw_rms_db(
+            self._widget.audiobuffer,
+            live_raw_rms_db=self._widget.last_raw_rms_db,
+        )
+        if calibration_signal_too_quiet(raw_rms_db):
+            cal = self._widget.effective_calibration()
+            QtWidgets.QMessageBox.warning(
+                self,
+                "Calibrate level",
+                calibration_quiet_message(
+                    raw_rms_db,
+                    offset_db=cal.offset_db,
+                    unit_label=cal.unit_label,
+                ),
+            )
+            return
         target_db, ok = QtWidgets.QInputDialog.getDouble(
             self,
             "Calibrate level",
-            "Current input should read (dB):",
+            f"Raw input is {raw_rms_db:.1f} dBFS.\n"
+            "It should read (dB):",
             value=94.0,
             decimals=1,
         )
         if ok:
-            self._widget.calibrate_to_target(target_db)
-            self.doubleSpinBox_offset.setValue(self._widget.calibration.offset_db)
+            unit_label = unit_label_for_calibration_target(
+                self._widget.local_calibration.unit_label, target_db
+            )
+            if unit_label != self._widget.local_calibration.unit_label:
+                self._widget.set_local_unit_label(unit_label)
+            self._widget.calibrate_local_to_target(raw_rms_db, target_db)
+            self.calibration_rows.load(
+                self._widget.local_calibration.offset_db,
+                self._widget.local_calibration.unit_label,
+                self._widget.local_calibration.reference_note,
+            )
 
     def saveState(self, settings):
         settings.setValue("Min", self.spinBox_specmin.value())
         settings.setValue("Max", self.spinBox_specmax.value())
         settings.setValue("RespTime", self.spinBox_resptime.value())
         settings.setValue("TimeMax", self.spinBox_timemax.value())
-        settings.setValue("offsetDb", self.doubleSpinBox_offset.value())
-        settings.setValue("unitLabel", self.comboBox_unit.currentText())
-        settings.setValue("referenceNote", self.lineEdit_reference.text())
+        settings.setValue("useGlobalCalibration", self.calibration_rows.use_global())
+        offset_db, unit_label, reference_note = self.calibration_rows.save()
+        write_settings_float(settings, "offsetDb", offset_db)
+        settings.setValue("unitLabel", unit_label)
+        settings.setValue("referenceNote", reference_note)
 
     def restoreState(self, settings):
         colorMin = settings.value("Min", DEFAULT_LEVEL_MIN, type=int)
@@ -137,12 +159,11 @@ class LongLevels_Settings_Dialog(QtWidgets.QDialog):
         self.spinBox_resptime.setValue(resptime)
         timemax = settings.value("TimeMax", DEFAULT_MAXTIME, type=int)
         self.spinBox_timemax.setValue(timemax)
-        self.doubleSpinBox_offset.setValue(
-            settings.value("offsetDb", DEFAULT_CALIBRATION_OFFSET_DB, type=float)
+        self.calibration_rows.set_use_global(
+            settings.value("useGlobalCalibration", True, type=bool)
         )
-        unit = settings.value("unitLabel", DEFAULT_UNIT_LABEL, type=str)
-        if unit in UNIT_PRESETS:
-            self.comboBox_unit.setCurrentText(unit)
-        self.lineEdit_reference.setText(
-            settings.value("referenceNote", "", type=str)
+        self.calibration_rows.load(
+            read_settings_float(settings, "offsetDb", DEFAULT_CALIBRATION_OFFSET_DB),
+            settings.value("unitLabel", DEFAULT_UNIT_LABEL, type=str),
+            settings.value("referenceNote", "", type=str),
         )

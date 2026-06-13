@@ -46,7 +46,7 @@ Rectangle {
         Text {
             id: peakLegend
             textFormat: Text.PlainText
-            text: "dB FS\nPeak"
+            text: level_view_model.unit_label + "\nPeak"
             verticalAlignment: Text.AlignTop
             horizontalAlignment: Text.AlignRight
             Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
@@ -69,7 +69,7 @@ Rectangle {
         Text {
             id: rmsLegend
             textFormat: Text.PlainText
-            text: "dB FS\nRMS"
+            text: level_view_model.unit_label + "\nRMS"
             verticalAlignment: Text.AlignTop
             horizontalAlignment: Text.AlignRight
             Layout.alignment: Qt.AlignVCenter | Qt.AlignRight

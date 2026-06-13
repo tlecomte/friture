@@ -40,6 +40,7 @@ import platformdirs
 from friture.exceptionhandler import errorBox, fileexcepthook
 import friture
 from friture.main_toolbar_view_model import MainToolbarViewModel
+from friture.global_calibration import GlobalCalibrationService
 from friture.playback.playback_control_view_model import PlaybackControlViewModel
 from friture.ui_friture import Ui_MainWindow
 from friture.about import About_Dialog  # About dialog
@@ -52,6 +53,7 @@ from friture.tilelayout import TileLayout
 from friture.level_view_model import LevelViewModel
 from friture.level_data import LevelData
 from friture.levels import Levels_Widget
+from friture.level_meter import calibration_raw_rms_db, raw_rms_db_from_buffer
 from friture.main_window_view_model import MainWindowViewModel
 from friture.store import GetStore, Store
 from friture.scope_data import Scope_Data
@@ -194,11 +196,17 @@ class Friture(QMainWindow, ):
 
         self._main_window_view_model = MainWindowViewModel(self.qml_engine)
 
+        self.global_calibration = GlobalCalibrationService(self)
+
         self.about_dialog = About_Dialog(self, self.slow_timer)
         self.settings_dialog = Settings_Dialog(
             self,
             self._main_window_view_model.toolbar_view_model,
             catalog=self.audio_ingest,
+            global_calibration=self.global_calibration,
+            raw_rms_provider=lambda: calibration_raw_rms_db(
+                self.audiobuffer, meter=self.level_widget._meter
+            ),
         )
         require_input_devices(self, self.audio_ingest)
 
@@ -218,7 +226,11 @@ class Friture(QMainWindow, ):
         self.main_tile_layout = self.quick_view.findChild(QObject, "main_tile_layout")
         assert self.main_tile_layout is not None, "Main tile layout not found in CentralWidget.qml"
 
-        self.level_widget = Levels_Widget(self, self._main_window_view_model.level_view_model)
+        self.level_widget = Levels_Widget(
+            self,
+            self._main_window_view_model.level_view_model,
+            self.global_calibration,
+        )
         self.level_widget.set_buffer(self.audiobuffer)
         self.audiobuffer.new_data_available.connect(self.level_widget.handle_new_data)
 

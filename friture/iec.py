@@ -30,8 +30,76 @@ def dB_to_IEC(dB):
         return (dB + 40.0) * 0.015 + 0.15
     elif dB < -20.0:
         return (dB + 30.0) * 0.02 + 0.3
-    else:  # if dB < 0.0
-        return (dB + 20.0) * 0.025 + 0.5
+    else:
+        return min(1.0, (dB + 20.0) * 0.025 + 0.5)
+
+
+# Meter bar shows readings between bottom and top (calibrated dB values).
+# dB FS keeps the classic IEC scale on raw digital levels instead of a linear range.
+METER_DISPLAY_RANGE = {
+    "dBSPL": (40.0, 120.0),
+    "dBu": (-40.0, 20.0),
+}
+
+DIGITAL_UNIT_LABELS = frozenset({"dB FS", "dBFS", "dB"})
+
+
+def normalize_unit_label(unit_label: str) -> str:
+    if unit_label in ("dBFS", "dB"):
+        return "dB FS"
+    return unit_label
+
+
+def meter_display_range(unit_label: str) -> tuple[float, float] | None:
+    return METER_DISPLAY_RANGE.get(normalize_unit_label(unit_label))
+
+
+def uses_iec_meter_scale(unit_label: str) -> bool:
+    return meter_display_range(unit_label) is None
+
+
+def meter_level_for_bar(
+    display_db: float, raw_db: float, unit_label: str = "dB FS"
+) -> float:
+    """Pick the dB value that drives the meter bar for a unit."""
+    if uses_iec_meter_scale(unit_label):
+        return raw_db
+    return display_db
+
+
+def meter_scale_ticks(unit_label: str) -> list[float]:
+    normalized = normalize_unit_label(unit_label)
+    display_range = meter_display_range(normalized)
+    if display_range is None:
+        return [0.0, -3.0, -6.0, -10.0, -20.0, -30.0, -40.0, -50.0, -60.0]
+    bottom, top = display_range
+    step = 10.0 if normalized == "dBSPL" else 10.0
+    ticks: list[float] = []
+    tick = top
+    while tick >= bottom:
+        ticks.append(tick)
+        tick -= step
+    return ticks
+
+
+def level_db_to_meter_fraction(level_db: float, unit_label: str = "dB FS") -> float:
+    """Map a level reading to a 0..1 meter bar height."""
+    normalized = normalize_unit_label(unit_label)
+    display_range = meter_display_range(normalized)
+    if display_range is None:
+        return dB_to_IEC(min(level_db, 0.0))
+
+    bottom, top = display_range
+    if level_db <= bottom:
+        return 0.0
+    if level_db >= top:
+        return 1.0
+    return (level_db - bottom) / (top - bottom)
+
+
+def level_db_to_iec(level_db: float, unit_label: str = "dB FS") -> float:
+    """Backward-compatible alias for meter bar height."""
+    return level_db_to_meter_fraction(level_db, unit_label)
 
 
 def iec_to_dB(iec):

@@ -27,8 +27,16 @@ from friture.input_device_catalog import (
     apply_saved_input_selection,
     get_input_device_catalog,
 )
+from friture.global_calibration import GlobalCalibrationService
 from friture.main_toolbar_view_model import MainToolbarViewModel
 from friture.ui_settings import Ui_Settings_Dialog
+from friture.calibration_settings_panel import CalibrationFormRows
+from friture.level_calibration import unit_label_for_calibration_target
+from friture.level_meter import (
+    calibration_quiet_message,
+    calibration_raw_rms_db,
+    calibration_signal_too_quiet,
+)
 
 # Backward-compatible re-exports for callers/tests.
 no_input_device_title = "No audio input device found"
@@ -57,6 +65,8 @@ class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
         parent,
         toolbar_view_model: MainToolbarViewModel,
         catalog: InputDeviceCatalog | None = None,
+        global_calibration: GlobalCalibrationService | None = None,
+        raw_rms_provider=None,
     ):
         QtWidgets.QDialog.__init__(self, parent)
         Ui_Settings_Dialog.__init__(self)
@@ -65,8 +75,12 @@ class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
 
         self._toolbar_view_model = toolbar_view_model
         self._catalog = catalog or get_input_device_catalog()
+        self._global_calibration = global_calibration
+        self._raw_rms_provider = raw_rms_provider
 
         self.setupUi(self)
+
+        self._setup_calibration_group()
 
         devices = self._catalog.get_readable_devices_list()
         self._has_input_devices = len(devices) > 0
@@ -80,6 +94,134 @@ class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
         self.checkbox_showPlayback.stateChanged.connect(self.show_playback_checkbox_changed)
         self.spinBox_historyLength.editingFinished.connect(self.history_length_edit_finished)
         self.buttonBox.rejected.connect(self.close)
+
+    def _setup_calibration_group(self) -> None:
+        if self._global_calibration is None:
+            return
+
+        self.calibrationGroup = QtWidgets.QGroupBox("Input calibration")
+        calibration_layout = QtWidgets.QFormLayout(self.calibrationGroup)
+        self._calibration_rows = CalibrationFormRows(
+            calibration_layout, include_use_global=False
+        )
+        self._calibration_rows.button_calibrate.clicked.connect(
+            self._calibrate_global_from_current
+        )
+        self._calibration_rows.doubleSpinBox_offset.valueChanged.connect(
+            self._global_calibration.set_offset_db
+        )
+        self._calibration_rows.comboBox_unit.currentTextChanged.connect(
+            self._global_calibration.set_unit_label
+        )
+        self._calibration_rows.lineEdit_reference.textChanged.connect(
+            self._global_calibration.set_reference_note
+        )
+        self._global_calibration.changed.connect(self._sync_global_calibration_form)
+
+        self.lineEdit_micCalFile = QtWidgets.QLineEdit()
+        self.lineEdit_micCalFile.setReadOnly(True)
+        self.lineEdit_micCalFile.setPlaceholderText("No microphone cal file loaded")
+        mic_cal_buttons = QtWidgets.QHBoxLayout()
+        self.button_micCalBrowse = QtWidgets.QPushButton("Browse…")
+        self.button_micCalClear = QtWidgets.QPushButton("Clear")
+        mic_cal_buttons.addWidget(self.button_micCalBrowse)
+        mic_cal_buttons.addWidget(self.button_micCalClear)
+        mic_cal_buttons.addStretch(1)
+        calibration_layout.addRow("Mic cal file", self.lineEdit_micCalFile)
+        calibration_layout.addRow("", mic_cal_buttons)
+        self.label_micCalSummary = QtWidgets.QLabel("")
+        self.label_micCalSummary.setWordWrap(True)
+        calibration_layout.addRow("", self.label_micCalSummary)
+        self.button_micCalBrowse.clicked.connect(self._browse_mic_cal_file)
+        self.button_micCalClear.clicked.connect(self._clear_mic_cal_file)
+
+        startup_index = self.verticalLayout_5.indexOf(self.startupGroup)
+        self.verticalLayout_5.insertWidget(startup_index, self.calibrationGroup)
+        self._sync_global_calibration_form()
+
+    def _sync_global_calibration_form(self) -> None:
+        if self._global_calibration is None:
+            return
+        cal = self._global_calibration.calibration
+        self._calibration_rows.load(cal.offset_db, cal.unit_label, cal.reference_note)
+        self._sync_mic_cal_form()
+
+    def _sync_mic_cal_form(self) -> None:
+        if self._global_calibration is None:
+            return
+        path = self._global_calibration.mic_cal_file_path
+        self.lineEdit_micCalFile.setText(path)
+        mic_cal = self._global_calibration.mic_cal
+        if mic_cal is None:
+            self.label_micCalSummary.setText(
+                "Load a factory .txt or REW .cal file to apply frequency correction globally."
+            )
+            return
+        self.label_micCalSummary.setText(
+            f"{mic_cal.summary()}. Frequency correction applies to spectrum widgets; "
+            "use Calibrate… or offset for absolute SPL."
+        )
+
+    def _browse_mic_cal_file(self) -> None:
+        if self._global_calibration is None:
+            return
+        path, _selected = QtWidgets.QFileDialog.getOpenFileName(
+            self,
+            "Select microphone calibration file",
+            self._global_calibration.mic_cal_file_path or "",
+            "Calibration files (*.cal *.txt);;All files (*)",
+        )
+        if not path:
+            return
+        try:
+            self._global_calibration.set_mic_cal_file(path)
+        except Exception as exc:
+            QtWidgets.QMessageBox.warning(
+                self,
+                "Calibration file",
+                f"Could not load calibration file:\n{exc}",
+            )
+            return
+        self._sync_global_calibration_form()
+
+    def _clear_mic_cal_file(self) -> None:
+        if self._global_calibration is None:
+            return
+        self._global_calibration.clear_mic_cal_file()
+        self._sync_global_calibration_form()
+
+    def _calibrate_global_from_current(self) -> None:
+        if self._global_calibration is None or self._raw_rms_provider is None:
+            return
+        raw_rms_db = self._raw_rms_provider()
+        if calibration_signal_too_quiet(raw_rms_db):
+            cal = self._global_calibration.calibration
+            QtWidgets.QMessageBox.warning(
+                self,
+                "Calibrate input",
+                calibration_quiet_message(
+                    raw_rms_db,
+                    offset_db=cal.offset_db,
+                    unit_label=cal.unit_label,
+                ),
+            )
+            return
+        target_db, ok = QtWidgets.QInputDialog.getDouble(
+            self,
+            "Calibrate input",
+            f"Raw input is {raw_rms_db:.1f} dBFS.\n"
+            "It should read (dB):",
+            value=94.0,
+            decimals=1,
+        )
+        if ok:
+            unit_label = unit_label_for_calibration_target(
+                self._global_calibration.calibration.unit_label, target_db
+            )
+            if unit_label != self._global_calibration.calibration.unit_label:
+                self._global_calibration.set_unit_label(unit_label)
+            self._global_calibration.calibrate_to_target(raw_rms_db, target_db)
+            self._sync_global_calibration_form()
 
     def has_input_devices(self) -> bool:
         return self._has_input_devices
@@ -205,6 +347,8 @@ class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
         settings.setValue("showPlayback", self.checkbox_showPlayback.checkState())
         settings.setValue("historyLength", self.spinBox_historyLength.value())
         settings.setValue("showSplash", self.checkbox_showSplash.isChecked())
+        if self._global_calibration is not None:
+            self._global_calibration.saveState(settings)
 
     def restoreState(self, settings):
         if self._has_input_devices:
@@ -240,3 +384,6 @@ class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
         self.spinBox_historyLength.setValue(settings.value("historyLength", 30, type=int))
         self.checkbox_showSplash.setChecked(settings.value("showSplash", True, type=bool))
         self.history_length_changed.emit(self.spinBox_historyLength.value())
+        if self._global_calibration is not None:
+            self._global_calibration.restoreState(settings)
+            self._sync_global_calibration_form()
