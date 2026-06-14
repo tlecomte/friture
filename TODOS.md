@@ -1,26 +1,6 @@
 # TODOs
 
 
-## Per-device input calibration
-
-**What:** Associate calibration offset (and optionally mic cal file) with a specific audio input device identity, not just globally.
-
-**Why:** Today the global calibration follows the app to any interface. An engineer who calibrated with Interface A and then plugs in Interface B gets the wrong SPL reading silently.
-
-**Context:** `GlobalCalibrationService` stores `offset_db` and `mic_cal_file_path` in QSettings with no device identity. Use a composite `(sanitized_name, host_api_name)` key for stability across USB re-enumeration. Schema: `GlobalCalibration/profiles/{device_key}/offsetDb` (profiles-compatible for future named profiles). Read device identity from the live `InputDeviceCatalog` at save time, not from QSettings, to avoid selected-vs-active mismatch. Fall back to global flat keys for legacy user configs (no deletion of old keys for at least 2 releases).
-
-**Depends on:** feature/global-calibration landing first. ✓ (merged)
-
-
-## Stale mic cal file UX warning
-
-**What:** When the app restarts and the configured mic cal file path no longer exists on disk, display a visible warning in the Settings calibration group rather than silently falling back to the cached arrays.
-
-**Why:** Silent fallback means the engineer could be running stale frequency correction without knowing it. A yellow warning label ("Mic cal file not found — using cached data") makes this transparent.
-
-**Context:** `GlobalCalibrationService.restoreState` already handles this with a try/except that falls back to `_mic_cal_from_settings_cache`. Warning condition: `os.path.exists(mic_cal_file_path)` is False (not just `mic_cal is None` — file-missing and corrupt-file are both covered this way). Fix in `Settings_Dialog._sync_mic_cal_form`.
-
-**Depends on:** feature/global-calibration landing first. ✓ (merged)
 
 
 ## Guided calibration wizard
@@ -57,3 +37,14 @@
 
 **Priority:** P1 for product vision.
 **Depends on:** Calibration polish sprint (dual-channel calibration must be solid first).
+
+
+## Completed
+
+### Per-device input calibration
+**Completed:** v0.59 (2026-06-14)
+SPL offset stored per device in `GlobalCalibration/profiles/{key}/offsetDb`. Device key = sanitized `name__host_api`. Falls back to legacy flat key.
+
+### Stale mic cal file UX warning
+**Completed:** v0.59 (2026-06-14)
+Yellow warning label in Settings when mic cal file path exists but file is missing from disk.
