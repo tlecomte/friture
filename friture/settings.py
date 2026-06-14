@@ -77,6 +77,7 @@ class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
         self._catalog = catalog or get_input_device_catalog()
         self._global_calibration = global_calibration
         self._raw_rms_provider = raw_rms_provider
+        self._settings_ref = None
 
         self.setupUi(self)
 
@@ -132,12 +133,23 @@ class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
         self.label_micCalSummary = QtWidgets.QLabel("")
         self.label_micCalSummary.setWordWrap(True)
         calibration_layout.addRow("", self.label_micCalSummary)
+        self.label_micCalStaleWarning = QtWidgets.QLabel(
+            "⚠ Mic cal file not found — using cached data"
+        )
+        self.label_micCalStaleWarning.setWordWrap(True)
+        self.label_micCalStaleWarning.setStyleSheet("color: orange;")
+        self.label_micCalStaleWarning.setVisible(False)
+        calibration_layout.addRow("", self.label_micCalStaleWarning)
+        self.label_calibrationAge = QtWidgets.QLabel("")
+        self.label_calibrationAge.setWordWrap(True)
+        calibration_layout.addRow("", self.label_calibrationAge)
         self.button_micCalBrowse.clicked.connect(self._browse_mic_cal_file)
         self.button_micCalClear.clicked.connect(self._clear_mic_cal_file)
 
         startup_index = self.verticalLayout_5.indexOf(self.startupGroup)
         self.verticalLayout_5.insertWidget(startup_index, self.calibrationGroup)
         self._sync_global_calibration_form()
+        self._sync_calibration_age()
 
     def _sync_global_calibration_form(self) -> None:
         if self._global_calibration is None:
@@ -145,17 +157,44 @@ class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
         cal = self._global_calibration.calibration
         self._calibration_rows.load(cal.offset_db, cal.unit_label, cal.reference_note)
         self._sync_mic_cal_form()
+        self._sync_calibration_age()
+
+    def _sync_calibration_age(self) -> None:
+        if self._global_calibration is None or not hasattr(self, "label_calibrationAge"):
+            return
+        from datetime import datetime
+        ts = getattr(self._global_calibration, "_calibrated_at", "")
+        if not ts:
+            self.label_calibrationAge.setText("Last calibrated: Unknown")
+            return
+        try:
+            then = datetime.fromisoformat(ts)
+            delta = datetime.now() - then
+            days = delta.days
+            if days == 0:
+                text = "Last calibrated: today"
+            elif days == 1:
+                text = "Last calibrated: 1 day ago"
+            else:
+                text = f"Last calibrated: {days} days ago"
+        except ValueError:
+            text = "Last calibrated: Unknown"
+        self.label_calibrationAge.setText(text)
 
     def _sync_mic_cal_form(self) -> None:
         if self._global_calibration is None:
             return
+        import os
         path = self._global_calibration.mic_cal_file_path
         self.lineEdit_micCalFile.setText(path)
         mic_cal = self._global_calibration.mic_cal
+        stale = bool(path and not os.path.exists(path))
+        self.label_micCalStaleWarning.setVisible(stale)
         if mic_cal is None:
-            self.label_micCalSummary.setText(
-                "Load a factory .txt or REW .cal file to apply frequency correction globally."
-            )
+            if not stale:
+                self.label_micCalSummary.setText(
+                    "Load a factory .txt or REW .cal file to apply frequency correction globally."
+                )
             return
         self.label_micCalSummary.setText(
             f"{mic_cal.summary()}. Frequency correction applies to spectrum widgets; "
@@ -269,6 +308,12 @@ class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
 
         self._sync_channel_combos()
 
+        if success and self._global_calibration is not None and self._settings_ref is not None:
+            self._global_calibration.restoreState(
+                self._settings_ref, device_key=self._current_device_key()
+            )
+            self._sync_global_calibration_form()
+
         self._toolbar_view_model.recording = True
 
     def _sync_channel_combos(self) -> None:
@@ -338,6 +383,11 @@ class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
     def history_length_edit_finished(self) -> None:
         self.history_length_changed.emit(self.spinBox_historyLength.value())
 
+    def _current_device_key(self) -> str:
+        if hasattr(self._catalog, "get_current_device_key"):
+            return self._catalog.get_current_device_key()
+        return ""
+
     def saveState(self, settings):
         if self._has_input_devices:
             settings.setValue("deviceName", self.comboBox_inputDevice.currentText())
@@ -348,7 +398,7 @@ class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
         settings.setValue("historyLength", self.spinBox_historyLength.value())
         settings.setValue("showSplash", self.checkbox_showSplash.isChecked())
         if self._global_calibration is not None:
-            self._global_calibration.saveState(settings)
+            self._global_calibration.saveState(settings, device_key=self._current_device_key())
 
     def restoreState(self, settings):
         if self._has_input_devices:
@@ -384,6 +434,7 @@ class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
         self.spinBox_historyLength.setValue(settings.value("historyLength", 30, type=int))
         self.checkbox_showSplash.setChecked(settings.value("showSplash", True, type=bool))
         self.history_length_changed.emit(self.spinBox_historyLength.value())
+        self._settings_ref = settings
         if self._global_calibration is not None:
-            self._global_calibration.restoreState(settings)
+            self._global_calibration.restoreState(settings, device_key=self._current_device_key())
             self._sync_global_calibration_form()

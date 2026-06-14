@@ -364,6 +364,10 @@ class PortAudioIngest(QtCore.QObject):
     def get_readable_current_device(self):
         return self.input_devices.index(self.device)
 
+    def get_current_device_key(self) -> str:
+        from friture.input_device_catalog import compute_device_key
+        return compute_device_key(self.device)
+
     def get_readable_current_channels(self):
         nchannels = self.device["max_input_channels"]
 

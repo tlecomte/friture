@@ -32,6 +32,7 @@ class GlobalCalibrationService(QObject):
         self.calibration = LevelCalibration()
         self.mic_cal: MicCalFile | None = None
         self.mic_cal_file_path = ""
+        self._calibrated_at: str = ""
 
     def frequency_adjustment_db(self, frequencies_hz) -> "np.ndarray":
         from friture.global_frequency_calibration import frequency_adjustment_db
@@ -91,9 +92,23 @@ class GlobalCalibrationService(QObject):
             self.changed.emit()
 
     def calibrate_to_target(self, raw_rms_db: float, target_db: float) -> None:
+        from datetime import datetime
         self.set_offset_db(calibration_offset_for_target(raw_rms_db, target_db))
+        self._calibrated_at = datetime.now().isoformat()
 
-    def saveState(self, settings: QSettings) -> None:
+    def _profile_group(self, device_key: str) -> str:
+        return f"GlobalCalibration/profiles/{device_key}" if device_key else ""
+
+    def saveState(self, settings: QSettings, device_key: str = "") -> None:
+        if device_key:
+            settings.beginGroup(self._profile_group(device_key))
+        self._write_calibration(settings)
+        if device_key:
+            settings.endGroup()
+
+    def _write_calibration(self, settings: QSettings) -> None:
+        if self._calibrated_at:
+            settings.setValue("calibratedAt", self._calibrated_at)
         write_settings_float(settings, "offsetDb", self.calibration.offset_db)
         settings.setValue("unitLabel", self.calibration.unit_label)
         settings.setValue("referenceNote", self.calibration.reference_note)
@@ -123,7 +138,17 @@ class GlobalCalibrationService(QObject):
             settings.remove("micCalSensitivityDb")
             settings.remove("micCalReferenceFreqHz")
 
-    def restoreState(self, settings: QSettings) -> None:
+    def restoreState(self, settings: QSettings, device_key: str = "") -> None:
+        if device_key and settings.contains(f"{self._profile_group(device_key)}/offsetDb"):
+            settings.beginGroup(self._profile_group(device_key))
+            self._read_calibration(settings)
+            settings.endGroup()
+        else:
+            self._read_calibration(settings)
+        self.changed.emit()
+
+    def _read_calibration(self, settings: QSettings) -> None:
+        self._calibrated_at = settings.value("calibratedAt", "", type=str)
         self.calibration.offset_db = read_settings_float(
             settings, "offsetDb", DEFAULT_OFFSET_DB
         )
@@ -143,7 +168,6 @@ class GlobalCalibrationService(QObject):
         elif settings.contains("micCalFrequencies"):
             self.mic_cal = self._mic_cal_from_settings_cache(settings)
         write_settings_float(settings, "offsetDb", self.calibration.offset_db)
-        self.changed.emit()
 
     @staticmethod
     def _mic_cal_from_settings_cache(settings: QSettings) -> MicCalFile | None:

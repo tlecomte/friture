@@ -7,6 +7,7 @@
 
 from __future__ import annotations
 
+import re
 import sys
 from typing import Protocol, runtime_checkable
 
@@ -57,6 +58,26 @@ class InputDeviceCatalog(Protocol):
 
     def set_duo_input(self) -> None:
         ...
+
+    def get_current_device_key(self) -> str:
+        ...
+
+
+def sanitize_device_key(name: str, host_api: str) -> str:
+    """Return a QSettings-safe composite key for a device identity."""
+    safe_name = re.sub(r"[^A-Za-z0-9_\-]", "_", name) if name else "__unknown__"
+    safe_api = re.sub(r"[^A-Za-z0-9_\-]", "_", host_api)
+    return f"{safe_name}__{safe_api}"
+
+
+def compute_device_key(device: dict) -> str:
+    """Return sanitized composite key for a sounddevice device dict. Empty on error."""
+    try:
+        import sounddevice
+        host_api_name = sounddevice.query_hostapis(device["hostapi"])["name"]
+        return sanitize_device_key(device["name"], host_api_name)
+    except Exception:
+        return ""
 
 
 def get_input_device_catalog() -> InputDeviceCatalog:
