@@ -8,6 +8,7 @@
 from __future__ import annotations
 
 import os
+from datetime import datetime
 
 import numpy as np
 from PyQt5.QtCore import QObject, QSettings, pyqtSignal
@@ -92,7 +93,6 @@ class GlobalCalibrationService(QObject):
             self.changed.emit()
 
     def calibrate_to_target(self, raw_rms_db: float, target_db: float) -> None:
-        from datetime import datetime
         self._calibrated_at = datetime.now().isoformat()
         self.set_offset_db(calibration_offset_for_target(raw_rms_db, target_db))
 
@@ -141,8 +141,10 @@ class GlobalCalibrationService(QObject):
     def restoreState(self, settings: QSettings, device_key: str = "") -> None:
         if device_key and settings.contains(f"{self._profile_group(device_key)}/offsetDb"):
             settings.beginGroup(self._profile_group(device_key))
-            self._read_calibration(settings)
-            settings.endGroup()
+            try:
+                self._read_calibration(settings)
+            finally:
+                settings.endGroup()
         else:
             self._read_calibration(settings)
         self.changed.emit()

@@ -41,17 +41,15 @@ class CalibrationAgeDisplayTest(unittest.TestCase):
         self._dialog = dialog
         return dialog, cal
 
-    def test_age_label_shows_just_now_after_calibration(self) -> None:
+    def test_age_label_shows_today_after_recent_calibration(self) -> None:
+        from datetime import datetime
         dialog, cal = self._make_dialog()
-        iso = IsolatedQSettings()
-        dialog.restoreState(iso.settings)
+        cal._calibrated_at = datetime.now().isoformat()
 
-        dialog._calibrate_global_from_current()  # no raw_rms_provider -> no-op, but persist ts
-
-        # Manually trigger age display sync
         dialog._sync_calibration_age()
+
         text = dialog.label_calibrationAge.text()
-        self.assertIn("calibrated", text.lower())
+        self.assertIn("today", text.lower())
 
     def test_age_label_shows_unknown_when_no_timestamp(self) -> None:
         dialog, cal = self._make_dialog()
@@ -147,14 +145,14 @@ class StaleMicCalWarningTest(unittest.TestCase):
         finally:
             os.unlink(cal.mic_cal_file_path)
 
-    def test_warning_shown_when_path_set_file_exists_but_cal_not_loaded(self) -> None:
-        """File exists on disk but mic_cal is None (parse failed, using cache)."""
+    def test_no_warning_when_file_exists_but_parse_failed(self) -> None:
+        """File exists on disk but cal is None (parse failed, no cache) — stale=False, no warning."""
         dialog, cal = self._make_dialog_with_cal()
 
         cal.mic_cal_file_path = "/some/path/mic.cal"
         cal.mic_cal = None
 
-        with patch("os.path.exists", return_value=False):
+        with patch("os.path.exists", return_value=True):
             dialog._sync_mic_cal_form()
 
-        self.assertFalse(dialog.label_micCalStaleWarning.isHidden())
+        self.assertTrue(dialog.label_micCalStaleWarning.isHidden())

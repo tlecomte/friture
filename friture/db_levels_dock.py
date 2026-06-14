@@ -8,10 +8,9 @@
 from PyQt5.QtCore import QSettings, QObject
 
 from friture.calibration_override import CalibrationOverrideMixin
-from friture.level_meter import calibrate_interactive
 from friture.db_levels_settings import DbLevels_Settings_Dialog
 from friture.freq_weighting import DEFAULT_WEIGHTING, weighting_suffix
-from friture.level_meter import LevelMeterProcessor, calibration_raw_rms_db
+from friture.level_meter import LevelMeterProcessor, calibrate_interactive, calibration_raw_rms_db
 from friture.level_view_model import LevelViewModel
 
 

@@ -31,7 +31,9 @@ from friture.global_calibration import GlobalCalibrationService
 from friture.main_toolbar_view_model import MainToolbarViewModel
 from friture.ui_settings import Ui_Settings_Dialog
 from friture.calibration_settings_panel import CalibrationFormRows
-from friture.level_meter import calibration_raw_rms_db
+import os
+from datetime import datetime
+from friture.level_meter import calibration_raw_rms_db, calibrate_interactive
 
 # Backward-compatible re-exports for callers/tests.
 no_input_device_title = "No audio input device found"
@@ -157,7 +159,6 @@ class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
     def _sync_calibration_age(self) -> None:
         if self._global_calibration is None or not hasattr(self, "label_calibrationAge"):
             return
-        from datetime import datetime
         ts = getattr(self._global_calibration, "_calibrated_at", "")
         if not ts:
             self.label_calibrationAge.setText("Last calibrated: Unknown")
@@ -165,7 +166,7 @@ class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
         try:
             then = datetime.fromisoformat(ts)
             delta = datetime.now() - then
-            days = delta.days
+            days = max(0, delta.days)
             if days == 0:
                 text = "Last calibrated: today"
             elif days == 1:
@@ -179,7 +180,6 @@ class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
     def _sync_mic_cal_form(self) -> None:
         if self._global_calibration is None:
             return
-        import os
         path = self._global_calibration.mic_cal_file_path
         self.lineEdit_micCalFile.setText(path)
         mic_cal = self._global_calibration.mic_cal
@@ -229,7 +229,6 @@ class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
     def _calibrate_global_from_current(self) -> None:
         if self._global_calibration is None or self._raw_rms_provider is None:
             return
-        from friture.level_meter import calibrate_interactive
         calibrate_interactive(self._raw_rms_provider(), self._global_calibration, self)
         self._sync_global_calibration_form()
 
@@ -410,7 +409,13 @@ class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
         self.spinBox_historyLength.setValue(settings.value("historyLength", 30, type=int))
         self.checkbox_showSplash.setChecked(settings.value("showSplash", True, type=bool))
         self.history_length_changed.emit(self.spinBox_historyLength.value())
-        self._settings_ref = settings
+        # Store a fresh, independent QSettings at the AudioBackend group so that
+        # input_device_changed() can save/restore calibration after the caller's
+        # beginGroup("AudioBackend")...endGroup() cycle has already completed.
+        from PyQt5.QtCore import QSettings as _QSettings
+        _fresh = _QSettings("Friture", "Friture")
+        _fresh.beginGroup("AudioBackend")
+        self._settings_ref = _fresh
         if self._global_calibration is not None:
             self._global_calibration.restoreState(settings, device_key=self._current_device_key())
             self._sync_global_calibration_form()
