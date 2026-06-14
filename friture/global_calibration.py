@@ -93,8 +93,8 @@ class GlobalCalibrationService(QObject):
 
     def calibrate_to_target(self, raw_rms_db: float, target_db: float) -> None:
         from datetime import datetime
-        self.set_offset_db(calibration_offset_for_target(raw_rms_db, target_db))
         self._calibrated_at = datetime.now().isoformat()
+        self.set_offset_db(calibration_offset_for_target(raw_rms_db, target_db))
 
     def _profile_group(self, device_key: str) -> str:
         return f"GlobalCalibration/profiles/{device_key}" if device_key else ""

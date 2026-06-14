@@ -163,10 +163,10 @@ class SettingsDialogDeviceKeyTest(unittest.TestCase):
         iso.settings.endGroup()
         dialog.saveState(iso.settings)
 
-        # Simulate switch to behringer
-        catalog.get_current_device_key.return_value = "behringer__alsa"
+        # Simulate switch: old key returned first (before select), new key after
+        catalog.get_current_device_key.side_effect = ["focusrite__alsa", "behringer__alsa"]
         catalog.select_input_device.return_value = (True, 1)
-        dialog._settings_ref = iso.settings  # inject settings for switch lookup
+        dialog._settings_ref = iso.settings
         dialog.input_device_changed(1)
 
         self.assertAlmostEqual(cal.calibration.offset_db, 14.0)

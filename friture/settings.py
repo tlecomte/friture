@@ -186,7 +186,9 @@ class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
         stale = bool(path and not os.path.exists(path))
         self.label_micCalStaleWarning.setVisible(stale)
         if mic_cal is None:
-            if not stale:
+            if stale:
+                self.label_micCalSummary.setText("")
+            else:
                 self.label_micCalSummary.setText(
                     "Load a factory .txt or REW .cal file to apply frequency correction globally."
                 )
@@ -264,9 +266,12 @@ class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
     def input_device_changed(self, index):
         self._toolbar_view_model.recording = False
 
+        old_device_key = self._current_device_key()
         success, index = self._catalog.select_input_device(index)
 
+        self.comboBox_inputDevice.blockSignals(True)
         self.comboBox_inputDevice.setCurrentIndex(index)
+        self.comboBox_inputDevice.blockSignals(False)
 
         if not success:
             error_message = QtWidgets.QErrorMessage(self)
@@ -278,6 +283,8 @@ class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
         self._sync_channel_combos()
 
         if success and self._global_calibration is not None and self._settings_ref is not None:
+            if old_device_key:
+                self._global_calibration.saveState(self._settings_ref, device_key=old_device_key)
             self._global_calibration.restoreState(
                 self._settings_ref, device_key=self._current_device_key()
             )
