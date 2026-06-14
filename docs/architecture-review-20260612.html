@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Friture — Architecture Review</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <style>
+    .badge-strong { @apply bg-emerald-100 text-emerald-800 border-emerald-300; }
+    .badge-explore { @apply bg-amber-100 text-amber-800 border-amber-300; }
+    .badge-spec { @apply bg-slate-100 text-slate-600 border-slate-300; }
+    .diagram-box {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      border-radius: 12px;
+      padding: 1rem;
+      min-height: 220px;
+    }
+    .node {
+      border-radius: 8px;
+      padding: 0.5rem 0.75rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-align: center;
+    }
+    .node-shallow { background: #fef3c7; color: #92400e; border: 2px dashed #f59e0b; }
+    .node-deep { background: #d1fae5; color: #065f46; border: 2px solid #10b981; }
+    .node-coupled { background: #fee2e2; color: #991b1b; border: 2px solid #ef4444; }
+    .node-seam { background: #dbeafe; color: #1e40af; border: 2px solid #3b82f6; }
+    .arrow-down { width: 2px; height: 20px; background: #64748b; margin: 0 auto; }
+    .mass-bar { height: 24px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: 700; color: white; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 antialiased">
+  <div class="max-w-5xl mx-auto px-6 py-10">
+
+    <header class="mb-10">
+      <p class="text-sm font-medium text-indigo-600 uppercase tracking-wide">Architecture Review</p>
+      <h1 class="text-4xl font-bold mt-2">Friture</h1>
+      <p class="text-slate-600 mt-3 max-w-2xl">
+        Deepening opportunities for a real-time audio analyzer (PyQt5 + QML).
+        Goal: testability and AI-navigability through deeper modules and clearer seams.
+      </p>
+      <p class="text-xs text-slate-400 mt-2">Generated 2026-06-12 · Branch context: improve-test-suite + integration test WIP</p>
+    </header>
+
+    <!-- Candidate 1 -->
+    <article class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 mb-8">
+      <div class="flex items-start justify-between gap-4 mb-6">
+        <h2 class="text-2xl font-bold">1. Audio ingest module (capture seam)</h2>
+        <span class="shrink-0 px-3 py-1 rounded-full text-xs font-bold border badge-strong">Strong</span>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-6 mb-6 text-sm">
+        <div>
+          <h3 class="font-semibold text-slate-700 mb-2">Files</h3>
+          <ul class="list-disc list-inside text-slate-600 space-y-1">
+            <li><code>friture/audiobackend.py</code></li>
+            <li><code>friture/audiobuffer.py</code></li>
+            <li><code>friture/analyzer.py</code> (wiring)</li>
+            <li><code>friture/settings.py</code> (device enumeration)</li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="font-semibold text-slate-700 mb-2">Problem</h3>
+          <p class="text-slate-600">
+            <code>AudioBackend</code> is a process-wide singleton that imports <code>sounddevice</code> at module load.
+            Any import of settings or backend requires PortAudio. There is no seam between "capture hardware" and
+            "push float frames into <code>AudioBuffer</code>". Tests must patch globals or install system libs.
+            The interface is nearly as complex as the implementation (device lists, JACK/ALSA quirks, callback threading).
+          </p>
+        </div>
+      </div>
+
+      <div class="mb-6">
+        <h3 class="font-semibold text-slate-700 mb-2">Solution</h3>
+        <p class="text-slate-600 text-sm">
+          Introduce a small <strong>Audio ingest</strong> interface: start/stop, list devices, emit
+          <code>(floatdata, input_time, status)</code>. Move PortAudio into one adapter.
+          <code>Analyzer</code> and <code>Settings_Dialog</code> depend on the interface, not the singleton.
+          Tests use a <code>SineWaveIngest</code> or replay adapter — same path production widgets use.
+        </p>
+      </div>
+
+      <div class="mb-6">
+        <h3 class="font-semibold text-slate-700 mb-2">Benefits</h3>
+        <ul class="text-slate-600 text-sm list-disc list-inside space-y-1">
+          <li><strong>Leverage:</strong> one call site wires ingest → buffer; all dock widgets inherit testability.</li>
+          <li><strong>Locality:</strong> device quirks and callback threading live behind one module.</li>
+          <li><strong>Tests:</strong> CI runs without <code>libportaudio2</code> for most suites; integration tests drive real widget pipelines via ingest adapter.</li>
+        </ul>
+      </div>
+
+      <h3 class="font-semibold text-slate-700 mb-4">Before / After</h3>
+      <div class="grid md:grid-cols-2 gap-4">
+        <div>
+          <p class="text-xs font-bold text-amber-700 mb-2 uppercase">Before — shallow singleton</p>
+          <div class="diagram-box">
+            <div class="flex flex-wrap gap-2 justify-center mb-3">
+              <div class="node node-coupled">Settings_Dialog</div>
+              <div class="node node-coupled">Analyzer</div>
+              <div class="node node-coupled">display_timer</div>
+            </div>
+            <div class="arrow-down"></div>
+            <div class="flex justify-center my-2">
+              <div class="node node-shallow" style="min-width: 200px;">AudioBackend() singleton<br><span class="font-normal">+ sounddevice @ import</span></div>
+            </div>
+            <div class="arrow-down"></div>
+            <div class="flex justify-center">
+              <div class="node node-deep">AudioBuffer</div>
+            </div>
+            <p class="text-slate-400 text-xs text-center mt-4">Deletion test: remove singleton → complexity explodes across N callers</p>
+          </div>
+        </div>
+        <div>
+          <p class="text-xs font-bold text-emerald-700 mb-2 uppercase">After — deep ingest module</p>
+          <div class="diagram-box">
+            <div class="flex flex-wrap gap-2 justify-center mb-3">
+              <div class="node node-deep">Settings</div>
+              <div class="node node-deep">Analyzer</div>
+            </div>
+            <div class="arrow-down"></div>
+            <div class="flex justify-center my-2">
+              <div class="node node-seam" style="min-width: 180px;">Audio ingest<br><span class="font-normal">start · stop · devices</span></div>
+            </div>
+            <div class="flex gap-2 justify-center my-2">
+              <div class="node node-shallow text-xs">PortAudio adapter</div>
+              <div class="node node-shallow text-xs">Test replay adapter</div>
+            </div>
+            <div class="arrow-down"></div>
+            <div class="flex justify-center">
+              <div class="node node-deep">AudioBuffer</div>
+            </div>
+            <p class="text-slate-400 text-xs text-center mt-4">Two adapters = real seam</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-6 mermaid">
+flowchart LR
+  subgraph before["Before"]
+    A1[Analyzer] --> AB[AudioBackend singleton]
+    S1[Settings] --> AB
+    AB --> BUF[AudioBuffer]
+  end
+  subgraph after["After"]
+    A2[Analyzer] --> ING[Audio ingest module]
+    S2[Settings] --> ING
+    ING --> PA[PortAudio adapter]
+    ING --> TST[Test adapter]
+    ING --> BUF2[AudioBuffer]
+  end
+      </div>
+    </article>
+
+    <!-- Candidate 2 -->
+    <article class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 mb-8">
+      <div class="flex items-start justify-between gap-4 mb-6">
+        <h2 class="text-2xl font-bold">2. Dock analysis widget protocol</h2>
+        <span class="shrink-0 px-3 py-1 rounded-full text-xs font-bold border badge-strong">Strong</span>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-6 mb-6 text-sm">
+        <div>
+          <h3 class="font-semibold text-slate-700 mb-2">Files</h3>
+          <ul class="list-disc list-inside text-slate-600 space-y-1">
+            <li><code>friture/dock.py</code>, <code>friture/dockmanager.py</code></li>
+            <li><code>friture/spectrum.py</code>, <code>levels.py</code>, <code>pitch_tracker.py</code></li>
+            <li><code>octavespectrum.py</code>, <code>spectrogram.py</code>, <code>scope.py</code>, …</li>
+            <li><code>friture/widgetdict.py</code></li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="font-semibold text-slate-700 mb-2">Problem</h3>
+          <p class="text-slate-600">
+            Nine widgets each implement <code>handle_new_data</code>, <code>set_buffer</code>, <code>canvasUpdate</code>,
+            <code>saveState</code> / <code>restoreState</code> with no shared module. <code>Dock</code> duck-types
+            <code>audiowidget</code> with <code># type: ignore</code>. Understanding "how a dock consumes audio"
+            requires reading every widget. New integration tests duplicate harness wiring per widget.
+          </p>
+        </div>
+      </div>
+
+      <div class="mb-6">
+        <h3 class="font-semibold text-slate-700 mb-2">Solution</h3>
+        <p class="text-slate-600 text-sm">
+          Extract a documented <strong>Dock analysis widget</strong> protocol (or base mixin) defining the
+          ring-buffer contract: which indices to read, frame size invariants, pause/restart semantics.
+          Optionally split each widget into <em>analysis module</em> (pure/numpy) + <em>dock shell</em> (Qt/QML glue).
+        </p>
+      </div>
+
+      <div class="mb-6">
+        <h3 class="font-semibold text-slate-700 mb-2">Benefits</h3>
+        <ul class="text-slate-600 text-sm list-disc list-inside space-y-1">
+          <li><strong>Locality:</strong> buffer indexing and "new data since last frame" logic in one place.</li>
+          <li><strong>Leverage:</strong> <code>AudioHarness</code> becomes the canonical test adapter for all docks.</li>
+          <li><strong>Tests:</strong> contract tests on the protocol; widget tests focus on analysis output, not wiring.</li>
+        </ul>
+      </div>
+
+      <h3 class="font-semibold text-slate-700 mb-4">Before / After — interface mass</h3>
+      <div class="grid md:grid-cols-2 gap-4">
+        <div>
+          <p class="text-xs font-bold text-amber-700 mb-2">Before — duplicated surface area</p>
+          <div class="space-y-1">
+            <div class="mass-bar bg-amber-500" style="width:95%">spectrum.handle_new_data</div>
+            <div class="mass-bar bg-amber-500" style="width:92%">levels.handle_new_data</div>
+            <div class="mass-bar bg-amber-500" style="width:90%">pitch.handle_new_data</div>
+            <div class="mass-bar bg-amber-500" style="width:88%">octave.handle_new_data</div>
+            <div class="mass-bar bg-amber-400" style="width:85%">spectrogram…</div>
+            <p class="text-xs text-slate-500 mt-2">Bar width ≈ interface complexity per widget (shallow)</p>
+          </div>
+        </div>
+        <div>
+          <p class="text-xs font-bold text-emerald-700 mb-2">After — shared frame reader</p>
+          <div class="diagram-box py-4">
+            <div class="node node-seam mx-auto mb-3" style="max-width: 220px;">Ring buffer frame reader</div>
+            <div class="flex flex-wrap gap-1 justify-center">
+              <div class="node node-deep text-xs">Spectrum analysis</div>
+              <div class="node node-deep text-xs">Levels analysis</div>
+              <div class="node node-deep text-xs">Pitch analysis</div>
+            </div>
+            <p class="text-slate-400 text-xs text-center mt-3">Small interfaces, deep implementations</p>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <!-- Candidate 3 -->
+    <article class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 mb-8">
+      <div class="flex items-start justify-between gap-4 mb-6">
+        <h2 class="text-2xl font-bold">3. Spectrum frame analyzer module</h2>
+        <span class="shrink-0 px-3 py-1 rounded-full text-xs font-bold border badge-explore">Worth exploring</span>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-6 mb-6 text-sm">
+        <div>
+          <h3 class="font-semibold text-slate-700 mb-2">Files</h3>
+          <ul class="list-disc list-inside text-slate-600 space-y-1">
+            <li><code>friture/spectrum.py</code> (<code>Spectrum_Widget.handle_new_data</code>)</li>
+            <li><code>friture/spectrum_plot_widget.py</code></li>
+            <li><code>friture/audioproc.py</code> (FFT helpers — already partially extracted)</li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="font-semibold text-slate-700 mb-2">Problem</h3>
+          <p class="text-slate-600">
+            <code>handle_new_data</code> orchestrates buffer indices, windowing, FFT, HPS peak pick, exponential
+            smoothing, and QML view-model updates in one method. Unit tests on <code>audioproc</code> pass while
+            bugs hide in index arithmetic and smoothing state — poor <strong>locality</strong>.
+          </p>
+        </div>
+      </div>
+
+      <div class="mb-6">
+        <h3 class="font-semibold text-slate-700 mb-2">Solution</h3>
+        <p class="text-slate-600 text-sm">
+          Deepen a <strong>Spectrum frame analyzer</strong> module: input = mono frame + settings snapshot;
+          output = frequency bins, peak Hz, smoothed curve. Widget becomes a thin adapter pushing results to QML.
+        </p>
+      </div>
+
+      <div class="mb-6">
+        <h3 class="font-semibold text-slate-700 mb-2">Benefits</h3>
+        <ul class="text-slate-600 text-sm list-disc list-inside space-y-1">
+          <li>440 Hz sine → peak label test runs without Qt (already started in widget tests).</li>
+          <li>Smoothing/time-constant changes touch one module.</li>
+          <li>Pattern repeats for octave spectrum (same FFT + band aggregation).</li>
+        </ul>
+      </div>
+
+      <div class="mermaid">
+sequenceDiagram
+  participant Buf as AudioBuffer
+  participant W as Spectrum_Widget
+  participant A as Frame analyzer
+  participant Q as QML view model
+  Note over W: Before: W does Buf+A+Q
+  Buf->>W: new_data_available
+  W->>W: index + FFT + smooth + setdata
+  Note over W,A: After: W delegates
+  Buf->>W: new_data_available
+  W->>A: analyze(frame, settings)
+  A-->>W: SpectrumFrame
+  W->>Q: apply(frame)
+      </div>
+    </article>
+
+    <!-- Candidate 4 -->
+    <article class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 mb-8">
+      <div class="flex items-start justify-between gap-4 mb-6">
+        <h2 class="text-2xl font-bold">4. Settings bootstrap vs. device discovery</h2>
+        <span class="shrink-0 px-3 py-1 rounded-full text-xs font-bold border badge-explore">Worth exploring</span>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-6 mb-6 text-sm">
+        <div>
+          <h3 class="font-semibold text-slate-700 mb-2">Files</h3>
+          <ul class="list-disc list-inside text-slate-600 space-y-1">
+            <li><code>friture/settings.py</code> (<code>Settings_Dialog</code>)</li>
+            <li><code>friture/analyzer.py</code> (constructs dialog at startup)</li>
+            <li><code>friture/test/test_app_bootstrap.py</code> (patches required today)</li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="font-semibold text-slate-700 mb-2">Problem</h3>
+          <p class="text-slate-600">
+            Settings dialog constructor probes live input devices and can <code>sys.exit</code> when none exist.
+            App bootstrap tests must mock <code>AudioBackend</code> before import. Settings UI and hardware
+            discovery share one shallow module — no seam for headless or CI environments.
+          </p>
+        </div>
+      </div>
+
+      <div class="mb-6">
+        <h3 class="font-semibold text-slate-700 mb-2">Solution</h3>
+        <p class="text-slate-600 text-sm">
+          Split <strong>device catalog</strong> (list/query, injectable) from <strong>settings persistence</strong>
+          (QSettings, splash flag, buffer sizes). Dialog receives catalog via constructor; fatal "no devices"
+          becomes a policy decision in <code>Analyzer</code>, not in dialog init.
+        </p>
+      </div>
+
+      <div class="mb-6">
+        <h3 class="font-semibold text-slate-700 mb-2">Benefits</h3>
+        <ul class="text-slate-600 text-sm list-disc list-inside space-y-1">
+          <li>Bootstrap tests construct real <code>Settings_Dialog</code> with fake catalog.</li>
+          <li>Generator-only or playback-only modes don't need input hardware at dialog creation.</li>
+        </ul>
+      </div>
+    </article>
+
+    <!-- Candidate 5 -->
+    <article class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 mb-8">
+      <div class="flex items-start justify-between gap-4 mb-6">
+        <h2 class="text-2xl font-bold">5. Ballistic / smoothing time-constant module</h2>
+        <span class="shrink-0 px-3 py-1 rounded-full text-xs font-bold border badge-explore">Worth exploring</span>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-6 mb-6 text-sm">
+        <div>
+          <h3 class="font-semibold text-slate-700 mb-2">Files</h3>
+          <ul class="list-disc list-inside text-slate-600 space-y-1">
+            <li><code>friture/levels.py</code>, <code>longlevels.py</code></li>
+            <li><code>friture/spectrum.py</code>, <code>octavespectrum.py</code></li>
+            <li><code>friture/ballistic_peak.py</code> (partial extraction)</li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="font-semibold text-slate-700 mb-2">Problem</h3>
+          <p class="text-slate-600">
+            Exponential smoothing kernels and peak ballistics are re-derived in multiple widgets with slightly
+            different formulas and state shapes. <code>ballistic_peak.py</code> helps levels but spectrum/octave
+            still carry parallel math — shallow duplication, no shared seam (one adapter today).
+          </p>
+        </div>
+      </div>
+
+      <div class="mb-6">
+        <h3 class="font-semibold text-slate-700 mb-2">Solution</h3>
+        <p class="text-slate-600 text-sm">
+          Deepen a <strong>Ballistic smoother</strong> module parameterized by attack/release or time constants;
+          widgets hold instances per channel or per bin. Interface: <code>update(sample) → value</code>.
+        </p>
+      </div>
+
+      <div class="mb-6">
+        <h3 class="font-semibold text-slate-700 mb-2">Benefits</h3>
+        <ul class="text-slate-600 text-sm list-disc list-inside space-y-1">
+          <li>One test suite for IEC-style ballistics; widgets inherit correctness.</li>
+          <li>"Input feels hotter" tuning becomes a single-knob change with predictable cross-widget behavior.</li>
+        </ul>
+      </div>
+    </article>
+
+    <!-- Candidate 6 -->
+    <article class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 mb-8">
+      <div class="flex items-start justify-between gap-4 mb-6">
+        <h2 class="text-2xl font-bold">6. Analyzer application shell</h2>
+        <span class="shrink-0 px-3 py-1 rounded-full text-xs font-bold border badge-spec">Speculative</span>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-6 mb-6 text-sm">
+        <div>
+          <h3 class="font-semibold text-slate-700 mb-2">Files</h3>
+          <ul class="list-disc list-inside text-slate-600 space-y-1">
+            <li><code>friture/analyzer.py</code> (~580 lines)</li>
+            <li>QML registration, timers, dock manager, level widget, playback</li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="font-semibold text-slate-700 mb-2">Problem</h3>
+          <p class="text-slate-600">
+            <code>Friture</code> class is a god-module: QML type registration, signal wiring, timer policy, and
+            window chrome in one file. Hard to test "app starts headless" without constructing most of Qt.
+            Deletion test: removing it removes the app — complexity is real, but interface is as wide as implementation (shallow at app scale).
+          </p>
+        </div>
+      </div>
+
+      <div class="mb-6">
+        <h3 class="font-semibold text-slate-700 mb-2">Solution</h3>
+        <p class="text-slate-600 text-sm">
+          Extract <strong>Application composition</strong> module: given ingest + settings + dock factory,
+          return wired subsystems. Keeps <code>analyzer.py</code> as entrypoint only. Enables phased bootstrap tests.
+        </p>
+      </div>
+
+      <div class="mb-6">
+        <h3 class="font-semibold text-slate-700 mb-2">Benefits</h3>
+        <ul class="text-slate-600 text-sm list-disc list-inside space-y-1">
+          <li>Lower risk if done after ingest + dock protocol seams exist.</li>
+          <li>Speculative until smaller deepenings land — large refactor for moderate test gain alone.</li>
+        </ul>
+      </div>
+    </article>
+
+    <!-- Top recommendation -->
+    <section class="bg-indigo-950 text-white rounded-2xl p-8 mb-10">
+      <h2 class="text-2xl font-bold mb-4">Top recommendation</h2>
+      <p class="text-indigo-100 leading-relaxed">
+        Start with <strong class="text-white">Candidate 1 — Audio ingest module</strong>, then
+        <strong class="text-white">Candidate 2 — Dock analysis widget protocol</strong>.
+      </p>
+      <p class="text-indigo-200 mt-4 text-sm leading-relaxed">
+        Your integration test work (<code>AudioHarness</code>, widget <code>handle_new_data</code> tests) already
+        assumes a push-based buffer path. The missing seam is at capture: once ingest is injectable, the same harness
+        becomes a second adapter alongside PortAudio, and CI no longer couples every test file to
+        <code>libportaudio2</code>. Formalizing the dock protocol (2) then stops each new widget test from
+        re-discovering buffer indexing rules — that is the fastest route to a "real" suite that proves the app works,
+        not just leaf math.
+      </p>
+      <p class="text-indigo-300 text-xs mt-4">
+        No ADRs found in repo; no CONTEXT.md yet — domain terms from <code>docs/agents/domain.md</code> and code structure.
+      </p>
+    </section>
+
+    <footer class="text-center text-slate-400 text-sm pb-8">
+      Friture architecture review · improve-codebase-architecture skill
+    </footer>
+  </div>
+
+  <script>mermaid.initialize({ startOnLoad: true, theme: 'neutral' });</script>
+</body>
+</html>

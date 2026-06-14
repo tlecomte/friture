@@ -21,6 +21,7 @@ import logging
 
 from PyQt5 import QtWidgets
 from friture.settings_dialog_layout import create_form_layout
+from friture.reference_settings_rows import ReferenceOverlaySettingsRows
 
 # shared with octavespectrum.py
 DEFAULT_SPEC_MIN = -80
@@ -87,6 +88,8 @@ class OctaveSpectrum_Settings_Dialog(QtWidgets.QDialog):
         self.comboBox_response_time.addItem("5s (Very Slow)")
         self.comboBox_response_time.setCurrentIndex(DEFAULT_RESPONSE_TIME_INDEX)
 
+        self._reference_rows = ReferenceOverlaySettingsRows(self.formLayout)
+
         self.formLayout.addRow("Bands per octave:", self.comboBox_bandsperoctave)
         self.formLayout.addRow("Min:", self.spinBox_specmin)
         self.formLayout.addRow("Max:", self.spinBox_specmax)
@@ -98,6 +101,12 @@ class OctaveSpectrum_Settings_Dialog(QtWidgets.QDialog):
         self.spinBox_specmax.valueChanged.connect(view_model.setmax)
         self.comboBox_weighting.currentIndexChanged.connect(view_model.setweighting)
         self.comboBox_response_time.currentIndexChanged.connect(self.responsetimechanged)
+        self._reference_rows.comboBox_reference.currentIndexChanged.connect(
+            self.view_model.set_reference_preset
+        )
+        self._reference_rows.doubleSpinBox_reference_offset.valueChanged.connect(
+            self.view_model.set_reference_offset_db
+        )
 
     # slot
     def bandsperoctavechanged(self, index):
@@ -127,6 +136,7 @@ class OctaveSpectrum_Settings_Dialog(QtWidgets.QDialog):
         settings.setValue("Max", self.spinBox_specmax.value())
         settings.setValue("weighting", self.comboBox_weighting.currentIndex())
         settings.setValue("response_time", self.comboBox_response_time.currentIndex())
+        self._reference_rows.save_state(settings)
 
     # method
     def restoreState(self, settings):
@@ -140,3 +150,4 @@ class OctaveSpectrum_Settings_Dialog(QtWidgets.QDialog):
         self.comboBox_weighting.setCurrentIndex(weighting)
         response_time_index = settings.value("response_time", DEFAULT_RESPONSE_TIME_INDEX, type=int)
         self.comboBox_response_time.setCurrentIndex(response_time_index)
+        self._reference_rows.restore_state(settings)

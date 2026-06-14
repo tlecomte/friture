@@ -166,6 +166,12 @@ class OctaveSpectrum_Widget(QObject, CalibratedDisplayRangeMixin):
         # reset kernel and parameters for the smoothing filter
         self.setresponsetime(self.response_time)
 
+    def set_reference_preset(self, preset: int) -> None:
+        self.PlotZoneSpect.set_reference_preset(preset)
+
+    def set_reference_offset_db(self, offset_db: float) -> None:
+        self.PlotZoneSpect.set_reference_offset_db(offset_db)
+
     def settings_called(self, checked):
         self.settings_dialog.show()
 

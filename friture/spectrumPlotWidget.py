@@ -14,6 +14,7 @@ from friture.plotting.coordinateTransform import CoordinateTransform
 from friture.spectrum_data import Spectrum_Data
 from friture.filled_curve import CurveType, FilledCurve
 from friture.pitch_tracker import format_frequency
+from friture.reference_overlay_plot import ReferenceOverlayPlot
 from friture.store import GetStore
 
 # The peak decay rates (magic goes here :).
@@ -63,6 +64,13 @@ class SpectrumPlotWidget(QObject):
         self.normVerticalScaleTransform = CoordinateTransform(0, 1, 1, 0, 0)
         self.normHorizontalScaleTransform = CoordinateTransform(0, 22000, 1, 0, 0)
 
+        self._reference_overlay = ReferenceOverlayPlot(
+            self._spectrum_data,
+            self.normHorizontalScaleTransform,
+            self.normVerticalScaleTransform,
+            display_mode="fft",
+        )
+
     def qml_file_name(self):
         return "Spectrum.qml"
     
@@ -72,6 +80,7 @@ class SpectrumPlotWidget(QObject):
     def setfreqscale(self, scale):
         self.normHorizontalScaleTransform.setScale(scale)
         self._spectrum_data.horizontal_axis.setScale(scale)
+        self._reference_overlay.refresh()
 
     def setfreqrange(self, minfreq, maxfreq):
         self.xmin = minfreq
@@ -79,6 +88,7 @@ class SpectrumPlotWidget(QObject):
 
         self._spectrum_data.horizontal_axis.setRange(minfreq, maxfreq)
         self.normHorizontalScaleTransform.setRange(minfreq, maxfreq)
+        self._reference_overlay.refresh()
 
     def setspecrange(self, spec_min, spec_max):
         if spec_min > spec_max:
@@ -86,6 +96,13 @@ class SpectrumPlotWidget(QObject):
 
         self._spectrum_data.vertical_axis.setRange(spec_min, spec_max)
         self.normVerticalScaleTransform.setRange(spec_min, spec_max)
+        self._reference_overlay.refresh()
+
+    def set_reference_preset(self, preset: int) -> None:
+        self._reference_overlay.set_preset(preset)
+
+    def set_reference_offset_db(self, offset_db: float) -> None:
+        self._reference_overlay.set_offset_db(offset_db)
 
     def setweighting(self, weighting):
         if weighting == 0:
@@ -120,6 +137,7 @@ class SpectrumPlotWidget(QObject):
         self._baseline = Baseline.DATA_ZERO
 
     def setdata(self, x, y, fmax, fpitch):
+        self._reference_overlay.set_frequencies_hz(x)
         if not self.paused:
             if fmax < 2e2:
                 text = "%.1f Hz" % (fmax)

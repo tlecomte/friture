@@ -19,6 +19,13 @@ Plot {
         }
     }
 
+    PlotCurve {
+        visible: scopedata.reference_overlay_visible
+        anchors.fill: parent
+        color: "#888888"
+        curve: scopedata.reference_overlay
+    }
+
     Column {
         anchors.fill: parent
         spacing: 0
