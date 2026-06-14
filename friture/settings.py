@@ -173,7 +173,7 @@ class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
                 text = "Last calibrated: 1 day ago"
             else:
                 text = f"Last calibrated: {days} days ago"
-        except ValueError:
+        except (ValueError, TypeError):
             text = "Last calibrated: Unknown"
         self.label_calibrationAge.setText(text)
 
@@ -264,32 +264,32 @@ class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
 
     def input_device_changed(self, index):
         self._toolbar_view_model.recording = False
+        try:
+            old_device_key = self._current_device_key()
+            success, index = self._catalog.select_input_device(index)
 
-        old_device_key = self._current_device_key()
-        success, index = self._catalog.select_input_device(index)
+            self.comboBox_inputDevice.blockSignals(True)
+            self.comboBox_inputDevice.setCurrentIndex(index)
+            self.comboBox_inputDevice.blockSignals(False)
 
-        self.comboBox_inputDevice.blockSignals(True)
-        self.comboBox_inputDevice.setCurrentIndex(index)
-        self.comboBox_inputDevice.blockSignals(False)
+            if not success:
+                error_message = QtWidgets.QErrorMessage(self)
+                error_message.setWindowTitle("Input device error")
+                error_message.showMessage(
+                    "Impossible to use the selected input device, reverting to the previous one"
+                )
 
-        if not success:
-            error_message = QtWidgets.QErrorMessage(self)
-            error_message.setWindowTitle("Input device error")
-            error_message.showMessage(
-                "Impossible to use the selected input device, reverting to the previous one"
-            )
+            self._sync_channel_combos()
 
-        self._sync_channel_combos()
-
-        if success and self._global_calibration is not None and self._settings_ref is not None:
-            if old_device_key:
-                self._global_calibration.saveState(self._settings_ref, device_key=old_device_key)
-            self._global_calibration.restoreState(
-                self._settings_ref, device_key=self._current_device_key()
-            )
-            self._sync_global_calibration_form()
-
-        self._toolbar_view_model.recording = True
+            if success and self._global_calibration is not None and self._settings_ref is not None:
+                if old_device_key:
+                    self._global_calibration.saveState(self._settings_ref, device_key=old_device_key)
+                self._global_calibration.restoreState(
+                    self._settings_ref, device_key=self._current_device_key()
+                )
+                self._sync_global_calibration_form()
+        finally:
+            self._toolbar_view_model.recording = True
 
     def _sync_channel_combos(self) -> None:
         channels = self._catalog.get_readable_current_channels()
