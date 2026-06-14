@@ -31,12 +31,7 @@ from friture.global_calibration import GlobalCalibrationService
 from friture.main_toolbar_view_model import MainToolbarViewModel
 from friture.ui_settings import Ui_Settings_Dialog
 from friture.calibration_settings_panel import CalibrationFormRows
-from friture.level_calibration import unit_label_for_calibration_target
-from friture.level_meter import (
-    calibration_quiet_message,
-    calibration_raw_rms_db,
-    calibration_signal_too_quiet,
-)
+from friture.level_meter import calibration_raw_rms_db
 
 # Backward-compatible re-exports for callers/tests.
 no_input_device_title = "No audio input device found"
@@ -232,35 +227,9 @@ class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
     def _calibrate_global_from_current(self) -> None:
         if self._global_calibration is None or self._raw_rms_provider is None:
             return
-        raw_rms_db = self._raw_rms_provider()
-        if calibration_signal_too_quiet(raw_rms_db):
-            cal = self._global_calibration.calibration
-            QtWidgets.QMessageBox.warning(
-                self,
-                "Calibrate input",
-                calibration_quiet_message(
-                    raw_rms_db,
-                    offset_db=cal.offset_db,
-                    unit_label=cal.unit_label,
-                ),
-            )
-            return
-        target_db, ok = QtWidgets.QInputDialog.getDouble(
-            self,
-            "Calibrate input",
-            f"Raw input is {raw_rms_db:.1f} dBFS.\n"
-            "It should read (dB):",
-            value=94.0,
-            decimals=1,
-        )
-        if ok:
-            unit_label = unit_label_for_calibration_target(
-                self._global_calibration.calibration.unit_label, target_db
-            )
-            if unit_label != self._global_calibration.calibration.unit_label:
-                self._global_calibration.set_unit_label(unit_label)
-            self._global_calibration.calibrate_to_target(raw_rms_db, target_db)
-            self._sync_global_calibration_form()
+        from friture.level_meter import calibrate_interactive
+        calibrate_interactive(self._raw_rms_provider(), self._global_calibration, self)
+        self._sync_global_calibration_form()
 
     def has_input_devices(self) -> bool:
         return self._has_input_devices

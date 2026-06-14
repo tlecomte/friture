@@ -27,6 +27,7 @@ class LevelViewModel(QtCore.QObject):
     two_channels_changed = QtCore.pyqtSignal(bool)
     unit_label_changed = QtCore.pyqtSignal(str)
     weighting_suffix_changed = QtCore.pyqtSignal(str)
+    calibrate_requested = QtCore.pyqtSignal()
 
     def __init__(self, parent=None):
         super().__init__(parent)

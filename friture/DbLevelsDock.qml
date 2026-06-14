@@ -1,4 +1,5 @@
 import QtQuick 2.15
+import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
 import Friture 1.0
 
@@ -195,5 +196,18 @@ Rectangle {
             verticalAlignment: Text.AlignVCenter
             text: level_to_text(viewModel.level_data_slow_2.level_rms)
         }
+    }
+
+    // Calibrate button — top-right corner overlay
+    ToolButton {
+        anchors.right: parent.right
+        anchors.top: parent.top
+        anchors.margins: 4
+        text: "CAL"
+        font.pixelSize: 10
+        opacity: 0.6
+        ToolTip.text: "Calibrate global input level"
+        ToolTip.visible: hovered
+        onClicked: viewModel.calibrate_requested()
     }
 }

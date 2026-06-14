@@ -279,3 +279,41 @@ def calibration_quiet_message(
         )
     return "\n".join(lines)
 
+
+def calibrate_interactive(
+    raw_rms_db: float,
+    global_cal,
+    parent_widget,
+) -> None:
+    """Show calibration dialog; update global_cal on confirmation. No-op if signal too quiet."""
+    from PyQt5 import QtWidgets
+    from friture.level_calibration import unit_label_for_calibration_target
+
+    if calibration_signal_too_quiet(raw_rms_db):
+        QtWidgets.QMessageBox.warning(
+            parent_widget,
+            "Calibrate input",
+            calibration_quiet_message(
+                raw_rms_db,
+                offset_db=global_cal.calibration.offset_db,
+                unit_label=global_cal.calibration.unit_label,
+            ),
+        )
+        return
+
+    target_db, ok = QtWidgets.QInputDialog.getDouble(
+        parent_widget,
+        "Calibrate input",
+        f"Raw input is {raw_rms_db:.1f} dBFS.\nIt should read (dB):",
+        value=94.0,
+        decimals=1,
+    )
+    if not ok:
+        return
+
+    unit_label = unit_label_for_calibration_target(
+        global_cal.calibration.unit_label, target_db
+    )
+    if unit_label != global_cal.calibration.unit_label:
+        global_cal.set_unit_label(unit_label)
+    global_cal.calibrate_to_target(raw_rms_db, target_db)

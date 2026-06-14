@@ -8,6 +8,7 @@
 from PyQt5.QtCore import QSettings, QObject
 
 from friture.calibration_override import CalibrationOverrideMixin
+from friture.level_meter import calibrate_interactive
 from friture.db_levels_settings import DbLevels_Settings_Dialog
 from friture.freq_weighting import DEFAULT_WEIGHTING, weighting_suffix
 from friture.level_meter import LevelMeterProcessor, calibration_raw_rms_db
@@ -25,6 +26,7 @@ class DbLevelsDockWidget(QObject, CalibrationOverrideMixin):
         self._meter = LevelMeterProcessor()
         self._sync_view_model_weighting()
         self.on_effective_calibration_changed()
+        self._level_view_model.calibrate_requested.connect(self.calibrate_global)
         self.settings_dialog = DbLevels_Settings_Dialog(parent, self)
 
     def on_effective_calibration_changed(self) -> None:
@@ -70,6 +72,17 @@ class DbLevelsDockWidget(QObject, CalibrationOverrideMixin):
 
     def _sync_view_model_weighting(self) -> None:
         self._level_view_model.weighting_suffix = weighting_suffix(self._meter.weighting())
+
+    def calibrate_global(self) -> None:
+        """Trigger global calibration from live audio — no Settings required."""
+        if self._global_calibration is None:
+            return
+        raw_rms_db = calibration_raw_rms_db(
+            self.audiobuffer,
+            meter=self._meter,
+            weighting=self._meter.weighting(),
+        )
+        calibrate_interactive(raw_rms_db, self._global_calibration, self._parent)
 
     def calibrate_to_target(self, target_db: float) -> None:
         raw_rms_db = calibration_raw_rms_db(
