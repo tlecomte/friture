@@ -34,7 +34,7 @@ dynamic = ["version"]
 dependencies = [
     "sounddevice==0.5.3",
     "rtmixer==0.1.7",
-    "docutils==0.22.2",
+    "docutils==0.22.3",
     "numpy==2.3.4",
     "PyQt5==5.15.11",
     "platformdirs==4.5.0",
