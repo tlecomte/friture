@@ -4,7 +4,7 @@ requires = [
 
     # Cython and numpy are needed when running setup.py, to build extensions
     "numpy==2.4.6",
-    "Cython==3.2.2",
+    "Cython==3.2.8",
 ]
 build-backend = "setuptools.build_meta"
 
