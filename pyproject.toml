@@ -39,7 +39,7 @@ dependencies = [
     "PyQt5==5.15.11",
     "platformdirs==4.5.1",
     "pyrr==0.10.3",
-    "pyinstaller==6.17.0"
+    "pyinstaller==6.21.0"
 ]
 
 [project.optional-dependencies]
