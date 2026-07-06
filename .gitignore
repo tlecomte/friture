@@ -44,3 +44,10 @@ Notepad++
 
 # Macos
 .DS_Store
+
+# UV
+.venv/
+
+# Temporary test scripts
+test_*.py
+test_*.qml
