@@ -29,7 +29,7 @@ import logging.handlers
 from PyQt5 import QtCore
 # specifically import from PyQt5.QtGui and QWidgets for startup time improvement :
 from PyQt5.QtWidgets import QMainWindow, QApplication, QSplashScreen, QWidget
-from PyQt5.QtGui import QPixmap, QFontDatabase
+from PyQt5.QtGui import QPixmap, QFontDatabase, QPalette, QColor
 from PyQt5.QtQml import QQmlEngine, qmlRegisterSingletonType, qmlRegisterType
 from PyQt5.QtCore import QObject
 from PyQt5.QtQuick import QQuickView
@@ -83,6 +83,35 @@ SMOOTH_DISPLAY_TIMER_PERIOD_MS = 10
 # (and text painting is costly)
 SLOW_TIMER_PERIOD_MS = 1000
 
+def apply_theme(app: QApplication, theme_index: int):
+    if theme_index == 2:  # Dark
+        app.setStyle("Fusion")
+        dark_palette = QPalette()
+        dark_palette.setColor(QPalette.Window, QColor(53, 53, 53))
+        dark_palette.setColor(QPalette.WindowText, QtCore.Qt.white)
+        dark_palette.setColor(QPalette.Base, QColor(25, 25, 25))
+        dark_palette.setColor(QPalette.AlternateBase, QColor(53, 53, 53))
+        dark_palette.setColor(QPalette.ToolTipBase, QtCore.Qt.white)
+        dark_palette.setColor(QPalette.ToolTipText, QtCore.Qt.white)
+        dark_palette.setColor(QPalette.Text, QtCore.Qt.white)
+        dark_palette.setColor(QPalette.Button, QColor(53, 53, 53))
+        dark_palette.setColor(QPalette.ButtonText, QtCore.Qt.white)
+        dark_palette.setColor(QPalette.BrightText, QtCore.Qt.red)
+        dark_palette.setColor(QPalette.Link, QColor(42, 130, 218))
+        dark_palette.setColor(QPalette.Highlight, QColor(42, 130, 218))
+        dark_palette.setColor(QPalette.HighlightedText, QtCore.Qt.black)
+        app.setPalette(dark_palette)
+        if hasattr(app, 'paletteChanged'):
+            app.paletteChanged.emit(dark_palette)
+    elif theme_index == 1:  # Light
+        app.setStyle("Fusion")
+        app.setPalette(app.style().standardPalette())
+        if hasattr(app, 'paletteChanged'):
+            app.paletteChanged.emit(app.style().standardPalette())
+    else:  # System Default
+        app.setPalette(app.style().standardPalette())
+        if hasattr(app, 'paletteChanged'):
+            app.paletteChanged.emit(app.style().standardPalette())
 
 class Friture(QMainWindow, ):
 
@@ -162,6 +191,7 @@ class Friture(QMainWindow, ):
 
         self.quick_view = QQuickView(self.qml_engine, None)
         self.quick_view.setResizeMode(QQuickView.SizeRootObjectToView)
+        self.quick_view.setColor(QApplication.instance().palette().window().color())
         self.quick_view.setInitialProperties({
             "main_window_view_model": self._main_window_view_model,
             "fixedFont": QFontDatabase.systemFont(QFontDatabase.FixedFont).family()
@@ -199,6 +229,7 @@ class Friture(QMainWindow, ):
         # settings changes
         self.settings_dialog.show_playback_changed.connect(self.show_playback_changed)
         self.settings_dialog.history_length_changed.connect(self.player.set_history_seconds)
+        self.settings_dialog.theme_changed.connect(self.theme_changed)
 
         # restore the settings and widgets geometries
         self.restoreAppState()
@@ -230,6 +261,12 @@ class Friture(QMainWindow, ):
 
     def show_playback_changed(self, show: bool) -> None:
         self._main_window_view_model.playback_control_enabled = show
+
+    def theme_changed(self, theme_index: int) -> None:
+        app = QApplication.instance()
+        apply_theme(app, theme_index)
+        self.quick_view.setColor(app.palette().window().color())
+        self._main_window_view_model.theme_index = theme_index
 
     # slot
     def about_called(self):
@@ -482,6 +519,10 @@ def main():
     # It uses the standard system palettes to provide colors that match the desktop environment.
     if "QT_QUICK_CONTROLS_STYLE" not in os.environ:
         os.environ["QT_QUICK_CONTROLS_STYLE"] = "Fusion"
+
+    settings = QtCore.QSettings("Friture", "Friture")
+    theme_index = settings.value("AudioBackend/theme", 0, type=int)
+    apply_theme(app, theme_index)
 
     # Splash screen
     if not program_arguments.no_splash:

@@ -26,6 +26,7 @@ from friture.playback.playback_control_view_model import PlaybackControlViewMode
 
 class MainWindowViewModel(QtCore.QObject):
     playback_control_enabled_changed = pyqtSignal(bool)
+    theme_index_changed = pyqtSignal(int)
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -34,6 +35,7 @@ class MainWindowViewModel(QtCore.QObject):
         self._level_view_model = LevelViewModel(self)
         self._playback_control_view_model = PlaybackControlViewModel(self)
         self._playback_control_enabled = False
+        self._theme_index = 0  # 0 = System Default, 1 = Light, 2 = Dark
 
     @pyqtProperty(MainToolbarViewModel, constant=True) # type: ignore
     def toolbar_view_model(self):
@@ -56,3 +58,43 @@ class MainWindowViewModel(QtCore.QObject):
             self.playback_control_enabled_changed.emit(playback_control_enabled)
     
     playback_control_enabled = pyqtProperty(int, fget=get_playback_control_enabled, fset=set_playback_control_enabled, notify=playback_control_enabled_changed)
+
+    def get_theme_index(self) -> int:
+        return self._theme_index
+
+    def set_theme_index(self, index: int) -> None:
+        if self._theme_index != index:
+            self._theme_index = index
+            self.theme_index_changed.emit(index)
+
+    theme_index = pyqtProperty(int, fget=get_theme_index, fset=set_theme_index, notify=theme_index_changed)
+
+    @pyqtProperty(str, notify=theme_index_changed)
+    def window_color(self) -> str:
+        from PyQt5.QtWidgets import QApplication
+        return QApplication.instance().palette().window().color().name()
+
+    @pyqtProperty(str, notify=theme_index_changed)
+    def window_text_color(self) -> str:
+        from PyQt5.QtWidgets import QApplication
+        return QApplication.instance().palette().windowText().color().name()
+
+    @pyqtProperty(str, notify=theme_index_changed)
+    def base_color(self) -> str:
+        from PyQt5.QtWidgets import QApplication
+        return QApplication.instance().palette().base().color().name()
+
+    @pyqtProperty(str, notify=theme_index_changed)
+    def text_color(self) -> str:
+        from PyQt5.QtWidgets import QApplication
+        return QApplication.instance().palette().text().color().name()
+
+    @pyqtProperty(str, notify=theme_index_changed)
+    def button_color(self) -> str:
+        from PyQt5.QtWidgets import QApplication
+        return QApplication.instance().palette().button().color().name()
+
+    @pyqtProperty(str, notify=theme_index_changed)
+    def button_text_color(self) -> str:
+        from PyQt5.QtWidgets import QApplication
+        return QApplication.instance().palette().buttonText().color().name()

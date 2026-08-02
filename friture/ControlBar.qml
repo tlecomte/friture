@@ -7,9 +7,10 @@ RowLayout {
     objectName: "controlBar"
     spacing: 0
 
-    SystemPalette { id: systemPalette; colorGroup: SystemPalette.Active }
-
     required property var viewModel
+    required property var main_window_view_model
+
+    readonly property color iconColor: main_window_view_model.window_text_color
 
     ComboBox {
         id: widgetSelector
@@ -37,7 +38,7 @@ RowLayout {
         id: settingsButton
         icon.source: "qrc:/images-src/dock-settings.svg"
         ToolTip.text: "Customize the audio widget"
-        icon.color: systemPalette.windowText
+        icon.color: controlBar.iconColor
         onClicked: viewModel.onSettingsClicked()
     }
 
@@ -45,7 +46,7 @@ RowLayout {
         id: movePreviousButton
         icon.source: "qrc:/images-src/dock-move-previous.svg"
         ToolTip.text: "Move widget to previous slot"
-        icon.color: systemPalette.windowText
+        icon.color: controlBar.iconColor
         onClicked: viewModel.onMovePreviousClicked()
     }
 
@@ -53,7 +54,7 @@ RowLayout {
         id: moveNextButton
         icon.source: "qrc:/images-src/dock-move-next.svg"
         ToolTip.text: "Move widget to next slot"
-        icon.color: systemPalette.windowText
+        icon.color: controlBar.iconColor
         onClicked: viewModel.onMoveNextClicked()
     }
 
@@ -61,7 +62,7 @@ RowLayout {
         id: closeButton
         icon.source: "qrc:/images-src/dock-close.svg"
         ToolTip.text: "Close the audio widget"
-        icon.color: systemPalette.windowText
+        icon.color: controlBar.iconColor
         onClicked: viewModel.onCloseClicked()
     }
 

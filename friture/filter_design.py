@@ -221,7 +221,7 @@ def main():
     low_freq = 20.
 
     impulse = zeros(N)
-    impulse[N / 2] = 1
+    impulse[N // 2] = 1
     f = 1000.
     # impulse = sin(2*pi*f*arange(0, N/fs, 1./fs))
 

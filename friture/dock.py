@@ -48,6 +48,7 @@ class Dock(QObject):
 
         self.dockmanager: 'DockManager' = parent.dockmanager
         self.audiobuffer = parent.audiobuffer
+        self._main_window_view_model = parent._main_window_view_model
 
         self.setObjectName(name)
 
@@ -67,11 +68,16 @@ class Dock(QObject):
         component_raise_if_error(dock_component)
 
         context = self.qml_engine.rootContext()
-        self.dock_qml = dock_component.createWithInitialProperties({}, context)
+        self.dock_qml = dock_component.createWithInitialProperties(
+            {"main_window_view_model": self._main_window_view_model}, context
+        )
         self.dock_qml.setParent(self.qml_engine)
         self.dock_qml.setParentItem(self.parent().main_tile_layout) # type: ignore
         
-        initialProperties = {"viewModel": self.controlbar_viewmodel}
+        initialProperties = {
+            "viewModel": self.controlbar_viewmodel,
+            "main_window_view_model": self._main_window_view_model
+        }
         component = QQmlComponent(self.qml_engine)
         component.loadUrl(qml_url("ControlBar.qml"))
 

@@ -1,10 +1,12 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.2
+import Friture 1.0
 
 Rectangle {
-    SystemPalette { id: systemPalette; colorGroup: SystemPalette.Active }
-    color: systemPalette.window
+    required property MainWindowViewModel main_window_view_model
+
+    color: main_window_view_model.window_color
 
     property string fixedFont
 
@@ -28,4 +30,3 @@ Rectangle {
         }
     }
 }
-
