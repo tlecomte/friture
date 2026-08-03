@@ -9,8 +9,6 @@ RowLayout {
 
     SystemPalette { id: systemPalette; colorGroup: SystemPalette.Active }
 
-    required property var viewModel
-
     ComboBox {
         id: widgetSelector
         model: [
@@ -38,31 +36,31 @@ RowLayout {
         icon.source: "qrc:/images-src/dock-settings.svg"
         ToolTip.text: "Customize the audio widget"
         icon.color: systemPalette.windowText
-        onClicked: viewModel.onSettingsClicked()
+        onClicked: viewModel.triggerSettingsClicked()
     }
-
+    
     ToolButton {
         id: movePreviousButton
         icon.source: "qrc:/images-src/dock-move-previous.svg"
         ToolTip.text: "Move widget to previous slot"
         icon.color: systemPalette.windowText
-        onClicked: viewModel.onMovePreviousClicked()
+        onClicked: viewModel.triggerMovePreviousClicked()
     }
-
+    
     ToolButton {
         id: moveNextButton
         icon.source: "qrc:/images-src/dock-move-next.svg"
         ToolTip.text: "Move widget to next slot"
         icon.color: systemPalette.windowText
-        onClicked: viewModel.onMoveNextClicked()
+        onClicked: viewModel.triggerMoveNextClicked()
     }
-
+    
     ToolButton {
         id: closeButton
         icon.source: "qrc:/images-src/dock-close.svg"
         ToolTip.text: "Close the audio widget"
         icon.color: systemPalette.windowText
-        onClicked: viewModel.onCloseClicked()
+        onClicked: viewModel.triggerCloseClicked()
     }
 
     Item {

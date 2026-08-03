@@ -20,7 +20,7 @@
 import logging
 import math
 
-from PyQt5 import QtCore
+from PyQt6 import QtCore
 import sounddevice
 import rtmixer
 from numpy import ndarray, vstack, int8, int16, float64, float32, frombuffer, concatenate

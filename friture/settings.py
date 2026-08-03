@@ -20,8 +20,8 @@
 import sys
 import logging
 
-from PyQt5 import QtCore, QtWidgets
-from PyQt5.QtCore import pyqtSignal, pyqtProperty
+from PyQt6 import QtCore, QtWidgets
+from PyQt6.QtCore import pyqtSignal, pyqtProperty  # type: ignore
 from friture.audiobackend import AudioBackend
 from friture.main_toolbar_view_model import MainToolbarViewModel
 from friture.ui_settings import Ui_Settings_Dialog
@@ -87,7 +87,7 @@ class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
 
     @pyqtProperty(bool, notify=show_playback_changed) # type: ignore
     def show_playback(self) -> bool:
-        return bool(self.checkbox_showPlayback.checkState())
+        return self.checkbox_showPlayback.checkState() == QtCore.Qt.CheckState.Checked
 
     # slot
     # used when no audio input device has been found, to exit immediately
@@ -176,7 +176,7 @@ class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
 
     # slot
     def show_playback_checkbox_changed(self, state: int) -> None:
-        self.show_playback_changed.emit(bool(state))
+        self.show_playback_changed.emit(state == QtCore.Qt.CheckState.Checked.value)
 
     # slot
     def history_length_edit_finished(self) -> None:
@@ -190,7 +190,7 @@ class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
         settings.setValue("firstChannel", self.comboBox_firstChannel.currentIndex())
         settings.setValue("secondChannel", self.comboBox_secondChannel.currentIndex())
         settings.setValue("duoInput", self.inputTypeButtonGroup.checkedId())
-        settings.setValue("showPlayback", self.checkbox_showPlayback.checkState())
+        settings.setValue("showPlayback", self.checkbox_showPlayback.checkState().value)
         settings.setValue("historyLength", self.spinBox_historyLength.value())
 
     # method
@@ -206,7 +206,7 @@ class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
             self.comboBox_secondChannel.setCurrentIndex(channel)
             duo_input_id = settings.value("duoInput", 0, type=int)
             self.inputTypeButtonGroup.button(duo_input_id).setChecked(True)
-        self.checkbox_showPlayback.setCheckState(settings.value("showPlayback", 0, type=int))
+        self.checkbox_showPlayback.setCheckState(QtCore.Qt.CheckState(settings.value("showPlayback", 0, type=int)))
         self.spinBox_historyLength.setValue(settings.value("historyLength", 30, type=int))
         # need to emit this because setValue doesn't emit editFinished
         self.history_length_changed.emit(self.spinBox_historyLength.value())

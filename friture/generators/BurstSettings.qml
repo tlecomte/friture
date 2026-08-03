@@ -4,7 +4,7 @@ import Friture 1.0
 
 Row {
     id: root
-    required property Burst_Generator_Settings_View_Model viewModel
+    required property Burst_Generator_Settings_View_Model settingsViewModel
     spacing: 8
 
     SystemPalette { id: systemPalette; colorGroup: SystemPalette.Active }
@@ -15,8 +15,8 @@ Row {
         anchors.verticalCenter: parent.verticalCenter
     }
     DecimalSpinBox {   
-        binding: root.viewModel.period
-        onDecimalValueModified: root.viewModel.period = decimalValue
+        binding: root.settingsViewModel.period
+        onDecimalValueModified: root.settingsViewModel.period = decimalValue
         suffix: " s"
         decimalFrom: 0.01
         decimalTo: 60

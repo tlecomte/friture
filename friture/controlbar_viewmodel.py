@@ -1,4 +1,4 @@
-from PyQt5.QtCore import QObject, pyqtSignal, pyqtProperty
+from PyQt6.QtCore import QObject, pyqtSignal, pyqtProperty, pyqtSlot  # type: ignore
 
 class ControlBarViewModel(QObject):
     indexChanged = pyqtSignal(int)
@@ -21,14 +21,18 @@ class ControlBarViewModel(QObject):
 
     currentIndex = pyqtProperty(int, fget=getCurrentIndex, fset=setCurrentIndex, notify=indexChanged)
 
-    def onSettingsClicked(self):
+    @pyqtSlot()  # type: ignore
+    def triggerSettingsClicked(self):
         self.settingsClicked.emit()
 
-    def onMovePreviousClicked(self):
+    @pyqtSlot()  # type: ignore
+    def triggerMovePreviousClicked(self):
         self.movePreviousClicked.emit()
 
-    def onMoveNextClicked(self):
+    @pyqtSlot()  # type: ignore
+    def triggerMoveNextClicked(self):
         self.moveNextClicked.emit()
 
-    def onCloseClicked(self):
+    @pyqtSlot()  # type: ignore
+    def triggerCloseClicked(self):
         self.closeClicked.emit()

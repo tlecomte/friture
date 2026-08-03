@@ -3,8 +3,6 @@ import QtQuick.Controls 2.15
 
 Rectangle {
     id: root
-    required property var viewModel
-    required property string fixedFont
 
     SystemPalette { id: systemPalette; colorGroup: SystemPalette.Active }
     color: systemPalette.window

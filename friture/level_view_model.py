@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt5 import QtCore
-from PyQt5.QtCore import pyqtProperty
+from PyQt6 import QtCore
+from PyQt6.QtCore import QObject, pyqtProperty  # type: ignore
 
 from friture.ballistic_peak import BallisticPeak
 from friture.level_data import LevelData
@@ -48,26 +48,26 @@ class LevelViewModel(QtCore.QObject):
             self._two_channels = two_channels
             self.two_channels_changed.emit(two_channels)
 
-    @pyqtProperty(LevelData, constant = True) # type: ignore
+    @pyqtProperty(QObject, constant = True) # type: ignore
     def level_data(self):
         return self._level_data
 
-    @pyqtProperty(LevelData, constant = True) # type: ignore
+    @pyqtProperty(QObject, constant = True) # type: ignore
     def level_data_2(self):
         return self._level_data_2
 
-    @pyqtProperty(LevelData, constant = True) # type: ignore
+    @pyqtProperty(QObject, constant = True) # type: ignore
     def level_data_slow(self):
         return self._level_data_slow
 
-    @pyqtProperty(LevelData, constant = True) # type: ignore
+    @pyqtProperty(QObject, constant = True) # type: ignore
     def level_data_slow_2(self):
         return self._level_data_slow_2
 
-    @pyqtProperty(LevelData, constant = True) # type: ignore
+    @pyqtProperty(QObject, constant = True) # type: ignore
     def level_data_ballistic(self):
         return self._level_data_ballistic
 
-    @pyqtProperty(LevelData, constant = True) # type: ignore
+    @pyqtProperty(QObject, constant = True) # type: ignore
     def level_data_ballistic_2(self):
         return self._level_data_ballistic_2

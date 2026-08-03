@@ -9,21 +9,20 @@ Rectangle {
     SystemPalette { id: systemPalette; colorGroup: SystemPalette.Active }
     color: systemPalette.window
 
-    required property MainWindowViewModel main_window_view_model
-    required property string fixedFont
+    property string fixedFont
 
     GridLayout {
         objectName: "main_row_layout"
         anchors.fill: parent
-        rows: main_window.main_window_view_model.playback_control_enabled ? 2 : 1
+        rows: main_window_view_model.playback_control_enabled ? 2 : 1
         columns: 2
         rowSpacing: 3
         columnSpacing: 3
 
         Levels {
-            level_view_model: main_window.main_window_view_model.level_view_model
+            level_view_model: main_window_view_model.level_view_model
             Layout.row: 0
-            Layout.rowSpan: main_window.main_window_view_model.playback_control_enabled ? 2 : 1
+            Layout.rowSpan: main_window_view_model.playback_control_enabled ? 2 : 1
             Layout.column: 0
             Layout.fillHeight: true
             Layout.margins: 5
@@ -47,9 +46,9 @@ Rectangle {
             Layout.fillWidth: true
             Layout.margins: 5
 
-            viewModel: main_window.main_window_view_model.playback_control_view_model
+            viewModel: main_window_view_model.playback_control_view_model
 
-            visible: main_window.main_window_view_model.playback_control_enabled
+            visible: main_window_view_model.playback_control_enabled
         }
     }
 }

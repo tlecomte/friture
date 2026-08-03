@@ -21,7 +21,7 @@
 
 
 import logging
-from PyQt5.QtCore import QObject
+from PyQt6.QtCore import QObject
 import numpy as np
 from friture.longlevels_settings import (LongLevels_Settings_Dialog,
                                          DEFAULT_LEVEL_MIN,

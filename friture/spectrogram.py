@@ -19,7 +19,7 @@
 
 """Spectrogram widget, that displays a rolling 2D image of the time-frequency spectrum."""
 
-from PyQt5.QtCore import QObject
+from PyQt6.QtCore import QObject
 from numpy import log10, floor, zeros, float64, tile, array, ndarray
 from friture.audiobuffer import AudioBuffer
 from friture.imageplot import ImagePlot

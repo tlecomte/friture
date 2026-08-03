@@ -1,6 +1,6 @@
-from PyQt5 import QtCore
-from PyQt5.QtCore import QObject, pyqtProperty
-from PyQt5.QtQml import QQmlListProperty # type: ignore
+from PyQt6 import QtCore
+from PyQt6.QtCore import QObject, pyqtProperty  # type: ignore
+from PyQt6.QtQml import QQmlListProperty # type: ignore
 
 __storeInstance = None
 

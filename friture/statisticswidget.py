@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt5 import QtCore, QtWidgets, QtGui
+from PyQt6 import QtCore, QtWidgets, QtGui
 from friture.audiobackend import AudioBackend
 
 
@@ -30,7 +30,7 @@ class StatisticsWidget(QtWidgets.QWidget):
 
         self.stats_scrollarea = QtWidgets.QScrollArea(self)
         self.stats_scrollarea.setWidgetResizable(True)
-        self.stats_scrollarea.setAlignment(QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
+        self.stats_scrollarea.setAlignment(QtCore.Qt.AlignmentFlag.AlignLeading | QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignTop)
         self.stats_scrollarea.setObjectName("stats_scrollArea")
 
         self.scrollAreaWidgetContents = QtWidgets.QWidget(self.stats_scrollarea)
@@ -38,14 +38,14 @@ class StatisticsWidget(QtWidgets.QWidget):
         self.scrollAreaWidgetContents.setObjectName("stats_scrollAreaWidgetContents")
 
         palette = self.scrollAreaWidgetContents.palette()
-        palette.setColor(QtGui.QPalette.Window, palette.color(QtGui.QPalette.Base))
+        palette.setColor(QtGui.QPalette.ColorRole.Window, palette.color(QtGui.QPalette.ColorRole.Base))
         self.scrollAreaWidgetContents.setPalette(palette)
         self.scrollAreaWidgetContents.setAutoFillBackground(True)
 
         self.LabelStats = QtWidgets.QLabel(self.scrollAreaWidgetContents)
-        self.LabelStats.setAlignment(QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
-        self.LabelStats.setTextInteractionFlags(QtCore.Qt.LinksAccessibleByKeyboard | QtCore.Qt.LinksAccessibleByMouse |
-                                                QtCore.Qt.TextBrowserInteraction | QtCore.Qt.TextSelectableByKeyboard | QtCore.Qt.TextSelectableByMouse)
+        self.LabelStats.setAlignment(QtCore.Qt.AlignmentFlag.AlignLeading | QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignTop)
+        self.LabelStats.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.LinksAccessibleByKeyboard | QtCore.Qt.TextInteractionFlag.LinksAccessibleByMouse |
+                                                QtCore.Qt.TextInteractionFlag.TextBrowserInteraction | QtCore.Qt.TextInteractionFlag.TextSelectableByKeyboard | QtCore.Qt.TextInteractionFlag.TextSelectableByMouse)
         self.LabelStats.setObjectName("LabelStats")
 
         self.stats_layout = QtWidgets.QVBoxLayout(self.scrollAreaWidgetContents)

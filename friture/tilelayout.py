@@ -19,21 +19,21 @@
 
 import math
 
-from PyQt5.QtQuick import QQuickItem
+from PyQt6.QtQuick import QQuickItem
 
 class TileLayout(QQuickItem):
 
     def __init__(self, parent = None):
         super().__init__(parent)
 
-        self.setFlag(QQuickItem.ItemHasContents, False)
+        self.setFlag(QQuickItem.Flag.ItemHasContents, False)
 
         self.widthChanged.connect(self.updatePolish)
         self.heightChanged.connect(self.updatePolish)
 
     def itemChange(self, change, value):
-        if (change == QQuickItem.ItemChildAddedChange
-          or change == QQuickItem.ItemChildRemovedChange):
+        if (change == QQuickItem.ItemChange.ItemChildAddedChange
+           or change == QQuickItem.ItemChange.ItemChildRemovedChange):
             self.polish()
     
         return super().itemChange(change, value)

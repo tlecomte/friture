@@ -13,7 +13,7 @@ sudo apt-get install -y fuse # AppImages require FUSE to run
 
 # when PyInstaller collect libraries, it ignores libraries that are not found on the host.
 # Those missing libs prevent proper startup.
-# For example, PyQt5 bundles Qt5 libs that depend on libxcb-xinerama.so.0
+# For example, PyQt6 bundles Qt6 libs that depend on libxcb-xinerama.so.0
 # which would not be bundled unless explicitly installed.
 sudo apt-get install libxcb-xinerama0
 sudo apt-get install libxkbcommon-x11-0

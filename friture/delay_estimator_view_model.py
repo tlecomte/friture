@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt5 import QtCore
+from PyQt6 import QtCore
 
 class Delay_Estimator_View_Model(QtCore.QObject):
     delayChanged = QtCore.pyqtSignal(str)

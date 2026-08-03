@@ -7,9 +7,6 @@ import "plotItemColors.js" as PlotItemColors
 
 Item {
     id: container
-    required property var viewModel
-    required property string fixedFont
-
     anchors.fill: parent
 
     Plot {

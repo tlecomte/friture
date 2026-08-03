@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt5 import QtCore
-from PyQt5.QtCore import pyqtProperty
+from PyQt6 import QtCore
+from PyQt6.QtCore import pyqtProperty  # type: ignore
 
 class BarLabel(QtCore.QObject):
     x_changed = QtCore.pyqtSignal()

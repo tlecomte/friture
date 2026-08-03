@@ -23,8 +23,8 @@ import time
 import traceback
 import friture
 import platformdirs
-from PyQt5 import QtCore
-from PyQt5.QtWidgets import QMessageBox, QApplication
+from PyQt6 import QtCore
+from PyQt6.QtWidgets import QMessageBox, QApplication
 
 
 def fileexcepthook(exception_type, exception_value, traceback_object):
@@ -67,14 +67,14 @@ def errorBox(message):
         errorbox = QMessageBox()
         errorbox.setWindowTitle("Friture error occured")
         errorbox.setText(message)
-        errorbox.setTextFormat(QtCore.Qt.RichText)
-        errorbox.setStandardButtons(QMessageBox.Abort)
+        errorbox.setTextFormat(QtCore.Qt.TextFormat.RichText)
+        errorbox.setStandardButtons(QMessageBox.StandardButton.Abort)
 
-        continueButton = errorbox.addButton("Ignore and try to continue", QMessageBox.RejectRole)
+        continueButton = errorbox.addButton("Ignore and try to continue", QMessageBox.ButtonRole.RejectRole)
 
-        ret = errorbox.exec_()
+        ret = errorbox.exec()
 
-        if ret == QMessageBox.Abort:
+        if ret == QMessageBox.StandardButton.Abort:
             sys.exit(1)
         else:
             logger.info("Try to continue")

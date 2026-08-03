@@ -1,5 +1,5 @@
-from PyQt5 import QtCore
-from PyQt5.QtCore import pyqtProperty, pyqtSlot
+from PyQt6 import QtCore
+from PyQt6.QtCore import QObject, pyqtProperty, pyqtSlot  # type: ignore
 
 from friture.plotting.coordinateTransform import CoordinateTransform
 from friture.plotting.scaleDivision import ScaleDivision
@@ -42,7 +42,7 @@ class Axis(QtCore.QObject):
         self._scale_division.setScale(scale)
         self._coordinate_transform.setScale(scale)
 
-    @pyqtProperty(ScaleDivision, constant=True) # type: ignore
+    @pyqtProperty(QObject, constant=True) # type: ignore
     def scale_division(self):
         return self._scale_division
 

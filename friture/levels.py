@@ -19,7 +19,7 @@
 
 """Level widget that displays peak and RMS levels for 1 or 2 ports."""
 
-from PyQt5.QtCore import QObject
+from PyQt6.QtCore import QObject
 import numpy as np
 
 from friture.levels_settings import Levels_Settings_Dialog  # settings dialog

@@ -17,16 +17,12 @@
 # You should have received a copy of the GNU General Public License
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt5.QtCore import pyqtSignal, pyqtProperty, QRectF
-from PyQt5.QtQuick import QQuickPaintedItem
-from PyQt5.QtGui import QPainter
+from PyQt6.QtCore import QObject, pyqtSignal, pyqtProperty, QRectF  # type: ignore
+from PyQt6.QtQuick import QQuickPaintedItem
+from PyQt6.QtGui import QPainter
 from friture.audiobackend import AudioBackend
 from friture.spectrogram_item_data import SpectrogramImageData
 
-# QQuickPaintedItem does not work for all Qt backends.
-# Ideally we would use QSGSimpleTextureNode and createTextureFromImage instead,
-# but I did not manage to fix the segfaults that I got with those
-# To revist in Qt6
 class SpectrogramItem(QQuickPaintedItem):
     curveChanged = pyqtSignal()
 
@@ -36,7 +32,7 @@ class SpectrogramItem(QQuickPaintedItem):
 
         self._curve = SpectrogramImageData()
 
-    @pyqtProperty(SpectrogramImageData, notify=curveChanged)
+    @pyqtProperty(QObject, notify=curveChanged)
     def curve(self) -> SpectrogramImageData:
         return self._curve
 
@@ -53,12 +49,14 @@ class SpectrogramItem(QQuickPaintedItem):
     def updateScreenSize(self) -> None:
         self._curve.update_screen_size(self.width(), self.height())
 
-    def paint(self, painter: QPainter) -> None:
+    def paint(self, painter: QPainter | None) -> None:  # type: ignore
         if self._curve.is_playing:
             self.last_paint_time = AudioBackend().get_stream_time()
         
         pixmap_source_rect = self._curve.pixmap_source_rect(self.last_paint_time)
 
+        if painter is None:
+            return
         painter.drawPixmap(
             QRectF(0, 0, self.width(), self.height()),
             self._curve.pixmap(),

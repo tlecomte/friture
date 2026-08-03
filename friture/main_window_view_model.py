@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt5 import QtCore
-from PyQt5.QtCore import pyqtProperty, pyqtSignal
+from PyQt6 import QtCore
+from PyQt6.QtCore import QObject, pyqtProperty, pyqtSignal  # type: ignore
 
 from friture.level_view_model import LevelViewModel
 from friture.main_toolbar_view_model import MainToolbarViewModel
@@ -35,15 +35,15 @@ class MainWindowViewModel(QtCore.QObject):
         self._playback_control_view_model = PlaybackControlViewModel(self)
         self._playback_control_enabled = False
 
-    @pyqtProperty(MainToolbarViewModel, constant=True) # type: ignore
+    @pyqtProperty(QObject, constant=True) # type: ignore
     def toolbar_view_model(self):
         return self._toolbar_view_model
 
-    @pyqtProperty(LevelViewModel, constant=True) # type: ignore
+    @pyqtProperty(QObject, constant=True) # type: ignore
     def level_view_model(self):
         return self._level_view_model
     
-    @pyqtProperty(PlaybackControlViewModel, constant=True) # type: ignore
+    @pyqtProperty(QObject, constant=True) # type: ignore
     def playback_control_view_model(self):
         return self._playback_control_view_model
     
@@ -55,4 +55,4 @@ class MainWindowViewModel(QtCore.QObject):
             self._playback_control_enabled = playback_control_enabled
             self.playback_control_enabled_changed.emit(playback_control_enabled)
     
-    playback_control_enabled = pyqtProperty(int, fget=get_playback_control_enabled, fset=set_playback_control_enabled, notify=playback_control_enabled_changed)
+    playback_control_enabled = pyqtProperty(bool, fget=get_playback_control_enabled, fset=set_playback_control_enabled, notify=playback_control_enabled_changed)  # type: ignore

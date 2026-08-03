@@ -19,7 +19,7 @@
 
 import logging
 
-from PyQt5.QtCore import pyqtSignal, QObject
+from PyQt6.QtCore import pyqtSignal, QObject
 
 from friture.playback.playback_control_view_model import PlaybackControlViewModel
 from friture.playback.player import Player

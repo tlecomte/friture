@@ -19,7 +19,7 @@
 
 import numpy as np
 
-from PyQt5.QtQuick import QQuickItem, QSGGeometryNode, QSGGeometry, QSGNode, QSGVertexColorMaterial
+from PyQt6.QtQuick import QQuickItem, QSGGeometryNode, QSGGeometry, QSGNode, QSGVertexColorMaterial
 
 from friture.plotting import generated_cmrmap
 
@@ -30,7 +30,7 @@ class ColorBar(QQuickItem):
 
         self._cmap = generated_cmrmap.CMAP
 
-        self.setFlag(QQuickItem.ItemHasContents, True)
+        self.setFlag(QQuickItem.Flag.ItemHasContents, True)
 
     def updatePaintNode(self, paint_node, update_data):
 
@@ -48,16 +48,16 @@ class ColorBar(QQuickItem):
             paint_node = QSGGeometryNode()
 
             geometry = QSGGeometry(QSGGeometry.defaultAttributes_ColoredPoint2D(), vertex_count)
-            geometry.setDrawingMode(QSGGeometry.DrawTriangles)
+            geometry.setDrawingMode(QSGGeometry.DrawingMode.DrawTriangles)
             paint_node.setGeometry(geometry)
-            paint_node.setFlag(QSGNode.OwnsGeometry)
+            paint_node.setFlag(QSGNode.Flag.OwnsGeometry)
 
             material = QSGVertexColorMaterial()
             opaque_material = QSGVertexColorMaterial()
             paint_node.setMaterial(material)
             paint_node.setMaterial(opaque_material)
-            paint_node.setFlag(QSGNode.OwnsMaterial)
-            paint_node.setFlag(QSGNode.OwnsOpaqueMaterial)
+            paint_node.setFlag(QSGNode.Flag.OwnsMaterial)
+            paint_node.setFlag(QSGNode.Flag.OwnsOpaqueMaterial)
         else:
             geometry = paint_node.geometry()
             geometry.allocate(vertex_count) # geometry will be marked as dirty below
@@ -132,7 +132,7 @@ class ColorBar(QQuickItem):
         vertices[5::6]['b'] = b
         vertices[5::6]['a'] = a
 
-        paint_node.markDirty(QSGNode.DirtyGeometry)
-        paint_node.markDirty(QSGNode.DirtyMaterial)
+        paint_node.markDirty(QSGNode.DirtyStateBit.DirtyGeometry)
+        paint_node.markDirty(QSGNode.DirtyStateBit.DirtyMaterial)
 
         return paint_node

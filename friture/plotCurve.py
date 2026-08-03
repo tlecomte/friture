@@ -1,7 +1,7 @@
 import numpy as np
-from PyQt5.QtCore import pyqtSignal, pyqtProperty # type: ignore
-from PyQt5.QtGui import QColor
-from PyQt5.QtQuick import QQuickItem, QSGGeometryNode, QSGGeometry, QSGFlatColorMaterial, QSGNode # type: ignore
+from PyQt6.QtCore import QObject, pyqtSignal, pyqtProperty # type: ignore  # type: ignore
+from PyQt6.QtGui import QColor
+from PyQt6.QtQuick import QQuickItem, QSGGeometryNode, QSGGeometry, QSGFlatColorMaterial, QSGNode # type: ignore
 
 from friture.curve import Curve
 
@@ -12,7 +12,7 @@ class PlotCurve(QQuickItem):
     def __init__(self, parent = None):
         super().__init__(parent)
 
-        self.setFlag(QQuickItem.ItemHasContents, True)
+        self.setFlag(QQuickItem.Flag.ItemHasContents, True)
 
         self._x_array = np.array([0])
         self._y_array = np.array([0])
@@ -31,7 +31,7 @@ class PlotCurve(QQuickItem):
             self.update()
             self.colorChanged.emit()
 
-    @pyqtProperty(Curve, notify=curveChanged)
+    @pyqtProperty(QObject, notify=curveChanged)
     def curve(self):
         return self._curve
 
@@ -51,15 +51,15 @@ class PlotCurve(QQuickItem):
 
             geometry = QSGGeometry(QSGGeometry.defaultAttributes_Point2D(), self.curve.x_array().size)
             geometry.setLineWidth(2)
-            geometry.setDrawingMode(QSGGeometry.GL_LINE_STRIP)
+            geometry.setDrawingMode(QSGGeometry.DrawingMode.DrawLineStrip)
             paint_node.setGeometry(geometry)
-            paint_node.setFlag(QSGNode.OwnsGeometry)
+            paint_node.setFlag(QSGNode.Flag.OwnsGeometry)
 
             material = QSGFlatColorMaterial()
             material.setColor(self._color)
             paint_node.setMaterial(material)
-            paint_node.setFlag(QSGNode.OwnsMaterial)
-            paint_node.markDirty(QSGNode.DirtyMaterial)
+            paint_node.setFlag(QSGNode.Flag.OwnsMaterial)
+            paint_node.markDirty(QSGNode.DirtyStateBit.DirtyMaterial)
 
         else:
             geometry = paint_node.geometry()
@@ -68,7 +68,7 @@ class PlotCurve(QQuickItem):
             material = paint_node.material()
             if material.color() != self._color:
                 material.setColor(self._color)
-                paint_node.markDirty(QSGNode.DirtyMaterial)
+                paint_node.markDirty(QSGNode.DirtyStateBit.DirtyMaterial)
 
         size = self.curve.x_array().size
 
@@ -83,6 +83,6 @@ class PlotCurve(QQuickItem):
         polygon_array[: (size - 1) * 2 + 1 : 2] = np.asarray(self.curve.x_array() * self.width(), dtype=np.float32)
         polygon_array[1 : (size - 1) * 2 + 2 : 2] = np.asarray(self.curve.y_array() * self.height(), dtype=np.float32)
 
-        paint_node.markDirty(QSGNode.DirtyGeometry)
+        paint_node.markDirty(QSGNode.DirtyStateBit.DirtyGeometry)
 
         return paint_node

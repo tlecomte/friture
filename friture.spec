@@ -8,57 +8,43 @@ from PyInstaller.utils.hooks import collect_data_files
 
 block_cipher = None
 
-# pyinstaller is conservative: it includes all Qt5 modules by default
+# pyinstaller is conservative: it includes all Qt6 modules by default
 # to reduce our frozen image size, we exclude unused modules
 excludes = [
-        'PyQt5.QtHelp',
-        'PyQt5.QtMultimedia',
-        'PyQt5.QtScript',
-        'PyQt5.QtScriptTools',
-        'PyQt5.QtSql',
-        'PyQt5.QtDesigner',
-        'PyQt5.QtTest',
-        'PyQt5.QtWebKit',
-        'PyQt5.QtXMLPatterns',
-        'PyQt5.QtCLucene',
-        'PyQt5.QtBluetooth',
-        'PyQt5.QtConcurrent',
-        'PyQt5.QtMultimediaWidgets',
-        'PyQt5.QtPositioning',
-        'PyQt5.QtSensors',
-        'PyQt5.QtSerialPort',
-        'PyQt5.QtWebChannel',
-        'PyQt5.QtWebEngine',
-        'PyQt5.QtWebEngineCore',
-        'PyQt5.QtWebEngineWidgets',
-        'PyQt5.QtWebKitWidgets',
-        'PyQt5.QtWebSockets']
+        'PyQt6.QtHelp',
+        'PyQt6.QtMultimedia',
+        'PyQt6.QtSql',
+        'PyQt6.QtDesigner',
+        'PyQt6.QtTest',
+        'PyQt6.QtPositioning',
+        'PyQt6.QtSensors',
+        'PyQt6.QtSerialPort',
+        'PyQt6.QtWebChannel',
+        'PyQt6.QtWebEngine',
+        'PyQt6.QtWebEngineCore',
+        'PyQt6.QtWebEngineWidgets',
+        'PyQt6.QtWebSockets']
 
 excluded_binaries = [
-        'Qt5Bluetooth.dll',
-        'Qt5DBus.dll',
-        'Qt5Location.dll',
-        'Qt5Nfc.dll',
-        'Qt5Positioning.dll',
-        'Qt5PositioningQuick.dll',
-        'Qt5PrintSupport.dll',
-        'Qt5RemoteObjects.dll',
-        'Qt5WebSockets.dll',
-        'Qt5WinExtras.dll',
-        'Qt5Xml.dll',
-        'Qt5XmlPatterns.dll',
+        'Qt6Bluetooth.dll',
+        'Qt6DBus.dll',
+        'Qt6Location.dll',
+        'Qt6Nfc.dll',
+        'Qt6Positioning.dll',
+        'Qt6PositioningQuick.dll',
+        'Qt6PrintSupport.dll',
+        'Qt6RemoteObjects.dll',
+        'Qt6WebSockets.dll',
+        'Qt6WinExtras.dll',
+        'Qt6Xml.dll',
 
         # # macos
         'QtHelp.framework',
         'QtMultimedia.framework',
-        'QtScript.framework',
-        'QtScriptTools.framework',
         'QtSql.framework',
         'QtDesigner.framework',
         'QtTest.framework',
-        'QtWebKit.framework',
         'QtXMLPatterns.framework',
-        'QtCLucene.framework',
         'QtBluetooth.framework',
         'QtConcurrent.framework',
         'QtMultimediaWidgets.framework',
@@ -69,15 +55,14 @@ excluded_binaries = [
         'QtWebEngine.framework',
         'QtWebEngineCore.framework',
         'QtWebEngineWidgets.framework',
-        'QtWebKitWidgets.framework',
         'QtWebSockets.framework'
         ]
 
 pathex = []
 if platform.system() == "Windows":
-  # workaround for PyInstaller that does not look where the new PyQt5 official wheels put the Qt dlls
+  # workaround for PyInstaller that does not look where the new PyQt6 official wheels put the Qt dlls
   from PyInstaller.compat import getsitepackages
-  pathex += [os.path.join(x, 'PyQt5', 'Qt', 'bin') for x in getsitepackages()]
+  pathex += [os.path.join(x, 'PyQt6', 'Qt', 'bin') for x in getsitepackages()]
 
 a = Analysis(['main.py'],
              pathex=pathex,
@@ -120,6 +105,6 @@ app = BUNDLE(coll,
          bundle_identifier="org.silentgain.friture",
          version=friture.__version__,
          info_plist={
-            'NSMicrophoneUsageDescription': 'Friture reads from the audio inputs to show visualizations',
-            'CFBundleVersion': friture.__version__
+             'NSMicrophoneUsageDescription': 'Friture reads from the audio inputs to show visualizations',
+             'CFBundleVersion': friture.__version__
          })

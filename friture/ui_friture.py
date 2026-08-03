@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 
-from PyQt5 import QtCore, QtGui
+from PyQt6 import QtCore, QtGui
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(869, 573)
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap(":/images-src/window-icon.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap(":/images-src/window-icon.svg"), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
         MainWindow.setWindowIcon(icon)
 
         self.retranslateUi(MainWindow)

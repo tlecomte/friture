@@ -18,7 +18,7 @@
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
-from PyQt5.QtCore import QObject
+from PyQt6.QtCore import QObject
 from numpy import zeros, ones, log10
 import numpy
 from friture.filled_curve import CurveType, FilledCurve

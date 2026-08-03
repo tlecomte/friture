@@ -19,8 +19,8 @@
 
 import logging
 
-from PyQt5 import QtWidgets
-from PyQt5.QtCore import QObject
+from PyQt6 import QtWidgets
+from PyQt6.QtCore import QObject
 
 from numpy import log10, where, sign, arange, zeros
 

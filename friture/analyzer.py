@@ -26,13 +26,13 @@ import platform
 import logging
 import logging.handlers
 
-from PyQt5 import QtCore
-# specifically import from PyQt5.QtGui and QWidgets for startup time improvement :
-from PyQt5.QtWidgets import QMainWindow, QApplication, QSplashScreen, QWidget
-from PyQt5.QtGui import QPixmap, QFontDatabase
-from PyQt5.QtQml import QQmlEngine, qmlRegisterSingletonType, qmlRegisterType
-from PyQt5.QtCore import QObject
-from PyQt5.QtQuick import QQuickView
+from PyQt6 import QtCore
+# specifically import from PyQt6.QtGui and QWidgets for startup time improvement :
+from PyQt6.QtWidgets import QMainWindow, QApplication, QSplashScreen, QWidget
+from PyQt6.QtGui import QPixmap, QFontDatabase
+from PyQt6.QtQml import QQmlEngine, qmlRegisterSingletonType, qmlRegisterType
+from PyQt6.QtCore import QObject
+from PyQt6.QtQuick import QQuickView
 
 import platformdirs
 
@@ -131,7 +131,7 @@ class Friture(QMainWindow, ):
         qmlRegisterType(Sweep_Generator_Settings_View_Model, 'Friture', 1, 0, 'Sweep_Generator_Settings_View_Model')
         qmlRegisterType(Sine_Generator_Settings_View_Model, 'Friture', 1, 0, 'Sine_Generator_Settings_View_Model')
 
-        qmlRegisterSingletonType(Store, 'Friture', 1, 0, 'Store', lambda engine, script_engine: GetStore())
+        qmlRegisterSingletonType(Store, 'Friture', 1, 0, lambda engine, script_engine: GetStore(), 'Store')
 
         # Setup the user interface
         self.ui = Ui_MainWindow()
@@ -161,10 +161,12 @@ class Friture(QMainWindow, ):
         self.settings_dialog = Settings_Dialog(self, self._main_window_view_model.toolbar_view_model)
 
         self.quick_view = QQuickView(self.qml_engine, None)
-        self.quick_view.setResizeMode(QQuickView.SizeRootObjectToView)
+        self.quick_view.setResizeMode(QQuickView.ResizeMode.SizeRootObjectToView)
+        self.qml_engine.rootContext().setContextProperty("main_window_view_model", self._main_window_view_model)
+        fixed_font = QFontDatabase.systemFont(QFontDatabase.SystemFont.FixedFont).family()
+        self.qml_engine.rootContext().setContextProperty("fixedFont", fixed_font)
         self.quick_view.setInitialProperties({
-            "main_window_view_model": self._main_window_view_model,
-            "fixedFont": QFontDatabase.systemFont(QFontDatabase.FixedFont).family()
+            "fixedFont": fixed_font
         })
         self.quick_view.setSource(qml_url("FritureMainWindow.qml"))
 
@@ -268,7 +270,7 @@ class Friture(QMainWindow, ):
         if settings.contains("CentralWidget/type"):
             settings.beginGroup("CentralWidget")
             centralWidgetKeys = settings.allKeys()
-            children = {key: settings.value(key, type=QtCore.QVariant) for key in centralWidgetKeys}
+            children = {key: settings.value(key) for key in centralWidgetKeys}
             settings.endGroup()
 
             if not settings.contains("Docks/central/type"):
@@ -353,13 +355,13 @@ class Friture(QMainWindow, ):
 
 def qt_message_handler(mode, context, message):
     logger = logging.getLogger(__name__)
-    if mode == QtCore.QtInfoMsg:
+    if mode == QtCore.QtMsgType.QtInfoMsg:
         logger.info(message)
-    elif mode == QtCore.QtWarningMsg:
+    elif mode == QtCore.QtMsgType.QtWarningMsg:
         logger.warning(message)
-    elif mode == QtCore.QtCriticalMsg:
+    elif mode == QtCore.QtMsgType.QtCriticalMsg:
         logger.error(message)
-    elif mode == QtCore.QtFatalMsg:
+    elif mode == QtCore.QtMsgType.QtFatalMsg:
         logger.critical(message)
     else:
         logger.debug(message)
@@ -511,7 +513,7 @@ def main():
         # friture.cprof can be visualized with SnakeViz
         # http://jiffyclub.github.io/snakeviz/
         # snakeviz friture.cprof
-        cProfile.runctx('app.exec_()', globals(), locals(), filename="friture.cprof")
+        cProfile.runctx('app.exec()', globals(), locals(), filename="friture.cprof")
 
         logger.info("Profile saved to '%s'", "friture.cprof")
 
@@ -523,13 +525,13 @@ def main():
         import lsprofcalltree
 
         p = cProfile.Profile()
-        p.run('app.exec_()')
+        p.run('app.exec()')
 
         k = lsprofcalltree.KCacheGrind(p)
         with open('cachegrind.out.00000', 'wb') as data:
             k.output(data)
     else:
-        return_code = app.exec_()
+        return_code = app.exec()
 
     # explicitly delete the main windows instead of waiting for the interpreter shutdown
     # tentative to prevent errors on exit on macos
