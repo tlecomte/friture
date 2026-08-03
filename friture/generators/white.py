@@ -18,7 +18,7 @@
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
 from numpy.random import standard_normal
-from PyQt5.QtCore import QObject
+from PyQt6.QtCore import QObject
 
 class WhiteGenerator:
     name = "White noise"

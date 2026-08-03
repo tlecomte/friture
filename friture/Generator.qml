@@ -1,14 +1,11 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
-import QtQuick.Dialogs 1.3
 import QtQml 2.15
 import "./generators"
 
 Rectangle {
     id: generatorRoot
-    required property var viewModel
-    required property string fixedFont
 
     SystemPalette { id: systemPalette; colorGroup: SystemPalette.Active }
     color: systemPalette.window
@@ -34,28 +31,33 @@ Rectangle {
         }
 
         SineSettings {
-            viewModel: generatorRoot.viewModel.sineGenerator
-            visible: generatorRoot.viewModel.generatorIndex === 0
+            Layout.fillWidth: true
+            settingsViewModel: viewModel.sineGenerator
+            visible: viewModel.generatorIndex === 0
         }
 
         WhiteSettings {
-            viewModel: generatorRoot.viewModel.whiteGenerator
-            visible: generatorRoot.viewModel.generatorIndex === 1
+            Layout.fillWidth: true
+            settingsViewModel: viewModel.whiteGenerator
+            visible: viewModel.generatorIndex === 1
         }
 
         PinkSettings {
-            viewModel: generatorRoot.viewModel.pinkGenerator
-            visible: generatorRoot.viewModel.generatorIndex === 2
+            Layout.fillWidth: true
+            settingsViewModel: viewModel.pinkGenerator
+            visible: viewModel.generatorIndex === 2
         }
 
         SweepSettings {
-            viewModel: generatorRoot.viewModel.sweepGenerator
-            visible: generatorRoot.viewModel.generatorIndex === 3
+            Layout.fillWidth: true
+            settingsViewModel: viewModel.sweepGenerator
+            visible: viewModel.generatorIndex === 3
         }
 
         BurstSettings {
-            viewModel: generatorRoot.viewModel.burstGenerator
-            visible: generatorRoot.viewModel.generatorIndex === 4
+            Layout.fillWidth: true
+            settingsViewModel: viewModel.burstGenerator
+            visible: viewModel.generatorIndex === 4
         }
     }
 }

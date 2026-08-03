@@ -17,9 +17,9 @@
 # You should have received a copy of the GNU General Public License
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt5 import QtCore
-from PyQt5.QtCore import pyqtProperty
-from PyQt5.QtQml import QQmlListProperty # type: ignore
+from PyQt6 import QtCore
+from PyQt6.QtCore import QObject, pyqtProperty  # type: ignore
+from PyQt6.QtQml import QQmlListProperty # type: ignore
 
 from friture.axis import Axis
 from friture.curve import Curve
@@ -56,15 +56,15 @@ class Scope_Data(QtCore.QObject):
         self._plot_items.remove(plot_item)
         self.plot_items_changed.emit()
 
-    @pyqtProperty(Axis, constant=True) # type: ignore
+    @pyqtProperty(QObject, constant=True) # type: ignore
     def horizontal_axis(self):
         return self._horizontal_axis
 
-    @pyqtProperty(Axis, constant=True) # type: ignore
+    @pyqtProperty(QObject, constant=True) # type: ignore
     def vertical_axis(self):
         return self._vertical_axis
 
-    @pyqtProperty(Axis, constant=True)
+    @pyqtProperty(QObject, constant=True)
     def color_axis(self):
         return self._color_axis
     

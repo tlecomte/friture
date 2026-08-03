@@ -19,8 +19,8 @@
 
 import logging
 
-from PyQt5 import QtCore, QtWidgets
-from PyQt5.QtCore import QObject, pyqtProperty, pyqtSignal
+from PyQt6 import QtCore, QtWidgets
+from PyQt6.QtCore import QObject, pyqtProperty, pyqtSignal  # type: ignore
 import numpy as np
 import sounddevice
 from friture.audiobackend import SAMPLING_RATE, AudioBackend
@@ -300,23 +300,23 @@ class Generator_View_Model(QObject):
             self._generator = self._generators[generatorIndex]
             self.generatorChanged.emit()
 
-    @pyqtProperty(Sine_Generator_Settings_View_Model, constant=True) # type: ignore
+    @pyqtProperty(QObject, constant=True) # type: ignore
     def sineGenerator(self):
         return self._generators[0].view_model()
     
-    @pyqtProperty(White_Generator_Settings_View_Model, constant=True) # type: ignore
+    @pyqtProperty(QObject, constant=True) # type: ignore
     def whiteGenerator(self):
         return self._generators[1].view_model()
     
-    @pyqtProperty(Pink_Generator_Settings_View_Model, constant=True) # type: ignore
+    @pyqtProperty(QObject, constant=True) # type: ignore
     def pinkGenerator(self):
         return self._generators[2].view_model()
     
-    @pyqtProperty(Sweep_Generator_Settings_View_Model, constant=True) # type: ignore
+    @pyqtProperty(QObject, constant=True) # type: ignore
     def sweepGenerator(self):
         return self._generators[3].view_model()
     
-    @pyqtProperty(Burst_Generator_Settings_View_Model, constant=True) # type: ignore
+    @pyqtProperty(QObject, constant=True) # type: ignore
     def burstGenerator(self):
         return self._generators[4].view_model()
 

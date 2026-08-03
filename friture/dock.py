@@ -19,10 +19,10 @@
 
 from inspect import signature
 
-from PyQt5.QtQuick import QQuickItem # type: ignore
-from PyQt5.QtQml import QQmlComponent
-from PyQt5.QtGui import QFontDatabase
-from PyQt5.QtCore import QObject, QSettings
+from PyQt6.QtQuick import QQuickItem # type: ignore
+from PyQt6.QtQml import QQmlComponent, QQmlContext
+from PyQt6.QtGui import QFontDatabase
+from PyQt6.QtCore import QObject, QSettings
 
 from friture.qml_tools import component_raise_if_error, qml_url
 from friture.widgetdict import getWidgetById, widgetIds
@@ -32,7 +32,7 @@ from typing import Optional, TYPE_CHECKING
 if TYPE_CHECKING:
     from friture.analyzer import Friture
     from friture.dockmanager import DockManager
-    from PyQt5.QtQml import QQmlEngine
+    from PyQt6.QtQml import QQmlEngine
 
 
 class Dock(QObject):
@@ -67,8 +67,8 @@ class Dock(QObject):
         component_raise_if_error(dock_component)
 
         context = self.qml_engine.rootContext()
-        self.dock_qml = dock_component.createWithInitialProperties({}, context)
-        self.dock_qml.setParent(self.qml_engine)
+        self.dock_qml = dock_component.createWithInitialProperties({}, context) # type: ignore
+        self.dock_qml.setParent(self.qml_engine) # type: ignore
         self.dock_qml.setParentItem(self.parent().main_tile_layout) # type: ignore
         
         initialProperties = {"viewModel": self.controlbar_viewmodel}
@@ -77,15 +77,16 @@ class Dock(QObject):
 
         component_raise_if_error(component)
 
-        controlbar_context = self.qml_engine.rootContext()
-        control_bar_qml = component.createWithInitialProperties(initialProperties, controlbar_context)
-        control_bar_qml.setParent(self.qml_engine)
+        controlbar_context = QQmlContext(self.qml_engine.rootContext(), self.qml_engine)
+        controlbar_context.setContextProperty("viewModel", self.controlbar_viewmodel)
+        control_bar_qml = component.createWithInitialProperties({}, controlbar_context) # type: ignore
+        control_bar_qml.setParent(self.qml_engine) # type: ignore
 
-        control_bar_container = self.dock_qml.findChild(QObject, "control_bar_container")
+        control_bar_container = self.dock_qml.findChild(QObject, "control_bar_container") # type: ignore
         assert control_bar_container is not None, "Control bar container not found in Dock.qml"
         control_bar_qml.setParentItem(control_bar_container) # type: ignore
  
-        self.audio_widget_container = self.dock_qml.findChild(QObject, "audio_widget_container")
+        self.audio_widget_container = self.dock_qml.findChild(QObject, "audio_widget_container") # type: ignore
         assert self.audio_widget_container is not None, "Audio widget container not found in Dock.qml"
 
         self.widgetId: Optional[int] = None
@@ -164,12 +165,8 @@ class Dock(QObject):
             self.audiowidget = constructor(self.parent())
         assert self.audiowidget is not None # mypy can't prove this :(
 
-        initialProperties = {
-            "fixedFont": QFontDatabase.systemFont(QFontDatabase.FixedFont).family(),
-            "viewModel": self.audiowidget.view_model(), # type: ignore
-        }
+        fixed_font = QFontDatabase.systemFont(QFontDatabase.SystemFont.FixedFont).family()
 
-        # audiowidget is duck typed for this:
         self.audiowidget.set_buffer(self.audiobuffer) # type: ignore
         self.audiobuffer.new_data_available.connect(
             self.audiowidget.handle_new_data) # type: ignore
@@ -183,8 +180,10 @@ class Dock(QObject):
         component_raise_if_error(component)
         component.statusChanged.connect(self.on_status_changed)
 
-        qml_context = self.qml_engine.rootContext()
-        self.audio_widget_qml = component.createWithInitialProperties(initialProperties, qml_context) # type: ignore
+        qml_context = QQmlContext(self.qml_engine.rootContext(), self.qml_engine)
+        qml_context.setContextProperty("viewModel", self.audiowidget.view_model()) # type: ignore
+        qml_context.setContextProperty("fixedFont", fixed_font)
+        self.audio_widget_qml = component.createWithInitialProperties({}, qml_context) # type: ignore
         self.audio_widget_qml.setParent(self.qml_engine) # type: ignore
         self.audio_widget_qml.setParentItem(self.audio_widget_container) # type: ignore
         self.audio_widget_qml.setProperty("anchors.fill", self.audio_widget_container) # type: ignore
@@ -193,7 +192,7 @@ class Dock(QObject):
         self.controlbar_viewmodel.setCurrentIndex(index)
 
     def on_status_changed(self, status):
-        if status == QQmlComponent.Error:
+        if status == QQmlComponent.Status.Error:
             for error in self.audio_widget_qml.errors():
                 self.logger.error("QML error: " + error.toString())
 

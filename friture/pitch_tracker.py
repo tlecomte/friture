@@ -28,8 +28,8 @@ from collections.abc import Generator
 import logging
 import math as m
 import numpy as np
-from PyQt5 import QtWidgets
-from PyQt5.QtCore import QSettings, QObject
+from PyQt6 import QtWidgets
+from PyQt6.QtCore import QSettings, QObject
 from typing import Any, Optional
 
 from friture.audiobackend import SAMPLING_RATE

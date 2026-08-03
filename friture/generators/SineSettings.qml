@@ -5,7 +5,7 @@ import Friture 1.0
 Row {
     id: sineSettingsRoot
     spacing: 8
-    required property Sine_Generator_Settings_View_Model viewModel
+    required property Sine_Generator_Settings_View_Model settingsViewModel
 
     SystemPalette { id: systemPalette; colorGroup: SystemPalette.Active }
 
@@ -16,7 +16,7 @@ Row {
     }
 
     DecimalSpinBox {   
-        binding: sineSettingsRoot.viewModel.frequency
-        onDecimalValueModified: sineSettingsRoot.viewModel.frequency = decimalValue
+        binding: sineSettingsRoot.settingsViewModel.frequency
+        onDecimalValueModified: sineSettingsRoot.settingsViewModel.frequency = decimalValue
     }
 }

@@ -19,8 +19,8 @@
 
 import logging
 
-from PyQt5 import QtCore
-from PyQt5.QtWidgets import QMainWindow
+from PyQt6 import QtCore
+from PyQt6.QtWidgets import QMainWindow
 from friture.defaults import DEFAULT_DOCKS
 from friture.dock import Dock
 from friture.tilelayout import TileLayout

@@ -8,7 +8,7 @@ Get the latest binary releases for Windows, macOS and Linux on the [Releases](ht
 
 The following steps can be used to prepare a development environment for Friture on Ubuntu.
 
-Prerequisite: a 64 bits Linux installation (PyQt5 wheels for Linux are only available for 64 bits).
+Prerequisite: a 64 bits Linux installation (PyQt6 wheels for Linux are only available for 64 bits).
 
 This has been tested in a Virtualbox image for Ubuntu Trusty 16.04 LTS 64 bits from osboxes.org. The following custom settings have been set on the VM: increase video memory, enable 3d acceleration, enable audio input, install guest addition, add user to vboxsf (for file sharing with the host), keyboard layout setup.
 
@@ -40,7 +40,7 @@ git fetch
 git checkout origin/<branchName>
 ```
 
-6. Create a virtual environment, install Friture dependencies (PyQt5, etc.), and build Cython extensions
+6. Create a virtual environment, install Friture dependencies (PyQt6, etc.), and build Cython extensions
 ```
 uv sync
 ```
@@ -92,8 +92,8 @@ See [pyproject.toml](pyproject.toml)
 If `settings.ui` or `resource.qrc` are changed, the corresponding python files need to be rebuilt:
 
 ```
-uv run pyuic5 ui/settings.ui --from-imports > friture/ui_settings.py
-uv run pyrcc5 resources/friture.qrc -o friture/friture_rc.py
+uv run pyuic6 ui/settings.ui -o friture/ui_settings.py
+uv run pyrcc6 resources/friture.qrc -o friture/friture_rc.py
 ```
 
 ## Filters parameters

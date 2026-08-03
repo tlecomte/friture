@@ -20,7 +20,7 @@ from enum import Enum
 import logging
 from typing import Any, Dict, Optional
 
-from PyQt5.QtCore import pyqtSignal, QObject
+from PyQt6.QtCore import pyqtSignal, QObject
 import numpy as np
 from sounddevice import OutputStream
 

@@ -4,7 +4,7 @@
 from enum import Enum
 import logging
 
-from PyQt5.QtCore import QObject
+from PyQt6.QtCore import QObject
 
 from numpy import zeros, ones, log10
 import numpy as np

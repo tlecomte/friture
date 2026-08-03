@@ -37,7 +37,7 @@ dependencies = [
     "rtmixer==0.1.7",
     "docutils==0.23",
     "numpy==2.4.6",
-    "PyQt5==5.15.11",
+    "PyQt6",
     "platformdirs==4.11.0",
     "pyrr==0.10.3",
     "pyinstaller==6.21.0"
@@ -62,7 +62,6 @@ required-environments = [
 [dependency-groups]
 dev = [
     "mypy==2.3.0",
-    "PyQt5-stubs==5.15.6.0",
     "pytest>=8.0",
 ]
 

@@ -9,8 +9,7 @@ Rectangle { // eventually move to ApplicationWindow
     // title: qsTr("Friture") // ApplicationWindow
     // icon.source: "qrc:/images-src/window-icon.svg" // ApplicationWindow
 
-    required property MainWindowViewModel main_window_view_model
-    required property string fixedFont
+    property string fixedFont
 
     ColumnLayout { // remove once we use ApplicationWindow
         anchors.fill: parent
@@ -26,15 +25,19 @@ Rectangle { // eventually move to ApplicationWindow
                 ToolButton {
                     id: startButton
                     checkable: true
-                    checked: mainWindow.main_window_view_model.toolbar_view_model.recording
+                    checked: main_window_view_model.toolbar_view_model.recording
                     icon.source: startButton.checked ? "qrc:/images-src/stop.svg" : "qrc:/images-src/start.svg"
                     text: startButton.checked ? qsTr("Stop") : qsTr("Start")
                     ToolTip.text: qsTr("Start/Stop")
                     icon.height: 32
                     icon.width: 32
-                    //shortcut: "Space"
+                    Shortcut {
+                        context: Qt.ApplicationShortcut
+                        sequences: ["Space"]
+                        onActivated: startButton.clicked()
+                    }
                     onClicked: {
-                        mainWindow.main_window_view_model.toolbar_view_model.recording_toggle()
+                        main_window_view_model.toolbar_view_model.recording_toggle()
                     }
                 }
                 ToolButton {
@@ -45,7 +48,7 @@ Rectangle { // eventually move to ApplicationWindow
                     icon.height: 32
                     icon.width: 32
                     onClicked: {
-                        mainWindow.main_window_view_model.toolbar_view_model.new_dock()
+                        main_window_view_model.toolbar_view_model.new_dock()
                     }
                 }
                 ToolButton {
@@ -56,7 +59,7 @@ Rectangle { // eventually move to ApplicationWindow
                     icon.height: 32
                     icon.width: 32
                     onClicked: {
-                        mainWindow.main_window_view_model.toolbar_view_model.settings()
+                        main_window_view_model.toolbar_view_model.settings()
                     }
                 }
                 ToolButton {
@@ -66,7 +69,7 @@ Rectangle { // eventually move to ApplicationWindow
                     icon.height: 32
                     icon.width: 32
                     onClicked: {
-                        mainWindow.main_window_view_model.toolbar_view_model.about()
+                        main_window_view_model.toolbar_view_model.about()
                     }
                 }
             }
@@ -77,7 +80,6 @@ Rectangle { // eventually move to ApplicationWindow
             Layout.fillWidth: true
             Layout.fillHeight: true
             fixedFont: mainWindow.fixedFont
-            main_window_view_model: mainWindow.main_window_view_model
         }
     }
 }

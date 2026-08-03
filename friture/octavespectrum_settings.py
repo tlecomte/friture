@@ -19,7 +19,7 @@
 
 import logging
 
-from PyQt5 import QtWidgets
+from PyQt6 import QtWidgets
 
 # shared with octavespectrum.py
 DEFAULT_SPEC_MIN = -80

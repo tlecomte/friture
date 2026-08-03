@@ -19,7 +19,7 @@
 
 import numpy as np
 from friture.audiobackend import SAMPLING_RATE
-from PyQt5.QtCore import QObject, pyqtProperty, pyqtSignal
+from PyQt6.QtCore import QObject, pyqtProperty, pyqtSignal  # type: ignore
 
 DEFAULT_BURST_PERIOD_S = 1.
 

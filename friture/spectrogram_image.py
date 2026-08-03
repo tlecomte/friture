@@ -20,7 +20,7 @@
 import logging
 
 import numpy
-from PyQt5 import QtCore, QtGui
+from PyQt6 import QtCore, QtGui
 
 
 class CanvasScaledSpectrogram(QtCore.QObject):
@@ -62,7 +62,7 @@ class CanvasScaledSpectrogram(QtCore.QObject):
         if width != oldWidth and width > 0 and oldWidth > 0:
             self.write_offset = (self.write_offset % oldWidth) * width / oldWidth
             self.write_offset = self.write_offset % width  # to handle negative values
-        self.pixmap = self.pixmap.scaled(2 * width, height, QtCore.Qt.IgnoreAspectRatio, QtCore.Qt.SmoothTransformation)
+        self.pixmap = self.pixmap.scaled(2 * width, height, QtCore.Qt.AspectRatioMode.IgnoreAspectRatio, QtCore.Qt.TransformationMode.SmoothTransformation)
 
     def setcanvas_height(self, canvas_height):
         canvas_height = max(1, int(canvas_height))
@@ -125,7 +125,7 @@ class CanvasScaledSpectrogram(QtCore.QObject):
     # NOTE: QImage with a colormap is slower (by a factor of 2) than the custom
     # colormap code here.
     def prepare_image(self, byteString, width, height):
-        myimage = QtGui.QImage(byteString, width, height, QtGui.QImage.Format_RGB32)
+        myimage = QtGui.QImage(byteString, width, height, width * 4, QtGui.QImage.Format.Format_RGB32)
         return myimage
 
     def getpixmap(self):

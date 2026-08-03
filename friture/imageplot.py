@@ -18,7 +18,7 @@
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
-from PyQt5.QtCore import QObject
+from PyQt6.QtCore import QObject
 from friture.spectrogram_data import Spectrogram_Data
 from friture.spectrogram_item_data import SpectrogramImageData
 from friture.store import GetStore

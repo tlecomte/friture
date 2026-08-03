@@ -6,9 +6,6 @@ import Friture 1.0
 import "plotItemColors.js" as PlotItemColors
 
 Plot {
-    required property var viewModel
-    required property string fixedFont
-
     scopedata: viewModel
 
     Repeater {

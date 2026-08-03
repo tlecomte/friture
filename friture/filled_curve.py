@@ -19,8 +19,8 @@
 
 from enum import Enum
 
-from PyQt5 import QtCore
-from PyQt5.QtCore import pyqtProperty
+from PyQt6 import QtCore
+from PyQt6.QtCore import pyqtProperty  # type: ignore
 import numpy
 
 class CurveType(Enum):

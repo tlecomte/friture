@@ -19,7 +19,7 @@
 
 import numpy as np
 from numpy.random import standard_normal
-from PyQt5.QtCore import QObject
+from PyQt6.QtCore import QObject
 
 PINK_FIDELITY = 100.
 

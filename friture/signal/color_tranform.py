@@ -23,7 +23,7 @@ import logging
 import numpy as np
 from friture.plotting import generated_cmrmap
 from friture_extensions.lookup_table import pyx_color_from_float_2D
-from PyQt5.QtGui import QColor
+from PyQt6.QtGui import QColor
 
 class Color_Transform:
 

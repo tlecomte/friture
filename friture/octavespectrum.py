@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt5.QtCore import QObject
+from PyQt6.QtCore import QObject
 from numpy import log10, array, arange
 
 from friture.histplot import HistPlot

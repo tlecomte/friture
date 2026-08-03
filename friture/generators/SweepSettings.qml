@@ -4,7 +4,7 @@ import Friture 1.0
 
 Column {
     id: root
-    required property Sweep_Generator_Settings_View_Model viewModel
+    required property Sweep_Generator_Settings_View_Model settingsViewModel
 
     spacing: 8
 
@@ -20,8 +20,8 @@ Column {
         }
 
         DecimalSpinBox {   
-            binding: root.viewModel.start_frequency
-            onDecimalValueModified: root.viewModel.start_frequency = decimalValue
+            binding: root.settingsViewModel.start_frequency
+            onDecimalValueModified: root.settingsViewModel.start_frequency = decimalValue
         }
     }
 
@@ -35,8 +35,8 @@ Column {
         }
 
         DecimalSpinBox {   
-            binding: root.viewModel.stop_frequency
-            onDecimalValueModified: root.viewModel.stop_frequency = decimalValue
+            binding: root.settingsViewModel.stop_frequency
+            onDecimalValueModified: root.settingsViewModel.stop_frequency = decimalValue
         }
     }
 
@@ -49,8 +49,8 @@ Column {
             anchors.verticalCenter: parent.verticalCenter
         }
         DecimalSpinBox {   
-            binding: root.viewModel.period
-            onDecimalValueModified: root.viewModel.period = decimalValue
+            binding: root.settingsViewModel.period
+            onDecimalValueModified: root.settingsViewModel.period = decimalValue
             suffix: " s"
             decimalFrom: 0.01
             decimalTo: 60

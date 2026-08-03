@@ -3,5 +3,5 @@ import QtQuick.Controls 2.15
 import Friture 1.0
 
 Item {
-    required property Pink_Generator_Settings_View_Model viewModel
+    required property Pink_Generator_Settings_View_Model settingsViewModel
 }
