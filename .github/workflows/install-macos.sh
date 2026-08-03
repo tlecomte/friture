@@ -2,13 +2,10 @@
 
 set -x
 
-which python3
-python3 -c 'import sys; print(sys.version)'
-
-pip3 install .
+uv run python -c 'import sys; print(sys.version)'
 
 # pyinstaller needs to have the extensions built explicitely
-python3 setup.py build_ext --inplace
+uv run python setup.py build_ext --inplace
 
 # for Macos Big Sur, the stable portaudio (19.6.0) makes Friture freeze on startup
 # install from a newer master commit instead
@@ -23,7 +20,7 @@ make
 sudo make install
 cd -
 
-pyinstaller friture.spec -y
+uv run pyinstaller friture.spec -y
 
 ls -la dist/*
 
@@ -35,12 +32,12 @@ ls -la dist/friture.app/Contents/Frameworks/_sounddevice_data/portaudio-binaries
 # (this is visible in the logs)
 # see https://github.com/pyinstaller/pyinstaller/wiki/Recipe-OSX-Code-Signing-Qt
 # so we fix the folder names and then sign again manually
-python3 installer/fix_app_qt_folder_names_for_codesign.py dist/friture.app
+uv run python installer/fix_app_qt_folder_names_for_codesign.py dist/friture.app
 codesign -s - --force --all-architectures --timestamp --deep dist/friture.app
 codesign -dv dist/friture.app
 
 # prepare a dmg out of friture.app
-export ARTIFACT_FILENAME=friture-$(python3 -c 'import friture; print(friture.__version__)')-$(date +'%Y%m%d').dmg
+export ARTIFACT_FILENAME=friture-$(uv run python -c 'import friture; print(friture.__version__)')-$(date +'%Y%m%d').dmg
 echo $ARTIFACT_FILENAME
 
 # macos has random hdiutil errors because of XProtectBehaviorService, retry a few times.

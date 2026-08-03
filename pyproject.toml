@@ -31,6 +31,7 @@ classifiers=[
     "Topic :: Multimedia :: Sound/Audio :: Speech"
 ]
 dynamic = ["version"]
+requires-python = ">=3.11"
 dependencies = [
     "sounddevice==0.5.5",
     "rtmixer==0.1.7",
@@ -42,12 +43,6 @@ dependencies = [
     "pyinstaller==6.21.0"
 ]
 
-[project.optional-dependencies]
-dev = [
-    "mypy==2.3.0",
-    "PyQt5-stubs==5.15.6.0",
-]
-
 [project.scripts]
 friture = "friture.analyzer:main"
 
@@ -55,6 +50,17 @@ friture = "friture.analyzer:main"
 Homepage = "http://www.friture.org"
 Repository = "https://github.com/tlecomte/friture"
 Issues = "https://github.com/tlecomte/friture/issues"
+
+[dependency-groups]
+dev = [
+    "mypy==2.3.0",
+    "PyQt5-stubs==5.15.6.0",
+    "pytest>=8.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["friture/test"]
+python_files = ["test_*.py"]
 
 [tool.setuptools]
 packages=[

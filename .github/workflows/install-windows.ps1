@@ -1,98 +1,24 @@
-$virtualenv = "buildenv"
-
-# check for python and pip in PATH
-
-$pythonPath = Get-Command "python" -ErrorAction SilentlyContinue
-if ($pythonPath -eq $null)
-{
-   throw "Unable to find python in PATH"
-}
-
-Write-Host "python found in " $pythonPath.Definition
-
-$pipPath = Get-Command "pip" -ErrorAction SilentlyContinue
-if ($pipPath -eq $null)
-{
-    # try to add the Python Scripts folder to the path
-    $pythonPath = Get-Command "python" | Select-Object -ExpandProperty Definition | Split-Path
-    $env:Path += ";$pythonPath\Scripts"
-
-    # retry
-    $pipPath = Get-Command "pip" -ErrorAction SilentlyContinue
-    if ($pipPath -eq $null)
-    {
-        throw "Unable to find pip in PATH"
-    }
-}
-
-Write-Host "pip found in " $pipPath.Definition
-
-Write-Host "WIX env var set to " $env:WIX
-
 Write-Host ""
 Write-Host "==========================================="
 Write-Host "Cleaning up"
 Write-Host "==========================================="
 
-Remove-Item $virtualenv -Recurse -ErrorAction Ignore
 Remove-Item "build" -Recurse -ErrorAction Ignore
 Remove-Item "dist" -Recurse -ErrorAction Ignore
-
-Write-Host ""
-Write-Host "==========================================="
-Write-Host "Making sure pip is up-to-date"
-Write-Host "==========================================="
-
-& python -m pip install --upgrade pip
-
-Write-Host ""
-Write-Host "==========================================="
-Write-Host "Making sure setuptools is up-to-date (for compiler compatibility)"
-Write-Host "==========================================="
-
-& pip install --upgrade setuptools
-
-Write-Host ""
-Write-Host "==========================================="
-Write-Host "Installing virtualenv"
-Write-Host "==========================================="
-
-& pip install -U virtualenv
-
-Write-Host ""
-Write-Host "==========================================="
-Write-Host "Creating a virtualenv"
-Write-Host "==========================================="
-
-& virtualenv $virtualenv
-
-Write-Host ""
-Write-Host "==========================================="
-Write-Host "Activating the virtualenv"
-Write-Host "==========================================="
-
-& "$virtualenv\Scripts\activate"
-
-Write-Host ""
-Write-Host "==========================================="
-Write-Host "Installing dependencies"
-Write-Host "==========================================="
-
-& pip install .
 
 Write-Host ""
 Write-Host "==========================================="
 Write-Host "Building Cython extensions"
 Write-Host "==========================================="
 
-& python setup.py build_ext --inplace
+uv run python setup.py build_ext --inplace
 
 Write-Host ""
 Write-Host "==========================================="
 Write-Host "Packaging with pyinstaller"
 Write-Host "==========================================="
 
-& pyinstaller friture.spec -y --log-level=DEBUG
+uv run pyinstaller friture.spec -y --log-level=DEBUG
 
 Write-Host ""
 Write-Host "==========================================="
@@ -105,9 +31,7 @@ Write-Host ""
 Write-Host "==========================================="
 Write-Host "Read version from file"
 Write-Host "==========================================="
-$initFileContent = Get-Content "friture/__init__.py"
-$version = $initFileContent | Select-String '__version__ = \"([\d\.]+)\"' | Foreach-Object {$_.Matches.Groups[1].Value} 
-
+$version = uv run python -c "import friture; print(friture.__version__)"
 Write-Host $version
 
 Write-Host ""

@@ -23,9 +23,9 @@ sudo apt-get install -y git
 sudo apt-get install -y libportaudio2
 ```
 
-3. Install python 3.11 and related build tools
+3. Install uv (Python package manager)
 ```
-sudo apt-get install -y python3.11-dev
+curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
 4. Clone the repository
@@ -40,33 +40,16 @@ git fetch
 git checkout origin/<branchName>
 ```
 
-6. Update `pip`, `setuptools` and `virtualenv`
-
+6. Create a virtual environment, install Friture dependencies (PyQt5, etc.), and build Cython extensions
 ```
-sudo python3.11 -m pip install --upgrade pip
-sudo pip3.11 install --upgrade setuptools
-sudo pip3.11 install --upgrade virtualenv
+uv sync
 ```
 
-7. Create a virtualenv and activate it
-```
-virtualenv  -p /usr/bin/python3.11 buildenv
-source ./buildenv/bin/activate
-```
+`uv sync` handles everything: it creates the virtual environment, installs all dependencies, and compiles the Cython extensions in-place.
 
-8. Install Friture dependencies (PyQt5, etc.)
+7. Run Friture
 ```
-pip3.11 install .[dev] 
-```
-
-9. Build Cython extensions
-```
-python3.11 setup.py build_ext --inplace
-```
-
-10. Run Friture
-```
-python3.11 main.py
+uv run python main.py
 ```
 
 ## Running Friture from source on Windows
@@ -77,7 +60,7 @@ The following steps can be used to prepare a development environment for Friture
 
 2. Install *chocolatey* from https://chocolatey.org/install
 
-2. Install Python and Microsoft Visual Studio C++ Build Tools, required to build Friture. With chocolatey, in an administrator terminal:
+2. Install Python, uv, and Microsoft Visual Studio C++ Build Tools, required to build Friture. With chocolatey, in an administrator terminal:
 
 ```
 choco install -y choco\packages.config
@@ -87,46 +70,17 @@ Watch out for a message indicating that a reboot is necessary.
 
 The next commands do not need to be run in an administrator terminal.
 
-4. Make sure pip is up-to-date:
-
+4. Create a virtual environment, install dependencies, and build Cython extensions
 ```
-python -m pip install --upgrade pip
-```
-
-5. Install virtualenv:
-
-```
-pip install -U virtualenv
+uv sync
 ```
 
-6. Build a virtualenv:
+`uv sync` handles everything: it creates the virtual environment, installs all dependencies, and compiles the Cython extensions in-place.
+
+5. Run Friture
 
 ```
-virtualenv buildenv
-```
-
-7. Activate the virtualenv
-
-```
-.\buildenv\Scripts\activate
-```
-
-8. Install dependencies
-
-```
-pip install .[dev]
-```
-
-9. Build Cython extensions
-
-```
-python setup.py build_ext --inplace
-```
-
-10. Run Friture
-
-```
-python main.py
+uv run python main.py
 ```
 
 ## Dependencies
@@ -138,8 +92,8 @@ See [pyproject.toml](pyproject.toml)
 If `settings.ui` or `resource.qrc` are changed, the corresponding python files need to be rebuilt:
 
 ```
-pyuic5 ui/settings.ui --from-imports > friture/ui_settings.py
-pyrcc5 resources/friture.qrc -o friture/friture_rc.py
+uv run pyuic5 ui/settings.ui --from-imports > friture/ui_settings.py
+uv run pyrcc5 resources/friture.qrc -o friture/friture_rc.py
 ```
 
 ## Filters parameters
