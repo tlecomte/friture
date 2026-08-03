@@ -23,6 +23,7 @@ doc/make.bat
 env/*
 buildenv/*
 venv/*
+.venv/
 tools/*
 friture.egg-info
 .eggs/

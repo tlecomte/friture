@@ -19,8 +19,16 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v7
 
+    - name: Set up uv
+      uses: astral-sh/setup-uv@v6
+      with:
+        enable-cache: "auto"
+
+    - name: Install dependencies
+      run: uv sync --frozen
+
     - name: Display Python version
-      run: python -c "import sys; print(sys.version)"
+      run: uv run python -c "import sys; print(sys.version)"
 
     - name: Inspect Build Environment
       shell: powershell
@@ -78,8 +86,16 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v7
 
+    - name: Set up uv
+      uses: astral-sh/setup-uv@v6
+      with:
+        enable-cache: "auto"
+
+    - name: Install dependencies
+      run: uv sync --frozen
+
     - name: Display Python version
-      run: python -c "import sys; print(sys.version)"
+      run: uv run python -c "import sys; print(sys.version)"
 
     - name: Build
       run: source ./.github/workflows/install-linux.sh
@@ -101,8 +117,16 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v7
 
+    - name: Set up uv
+      uses: astral-sh/setup-uv@v6
+      with:
+        enable-cache: "auto"
+
+    - name: Install dependencies
+      run: uv sync --frozen
+
     - name: Display Python version
-      run: python -c "import sys; print(sys.version)"
+      run: uv run python -c "import sys; print(sys.version)"
 
     - name: Build
       run: source ./.github/workflows/install-macos.sh
