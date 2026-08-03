@@ -51,6 +51,14 @@ Homepage = "http://www.friture.org"
 Repository = "https://github.com/tlecomte/friture"
 Issues = "https://github.com/tlecomte/friture/issues"
 
+[tool.uv]
+required-environments = [
+    "sys_platform == 'darwin' and platform_machine == 'x86_64'",
+    "sys_platform == 'darwin' and platform_machine == 'arm64'",
+    "sys_platform == 'linux' and platform_machine == 'x86_64'",
+    "sys_platform == 'win32' and platform_machine == 'AMD64'",
+]
+
 [dependency-groups]
 dev = [
     "mypy==2.3.0",
