@@ -32,6 +32,8 @@ from friture.curve import Curve
 SMOOTH_DISPLAY_TIMER_PERIOD_MS = 25
 DEFAULT_TIMERANGE = 2 * SMOOTH_DISPLAY_TIMER_PERIOD_MS
 
+SCROLLING_THRESHOLD_MS = 500.0
+
 class Scope_Widget(QObject):
 
     def __init__(self, parent):
@@ -76,44 +78,40 @@ class Scope_Widget(QObject):
     def handle_new_data(self, floatdata):
         time = self.timerange * 1e-3
         width = int(time * SAMPLING_RATE)
-        # basic trigger capability on leading edge
-        floatdata = self.audiobuffer.data(2 * width)
 
-        twoChannels = False
-        if floatdata.shape[0] > 1:
-            twoChannels = True
+        twoChannels = floatdata.shape[0] > 1
 
         if twoChannels and len(self._scope_data.plot_items) == 1:
             self._scope_data.add_plot_item(self._curve_2)
         elif not twoChannels and len(self._scope_data.plot_items) == 2:
             self._scope_data.remove_plot_item(self._curve_2)
 
-        # trigger on the first channel only
-        triggerdata = floatdata[0, :]
-        # trigger on half of the waveform
-        trig_search_start = width // 2
-        trig_search_stop = -width // 2
-        triggerdata = triggerdata[trig_search_start: trig_search_stop]
-
-        trigger_level = triggerdata.max() * 2. / 3.
-        trigger_pos = where((triggerdata[:-1] < trigger_level) * (triggerdata[1:] >= trigger_level))[0]
-
-        if len(trigger_pos) == 0:
-            return
-
-        if len(trigger_pos) > 0:
-            shift = trigger_pos[0]
+        if self.timerange > SCROLLING_THRESHOLD_MS:
+            # Scrolling mode for long time windows: show the latest samples
+            # without triggering, which causes missed updates on noisy signals.
+            floatdata = self.audiobuffer.data(width)
+            self.y = floatdata[0, :]
+            self.y2 = floatdata[1, :] if twoChannels else None
         else:
-            shift = 0
-        shift += trig_search_start
-        datarange = width
-        floatdata = floatdata[:, shift - datarange // 2: shift + datarange // 2]
+            # Trigger mode: fetch 2x window and align on a rising edge.
+            floatdata = self.audiobuffer.data(2 * width)
+            # trigger on the first channel only
+            triggerdata = floatdata[0, :]
+            # trigger on half of the waveform
+            trig_search_start = width // 2
+            trig_search_stop = -width // 2
+            triggerdata = triggerdata[trig_search_start: trig_search_stop]
 
-        self.y = floatdata[0, :]
-        if twoChannels:
-            self.y2 = floatdata[1, :]
-        else:
-            self.y2 = None
+            trigger_level = triggerdata.max() * 2. / 3.
+            trigger_pos = where((triggerdata[:-1] < trigger_level) * (triggerdata[1:] >= trigger_level))[0]
+
+            if len(trigger_pos) == 0:
+                return
+
+            shift = trigger_pos[0] + trig_search_start
+            floatdata = floatdata[:, shift - width // 2: shift + width // 2]
+            self.y = floatdata[0, :]
+            self.y2 = floatdata[1, :] if twoChannels else None
 
         dBscope = False
         if dBscope:
@@ -124,7 +122,7 @@ class Scope_Widget(QObject):
             else:
                 self.y2 = None
 
-        self.time = (arange(len(self.y)) - datarange // 2) / float(SAMPLING_RATE)
+        self.time = (arange(len(self.y)) - width // 2) / float(SAMPLING_RATE)
 
         scaled_t = (self.time * 1e3 + self.timerange/2.) / self.timerange
         scaled_y = 1. - (self.y + 1) / 2.
@@ -174,7 +172,7 @@ class Scope_Settings_Dialog(QtWidgets.QDialog):
         self.doubleSpinBox_timerange = QtWidgets.QDoubleSpinBox(self)
         self.doubleSpinBox_timerange.setDecimals(1)
         self.doubleSpinBox_timerange.setMinimum(0.1)
-        self.doubleSpinBox_timerange.setMaximum(1000.0)
+        self.doubleSpinBox_timerange.setMaximum(10000.0)
         self.doubleSpinBox_timerange.setProperty("value", DEFAULT_TIMERANGE)
         self.doubleSpinBox_timerange.setObjectName("doubleSpinBox_timerange")
         self.doubleSpinBox_timerange.setSuffix(" ms")
