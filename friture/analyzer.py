@@ -29,7 +29,7 @@ import logging.handlers
 from PyQt6 import QtCore
 # specifically import from PyQt6.QtGui and QWidgets for startup time improvement :
 from PyQt6.QtWidgets import QMainWindow, QApplication, QSplashScreen, QWidget
-from PyQt6.QtGui import QPixmap, QFontDatabase
+from PyQt6.QtGui import QPixmap, QFontDatabase, QGuiApplication
 from PyQt6.QtQml import QQmlEngine, qmlRegisterSingletonType, qmlRegisterType
 from PyQt6.QtCore import QObject
 from PyQt6.QtQuick import QQuickView
@@ -73,6 +73,7 @@ from friture.generators.white import White_Generator_Settings_View_Model
 from friture.generators.pink import Pink_Generator_Settings_View_Model
 from friture.generators.sweep import Sweep_Generator_Settings_View_Model
 from friture.generators.burst import Burst_Generator_Settings_View_Model
+from friture.theme_manager import ThemeManager
 
 # the display timer could be made faster when the processing
 # power allows it, firing down to every 10 ms
@@ -96,6 +97,8 @@ class Friture(QMainWindow, ):
         sys.excepthook = self.excepthook
 
         store = GetStore()
+
+        self.theme_manager = ThemeManager()
 
         # set the store as the parent of the QML engine
         # so that the store outlives the engine
@@ -201,6 +204,7 @@ class Friture(QMainWindow, ):
         # settings changes
         self.settings_dialog.show_playback_changed.connect(self.show_playback_changed)
         self.settings_dialog.history_length_changed.connect(self.player.set_history_seconds)
+        self.settings_dialog.theme_preference_changed.connect(self.theme_manager.setThemePreference)
 
         # restore the settings and widgets geometries
         self.restoreAppState()
