@@ -3,11 +3,35 @@ import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.2
 import Friture 1.0
 
-Rectangle { // eventually move to ApplicationWindow
+// eventually move from Control to ApplicationWindow.
+// Meanwhile, needs to be Control rather than Item or Rectangle
+// so that it has a `palette` property
+Control {
     id: mainWindow
     anchors.fill: parent
     // title: qsTr("Friture") // ApplicationWindow
     // icon.source: "qrc:/images-src/window-icon.svg" // ApplicationWindow
+
+    SystemPalette { id: systemPalette; colorGroup: SystemPalette.Active }
+
+    // apply the palette changes from the system palette (controlled from ThemeManager)
+    // to the whole QtQuick application
+    palette.window: systemPalette.window
+    palette.windowText: systemPalette.windowText
+    palette.base: systemPalette.base
+    palette.alternateBase: systemPalette.alternateBase
+    palette.text: systemPalette.text
+    palette.button: systemPalette.button
+    palette.buttonText: systemPalette.buttonText
+    palette.light: systemPalette.light
+    palette.midlight: systemPalette.midlight
+    palette.mid: systemPalette.mid
+    palette.dark: systemPalette.dark
+    palette.shadow: systemPalette.shadow
+    palette.highlight: systemPalette.highlight
+    palette.highlightedText: systemPalette.highlightedText
+    palette.toolTipBase: systemPalette.toolTipBase
+    palette.toolTipText: systemPalette.toolTipText
 
     property string fixedFont
 

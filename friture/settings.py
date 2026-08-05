@@ -39,6 +39,7 @@ Friture will now exit.
 class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
     show_playback_changed = pyqtSignal(bool)
     history_length_changed = pyqtSignal(int)
+    theme_preference_changed = pyqtSignal(int)
 
     def __init__(self, parent, toolbar_view_model: MainToolbarViewModel):
         QtWidgets.QDialog.__init__(self, parent)
@@ -84,6 +85,13 @@ class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
         self.radioButton_duo.toggled.connect(self.duo_input_type_selected)
         self.checkbox_showPlayback.stateChanged.connect(self.show_playback_checkbox_changed)
         self.spinBox_historyLength.editingFinished.connect(self.history_length_edit_finished)
+        self.themeButtonGroup.idToggled.connect(self.theme_preference_toggled)
+
+        # Set explicit IDs for theme buttons to match ThemeManager enum values
+        # 0 = System (Unknown), 1 = Light, 2 = Dark
+        self.themeButtonGroup.setId(self.radioButton_themeSystem, 0)
+        self.themeButtonGroup.setId(self.radioButton_themeLight, 1)
+        self.themeButtonGroup.setId(self.radioButton_themeDark, 2)
 
     @pyqtProperty(bool, notify=show_playback_changed) # type: ignore
     def show_playback(self) -> bool:
@@ -182,6 +190,12 @@ class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
     def history_length_edit_finished(self) -> None:
         self.history_length_changed.emit(self.spinBox_historyLength.value())
 
+    # slot
+    def theme_preference_toggled(self, button_id: int, checked: bool) -> None:
+        if checked:
+            self.theme_preference_changed.emit(button_id)
+            self.logger.info("Theme preference changed to: %d", button_id)
+
     # method
     def saveState(self, settings):
         # for the input device, we search by name instead of index, since
@@ -192,6 +206,7 @@ class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
         settings.setValue("duoInput", self.inputTypeButtonGroup.checkedId())
         settings.setValue("showPlayback", self.checkbox_showPlayback.checkState().value)
         settings.setValue("historyLength", self.spinBox_historyLength.value())
+        settings.setValue("themePreference", self.themeButtonGroup.checkedId())
 
     # method
     def restoreState(self, settings):
@@ -208,5 +223,7 @@ class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
             self.inputTypeButtonGroup.button(duo_input_id).setChecked(True)
         self.checkbox_showPlayback.setCheckState(QtCore.Qt.CheckState(settings.value("showPlayback", 0, type=int)))
         self.spinBox_historyLength.setValue(settings.value("historyLength", 30, type=int))
+        theme_preference_id = settings.value("themePreference", 0, type=int)
+        self.themeButtonGroup.button(theme_preference_id).setChecked(True)
         # need to emit this because setValue doesn't emit editFinished
         self.history_length_changed.emit(self.spinBox_historyLength.value())
