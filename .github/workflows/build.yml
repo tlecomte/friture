@@ -106,6 +106,10 @@ jobs:
       # startup banner and asserts no missing-module/DLL errors.
       run: |
         ./friture-*.AppImage --appimage-extract
+        echo "=== locate generated_fft.npz in the extracted bundle ==="
+        find squashfs-root -name 'generated_fft.npz' 2>/dev/null || echo "(npz NOT found anywhere in the bundle)"
+        echo "=== _internal/data listing ==="
+        ls -la squashfs-root/usr/bin/_internal/data 2>/dev/null || echo "(no _internal/data dir)"
         uv run python scripts/smoke_test.py ./squashfs-root/AppRun --no-splash
 
     - name: Upload AppImage smoke-test log
