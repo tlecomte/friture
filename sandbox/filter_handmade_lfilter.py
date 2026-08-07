@@ -7,7 +7,7 @@ import numpy as np
 from numpy.fft import fft, fftshift, fftfreq
 import time
 
-from friture_extensions.lfilter import pyx_lfilter_float64_1D
+from friture.signal.lfilter import lfilter_float64_1D
 
 def pure_lfilter_float64_1D(b, a, x, zi):
     assert len(b.shape) == 1, "only 1D filters are allowed"
@@ -86,7 +86,7 @@ t1 = time.time()
 print("pure", t1-t0)
 
 t0 = time.time()
-yf_imp_pyx, zf_pyx = pyx_lfilter_float64_1D(b, a, impulse, z)
+yf_imp_pyx, zf_pyx = lfilter_float64_1D(b, a, impulse, z)
 t1 = time.time()
 print("cython", t1-t0)
 
@@ -110,9 +110,9 @@ t0 = time.time()
 z = np.zeros(b.shape[0]-1)
 for i in range(N3):
     if i == 0:
-        yf_mult_pyx, zf = pyx_lfilter_float64_1D(b, a, y2, zf)
+        yf_mult_pyx, zf = lfilter_float64_1D(b, a, y2, zf)
     else:
-        yf_mult_pyx, zf = pyx_lfilter_float64_1D(b, a, zeros, zf)
+        yf_mult_pyx, zf = lfilter_float64_1D(b, a, zeros, zf)
 t1 = time.time()
 print("cython", t1-t0)
 
@@ -120,7 +120,7 @@ print("cython", t1-t0)
 z = np.zeros(b.shape[0]-1)
 yf_lfilter, zf = lfilter(b, a, y, zi=z)#, zi=zeros(max(len(a_full),len(b_full))-1))
 yf_handmade, zf = pure_lfilter_float64_1D(b, a, y, z)
-yf_pyx, zf_pyx = pyx_lfilter_float64_1D(b, a, y, z)
+yf_pyx, zf_pyx = lfilter_float64_1D(b, a, y, z)
 
 #print("Direct:", t1-t0, "Cascade:", t2-t1)
 

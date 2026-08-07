@@ -4,10 +4,7 @@ set -x
 
 uv run python -c 'import sys; print(sys.version)'
 
-# pyinstaller needs to have the extensions built explicitely
-uv run python setup.py build_ext --inplace
-
-# for Macos Big Sur, the stable portaudio (19.6.0) makes Friture freeze on startup
+# For macOS Big Sur, the stable portaudio (19.6.0) makes Friture freeze on startup
 # install from a newer master commit instead
 # see: https://github.com/tlecomte/friture/issues/154
 PORTAUDIO_COMMIT=aa7a7902f1b79502633aeb88919657af46c84193

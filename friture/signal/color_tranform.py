@@ -22,7 +22,7 @@ import logging
 
 import numpy as np
 from friture.plotting import generated_cmrmap
-from friture_extensions.lookup_table import pyx_color_from_float_2D
+from friture.signal.lookup_table import color_from_float_2D
 from PyQt6.QtGui import QColor
 
 class Color_Transform:
@@ -48,4 +48,4 @@ class Color_Transform:
     def push(self, data):
         # clip in [0..1] before using the fast lookup function
         data = np.clip(data, 0., 1.)
-        return pyx_color_from_float_2D(self.colors, data)
+        return color_from_float_2D(self.colors, data)

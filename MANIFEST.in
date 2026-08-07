@@ -6,3 +6,4 @@ include TODO.txt
 include friture.py
 recursive-include friture *.qml
 recursive-include friture *.js
+recursive-include friture/data *.npz

@@ -31,7 +31,7 @@ from friture.longlevels_settings import (LongLevels_Settings_Dialog,
 from friture.audioproc import audioproc
 from .signal.decimate import decimate
 from .ringbuffer import RingBuffer
-from friture_extensions.lfilter import pyx_lfilter_float64_1D
+from friture.signal.lfilter import lfilter_float64_1D
 from friture.scope_data import Scope_Data
 from friture.curve import Curve
 from friture.store import GetStore
@@ -175,7 +175,7 @@ class LongLevelWidget(QObject):
                 # subsample
                 y0_squared_dec = self.subsampler.push(y0_squared)
 
-                self.level, self.zf = pyx_lfilter_float64_1D(self.b, self.a, y0_squared_dec, self.zf)
+                self.level, self.zf = lfilter_float64_1D(self.b, self.a, y0_squared_dec, self.zf)
 
                 self.level_rms = 10. * np.log10(max(self.level, 1e-150))
 

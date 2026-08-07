@@ -40,12 +40,10 @@ git fetch
 git checkout origin/<branchName>
 ```
 
-6. Create a virtual environment, install Friture dependencies (PyQt6, etc.), and build Cython extensions
+6. Create a virtual environment and install Friture dependencies (PyQt6, etc.)
 ```
 uv sync
 ```
-
-`uv sync` handles everything: it creates the virtual environment, installs all dependencies, and compiles the Cython extensions in-place.
 
 7. Run Friture
 ```
@@ -60,7 +58,7 @@ The following steps can be used to prepare a development environment for Friture
 
 2. Install *chocolatey* from https://chocolatey.org/install
 
-2. Install Python, uv, and Microsoft Visual Studio C++ Build Tools, required to build Friture. With chocolatey, in an administrator terminal:
+ 2. Install Python and uv. With chocolatey, in an administrator terminal:
 
 ```
 choco install -y choco\packages.config
@@ -70,12 +68,12 @@ Watch out for a message indicating that a reboot is necessary.
 
 The next commands do not need to be run in an administrator terminal.
 
-4. Create a virtual environment, install dependencies, and build Cython extensions
+4. Create a virtual environment and install dependencies
 ```
 uv sync
 ```
 
-`uv sync` handles everything: it creates the virtual environment, installs all dependencies, and compiles the Cython extensions in-place.
+`uv sync` handles everything: it creates the virtual environment and installs all dependencies.
 
 5. Run Friture
 
@@ -98,5 +96,12 @@ uv run pyrcc6 resources/friture.qrc -o friture/friture_rc.py
 
 ## Filters parameters
 
-The filters parameters are precomputed in a file called `generated_filters.py`. To rebuild this file,
-run the script named `filter_design.py`.
+The filters parameters are precomputed in files called `generated_filters.py`
+(IIR coefficients) and `generated_fft.py` (precomputed FIR coefficients and
+FFT frequency responses). To rebuild these files, run:
+
+```
+uv run python friture/filter_design.py
+```
+
+Note: `filter_design.py` requires `scipy` to be installed.

@@ -18,13 +18,25 @@
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
 from numpy import log10, array, where
+import numpy as np
 
-from friture.filter import (octave_filter_bank_decimation, octave_frequencies,
-                            octave_filter_bank_decimation_filtic, NOCTAVE)
+from friture.filter import (octave_frequencies,
+                            octave_filter_bank_decimation_fft,
+                            NOCTAVE)
 from friture import generated_filters
+from friture import generated_fft
 import friture.renard as renard
 
+# FIR filter length for the minimum-phase FFT approximation of octave
+# and decimation IIR filters.  512 samples captures the full IIR
+# impulse response (which extends well beyond 128 taps for narrow
+# 1/24-octave bands) while keeping per-block FFT cost well under the
+# 23 ms budget for all bands-per-octave settings.
+FIR_LENGTH = 512
+
 class Octave_Filters():
+
+    FIR_LENGTH = FIR_LENGTH
 
     def __init__(self, bandsperoctave):
         [self.bdec, self.adec] = generated_filters.PARAMS['dec']
@@ -35,11 +47,13 @@ class Octave_Filters():
         self.setbandsperoctave(bandsperoctave)
 
     def filter(self, floatdata):
-        y, dec, zfs = octave_filter_bank_decimation(self.bdec, self.adec,
-                                                    self.boct, self.aoct,
-                                                    floatdata, zis=self.zfs)
-
-        self.zfs = zfs
+        y, dec, self._overlaps_oct, self._overlaps_dec = \
+            octave_filter_bank_decimation_fft(
+                self.boct,
+                self._fft_H_oct, self._fft_H_dec, self._fft_sizes,
+                self.FIR_LENGTH,
+                floatdata,
+                self._overlaps_oct, self._overlaps_dec)
 
         return y, dec
 
@@ -66,7 +80,7 @@ class Octave_Filters():
         self.C = 0.06 + 20. * log10(Rc)
         self.B = 0.17 + 20. * log10(Rb)
         self.A = 2.0 + 20. * log10(Ra)
-        self.zfs = octave_filter_bank_decimation_filtic(self.bdec, self.adec, self.boct, self.aoct)
+        self._init_fir_and_states()
 
         if bandsperoctave == 1:
             # with 1 band per octave, we would need the "R3.33" Renard series, but it does not exist.
@@ -105,3 +119,40 @@ class Octave_Filters():
                 self.f_nominal = ["%d" % (10 ** (2 - k) * f) for f in basis] + self.f_nominal
                 k += 1
             self.f_nominal = self.f_nominal[-len(self.fi):]
+
+    def _init_fir_and_states(self):
+        """Load precomputed FIR coefficients and FFT representations."""
+        key = str(self.bandsperoctave)
+        data = generated_fft.load_arrays()
+        fir_length = self.FIR_LENGTH
+
+        # Load precomputed FIR coefficients (time-domain)
+        self._boct_fir = list(data[f'{key}_boct_fir'])
+        self._bdec_fir = data['bdec_fir']
+
+        # Load precomputed FFT frequency responses and sizes
+        H_oct_stack = data[f'{key}_fft_H_oct']   # (NOCTAVE, bpo, max_freq)
+        H_dec_stack = data[f'{key}_fft_H_dec']   # (NOCTAVE, max_freq)
+        fft_sizes = data[f'{key}_fft_sizes'].tolist()
+
+        self._fft_H_oct = []
+        self._fft_H_dec = []
+        self._fft_sizes = fft_sizes
+
+        for j in range(NOCTAVE):
+            n_freq = fft_sizes[j] // 2 + 1
+            self._fft_H_oct.append(H_oct_stack[j, :, :n_freq])
+            self._fft_H_dec.append(H_dec_stack[j, :n_freq])
+
+        # Initialise overlap buffers for FFT stages.  Fixed size L-1
+        # because overlapping tails from consecutive blocks are combined
+        # via element-wise addition (not concatenation), keeping the
+        # buffer size constant regardless of block size.
+        self._overlaps_oct = [
+            np.zeros((self.bandsperoctave, fir_length - 1))
+            for _ in range(NOCTAVE)
+        ]
+        self._overlaps_dec = [
+            np.zeros(fir_length - 1)
+            for _ in range(NOCTAVE)
+        ]

@@ -41,7 +41,6 @@ aboutText = """
         <li>PyQt %s (Qt %s)</li>
         <li>Python-sounddevice %s (%s)</li>
         <li>Numpy %s</li>
-        <li>Cython</li>
 </ul>
 """ % (friture.__version__,
        friture.__releasedate__,
@@ -51,7 +50,6 @@ aboutText = """
        sounddevice.__version__,
        sounddevice.get_portaudio_version()[1],
        numpy.__version__)
-       # Cython.__version__, #this pulls the whole Cython, makes PyInstaller think it needs all the dependencies, even IPython!)
 
 
 class About_Dialog(QtWidgets.QDialog):
