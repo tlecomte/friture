@@ -17,22 +17,38 @@
 # You should have received a copy of the GNU General Public License
 # along with Friture.  If not, see <http://www.gnu.org/licenses/>.
 
-import numpy
-from friture_extensions.lfilter import pyx_lfilter_float64_1D
+from __future__ import annotations
+
+import numpy as np
+import numpy.typing as npt
+from friture.signal.lfilter import lfilter_float64_1D
 
 
-def decimate(bdec, adec, x, zi):
+def decimate(
+    bdec: npt.NDArray[np.float64],
+    adec: npt.NDArray[np.float64],
+    x: npt.NDArray[np.float64],
+    zi: npt.NDArray[np.float64] | None = None,
+) -> tuple[npt.NDArray[np.float64], npt.NDArray[np.float64]]:
     if len(x) == 0:
         raise Exception("Filter input is too small")
 
     # could use a polyphase decimator here
-    x_dec, zf = pyx_lfilter_float64_1D(bdec, adec, x, zi)
+    if zi is None:
+        zi = np.zeros(max(len(bdec), len(adec)) - 1, dtype=np.float64)
+    x_dec, zf = lfilter_float64_1D(bdec, adec, x, zi)
 
     x_dec = x_dec[::2]
     return x_dec, zf
 
 
-def decimate_multiple(Ndec, bdec, adec, x, zis):
+def decimate_multiple(
+    Ndec: int,
+    bdec: npt.NDArray[np.float64],
+    adec: npt.NDArray[np.float64],
+    x: npt.NDArray[np.float64],
+    zis: list[npt.NDArray[np.float64]] | None,
+) -> tuple[npt.NDArray[np.float64], list[npt.NDArray[np.float64]] | None]:
     '''decimate Ndec times'''
     x_dec = x
 
@@ -55,10 +71,14 @@ def decimate_multiple(Ndec, bdec, adec, x, zis):
         return x_dec, zfs
 
 
-def decimate_multiple_filtic(Ndec, bdec, adec):
+def decimate_multiple_filtic(
+    Ndec: int,
+    bdec: npt.NDArray[np.float64],
+    adec: npt.NDArray[np.float64],
+) -> list[npt.NDArray[np.float64]]:
     '''build a proper array of zero initial conditions to start the subsampler'''
     zfs = []
     for i in range(Ndec):
         l = max(len(bdec), len(adec)) - 1
-        zfs += [numpy.zeros(l)]
+        zfs += [np.zeros(l)]
     return zfs

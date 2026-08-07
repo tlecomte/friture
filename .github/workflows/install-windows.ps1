@@ -8,13 +8,6 @@ Remove-Item "dist" -Recurse -ErrorAction Ignore
 
 Write-Host ""
 Write-Host "==========================================="
-Write-Host "Building Cython extensions"
-Write-Host "==========================================="
-
-uv run python setup.py build_ext --inplace
-
-Write-Host ""
-Write-Host "==========================================="
 Write-Host "Packaging with pyinstaller"
 Write-Host "==========================================="
 

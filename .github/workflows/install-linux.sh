@@ -4,9 +4,6 @@ set -x
 
 uv run python -c 'import sys; print(sys.version)'
 
-# pyinstaller needs to have the extensions built explicitely
-uv run python setup.py build_ext --inplace
-
 sudo apt-get update
 sudo apt-get install -y desktop-file-utils # for desktop-file-validate, used by pkg2appimage
 sudo apt-get install -y fuse # AppImages require FUSE to run

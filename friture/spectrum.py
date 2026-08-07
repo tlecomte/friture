@@ -34,7 +34,7 @@ import friture.plotting.frequency_scales as fscales
 
 from friture.audiobackend import SAMPLING_RATE
 from friture.spectrumPlotWidget import SpectrumPlotWidget
-from friture_extensions.exp_smoothing_conv import pyx_exp_smoothed_value_numpy
+from friture.signal.exp_smoothing import exp_smoothed_value_2d
 
 
 class Spectrum_Widget(QObject):
@@ -155,8 +155,8 @@ class Spectrum_Widget(QObject):
                 self.old_index += int(needed)
 
             # compute the widget data
-            sp1 = pyx_exp_smoothed_value_numpy(self.kernel, self.alpha, sp1n, self.dispbuffers1)
-            sp2 = pyx_exp_smoothed_value_numpy(self.kernel, self.alpha, sp2n, self.dispbuffers2)
+            sp1 = exp_smoothed_value_2d(self.kernel, self.alpha, sp1n, self.dispbuffers1)
+            sp2 = exp_smoothed_value_2d(self.kernel, self.alpha, sp2n, self.dispbuffers2)
             # store result for next computation
             self.dispbuffers1 = sp1
             self.dispbuffers2 = sp2

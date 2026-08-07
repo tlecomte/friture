@@ -8,7 +8,7 @@ Created on Sat Apr 21 16:12:12 2012
 import numpy as np
 
 from .scipy_resample import resample
-from friture_extensions.linear_interp import pyx_linear_interp_2D
+from friture.signal.linear_interp import linear_interp_2D
 
 
 class Online_Linear_2D_resampler:
@@ -79,7 +79,7 @@ class Online_Linear_2D_resampler:
             if self.resampled_data.shape[1] < n:
                 self.resampled_data = np.zeros((self.height, n))
 
-            self.resampled_index = pyx_linear_interp_2D(
+            self.resampled_index = linear_interp_2D(
                 self.resampled_data,
                 data[:, j],
                 self.old_data,

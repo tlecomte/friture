@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import os
 from numpy import pi, exp, arange, cos, sin, sqrt, zeros, ones, log, arange, set_printoptions
 # the three following lines are a workaround for a bug with scipy and py2exe
 # together. See http://www.pyinstaller.org/ticket/83 for reference.
@@ -16,8 +17,9 @@ from scipy.signal.fir_filter_design import firwin
 import sys
 sys.path.insert(0, '.')
 from friture.filter import (octave_frequencies, octave_filter_bank,
-                            octave_filter_bank_decimation, NOCTAVE)
-
+                            octave_filter_bank_decimation, NOCTAVE,
+                            _next_composite_size)
+from friture.signal.lfilter import iir_to_minphase_fir
 from friture.audiobackend import SAMPLING_RATE
 
 # bank of filters for any other kind of frequency scale
@@ -354,8 +356,85 @@ def main():
             m += 1
 
     generate_filters_params()
+    generate_fft_filters()
 
     show()
 
+
+def generate_fft_filters():
+    """Precompute FIR coefficients and FFT frequency responses for all
+    bands-per-octave settings and write them to ``friture/data/generated_fft.npz``.
+
+    This eliminates the runtime cost of ``iir_to_minphase_fir`` and
+    ``np.fft.rfft`` during ``Octave_Filters.__init__``.
+    """
+    from friture.octavefilters import FIR_LENGTH
+
+    # Load the IIR coefficients (already stored as lists in PARAMS)
+    params = __import__('friture.generated_filters', fromlist=['PARAMS']).PARAMS
+
+    bdec, adec = params['dec']
+    bdec_arr = np.array(bdec)
+    adec_arr = np.array(adec)
+    bdec_fir = iir_to_minphase_fir(bdec_arr, adec_arr, FIR_LENGTH)
+
+    all_arrays = {'bdec_fir': bdec_fir}
+
+    for bpo in [1, 3, 6, 12, 24]:
+        key = str(bpo)
+        boct, aoct, fi, flow, fhigh = params[key]
+        boct_arr = [np.array(b) for b in boct]
+        aoct_arr = [np.array(a) for a in aoct]
+
+        boct_fir = [iir_to_minphase_fir(b, a, FIR_LENGTH)
+                     for b, a in zip(boct_arr, aoct_arr)]
+
+        # Store FIR coefficients as a stacked array
+        all_arrays[f'{key}_boct_fir'] = np.array(boct_fir)
+
+        fft_sizes = []
+        H_oct_list = []
+        H_dec_list = []
+
+        for j in range(NOCTAVE):
+            N_stage = 1024 // (2 ** j)
+            fft_size = _next_composite_size(N_stage + FIR_LENGTH - 1)
+            fft_sizes.append(fft_size)
+
+            H_oct = np.array([
+                np.fft.rfft(np.pad(h, (0, fft_size - len(h))), fft_size)
+                for h in boct_fir
+            ])
+            H_dec = np.fft.rfft(
+                np.pad(bdec_fir, (0, fft_size - len(bdec_fir))),
+                fft_size
+            )
+            H_oct_list.append(H_oct)
+            H_dec_list.append(H_dec)
+
+        # Stack complex arrays into 3D arrays (NOCTAVE, bands, n_freq)
+        # All stages have different fft_sizes, so we pad to the max.
+        max_oct = max(h.shape[1] for h in H_oct_list)
+        max_dec = max(h.shape[0] for h in H_dec_list)
+
+        H_oct_stack = np.zeros((NOCTAVE, len(boct_fir), max_oct), dtype=complex)
+        H_dec_stack = np.zeros((NOCTAVE, max_dec), dtype=complex)
+
+        for j in range(NOCTAVE):
+            h_oct = H_oct_list[j]
+            h_dec = H_dec_list[j]
+            H_oct_stack[j, :, :h_oct.shape[1]] = h_oct
+            H_dec_stack[j, :h_dec.shape[0]] = h_dec
+
+        all_arrays[f'{key}_fft_H_oct'] = H_oct_stack
+        all_arrays[f'{key}_fft_H_dec'] = H_dec_stack
+        all_arrays[f'{key}_fft_sizes'] = np.array(fft_sizes)
+
+    fname = os.path.join(os.path.dirname(__file__), 'data', 'generated_fft.npz')
+    np.savez_compressed(fname, **all_arrays)
+    print(f"  wrote {fname}")
+
+
 if __name__ == "__main__":
     main()
+

@@ -31,7 +31,7 @@ from friture.octavespectrum_settings import (OctaveSpectrum_Settings_Dialog,  # 
 
 from friture.filter import NOCTAVE
 
-from friture_extensions.exp_smoothing_conv import pyx_exp_smoothed_value
+from friture.signal.exp_smoothing import exp_smoothed_value
 
 from friture.audiobackend import SAMPLING_RATE
 
@@ -101,7 +101,7 @@ class OctaveSpectrum_Widget(QObject):
         y, decs_unused = self.filters.filter(floatdata)
 
         # compute the widget data
-        sp = [pyx_exp_smoothed_value(kernel, alpha, bankdata ** 2, old) for bankdata, kernel, alpha, old in zip(y, self.kernels, self.alphas, self.dispbuffers)]
+        sp = [exp_smoothed_value(kernel, alpha, bankdata ** 2, old) for bankdata, kernel, alpha, old in zip(y, self.kernels, self.alphas, self.dispbuffers)]
 
         # store result for next computation
         self.dispbuffers = sp
