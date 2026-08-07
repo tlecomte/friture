@@ -13,6 +13,11 @@ sudo apt-get install -y fuse # AppImages require FUSE to run
 # which would not be bundled unless explicitly installed.
 sudo apt-get install libxcb-xinerama0
 sudo apt-get install libxkbcommon-x11-0
+# The Qt6/PyQt6 GUI stack links against the Mesa EGL/GL/X11/dbus/fontconfig
+# stack. PyInstaller only bundles libs it can resolve with ldd at build time,
+# so install them here too -- otherwise the bundled .so files emit
+# "libEGL.so.1: cannot open shared object file" at import time.
+sudo apt-get install -y libegl1 libgl1 libglx-mesa0 libgl1-mesa-dri
 
 # dependencies to build PortAudio
 sudo apt-get install -y libasound-dev
@@ -56,14 +61,45 @@ cp -R dist/friture/* $APPDIR/usr/bin/
 # bundle the source-built PortAudio so sounddevice's ctypes.find_library() resolves it
 cp portaudio-19.7.0/portaudio-install/lib/libportaudio.so* $APPDIR/usr/lib/x86_64-linux-gnu/
 
-# PortAudio links against ALSA/JACK.
-# Bundle the audio-API deps that PortAudio needs at runtime (discovered via ldd).
+# PortAudio is loaded via ctypes.CDLL (not an ELF NEEDED of the binary), so the
+# recursive ldd closure below cannot reach its own ALSA/JACK deps -- bundle them
+# explicitly, the same way the legacy pkg2appimage recipe's audio ingredients did.
 ldd portaudio-19.7.0/portaudio-install/lib/libportaudio.so.2 2>/dev/null \
   | grep '=>' | awk '{print $3}' | while read -r dep; do
     case "$dep" in
       *libasound*|*libjack*|*libportaudio*) cp -nL "$dep" $APPDIR/usr/lib/x86_64-linux-gnu/ 2>/dev/null ;;
     esac
   done
+
+# The frozen Qt6/PyQt6 GUI stack pulls in a large transitive set of system libs
+# (EGL, GL, X11, dbus, fontconfig, freetype...) that PyInstaller may skip if they
+# are not installed at build time. Build the full ldd closure of the bundle and
+# ship any system libraries we still don't provide, so the AppImage is
+# self-contained on a minimal host.
+gather_runtime_libs() {
+  local libdir="$1"
+  local -a queue=("$APPDIR/usr/bin/friture")
+  local -A seen=()
+  # seed with every shared object the freeze shipped
+  while IFS= read -r -d '' so; do queue+=("$so"); done \
+    < <(find "$APPDIR/usr/bin" -type f -name '*.so*' -print0 2>/dev/null)
+  local idx=0
+  while [ "$idx" -lt "${#queue[@]}" ]; do
+    local f="${queue[$((idx++))]}"
+    [ -e "$f" ] || continue
+    [ -n "${seen[$f]:-}" ] && continue
+    seen[$f]=1
+    # field 3 of `ldd` is the resolved path when the dep was found (-> "/...")
+    while IFS= read -r dep; do
+      case "$dep" in
+        /lib*/ld-linux*) continue ;;   # never bundle the ELF loader
+        /*) cp -nL "$dep" "$libdir"/ 2>/dev/null || true
+            queue+=("$dep") ;;
+      esac
+    done < <(ldd "$f" 2>/dev/null | awk '$3 ~ /^\// {print $3}')
+  done
+}
+gather_runtime_libs "$APPDIR/usr/lib/x86_64-linux-gnu"
 
 # desktop entry + icon
 cp appimage/friture.desktop $APPDIR/friture.desktop
