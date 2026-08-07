@@ -108,6 +108,16 @@ jobs:
         ./friture-*.AppImage --appimage-extract
         uv run python scripts/smoke_test.py ./squashfs-root/AppRun --no-splash
 
+    - name: Upload AppImage smoke-test log
+      # Always publish the Friture log so we can diagnose a "PASS but full init
+      # not reached" result (e.g. audio-input device absent on the runner).
+      if: always()
+      uses: actions/upload-artifact@v7
+      with:
+        name: friture-smoke-log
+        path: ~/.local/state/Friture/log/friture.log.txt
+        if-no-files-found: warn
+
     - name: Upload appImage
       uses: actions/upload-artifact@v7
       with:
