@@ -10,22 +10,23 @@ import numpy as np
 
 _CACHE = None
 
-def _npz_path():
-    # In a frozen (PyInstaller) bundle the data shipped by friture.spec lives
-    # next to the application binary; in a normal checkout it sits in the
-    # source tree under friture/data/.
+def _data_path(name):
+    # PyInstaller onedir exposes the bundle's data directory (which holds every
+    # collected data file, including those shipped via friture.spec's `datas`)
+    # as sys._MEIPASS. In a source checkout we resolve relative to this file so
+    # `import friture` from anywhere in the tree still finds the data.
     if getattr(sys, 'frozen', False):
-        base = os.path.dirname(os.path.abspath(sys.executable))
+        base = sys._MEIPASS
     else:
         base = os.path.dirname(os.path.abspath(__file__))
-    return os.path.join(base, 'data', 'generated_fft.npz')
+    return os.path.join(base, 'data', name)
 
 def load_arrays():
     """Return a dict of precomputed FFT filter data for all bands-per-octave
     settings.  Results are cached after the first call."""
     global _CACHE
     if _CACHE is None:
-        with open(_npz_path(), 'rb') as f:
+        with open(_data_path('generated_fft.npz'), 'rb') as f:
             data = np.load(f)
             _CACHE = {k: data[k] for k in data.files}
     return _CACHE

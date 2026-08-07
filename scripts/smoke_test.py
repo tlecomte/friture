@@ -33,14 +33,16 @@ except Exception:
     VERSION = None
 
 TIMEOUT_SECONDS = 20
-# Minimum runtime that counts as "it got off the ground" (not an immediate crash).
-MIN_RUNTIME_SECONDS = 3
 
 # Substrings that, if found in the log or stderr, mean the bundle is broken
-# (a missing Qt module, shared library, or Python extension).
+# (a missing Qt module, shared library, or Python extension). We include the
+# Python traceback header and the app's own unhandled-exception log line so a
+# crash that is swallowed by Friture's global exception handler (logged but not
+# fatal to the process) is still reported as a failure.
 FATAL_MARKERS = (
     "ModuleNotFoundError",
     "ImportError",
+    "FileNotFoundError",
     "Fatal Python error",
     "cannot load Qt platform plugin",
     "could not find or load",
@@ -49,6 +51,8 @@ FATAL_MARKERS = (
     "This application failed to start",
     "QLibraryPrivate",
     "QML error(s)",
+    "Unhandled exception",
+    "Traceback (most recent call last)",
     "Aborted",
     "core dumped",
 )
@@ -142,7 +146,6 @@ def main():
     banner_seen = banner in log_text
     full_init = FULL_INIT_LINE in log_text
     fatal = next((m for m in FATAL_MARKERS if m in combined), None)
-    ran_long = timed_out or (rc == 0 and elapsed >= MIN_RUNTIME_SECONDS)
 
     print("elapsed        : %.1fs" % elapsed)
     print("terminated     : %s (return code %r)" % (
@@ -155,13 +158,15 @@ def main():
         print("---- stderr (tail) ----")
         print(stderr[-1500:])
 
-    # Pass when the app stayed alive long enough to be running (didn't
-    # immediately crash), printed its startup banner, and emitted no fatal
-    # bundle error. A timeout-kill means it reached the Qt event loop = good.
-    ok = ran_long and banner_seen and fatal is None
-
-    if ok and not full_init:
-        print("note: full init not reached (audio device may be absent on the host)")
+    # Pass only when the bundle booted far enough to reach the Qt main event
+    # loop and emit Friture's "Init finished, entering the main loop" line.
+    # Reaching that line implies the startup banner was printed, the audio
+    # backend opened a stream, the default docks were constructed and the
+    # QML/Python stacks all loaded -- i.e. the bundle is genuinely intact.
+    # A crash before line 216 (e.g. a missing data file caught by the app's
+    # own exception handler) leaves full_init unset and fails the test, rather
+    # than false-passing on a hung-but-crashed process.
+    ok = full_init and banner_seen and fatal is None
 
     if not ok and log_text:
         print("---- log tail ----")
