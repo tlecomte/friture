@@ -62,6 +62,8 @@ Rectangle {
             Layout.fillHeight: true
             Layout.fillWidth: true
 
+            scopedata: plot.scopedata
+
             vertical_axis: scopedata.vertical_axis
             horizontal_axis: scopedata.horizontal_axis
 
