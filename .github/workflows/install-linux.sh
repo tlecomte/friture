@@ -17,7 +17,10 @@ sudo apt-get install libxkbcommon-x11-0
 # stack. PyInstaller only bundles libs it can resolve with ldd at build time,
 # so install them here too -- otherwise the bundled .so files emit
 # "libEGL.so.1: cannot open shared object file" at import time.
-sudo apt-get install -y libegl1 libgl1 libglx-mesa0 libgl1-mesa-dri
+# (libgl1-mesa-dri, the bulky DRI drivers, is intentionally NOT installed: the
+# smoke test runs headless on the offscreen Qt platform, which never dlopens
+# DRI drivers; ldd only needs the libEGL/libGL/libGLX .so symlinks.)
+sudo apt-get install -y libegl1 libgl1 libglx-mesa0
 
 # dependencies to build PortAudio
 sudo apt-get install -y libasound-dev
@@ -52,11 +55,12 @@ uv run pyinstaller friture.spec -y --log-level=DEBUG
 sudo apt-get install -y zsync
 
 APPDIR=AppDir
-rm -rf $APPDIR
-mkdir -p $APPDIR/usr/bin $APPDIR/usr/lib/x86_64-linux-gnu
+APPDIR="$PWD/$APPDIR"
+rm -rf "$APPDIR"
+mkdir -p "$APPDIR/usr/bin" "$APPDIR/usr/lib/x86_64-linux-gnu"
 
 # drop the PyInstaller bundle into usr/bin/ (preserves the bundled libs' layout)
-cp -R dist/friture/* $APPDIR/usr/bin/
+cp -R dist/friture/* "$APPDIR/usr/bin/"
 
 # bundle the source-built PortAudio so sounddevice's ctypes.find_library() resolves it
 cp portaudio-19.7.0/portaudio-install/lib/libportaudio.so* $APPDIR/usr/lib/x86_64-linux-gnu/
@@ -92,7 +96,18 @@ gather_runtime_libs() {
     # field 3 of `ldd` is the resolved path when the dep was found (-> "/...")
     while IFS= read -r dep; do
       case "$dep" in
-        /lib*/ld-linux*) continue ;;   # never bundle the ELF loader
+        # Skip deps that already live inside this AppDir (e.g. the bundled
+        # Qt6/Python libs resolved via $ORIGIN rpath) -- copying them would
+        # duplicate them and risk Qt version skew / size-check failure.
+        "$APPDIR"/*) continue ;;
+        # Never bundle the ELF loader itself.
+        /lib*/ld-linux*) continue ;;
+        # Never bundle glibc's own runtime components: the PyInstaller binary
+        # was linked against this build host's glibc, so the target host must
+        # match that baseline anyway -- overriding glibc via LD_LIBRARY_PATH
+        # with a loader/libc version pair risks a mismatch crash. Other
+        # graphics/font/X11/system libs below are safe to bundle.
+        */libc.so.*|*/libm.so.*|*/libdl.so.*|*/libpthread.so.*|*/librt.so.*|*/libutil.so.*|*/libanl.so.*|*/libnsl.so.*|*/libresolv.so.*|*/libmemusage.so|*/libSegFault.so|*/libnss_*.so.*) continue ;;
         /*) cp -nL "$dep" "$libdir"/ 2>/dev/null || true
             queue+=("$dep") ;;
       esac
