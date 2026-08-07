@@ -19,6 +19,7 @@
 
 import logging
 import math
+import time
 
 from PyQt6 import QtCore
 import sounddevice
@@ -120,6 +121,11 @@ class __AudioBackend(QtCore.QObject):
         self.chunk_number = 0
 
         self.devices_with_timing_errors = []
+
+        # throttle the "ringbuffer lagging behind" warning so a persistently
+        # starving input (e.g. no live capture device, as in headless CI) does
+        # not spam the log on every fetch cycle.
+        self._last_lag_warning = 0.0
 
     def close(self):
         if self.stream is not None:
@@ -458,7 +464,10 @@ class __AudioBackend(QtCore.QObject):
                 self.stream_start_time -= delta_seconds
 
             if stream_read_time < stream_time - 100 * FRAMES_PER_BUFFER / SAMPLING_RATE:
-                self.logger.warning("Ringbuffer lagging behind: ringbuffer time = %f, stream time = %f", stream_read_time, stream_time)
+                now = time.monotonic()
+                if now - self._last_lag_warning >= 5.0:
+                    self.logger.warning("Ringbuffer lagging behind: ringbuffer time = %f, stream time = %f", stream_read_time, stream_time)
+                    self._last_lag_warning = now
 
             channel = self.get_current_first_channel()
             if self.duo_input:
