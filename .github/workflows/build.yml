@@ -100,11 +100,21 @@ jobs:
     - name: Build
       run: source ./.github/workflows/install-linux.sh
 
+    - name: Verify AppImage launches (smoke test)
+      # Extract the AppImage (no FUSE needed) and run it headless with the
+      # offscreen Qt platform. The harness checks the Friture log for the
+      # startup banner and asserts no missing-module/DLL errors.
+      run: |
+        ./friture-*.AppImage --appimage-extract
+        uv run python scripts/smoke_test.py ./squashfs-root/AppRun --no-splash
+
     - name: Upload appImage
       uses: actions/upload-artifact@v7
       with:
         name: friture-appImage
-        path: friture*.AppImage
+        path: |
+          friture*.AppImage
+          friture*.AppImage.zsync
         if-no-files-found: error
 
   build-macos:
@@ -163,5 +173,6 @@ jobs:
             **/friture*.msi
             **/friture*.dmg
             **/friture*.AppImage
+            **/friture*.AppImage.zsync
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

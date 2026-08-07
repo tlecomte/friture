@@ -5,7 +5,6 @@ set -x
 uv run python -c 'import sys; print(sys.version)'
 
 sudo apt-get update
-sudo apt-get install -y desktop-file-utils # for desktop-file-validate, used by pkg2appimage
 sudo apt-get install -y fuse # AppImages require FUSE to run
 
 # when PyInstaller collect libraries, it ignores libraries that are not found on the host.
@@ -19,6 +18,13 @@ sudo apt-get install libxkbcommon-x11-0
 sudo apt-get install -y libasound-dev
 sudo apt-get install -y libjack-dev
 
+# Provide a virtual audio device so the headless smoke test (and the frozen app)
+# can fully start: PortAudio needs a default output device to enumerate, and
+# Friture's audio backend raises (hanging in an error dialog) otherwise.
+sudo apt-get install -y pulseaudio pulseaudio-utils libasound2-plugins
+pulseaudio --start --exit-idle-time=-1 2>/dev/null || true
+pactl load-module module-null-sink sink_name=friture_smoke sink_properties=device.description="Friture+smoke+test" 2>/dev/null || true
+
 # build PortAudio 19.7.0 from scratch (required for Jack fixes on distributions using PipeWire)
 wget https://github.com/PortAudio/portaudio/archive/refs/tags/v19.7.0.tar.gz
 tar -xvf v19.7.0.tar.gz
@@ -31,16 +37,80 @@ cd ..
 
 uv run pyinstaller friture.spec -y --log-level=DEBUG
 
-cd appimage
-wget -q https://github.com/AppImage/AppImages/raw/master/pkg2appimage -O ./pkg2appimage
-chmod a+x ./pkg2appimage
-bash -ex pkg2appimage friture.yml
+# ---- AppDir assembly ----
+# Friture is frozen with PyInstaller, so dist/friture/ is already a self-contained
+# bundle (Python + Qt6 + PortAudio). We lay it into a standard AppDir and let
+# appimagetool turn it into an AppImage (+ .zsync for AppImageUpdate).
 
-cd ..
-ls -la appimage/out
+# zsyncmake (from the zsync package) lets appimagetool emit the .zsync delta
+# file that powers in-App AppImageUpdate.
+sudo apt-get install -y zsync
+
+APPDIR=AppDir
+rm -rf $APPDIR
+mkdir -p $APPDIR/usr/bin $APPDIR/usr/lib/x86_64-linux-gnu
+
+# drop the PyInstaller bundle into usr/bin/ (preserves the bundled libs' layout)
+cp -R dist/friture/* $APPDIR/usr/bin/
+
+# bundle the source-built PortAudio so sounddevice's ctypes.find_library() resolves it
+cp portaudio-19.7.0/portaudio-install/lib/libportaudio.so* $APPDIR/usr/lib/x86_64-linux-gnu/
+
+# PortAudio links against ALSA/JACK.
+# Bundle the audio-API deps that PortAudio needs at runtime (discovered via ldd).
+ldd portaudio-19.7.0/portaudio-install/lib/libportaudio.so.2 2>/dev/null \
+  | grep '=>' | awk '{print $3}' | while read -r dep; do
+    case "$dep" in
+      *libasound*|*libjack*|*libportaudio*) cp -nL "$dep" $APPDIR/usr/lib/x86_64-linux-gnu/ 2>/dev/null ;;
+    esac
+  done
+
+# desktop entry + icon
+cp appimage/friture.desktop $APPDIR/friture.desktop
+cp resources/images-src/window-icon.svg $APPDIR/friture.svg
+
+# AppRun shim: expose the bundled PortAudio to the dynamic loader.
+# (Only the PortAudio dir is added to LD_LIBRARY_PATH; the frozen binary finds
+#  Qt/Python via its $ORIGIN rpath, so validation must not touch that lookup.)
+cat > $APPDIR/AppRun <<'EOF'
+#!/bin/sh
+HERE="$(dirname "$(readlink -f "${0}")")"
+export LD_LIBRARY_PATH="$HERE/usr/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH"
+exec "$HERE/usr/bin/friture" "$@"
+EOF
+chmod +x $APPDIR/AppRun
+
+# ---- Build the AppImage (+ .zsync for AppImageUpdate) with appimagetool ----
+# appimagetool is the canonical AppImage packager: it turns this AppDir into an
+# AppImage, validates the desktop file, creates the .DirIcon, and embeds update
+# info (generating the .zsync when zsyncmake is available).
+wget -q -O appimagetool https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage
+chmod a+x appimagetool
 
 export ARTIFACT_FILENAME=friture-$(uv run python -c 'import friture; print(friture.__version__)')-$(date +'%Y%m%d').AppImage
 echo $ARTIFACT_FILENAME
 
-mv appimage/out/Friture*.AppImage $ARTIFACT_FILENAME
+# update information lets AppImageUpdate do binary delta updates.
+# Format must be a recognized zsync-style scheme (appimagetool validates it).
+# For GitHub releases, gh-releases-zsync lets AppImageUpdate find the latest
+# release asset automatically; for non-release builds we embed a no-update
+# placeholder so the .zsync file is still produced for CI inspection.
+if [[ "$GITHUB_REF" == refs/tags/* ]]; then
+  UPDATE_INFO="gh-releases-zsync|tlecomte|friture|latest|friture*.AppImage.zsync"
+else
+  UPDATE_INFO="zsync|https://example.invalid/never"
+fi
+
+./appimagetool -u "$UPDATE_INFO" $APPDIR $ARTIFACT_FILENAME
+ls -la $ARTIFACT_FILENAME $ARTIFACT_FILENAME.zsync 2>/dev/null
 du -hs $ARTIFACT_FILENAME
+
+# sanity check: a sane Friture AppImage is well under 200 MB.
+# A much larger result usually means a packaging step duplicated the Qt/Python
+# libs, so fail loudly rather than ship a bloated artifact.
+SIZE_BYTES=$(stat -c%s "$ARTIFACT_FILENAME")
+echo "AppImage size: $SIZE_BYTES bytes"
+if [ "$SIZE_BYTES" -gt 200000000 ]; then
+  echo "ERROR: AppImage is unexpectedly large (>200MB); aborting."
+  exit 1
+fi
