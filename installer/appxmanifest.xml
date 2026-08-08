@@ -1,17 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- 
 
-To build an appx package to publish to the Microsoft store:
+To build an MSIX package to publish to the Microsoft Store:
 
-1. enable Windows developer mode (to allow side-loading)
+1. enable Windows developer mode (to allow side-loading of an unsigned package)
 2. the build output is in a friture-bin folder
-3. friture-bin should contain appxmanifest.xml
-4. in that folder, run: Add-AppxPackage -Register .\appxmanifest.xml
+3. friture-bin should contain AppxManifest.xml
+4. in that folder, run: Add-AppxPackage -Register .\AppxManifest.xml
 5. app should start from Windows Start menu
   - to deploy again, increase the version
 6. from the parent folder, run:
-PS C:\...\friture> MakeAppx pack /v /d .\friture-bin /p friture.appx
-7. friture.appx file can be uploaded in a new submission to the Windows Partern Center
+PS C:\...\friture> MakeAppx pack /v /d .\friture-bin /p friture.msix
+7. friture.msix can be uploaded in a new submission to the Microsoft Partner Center
+   (the Store signs the package on ingestion; this CI build produces an
+   unsigned MSIX used for packaging validation only).
 
 References:
 https://docs.microsoft.com/en-us/windows/msix/packaging-tool/create-app-package
@@ -25,7 +27,7 @@ https://docs.microsoft.com/en-us/windows/msix/package/create-app-package-with-ma
         Name="53504SilentGain.Friture"
         Version="0.0.0.0"
         Publisher="CN=74EE87F8-B2A0-400A-A66A-377F7F4E3BBE"
-        ProcessorArchitecture="x86" />
+        ProcessorArchitecture="amd64" />
     <Properties>
         <DisplayName>Friture</DisplayName>
         <PublisherDisplayName>Silent Gain</PublisherDisplayName>
@@ -37,7 +39,7 @@ https://docs.microsoft.com/en-us/windows/msix/package/create-app-package-with-ma
         <Resource Language="en-us" />
     </Resources>
     <Dependencies>
-        <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.14393.0" MaxVersionTested="10.0.14393.0" />
+        <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.17763.0" MaxVersionTested="10.0.19041.0" />
     </Dependencies>
     <Capabilities>
         <rescap:Capability Name="runFullTrust"/>
