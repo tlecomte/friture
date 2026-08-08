@@ -52,11 +52,24 @@ class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
         # Setup the user interface
         self.setupUi(self)
 
+        # Assign explicit IDs to the theme radio buttons (0=System,
+        # 1=Light, 2=Dark) immediately after setup, BEFORE the no-audio
+        # early return below. On a headless host with no input devices the
+        # early-return path skips the rest of __init__, so the IDs must be
+        # assigned here -- otherwise themeButtonGroup has no ids and
+        # restoreState()'s button(0) is None (which would crash on
+        # .setChecked). Interactive desktop users see no behaviour change.
+        self.themeButtonGroup.idToggled.connect(self.theme_preference_toggled)
+        self.themeButtonGroup.setId(self.radioButton_themeSystem, 0)
+        self.themeButtonGroup.setId(self.radioButton_themeLight, 1)
+        self.themeButtonGroup.setId(self.radioButton_themeDark, 2)
+
         devices = AudioBackend().get_readable_devices_list()
 
         if devices == []:
             # no audio input device
-            if QtWidgets.QApplication.instance().platformName() == "offscreen":                # Headless (e.g. the CI smoke test runs on the offscreen Qt
+            if QtWidgets.QApplication.instance().platformName() == "offscreen":
+                # Headless (e.g. the CI smoke test runs on the offscreen Qt
                 # platform with no audio hardware). A modal dialog here would
                 # block forever with no user to dismiss it; log and continue
                 # with an empty device set instead of exiting, so that -- for
@@ -94,13 +107,6 @@ class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
         self.radioButton_duo.toggled.connect(self.duo_input_type_selected)
         self.checkbox_showPlayback.stateChanged.connect(self.show_playback_checkbox_changed)
         self.spinBox_historyLength.editingFinished.connect(self.history_length_edit_finished)
-        self.themeButtonGroup.idToggled.connect(self.theme_preference_toggled)
-
-        # Set explicit IDs for theme buttons to match ThemeManager enum values
-        # 0 = System (Unknown), 1 = Light, 2 = Dark
-        self.themeButtonGroup.setId(self.radioButton_themeSystem, 0)
-        self.themeButtonGroup.setId(self.radioButton_themeLight, 1)
-        self.themeButtonGroup.setId(self.radioButton_themeDark, 2)
 
     @pyqtProperty(bool, notify=show_playback_changed) # type: ignore
     def show_playback(self) -> bool:
