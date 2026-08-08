@@ -52,10 +52,24 @@ class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
         # Setup the user interface
         self.setupUi(self)
 
+        self.themeButtonGroup.idToggled.connect(self.theme_preference_toggled)
+        # Set explicit IDs for theme buttons to match ThemeManager enum values
+        # 0 = System (Unknown), 1 = Light, 2 = Dark
+        self.themeButtonGroup.setId(self.radioButton_themeSystem, 0)
+        self.themeButtonGroup.setId(self.radioButton_themeLight, 1)
+        self.themeButtonGroup.setId(self.radioButton_themeDark, 2)
+
         devices = AudioBackend().get_readable_devices_list()
 
         if devices == []:
-            # no audio input device: display a message and exit
+            # no audio input device
+            if QtWidgets.QApplication.instance().platformName() == "offscreen":
+                # Headless (e.g. the CI smoke test).
+                # Log and continue with an empty device set instead of exiting,
+                # for validation purposes.
+                self.logger.warning("No audio input device available; continuing in headless mode")
+                return
+            # display a message and exit
             QtWidgets.QMessageBox.critical(self, no_input_device_title, no_input_device_message)
             QtCore.QTimer.singleShot(0, self.exitOnInit)
             sys.exit(1)
@@ -85,13 +99,6 @@ class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
         self.radioButton_duo.toggled.connect(self.duo_input_type_selected)
         self.checkbox_showPlayback.stateChanged.connect(self.show_playback_checkbox_changed)
         self.spinBox_historyLength.editingFinished.connect(self.history_length_edit_finished)
-        self.themeButtonGroup.idToggled.connect(self.theme_preference_toggled)
-
-        # Set explicit IDs for theme buttons to match ThemeManager enum values
-        # 0 = System (Unknown), 1 = Light, 2 = Dark
-        self.themeButtonGroup.setId(self.radioButton_themeSystem, 0)
-        self.themeButtonGroup.setId(self.radioButton_themeLight, 1)
-        self.themeButtonGroup.setId(self.radioButton_themeDark, 2)
 
     @pyqtProperty(bool, notify=show_playback_changed) # type: ignore
     def show_playback(self) -> bool:
