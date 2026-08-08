@@ -37,22 +37,52 @@ codesign -dv dist/friture.app
 export ARTIFACT_FILENAME=friture-$(uv run python -c 'import friture; print(friture.__version__)')-$(date +'%Y%m%d').dmg
 echo $ARTIFACT_FILENAME
 
-# macos has random hdiutil errors because of XProtectBehaviorService, retry a few times.
+# sanity check: a healthy Friture .app bundle is well under 200 MB.
+# A much larger result usually means a packaging step duplicated the Qt/Python
+# libs, so fail loudly rather than ship a bloated artifact.
+APP_BUNDLE_SIZE_BYTES=$(du -sk dist/friture.app | awk '{print $1}')
+echo "friture.app size: $APP_BUNDLE_SIZE_BYTES KB"
+if [ "$APP_BUNDLE_SIZE_BYTES" -gt 200000 ]; then
+    echo "ERROR: friture.app is unexpectedly large (>200MB); aborting."
+    exit 1
+fi
+
+# Build the DMG with a polished layout (icon positioning + a drop zone for
+# /Applications) using create-dmg.
+brew install create-dmg
+
+# macos has random errors with hdiutil (used within create-dmg) because of XProtectBehaviorService, retry a few times.
 # Reference: https://github.com/actions/runner-images/issues/7522#issuecomment-1556766641
 max_retries=30
 retry_delay_seconds=5
 
+create_dmg_cmd=(
+    create-dmg
+    --volname "Friture"
+    --window-pos 200 122
+    --window-size 660 440
+    --icon-size 110
+    --hide-extension "friture.app"
+    --icon "friture.app" 170 210
+    --app-drop-link 440 210
+    "$ARTIFACT_FILENAME"
+    dist/friture.app
+)
+
 for ((i=1; i<=max_retries; i++)); do
     set +e  # Disable 'exit on error'
-    hdiutil create $ARTIFACT_FILENAME -volname "Friture" -fs HFS+ -srcfolder dist/friture.app
+    "${create_dmg_cmd[@]}"
     status=$?
     set -e  # Re-enable 'exit on error'
 
     if [ $status -eq 0 ]; then
-        echo "hdiutil create succeeded on attempt $i"
+        echo "create-dmg succeeded on attempt $i"
         break
     else
-        echo "hdiutil create failed on attempt $i"
+        echo "create-dmg failed on attempt $i"
+        # create-dmg leaves a partial .dmg on some failures; remove it so the
+        # next attempt starts clean and the retry isn't masked by a stale file.
+        rm -f "$ARTIFACT_FILENAME"
         if [ $i -lt $max_retries ]; then
             echo "Retrying in $retry_delay_seconds seconds..."
             sleep $retry_delay_seconds
@@ -64,4 +94,4 @@ for ((i=1; i<=max_retries; i++)); do
 done
 
 du -hs dist/friture.app
-du -hs $ARTIFACT_FILENAME
+du -hs "$ARTIFACT_FILENAME"

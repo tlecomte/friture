@@ -28,6 +28,7 @@ tools/*
 friture.egg-info
 .eggs/
 *.appx
+*.msix
 
 ##################
 # IDE files
@@ -45,3 +46,4 @@ Notepad++
 
 # Macos
 .DS_Store
+*.dmg

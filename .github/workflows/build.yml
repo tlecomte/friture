@@ -192,6 +192,33 @@ jobs:
     - name: Build
       run: source ./.github/workflows/install-macos.sh
 
+    - name: Verify app launches (smoke test)
+      shell: bash
+      run: uv run python scripts/smoke_test.py dist/friture.app/Contents/MacOS/friture --no-splash
+
+    - name: Capture Friture log
+      if: always()
+      shell: bash
+      run: |
+        uv run python - <<'PY'
+        import os, shutil, platformdirs
+        src = os.path.join(platformdirs.user_log_dir("Friture", ""), "friture.log.txt")
+        dst = "friture-smoke.log"
+        if os.path.exists(src):
+            shutil.copy2(src, dst)
+        else:
+            with open(dst, "w") as f:
+                f.write("log not found: " + src)
+        PY
+
+    - name: Upload friture smoke-test log
+      if: always()
+      uses: actions/upload-artifact@v7
+      with:
+        name: friture-smoke-log-macos
+        path: friture-smoke.log
+        if-no-files-found: warn
+
     - name: Upload dmg
       uses: actions/upload-artifact@v7
       with:
