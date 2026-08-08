@@ -34,6 +34,20 @@ except Exception:
 
 TIMEOUT_SECONDS = 20
 
+
+def _kill_proc(proc):
+    """Kill a launched process, cross-platform.
+
+    On POSIX we started the process in its own session (start_new_session=True)
+    and kill the whole process group so a spawned helper child cannot keep the
+    stdout/stderr pipes open and make communicate() hang. Windows has no
+    process groups, so we just TerminateProcess the leader.
+    """
+    try:
+        os.killpg(os.getpgid(proc.pid), signal.SIGKILL)
+    except (AttributeError, ProcessLookupError, PermissionError):
+        proc.kill()
+
 # Substrings that, if found in the log or stderr, mean the bundle is broken
 # (a missing Qt module, shared library, or Python extension). We include the
 # Python traceback header and the app's own unhandled-exception log line so a
@@ -122,13 +136,12 @@ def main():
         rc = proc.returncode
     except subprocess.TimeoutExpired:
         timed_out = True
-        # kill the entire process group, not just the leader
-        try:
-            os.killpg(os.getpgid(proc.pid), signal.SIGKILL)
-        except (ProcessLookupError, PermissionError):
-            proc.kill()
+        _kill_proc(proc)
         stdout, stderr = proc.communicate()
         rc = proc.returncode
+    except KeyboardInterrupt:
+        _kill_proc(proc)
+        raise
 
     elapsed = time.time() - started
 
