@@ -27,7 +27,7 @@ https://docs.microsoft.com/en-us/windows/msix/package/create-app-package-with-ma
         Name="53504SilentGain.Friture"
         Version="0.0.0.0"
         Publisher="CN=74EE87F8-B2A0-400A-A66A-377F7F4E3BBE"
-        ProcessorArchitecture="amd64" />
+        ProcessorArchitecture="x64" />
     <Properties>
         <DisplayName>Friture</DisplayName>
         <PublisherDisplayName>Silent Gain</PublisherDisplayName>
