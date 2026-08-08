@@ -52,14 +52,9 @@ class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
         # Setup the user interface
         self.setupUi(self)
 
-        # Assign explicit IDs to the theme radio buttons (0=System,
-        # 1=Light, 2=Dark) immediately after setup, BEFORE the no-audio
-        # early return below. On a headless host with no input devices the
-        # early-return path skips the rest of __init__, so the IDs must be
-        # assigned here -- otherwise themeButtonGroup has no ids and
-        # restoreState()'s button(0) is None (which would crash on
-        # .setChecked). Interactive desktop users see no behaviour change.
         self.themeButtonGroup.idToggled.connect(self.theme_preference_toggled)
+        # Set explicit IDs for theme buttons to match ThemeManager enum values
+        # 0 = System (Unknown), 1 = Light, 2 = Dark
         self.themeButtonGroup.setId(self.radioButton_themeSystem, 0)
         self.themeButtonGroup.setId(self.radioButton_themeLight, 1)
         self.themeButtonGroup.setId(self.radioButton_themeDark, 2)
@@ -69,15 +64,12 @@ class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
         if devices == []:
             # no audio input device
             if QtWidgets.QApplication.instance().platformName() == "offscreen":
-                # Headless (e.g. the CI smoke test runs on the offscreen Qt
-                # platform with no audio hardware). A modal dialog here would
-                # block forever with no user to dismiss it; log and continue
-                # with an empty device set instead of exiting, so that -- for
-                # headless validation purposes -- Friture still reaches full
-                # init. Interactive users on a real desktop keep the message+exit
-                # below.
+                # Headless (e.g. the CI smoke test).
+                # Log and continue with an empty device set instead of exiting,
+                # for validation purposes.
                 self.logger.warning("No audio input device available; continuing in headless mode")
                 return
+            # display a message and exit
             QtWidgets.QMessageBox.critical(self, no_input_device_title, no_input_device_message)
             QtCore.QTimer.singleShot(0, self.exitOnInit)
             sys.exit(1)
@@ -235,29 +227,10 @@ class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
             channel = settings.value("secondChannel", 0, type=int)
             self.comboBox_secondChannel.setCurrentIndex(channel)
             duo_input_id = settings.value("duoInput", 0, type=int)
-            if duo_input_id is None:
-                duo_input_id = 0
-            # button() returns None for an unknown/stale id; never crash on a
-            # missing saved value.
-            duo_button = self.inputTypeButtonGroup.button(duo_input_id)
-            if duo_button is not None:
-                duo_button.setChecked(True)
+            self.inputTypeButtonGroup.button(duo_input_id).setChecked(True)
         self.checkbox_showPlayback.setCheckState(QtCore.Qt.CheckState(settings.value("showPlayback", 0, type=int)))
         self.spinBox_historyLength.setValue(settings.value("historyLength", 30, type=int))
         theme_preference_id = settings.value("themePreference", 0, type=int)
-        if theme_preference_id is None:
-            theme_preference_id = 0
-        # button() returns None when no button has this id (e.g. a stale
-        # saved value, or a fresh install whose stored id never mapped to a
-        # button). Restoring the theme must never crash Friture at startup, so
-        # fall back to the System (0) button when the stored id is unrecognized.
-        theme_button = self.themeButtonGroup.button(theme_preference_id)
-        if theme_button is not None:
-            theme_button.setChecked(True)
-        else:
-            self.logger.warning("No theme button for id %r; defaulting to System", theme_preference_id)
-            system_button = self.themeButtonGroup.button(0)
-            if system_button is not None:
-                system_button.setChecked(True)
+        self.themeButtonGroup.button(theme_preference_id).setChecked(True)
         # need to emit this because setValue doesn't emit editFinished
         self.history_length_changed.emit(self.spinBox_historyLength.value())

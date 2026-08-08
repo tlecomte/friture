@@ -142,10 +142,7 @@ class __AudioBackend(QtCore.QObject):
             default_input_device = sounddevice.query_devices(kind='input')
             default_input_device['index'] = raw_devices.index(default_input_device)
         except sounddevice.PortAudioError:
-            # headless CI has no default input device: this is expected, not
-            # an error, so log at debug (not exception) to avoid emitting a
-            # "Traceback" line that trips the smoke test's fatal-marker scan.
-            self.logger.debug("Failed to query the default input device")
+            self.logger.warning("Failed to query the default input device")
             default_input_device = None
 
         devices_list = []
@@ -169,10 +166,10 @@ class __AudioBackend(QtCore.QObject):
     def get_readable_output_devices_list(self):
         output_devices = self.get_output_devices()
 
-        # mirror get_input_devices(): if there are no output devices at all,
+        # if there are no output devices at all,
         # sounddevice.query_devices(kind='output') raises PortAudioError ("Error
-        # querying device -1") -- e.g. on a headless Windows runner with no
-        # audio. Degrade to an empty list instead of logging a traceback.
+        # querying device -1").
+        # Degrade to an empty list.
         if len(output_devices) == 0:
             return []
 
@@ -181,7 +178,7 @@ class __AudioBackend(QtCore.QObject):
             default_output_device = sounddevice.query_devices(kind='output')
             default_output_device['index'] = raw_devices.index(default_output_device)
         except sounddevice.PortAudioError:
-            self.logger.debug("No default output device available")
+            self.logger.warning("No default output device available")
             default_output_device = None
 
         devices_list = []
@@ -258,13 +255,12 @@ class __AudioBackend(QtCore.QObject):
         devices = sounddevice.query_devices()
 
         # sounddevice.query_devices(kind='output') raises PortAudioError when
-        # there is no default output device (e.g. a headless CI runner), which
-        # would crash AudioBackend() construction. Degrade gracefully instead,
-        # mirroring get_input_devices() below.
+        # there is no default output device.
+        # Degrade gracefully instead.
         try:
             default_output_device = sounddevice.query_devices(kind='output')
         except sounddevice.PortAudioError:
-            self.logger.debug("No default output device available")
+            self.logger.warning("No default output device available")
             default_output_device = None
 
         output_devices = []
