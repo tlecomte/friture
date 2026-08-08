@@ -55,7 +55,17 @@ class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
         devices = AudioBackend().get_readable_devices_list()
 
         if devices == []:
-            # no audio input device: display a message and exit
+            # no audio input device
+            if QtCore.QCoreApplication.platformName() == "offscreen":
+                # Headless (e.g. the CI smoke test runs on the offscreen Qt
+                # platform with no audio hardware). A modal dialog here would
+                # block forever with no user to dismiss it; log and continue
+                # with an empty device set instead of exiting, so that -- for
+                # headless validation purposes -- Friture still reaches full
+                # init. Interactive users on a real desktop keep the message+exit
+                # below.
+                self.logger.warning("No audio input device available; continuing in headless mode")
+                return
             QtWidgets.QMessageBox.critical(self, no_input_device_title, no_input_device_message)
             QtCore.QTimer.singleShot(0, self.exitOnInit)
             sys.exit(1)
