@@ -229,10 +229,29 @@ class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
             channel = settings.value("secondChannel", 0, type=int)
             self.comboBox_secondChannel.setCurrentIndex(channel)
             duo_input_id = settings.value("duoInput", 0, type=int)
-            self.inputTypeButtonGroup.button(duo_input_id).setChecked(True)
+            if duo_input_id is None:
+                duo_input_id = 0
+            # button() returns None for an unknown/stale id; never crash on a
+            # missing saved value.
+            duo_button = self.inputTypeButtonGroup.button(duo_input_id)
+            if duo_button is not None:
+                duo_button.setChecked(True)
         self.checkbox_showPlayback.setCheckState(QtCore.Qt.CheckState(settings.value("showPlayback", 0, type=int)))
         self.spinBox_historyLength.setValue(settings.value("historyLength", 30, type=int))
         theme_preference_id = settings.value("themePreference", 0, type=int)
-        self.themeButtonGroup.button(theme_preference_id).setChecked(True)
+        if theme_preference_id is None:
+            theme_preference_id = 0
+        # button() returns None when no button has this id (e.g. a stale
+        # saved value, or a fresh install whose stored id never mapped to a
+        # button). Restoring the theme must never crash Friture at startup, so
+        # fall back to the System (0) button when the stored id is unrecognized.
+        theme_button = self.themeButtonGroup.button(theme_preference_id)
+        if theme_button is not None:
+            theme_button.setChecked(True)
+        else:
+            self.logger.warning("No theme button for id %r; defaulting to System", theme_preference_id)
+            system_button = self.themeButtonGroup.button(0)
+            if system_button is not None:
+                system_button.setChecked(True)
         # need to emit this because setValue doesn't emit editFinished
         self.history_length_changed.emit(self.spinBox_historyLength.value())
