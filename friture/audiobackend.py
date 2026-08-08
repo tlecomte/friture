@@ -141,8 +141,8 @@ class __AudioBackend(QtCore.QObject):
         try:
             default_input_device = sounddevice.query_devices(kind='input')
             default_input_device['index'] = raw_devices.index(default_input_device)
-        except sounddevice.PortAudioError:
-            self.logger.warning("Failed to query the default input device", exc_info=True)
+        except sounddevice.PortAudioError as err:
+            self.logger.warning(f"Failed to query the default input device: {err}")
             default_input_device = None
 
         devices_list = []
@@ -177,8 +177,8 @@ class __AudioBackend(QtCore.QObject):
         try:
             default_output_device = sounddevice.query_devices(kind='output')
             default_output_device['index'] = raw_devices.index(default_output_device)
-        except sounddevice.PortAudioError:
-            self.logger.warning("No default output device available", exc_info=True)
+        except sounddevice.PortAudioError as err:
+            self.logger.warning(f"No default output device available: {err}")
             default_output_device = None
 
         devices_list = []
@@ -229,8 +229,8 @@ class __AudioBackend(QtCore.QObject):
 
         try:
             default_input_device = sounddevice.query_devices(kind='input')
-        except sounddevice.PortAudioError:
-            self.logger.exception("Failed to query the default input device", exc_info=True)
+        except sounddevice.PortAudioError as err:
+            self.logger.exception(f"Failed to query the default input device: {err}")
             default_input_device = None
 
         input_devices = []
@@ -259,8 +259,8 @@ class __AudioBackend(QtCore.QObject):
         # Degrade gracefully instead.
         try:
             default_output_device = sounddevice.query_devices(kind='output')
-        except sounddevice.PortAudioError:
-            self.logger.warning("No default output device available", exc_info=True)
+        except sounddevice.PortAudioError as err:
+            self.logger.warning(f"No default output device available: {err}")
             default_output_device = None
 
         output_devices = []
