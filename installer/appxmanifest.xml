@@ -12,8 +12,8 @@ To build an MSIX package to publish to the Microsoft Store:
 6. from the parent folder, run:
 PS C:\...\friture> MakeAppx pack /v /d .\friture-bin /p friture.msix
 7. friture.msix can be uploaded in a new submission to the Microsoft Partner Center
-   (the Store signs the package on ingestion; this CI build produces an
-   unsigned MSIX used for packaging validation only).
+   (this CI build produces an unsigned MSIX;
+   the Store signs the package on ingestion).
 
 References:
 https://docs.microsoft.com/en-us/windows/msix/packaging-tool/create-app-package
