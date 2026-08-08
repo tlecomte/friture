@@ -243,11 +243,19 @@ class __AudioBackend(QtCore.QObject):
     def get_output_devices(self):
         devices = sounddevice.query_devices()
 
-        default_output_device = sounddevice.query_devices(kind='output')
+        # sounddevice.query_devices(kind='output') raises PortAudioError when
+        # there is no default output device (e.g. a headless CI runner), which
+        # would crash AudioBackend() construction. Degrade gracefully instead,
+        # mirroring get_input_devices() below.
+        try:
+            default_output_device = sounddevice.query_devices(kind='output')
+        except sounddevice.PortAudioError:
+            self.logger.debug("No default output device available")
+            default_output_device = None
 
         output_devices = []
         if default_output_device is not None:
-            # start by the default input device
+            # start by the default output device
             default_output_device['index'] = devices.index(default_output_device)
             output_devices += [default_output_device]
 
