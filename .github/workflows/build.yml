@@ -100,11 +100,26 @@ jobs:
     - name: Build
       run: source ./.github/workflows/install-linux.sh
 
+    - name: Verify AppImage launches (smoke test)
+      run: |
+        ./friture-*.AppImage --appimage-extract
+        uv run python scripts/smoke_test.py ./squashfs-root/AppRun --no-splash
+
+    - name: Upload AppImage smoke-test log
+      if: always()
+      uses: actions/upload-artifact@v7
+      with:
+        name: friture-smoke-log
+        path: ~/.local/state/Friture/log/friture.log.txt
+        if-no-files-found: warn
+
     - name: Upload appImage
       uses: actions/upload-artifact@v7
       with:
         name: friture-appImage
-        path: friture*.AppImage
+        path: |
+          friture*.AppImage
+          friture*.AppImage.zsync
         if-no-files-found: error
 
   build-macos:
@@ -163,5 +178,6 @@ jobs:
             **/friture*.msi
             **/friture*.dmg
             **/friture*.AppImage
+            **/friture*.AppImage.zsync
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
