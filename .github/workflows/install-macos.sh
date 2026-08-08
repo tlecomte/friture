@@ -51,47 +51,19 @@ fi
 # /Applications) using create-dmg.
 brew install create-dmg
 
-# macos has random errors with hdiutil (used within create-dmg) because of XProtectBehaviorService, retry a few times.
-# Reference: https://github.com/actions/runner-images/issues/7522#issuecomment-1556766641
-max_retries=30
-retry_delay_seconds=5
-
-create_dmg_cmd=(
-    create-dmg
-    --volname "Friture"
-    --window-pos 200 122
-    --window-size 660 440
-    --icon-size 110
-    --hide-extension "friture.app"
-    --icon "friture.app" 170 210
-    --app-drop-link 440 210
-    "$ARTIFACT_FILENAME"
+create-dmg \
+    --volname "Friture" \
+    --window-pos 200 122 \
+    --window-size 600 400 \
+    --icon-size 100 \
+    --hide-extension "friture.app" \
+    --icon "friture.app" 150 190 \
+    --app-drop-link 450 190 \
+    --background "installer/dmg-background.png" \
+    --hdiutil-retries 30 \
+    --no-internet-enable \
+    "$ARTIFACT_FILENAME" \
     dist/friture.app
-)
-
-for ((i=1; i<=max_retries; i++)); do
-    set +e  # Disable 'exit on error'
-    "${create_dmg_cmd[@]}"
-    status=$?
-    set -e  # Re-enable 'exit on error'
-
-    if [ $status -eq 0 ]; then
-        echo "create-dmg succeeded on attempt $i"
-        break
-    else
-        echo "create-dmg failed on attempt $i"
-        # create-dmg leaves a partial .dmg on some failures; remove it so the
-        # next attempt starts clean and the retry isn't masked by a stale file.
-        rm -f "$ARTIFACT_FILENAME"
-        if [ $i -lt $max_retries ]; then
-            echo "Retrying in $retry_delay_seconds seconds..."
-            sleep $retry_delay_seconds
-        else
-            echo "All attempts failed."
-            exit 1
-        fi
-    fi
-done
 
 du -hs dist/friture.app
 du -hs "$ARTIFACT_FILENAME"

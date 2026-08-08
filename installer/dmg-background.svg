@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+  Friture DMG background image.
+
+  Canvas: 1200 x 800 px, tagged DPI 144.
+  Intended Finder window (window size): 600 x 400 points.
+  At DPI 144, Finder renders 1200x800 px as 600x400 points (2 px per point),
+  so the background fills a Retina window crisply with no scaling.  See
+  https://hobbyworker.me/en/dev/2026-05-20-design-macos-dmg-1-create-dmg-and-background/
+
+  Icon placement (create-dmg, coords in window POINTS; bg px = 2 x point):
+      friture app    icon "friture.app" at 150 190   -> image top-left bg px (300, 380)
+      Applications   app-drop-link at 450 190       -> image top-left bg px (900, 380)
+    Finder icon view position = top-left corner of the 100pt / 200px icon,
+    so each icon visual centre sits at bg px (400, 480) and (1000, 480).
+
+  Regenerate the PNG with rsvg-convert (then set DPI to 144 with sips):
+      rsvg-convert -w 1200 -h 800 -o installer/dmg-background.png installer/dmg-background.svg
+      sips -s dpiWidth 144 -s dpiHeight 144 installer/dmg-background.png
+-->
+
+<svg
+   width="1200"
+   height="800"
+   viewBox="0 0 1200 800"
+   version="1.1"
+   id="svg21"
+   inkscape:version="1.2.1 (9c6d41e, 2022-07-14)"
+   sodipodi:docname="dmg-background.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview23"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     showgrid="false"
+     inkscape:zoom="0.54439518"
+     inkscape:cx="598.8297"
+     inkscape:cy="393.09679"
+     inkscape:current-layer="svg21"
+     inkscape:showpageshadow="2"
+     inkscape:window-width="1440"
+     inkscape:window-height="774"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="0" />
+  <!-- background -->
+  <rect
+     width="1200"
+     height="800"
+     id="rect14"
+     style="fill:#ffffff" />
+  <!-- arrow -->
+  <rect
+     style="fill:#000000"
+     id="rect403"
+     width="224.10191"
+     height="53.270126"
+     x="437.1824"
+     y="455.45016"
+     ry="16.532108" />
+  <path
+     sodipodi:type="star"
+     style="fill:#000000"
+     id="path529"
+     inkscape:flatsided="true"
+     sodipodi:sides="3"
+     sodipodi:cx="747.61865"
+     sodipodi:cy="189.20079"
+     sodipodi:r1="146.73378"
+     sodipodi:r2="73.36689"
+     sodipodi:arg1="2.0943951"
+     sodipodi:arg2="3.1415927"
+     inkscape:rounded="0"
+     inkscape:randomized="0"
+     d="m 674.25176,316.27597 0,-254.15036 220.10067,127.07518 z"
+     inkscape:transform-center-x="-21.069794"
+     transform="matrix(0.57436774,0,0,0.57436774,219.01797,373.41438)"
+     inkscape:transform-center-y="3.0913773e-06" />
+</svg>
