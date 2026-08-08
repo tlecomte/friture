@@ -56,8 +56,7 @@ class Settings_Dialog(QtWidgets.QDialog, Ui_Settings_Dialog):
 
         if devices == []:
             # no audio input device
-            if QtCore.QCoreApplication.platformName() == "offscreen":
-                # Headless (e.g. the CI smoke test runs on the offscreen Qt
+            if QtWidgets.QApplication.instance().platformName() == "offscreen":                # Headless (e.g. the CI smoke test runs on the offscreen Qt
                 # platform with no audio hardware). A modal dialog here would
                 # block forever with no user to dismiss it; log and continue
                 # with an empty device set instead of exiting, so that -- for
