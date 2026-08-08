@@ -31,6 +31,8 @@
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
    xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs7" />
   <sodipodi:namedview
      id="namedview23"
      pagecolor="#ffffff"
@@ -60,10 +62,10 @@
   <rect
      style="fill:#000000"
      id="rect403"
-     width="224.10191"
-     height="53.270126"
-     x="437.1824"
-     y="455.45016"
+     width="196.54839"
+     height="53.270111"
+     x="451.87759"
+     y="352.58371"
      ry="16.532108" />
   <path
      sodipodi:type="star"
@@ -81,6 +83,6 @@
      inkscape:randomized="0"
      d="m 674.25176,316.27597 0,-254.15036 220.10067,127.07518 z"
      inkscape:transform-center-x="-21.069794"
-     transform="matrix(0.57436774,0,0,0.57436774,219.01797,373.41438)"
+     transform="matrix(0.57436774,0,0,0.57436774,219.01797,270.54793)"
      inkscape:transform-center-y="3.0913773e-06" />
 </svg>
