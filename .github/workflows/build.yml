@@ -41,11 +41,42 @@ jobs:
       shell: powershell
       run: ./.github/workflows/install-windows.ps1
 
-    - name: Upload friture appx
+    - name: Verify app launches (smoke test)
+      # Launch the frozen friture.exe headless (offscreen Qt) and assert it
+      # reaches full init. The MSIX itself is not installed here (it is
+      # unsigned; the Store signs on ingestion) -- we validate the same frozen
+      # binary the MSIX wraps.
+      shell: bash
+      run: uv run python scripts/smoke_test.py dist/friture/friture.exe --no-splash
+
+    - name: Capture Friture log
+      if: always()
+      shell: bash
+      run: |
+        uv run python - <<'PY'
+        import os, shutil, platformdirs
+        src = os.path.join(platformdirs.user_log_dir("Friture", ""), "friture.log.txt")
+        dst = "friture-smoke.log"
+        if os.path.exists(src):
+            shutil.copy2(src, dst)
+        else:
+            with open(dst, "w") as f:
+                f.write("log not found: " + src)
+        PY
+
+    - name: Upload friture smoke-test log
+      if: always()
       uses: actions/upload-artifact@v7
       with:
-        name: friture-appx
-        path: dist/friture-*.appx
+        name: friture-smoke-log-windows
+        path: friture-smoke.log
+        if-no-files-found: warn
+
+    - name: Upload friture msix
+      uses: actions/upload-artifact@v7
+      with:
+        name: friture-msix
+        path: dist/friture-*.msix
         if-no-files-found: error
 
     - name: Upload friture msi
@@ -105,12 +136,27 @@ jobs:
         ./friture-*.AppImage --appimage-extract
         uv run python scripts/smoke_test.py ./squashfs-root/AppRun --no-splash
 
+    - name: Capture Friture log
+      if: always()
+      shell: bash
+      run: |
+        uv run python - <<'PY'
+        import os, shutil, platformdirs
+        src = os.path.join(platformdirs.user_log_dir("Friture", ""), "friture.log.txt")
+        dst = "friture-smoke.log"
+        if os.path.exists(src):
+            shutil.copy2(src, dst)
+        else:
+            with open(dst, "w") as f:
+                f.write("log not found: " + src)
+        PY
+
     - name: Upload AppImage smoke-test log
       if: always()
       uses: actions/upload-artifact@v7
       with:
-        name: friture-smoke-log
-        path: ~/.local/state/Friture/log/friture.log.txt
+        name: friture-smoke-log-linux
+        path: friture-smoke.log
         if-no-files-found: warn
 
     - name: Upload appImage
@@ -176,6 +222,7 @@ jobs:
           fail_on_unmatched_files: true
           files: |
             **/friture*.msi
+            **/friture*.msix
             **/friture*.dmg
             **/friture*.AppImage
             **/friture*.AppImage.zsync
