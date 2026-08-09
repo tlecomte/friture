@@ -44,7 +44,7 @@ class ImagePlot(QObject):
         self._spectrogram_data.color_axis.name = "PSD (dB A)"
 
         self._spectrogram_data.vertical_axis.setRange(20, 20000)
-        self._spectrogram_data.horizontal_axis.setRange(0, 10)
+        self._spectrogram_data.horizontal_axis.setRange(10, 0)
         self._spectrogram_data.color_axis.setRange(-140, 0)
         self._spectrogram_data.show_color_axis = True
 
@@ -80,7 +80,7 @@ class ImagePlot(QObject):
         self._spectrogram_item.erase()
 
     def settimerange(self, timerange_seconds, dT_seconds):
-        self._spectrogram_data.horizontal_axis.setRange(0, timerange_seconds)
+        self._spectrogram_data.horizontal_axis.setRange(timerange_seconds, 0)
         self._spectrogram_item.settimerange(timerange_seconds)
 
     def setfreqrange(self, minfreq, maxfreq):
