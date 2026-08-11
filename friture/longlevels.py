@@ -210,7 +210,7 @@ class LongLevelWidget(QObject):
     def setduration(self, value):
         self.length_seconds = value
         self.length_samples = int(self.length_seconds * self.subsampled_sampling_rate)
-        self._long_levels_data.horizontal_axis.setRange(0., self.length_seconds)
+        self._long_levels_data.horizontal_axis.setRange(self.length_seconds, 0.)
 
     def setresptime(self, value):
         self.response_time = value
