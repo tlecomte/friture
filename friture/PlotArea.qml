@@ -8,6 +8,7 @@ Item {
 
     SystemPalette { id: systemPalette; colorGroup: SystemPalette.Active }
 
+    required property var scopedata
     required property Axis vertical_axis
     required property Axis horizontal_axis
 
@@ -29,6 +30,22 @@ Item {
     Item {
         id: plotItemPlaceholder
         anchors.fill: parent
+    }
+
+    Repeater {
+        id: annotationRepeater
+        anchors.fill: parent
+
+        model: scopePlotArea.scopedata.target_frequencies
+
+        Rectangle {
+            x: 0
+            y: parent.height * (1. - scopePlotArea.vertical_axis.coordinate_transform.toScreen(modelData) )
+            width: parent.width
+            height: 1
+            color: "lime"
+        }
+
     }
 
     Rectangle {
@@ -87,5 +104,19 @@ Item {
         id: plotMouseArea
         anchors.fill: parent
         cursorShape: Qt.CrossCursor
+        acceptedButtons: Qt.LeftButton | Qt.RightButton
+
+        onClicked: {
+            if (mouse.button !== Qt.RightButton) { return; }
+            var freq = vertical_axis.coordinate_transform.toPlot((parent.height - mouse.y) / parent.height);
+            for (var existingFreq of scopedata.target_frequencies) {
+                var existingCoord = parent.height * (1 - scopePlotArea.vertical_axis.coordinate_transform.toScreen(existingFreq));
+                if (Math.abs(existingCoord - mouse.y) < 5) {
+                    scopedata.remove_target_frequency(existingFreq);
+                    return;
+                }
+            }
+            scopedata.add_target_frequency(freq);
+        }
     }
 }
