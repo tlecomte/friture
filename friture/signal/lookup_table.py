@@ -25,7 +25,7 @@ def color_from_float(
     1D array of uint32
         Color values.
     """
-    indices = (values * 255).astype(np.intp)
+    indices = np.clip((values * 255).astype(np.intp), 0, lut.shape[0] - 1)
     return lut[indices]
 
 
@@ -48,7 +48,7 @@ def color_from_float_2D(
     2D array of uint32
         Color values.
     """
-    indices = (values * 255).astype(np.intp)
+    indices = np.clip((values * 255).astype(np.intp), 0, lut.shape[0] - 1)
     return lut[indices]
 
 
@@ -71,5 +71,5 @@ def rgb_from_float_2D(
     3D array of uint32, shape (M, N, 3)
         RGB color values.
     """
-    indices = (values * 255).astype(np.intp)
+    indices = np.clip((values * 255).astype(np.intp), 0, lut.shape[0] - 1)
     return lut[indices, :]
