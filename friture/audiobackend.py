@@ -2,8 +2,6 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2009 Timothée Lecomte
-
-# This file is part of Friture.
 #
 # Friture is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License version 3 as published by
@@ -21,11 +19,22 @@ import logging
 import math
 import time
 
-from PyQt6 import QtCore
+from PyQt5 import QtCore
 import sounddevice
 import rtmixer
 from numpy import ndarray, vstack, int8, int16, float64, float32, frombuffer, concatenate
 import numpy as np
+
+try:
+    from scipy import signal
+except ImportError:
+    signal = None
+
+try:
+    import pyaudiowpatch as pyaudio
+    PYAUDIOWPATCH_AVAILABLE = True
+except ImportError:
+    PYAUDIOWPATCH_AVAILABLE = False
 
 # the sample rate below should be dynamic, taken from PyAudio/PortAudio
 SAMPLING_RATE = 48000
@@ -33,30 +42,113 @@ FRAMES_PER_BUFFER = 512
 
 __audiobackendInstance = None
 
-# python-sounddevice (bindings to PortAudio)
-# > no device friendly name
-# > suffer from PortAudio bugs
-# > uses old PortAudio binaries
-# > sounddevice provides nice Python bindngs
-# > rtmixer provides nice C ringbuffer on top of sounddevice
 
-# rtaudio
-# > better maintained than PortAudio
-# > no device friendly name
-# > no ios/android support
-# > no nice Python bindings
+class DummyStats:
+    def __init__(self):
+        self.input_overflows = 0
 
-# qtmultimedia
-# > shipped with Qt5
-# > no device friendly name
-# > supports iOS and android
-# > opaque
 
-# python-soundcard
-# > not a lot of devs / users
-# > no android support
-# > provides device ids and friendly name
-# > doc, features are lacking
+class DummyAction:
+    def __init__(self):
+        self.stats = DummyStats()
+
+
+class PyAudioLoopbackStream:
+    """WASAPI Loopback stream handler for Windows using pyaudiowpatch."""
+    def __init__(self, device_info, ring_buffer, action, target_samplerate=SAMPLING_RATE):
+        self.device_info = device_info
+        self.ring_buffer = ring_buffer
+        self.action = action
+        self.target_samplerate = target_samplerate
+        self.device_samplerate = int(device_info.get('default_samplerate', target_samplerate))
+        self.channels = device_info['max_input_channels']
+        self.p = None
+        self.stream = None
+        self.device = device_info['index']
+        self.latency = 0.02
+        self._start_time = 0.0
+        self.logger = logging.getLogger(__name__)
+
+    @property
+    def time(self):
+        if self._start_time == 0.0:
+            return 0.0
+        return time.time() - self._start_time
+
+    def _callback(self, in_data, frame_count, time_info, status):
+        if status:
+            self.action.stats.input_overflows += 1
+
+        if in_data is not None:
+            try:
+                if self.device_samplerate == self.target_samplerate:
+                    data_to_write = in_data
+                    frames_to_write = frame_count
+                else:
+                    audio_np = np.frombuffer(in_data, dtype=np.float32)
+                    audio_np = audio_np.reshape((frame_count, self.channels))
+                    target_frames = int(round(frame_count * self.target_samplerate / self.device_samplerate))
+                    if signal is not None:
+                        resampled = signal.resample(audio_np, target_frames, axis=0).astype(np.float32)
+                    else:
+                        indices = np.linspace(0, frame_count - 1, target_frames)
+                        resampled = np.zeros((target_frames, self.channels), dtype=np.float32)
+                        for ch in range(self.channels):
+                            resampled[:, ch] = np.interp(indices, np.arange(frame_count), audio_np[:, ch])
+                    data_to_write = resampled.tobytes()
+                    frames_to_write = target_frames
+
+                if self.ring_buffer.write_available >= frames_to_write:
+                    self.ring_buffer.write(data_to_write)
+                else:
+                    self.action.stats.input_overflows += 1
+            except Exception:
+                pass
+
+        return (None, pyaudio.paContinue)
+
+    def start(self):
+        if self.p is None:
+            self.p = pyaudio.PyAudio()
+
+        if self.stream is None:
+            self._start_time = time.time()
+            self.stream = self.p.open(
+                format=pyaudio.paFloat32,
+                channels=self.channels,
+                rate=self.device_samplerate,
+                input=True,
+                input_device_index=self.device_info['index'],
+                frames_per_buffer=FRAMES_PER_BUFFER,
+                stream_callback=self._callback
+            )
+            self.stream.start_stream()
+        elif self.stream.is_stopped():
+            self._start_time = time.time()
+            self.stream.start_stream()
+
+    def stop(self):
+        if self.stream is not None:
+            try:
+                if self.stream.is_active():
+                    self.stream.stop_stream()
+            except Exception:
+                pass
+
+    def close(self):
+        self.stop()
+        if self.stream is not None:
+            try:
+                self.stream.close()
+            except Exception:
+                pass
+            self.stream = None
+        if self.p is not None:
+            try:
+                self.p.terminate()
+            except Exception:
+                pass
+            self.p = None
 
 
 def AudioBackend():
@@ -75,7 +167,6 @@ class __AudioBackend(QtCore.QObject):
         QtCore.QObject.__init__(self)
 
         self.logger = logging.getLogger(__name__)
-
         self.duo_input = False
 
         self.logger.info("Initializing audio backend")
@@ -117,36 +208,36 @@ class __AudioBackend(QtCore.QObject):
 
         # counter for the number of input buffer overflows
         self.xruns = 0
-
         self.chunk_number = 0
-
         self.devices_with_timing_errors = []
-
-        # throttle the "ringbuffer lagging behind" warning so a persistently
-        # starving input (e.g. no live capture device, as in headless CI) does
-        # not spam the log on every fetch cycle.
-        self._last_lag_warning = 0.0
 
     def close(self):
         if self.stream is not None:
-            self.stream.stop()
+            if hasattr(self.stream, 'close'):
+                self.stream.close()
+            else:
+                self.stream.stop()
             self.stream = None
 
-    # method
     def get_readable_devices_list(self):
         input_devices = self.get_input_devices()
-
         raw_devices = sounddevice.query_devices()
 
         try:
             default_input_device = sounddevice.query_devices(kind='input')
             default_input_device['index'] = raw_devices.index(default_input_device)
-        except sounddevice.PortAudioError as err:
-            self.logger.warning(f"Failed to query the default input device: {err}")
+        except sounddevice.PortAudioError:
+            self.logger.exception("Failed to query the default input device")
             default_input_device = None
 
         devices_list = []
         for device in input_devices:
+            if device.get('is_loopback', False):
+                nchannels = device['max_input_channels']
+                desc = "%s (%d channels) (WASAPI Loopback)" % (device['name'], nchannels)
+                devices_list += [desc]
+                continue
+
             api = sounddevice.query_hostapis(device['hostapi'])['name']
 
             if default_input_device is not None and device['index'] == default_input_device['index']:
@@ -155,31 +246,17 @@ class __AudioBackend(QtCore.QObject):
                 extra_info = ''
 
             nchannels = device['max_input_channels']
-
             desc = "%s (%d channels) (%s) %s" % (device['name'], nchannels, api, extra_info)
-
             devices_list += [desc]
 
         return devices_list
 
-    # method
     def get_readable_output_devices_list(self):
         output_devices = self.get_output_devices()
 
-        # if there are no output devices at all,
-        # sounddevice.query_devices(kind='output') raises PortAudioError ("Error
-        # querying device -1").
-        # Degrade to an empty list.
-        if len(output_devices) == 0:
-            return []
-
         raw_devices = sounddevice.query_devices()
-        try:
-            default_output_device = sounddevice.query_devices(kind='output')
-            default_output_device['index'] = raw_devices.index(default_output_device)
-        except sounddevice.PortAudioError as err:
-            self.logger.warning(f"No default output device available: {err}")
-            default_output_device = None
+        default_output_device = sounddevice.query_devices(kind='output')
+        default_output_device['index'] = raw_devices.index(default_output_device)
 
         devices_list = []
         for device in output_devices:
@@ -191,101 +268,94 @@ class __AudioBackend(QtCore.QObject):
                 extra_info = ''
 
             nchannels = device['max_output_channels']
-
             desc = "%s (%d channels) (%s) %s" % (device['name'], nchannels, api, extra_info)
-
             devices_list += [desc]
 
         return devices_list
 
-    # method
     def get_default_input_device(self):
         try:
             index = sounddevice.default.device[0]
         except IOError:
             index = None
-
         return index
 
-    # method
     def get_default_output_device(self):
         try:
             index = sounddevice.default.device[1]
         except IOError:
             index = None
-
         return index
 
-    # method
-    # returns a list of input devices index, starting with the system default
     def get_input_devices(self):
         devices = sounddevice.query_devices()
 
-        # early exit if there is no input device. Otherwise query_devices(kind='input') fails
         input_devices = [device for device in devices if device['max_input_channels'] > 0]
 
-        if len(input_devices) == 0:
+        loopback_devices = []
+        if PYAUDIOWPATCH_AVAILABLE:
+            try:
+                p = pyaudio.PyAudio()
+                try:
+                    for loopback in p.get_loopback_device_info_generator():
+                        loopback_dev = {
+                            'name': loopback['name'],
+                            'index': loopback['index'],
+                            'max_input_channels': loopback['maxInputChannels'],
+                            'default_samplerate': int(loopback['defaultSampleRate']),
+                            'is_loopback': True,
+                            'pyaudio_info': loopback
+                        }
+                        loopback_devices.append(loopback_dev)
+                finally:
+                    p.terminate()
+            except Exception:
+                self.logger.exception("Failed to query WASAPI loopback devices")
+
+        if len(input_devices) == 0 and len(loopback_devices) == 0:
             return []
 
         try:
             default_input_device = sounddevice.query_devices(kind='input')
-        except sounddevice.PortAudioError as err:
-            self.logger.exception(f"Failed to query the default input device: {err}")
+        except sounddevice.PortAudioError:
+            self.logger.exception("Failed to query the default input device")
             default_input_device = None
 
-        input_devices = []
+        final_input_devices = []
         if default_input_device is not None:
-            # start by the default input device
             default_input_device['index'] = devices.index(default_input_device)
-            input_devices += [default_input_device]
+            final_input_devices += [default_input_device]
 
         for device in devices:
-            # select only the input devices by looking at the number of input channels
             if device['max_input_channels'] > 0:
                 device['index'] = devices.index(device)
-                # default input device has already been inserted
                 if default_input_device is not None and device['index'] != default_input_device['index']:
-                    input_devices += [device]
+                    final_input_devices += [device]
 
-        return input_devices
+        # Добавляем все Loopback устройства в конец списка
+        final_input_devices.extend(loopback_devices)
+        return final_input_devices
 
-    # method
-    # returns a list of output devices index, starting with the system default
     def get_output_devices(self):
         devices = sounddevice.query_devices()
-
-        # sounddevice.query_devices(kind='output') raises PortAudioError when
-        # there is no default output device.
-        # Degrade gracefully instead.
-        try:
-            default_output_device = sounddevice.query_devices(kind='output')
-        except sounddevice.PortAudioError as err:
-            self.logger.warning(f"No default output device available: {err}")
-            default_output_device = None
+        default_output_device = sounddevice.query_devices(kind='output')
 
         output_devices = []
         if default_output_device is not None:
-            # start by the default output device
             default_output_device['index'] = devices.index(default_output_device)
             output_devices += [default_output_device]
 
         for device in devices:
-            # select only the output devices by looking at the number of output channels
             if device['max_output_channels'] > 0:
                 device['index'] = devices.index(device)
-                # default output device has already been inserted
                 if default_output_device is not None and device['index'] != default_output_device['index']:
                     output_devices += [device]
 
         return output_devices
 
-    # method.
-    # The index parameter is the index in the self.input_devices list of devices !
-    # The return parameter is also an index in the same list.
     def select_input_device(self, index):
         device = self.input_devices[index]
 
-        # save current stream in case we need to restore it
         previous_stream = self.stream
         previous_ringBuffer = self.ringBuffer
         previous_action = self.action
@@ -305,8 +375,10 @@ class __AudioBackend(QtCore.QObject):
             self.logger.exception("Failed to open input device")
             success = False
             if self.stream is not None:
-                self.stream.stop()
-            # restore previous stream
+                if hasattr(self.stream, 'close'):
+                    self.stream.close()
+                else:
+                    self.stream.stop()
             self.stream = previous_stream
             self.ringBuffer = previous_ringBuffer
             self.action = previous_action
@@ -315,9 +387,11 @@ class __AudioBackend(QtCore.QObject):
 
         if success:
             self.logger.info("Success")
-
             if previous_stream is not None:
-                previous_stream.stop()
+                if hasattr(previous_stream, 'close'):
+                    previous_stream.close()
+                else:
+                    previous_stream.stop()
 
             self.first_channel = 0
             nchannels = self.device['max_input_channels']
@@ -328,46 +402,45 @@ class __AudioBackend(QtCore.QObject):
 
         return success, self.input_devices.index(self.device)
 
-    # method
     def select_first_channel(self, index):
         self.first_channel = index
-        success = True
-        return success, self.first_channel
+        return True, self.first_channel
 
-    # method
     def select_second_channel(self, index):
         self.second_channel = index
-        success = True
-        return success, self.second_channel
+        return True, self.second_channel
 
-    # method
     def open_stream(self, device):
         self.log_supported_input_formats(device)
-
         self.logger.info("Opening the stream for device '%s'", device['name'])
 
-        # by default we open the device stream with all the channels
-        # (interleaved in the data buffer)
+        if device.get('is_loopback', False):
+            sampleSize = 4  # float32
+            nchannels_max = device['max_input_channels']
+            elementSize = nchannels_max * sampleSize
+
+            ringbufferSeconds = 3.
+            ringbufferSize = 2**int(math.log2(ringbufferSeconds * SAMPLING_RATE))
+
+            ringBuffer = rtmixer.RingBuffer(elementSize, ringbufferSize)
+            action = DummyAction()
+            stream = PyAudioLoopbackStream(device, ringBuffer, action, SAMPLING_RATE)
+            return (stream, ringBuffer, action, nchannels_max)
+
         stream = rtmixer.Recorder(
             device=device['index'],
             channels=device['max_input_channels'],
             blocksize=FRAMES_PER_BUFFER,
-            # latency=latency,
             samplerate=SAMPLING_RATE)
 
-        sampleSize = 4  # the sample size in bytes (float32)
-        nchannels_max = device['max_input_channels']  # the number of channels that we record
+        sampleSize = 4
+        nchannels_max = device['max_input_channels']
         elementSize = nchannels_max * sampleSize
 
-        # arbitrary size to avoid overflows without using too much memory
         ringbufferSeconds = 3.
-
-        # The number of elements in the buffer (must be a power of 2)
         ringbufferSize = 2**int(math.log2(ringbufferSeconds * SAMPLING_RATE))
 
         ringBuffer = rtmixer.RingBuffer(elementSize, ringbufferSize)
-
-        # action can be used to read the count of input overflows
         action = stream.record_ringbuffer(ringBuffer)
 
         lat_ms = 1000 * stream.latency
@@ -376,6 +449,10 @@ class __AudioBackend(QtCore.QObject):
         return (stream, ringBuffer, action, nchannels_max)
 
     def log_supported_input_formats(self, device):
+        if device.get('is_loopback', False):
+            self.logger.info(f"Loopback device: '{device['name']}' at {device.get('default_samplerate', 48000)} Hz")
+            return
+
         samplerates = [22050, 44100, 48000, 96000]
         dtypes = [float32, int16, int8]
         supported_formats = []
@@ -390,15 +467,12 @@ class __AudioBackend(QtCore.QObject):
                         samplerate=samplerate)
                     supported_formats += [f"{samplerate} Hz, {np.dtype(dtype).name}"]
                 except Exception:
-                    pass # check_input_settings throws when the format is not supported
+                    pass
 
         api = sounddevice.query_hostapis(device['hostapi'])['name']
         self.logger.info(f"Supported formats for '{device['name']}' on '{api}': {supported_formats}")
 
-    # method
     def open_output_stream(self, device, callback):
-        # by default we open the device stream with all the channels
-        # (interleaved in the data buffer)
         stream = sounddevice.OutputStream(
             samplerate=SAMPLING_RATE,
             blocksize=FRAMES_PER_BUFFER,
@@ -406,47 +480,32 @@ class __AudioBackend(QtCore.QObject):
             channels=device['max_output_channels'],
             dtype=int16,
             callback=callback)
-
         return stream
 
     def is_output_format_supported(self, device, output_format):
-        # raise sounddevice.PortAudioError if the format is not supported
-        # the exception message contains the details, such as an invalid sample rate
         sounddevice.check_output_settings(
             device=device['index'],
             channels=device['max_output_channels'],
             dtype=output_format,
             samplerate=SAMPLING_RATE)
 
-    # method
-    # return the index of the current input device in the input devices list
-    # (not the same as the PortAudio index, since the latter is the index
-    # in the list of *all* devices, not only input ones)
     def get_readable_current_device(self):
         return self.input_devices.index(self.device)
 
-    # method
     def get_readable_current_channels(self):
         nchannels = self.device['max_input_channels']
-
         if nchannels == 2:
             channels = ['L', 'R']
         else:
-            channels = []
-            for channel in range(0, nchannels):
-                channels += ["%d" % channel]
-
+            channels = [str(channel) for channel in range(nchannels)]
         return channels
 
-    # method
     def get_current_first_channel(self):
         return self.first_channel
 
-    # method
     def get_current_second_channel(self):
         return self.second_channel
 
-    # method
     def get_current_device_nchannels(self):
         return self.device['max_input_channels']
 
@@ -469,23 +528,15 @@ class __AudioBackend(QtCore.QObject):
             buffer.shape = -1, self.nchannels_max
             self.ringBuffer.advance_read_index(FRAMES_PER_BUFFER)
 
-            # ideally we would use the exact time of the samples retrieved from the ring buffer,
-            # but rtmixer does not provide it
             self.stream_read_index += read
             stream_read_time = self.stream_start_time + self.stream_read_index / SAMPLING_RATE
 
-            # when starting a stream, it seems PortAudio gives us some data that is already in the buffer
-            # so the stream start time is actually older
-            # so we compensate here
             if stream_read_time > stream_time and self.stream_read_index < 100000:
                 delta_seconds = stream_read_time - stream_time
                 self.stream_start_time -= delta_seconds
 
             if stream_read_time < stream_time - 100 * FRAMES_PER_BUFFER / SAMPLING_RATE:
-                now = time.monotonic()
-                if now - self._last_lag_warning >= 5.0:
-                    self.logger.warning("Ringbuffer lagging behind: ringbuffer time = %f, stream time = %f", stream_read_time, stream_time)
-                    self._last_lag_warning = now
+                self.logger.warning("Ringbuffer lagging behind: ringbuffer time = %f, stream time = %f", stream_read_time, stream_time)
 
             channel = self.get_current_first_channel()
             if self.duo_input:
@@ -508,7 +559,6 @@ class __AudioBackend(QtCore.QObject):
                 self.underflow.emit()
 
             self.new_data_available.emit(floatdata, stream_read_time, input_overflow)
-
             self.chunk_number += 1
 
     def set_single_input(self):
@@ -518,27 +568,12 @@ class __AudioBackend(QtCore.QObject):
         self.duo_input = True
 
     def get_stream_time(self) -> float:
-        """The current stream time in seconds.
-
-        The time values are monotonically increasing and have
-        unspecified origin.
-
-        This provides valid time values for the entire life of the
-        stream, from when the stream is opened until it is closed.
-        Starting and stopping the stream does not affect the passage of
-        time as provided here.
-
-        This time may be used for synchronizing other events to the
-        audio stream.
-        """
-
         if self.stream is None:
             return 0
-
         try:
             return self.stream.time
         except (sounddevice.PortAudioError, OSError):
-            if self.stream.device not in self.devices_with_timing_errors:
+            if hasattr(self.stream, 'device') and self.stream.device not in self.devices_with_timing_errors:
                 self.devices_with_timing_errors.append(self.stream.device)
                 self.logger.exception("Failed to read stream time")
             return 0
