@@ -35,7 +35,7 @@ dependencies = [
     "PyQt6",
     "platformdirs==4.11.1",
     "pyrr==0.10.3",
-    "pyinstaller==6.21.0"
+    "pyinstaller==6.22.3"
 ]
 
 [project.scripts]
