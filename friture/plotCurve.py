@@ -46,12 +46,22 @@ class PlotCurve(QQuickItem):
             self.curveChanged.emit()
 
     def updatePaintNode(self, paint_node, update_data):
+        # Non-finite samples are gaps. A GL line strip cannot have gaps (NaN
+        # vertices render as lines to the plot edge), so draw independent
+        # segments between consecutive finite points instead.
+        x = np.asarray(self.curve.x_array() * self.width(), dtype=np.float32)
+        y = np.asarray(self.curve.y_array() * self.height(), dtype=np.float32)
+        valid = np.isfinite(x) & np.isfinite(y)
+        pair_ok = valid[:-1] & valid[1:]
+        idx = np.flatnonzero(pair_ok)
+        size = 2 * idx.size
+
         if paint_node is None:
             paint_node = QSGGeometryNode()
 
-            geometry = QSGGeometry(QSGGeometry.defaultAttributes_Point2D(), self.curve.x_array().size)
+            geometry = QSGGeometry(QSGGeometry.defaultAttributes_Point2D(), size)
             geometry.setLineWidth(2)
-            geometry.setDrawingMode(QSGGeometry.DrawingMode.DrawLineStrip)
+            geometry.setDrawingMode(QSGGeometry.DrawingMode.DrawLines)
             paint_node.setGeometry(geometry)
             paint_node.setFlag(QSGNode.Flag.OwnsGeometry)
 
@@ -63,25 +73,26 @@ class PlotCurve(QQuickItem):
 
         else:
             geometry = paint_node.geometry()
-            geometry.allocate(self.curve.x_array().size) # geometry will be marked as dirty below
+            geometry.allocate(size) # geometry will be marked as dirty below
 
             material = paint_node.material()
             if material.color() != self._color:
                 material.setColor(self._color)
                 paint_node.markDirty(QSGNode.DirtyStateBit.DirtyMaterial)
 
-        size = self.curve.x_array().size
+        if size > 0:
+            # ideally we would use geometry.vertexDataAsPoint2D
+            # but there is a bug with the returned sip.array
+            # whose total size is not interpreted correctly
+            # `memoryview(geometry.vertexDataAsPoint2D()).nbytes` does not take itemsize into account
+            vertices = geometry.vertexData()
+            vertices.setsize(2 * np.dtype(np.float32).itemsize * size)
 
-        # ideally we would use geometry.vertexDataAsPoint2D
-        # but there is a bug with the returned sip.array
-        # whose total size is not interpreted correctly
-        # `memoryview(geometry.vertexDataAsPoint2D()).nbytes` does not take itemsize into account
-        vertices = geometry.vertexData()
-        vertices.setsize(2 * np.dtype(np.float32).itemsize * size)
-
-        polygon_array = np.frombuffer(vertices, dtype=np.float32)
-        polygon_array[: (size - 1) * 2 + 1 : 2] = np.asarray(self.curve.x_array() * self.width(), dtype=np.float32)
-        polygon_array[1 : (size - 1) * 2 + 2 : 2] = np.asarray(self.curve.y_array() * self.height(), dtype=np.float32)
+            polygon_array = np.frombuffer(vertices, dtype=np.float32).reshape(-1, 2, 2)  # segment, endpoint, xy
+            polygon_array[:, 0, 0] = x[idx]
+            polygon_array[:, 0, 1] = y[idx]
+            polygon_array[:, 1, 0] = x[idx + 1]
+            polygon_array[:, 1, 1] = y[idx + 1]
 
         paint_node.markDirty(QSGNode.DirtyStateBit.DirtyGeometry)
 

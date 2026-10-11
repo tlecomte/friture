@@ -113,8 +113,13 @@ class PitchTrackerWidget(QObject):
 
     def update_curve(self) -> None:
         pitches = self.tracker.get_estimates(self.duration)
+        # Unvoiced frames are NaN and the ring buffer starts as zeros; both
+        # become gaps in the curve (PlotCurve skips non-finite samples).
+        pitches = np.where(pitches > 0, pitches, np.nan)
         pitches = 1.0 - self.vertical_transform.toScreen(pitches) # type: ignore
-        pitches = np.clip(pitches, 0, 1)
+        # Out-of-range estimates (usually octave errors) used to be clipped to the
+        # plot edge, which drew a spike to the top/bottom; treat them as gaps too.
+        pitches = np.where((pitches >= 0) & (pitches <= 1), pitches, np.nan)
         times = np.linspace(0, 1.0, pitches.shape[0])
         self._curve.setData(times, pitches)
 
