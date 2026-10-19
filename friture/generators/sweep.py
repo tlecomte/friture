@@ -146,6 +146,6 @@ class Sweep_Generator_Settings_View_Model(QObject):
         settings.setValue("sweep period", self.period)
 
     def restoreState(self, settings):
-        self.start_frequency = settings.value("sweep start frequency", DEFAULT_SWEEP_STARTFREQUENCY, type=int)
-        self.stop_frequency = settings.value("sweep stop frequency", DEFAULT_SWEEP_STOPFREQUENCY, type=int)
+        self.start_frequency = settings.value("sweep start frequency", DEFAULT_SWEEP_STARTFREQUENCY, type=float)
+        self.stop_frequency = settings.value("sweep stop frequency", DEFAULT_SWEEP_STOPFREQUENCY, type=float)
         self.period = settings.value("sweep period", DEFAULT_SWEEP_PERIOD_S, type=float)
