@@ -572,5 +572,41 @@ Rectangle {{
         self.assertFalse(results[0], "Expected False when check state set to Unchecked")
 
 
+class TestSweepSettingsPersistence(unittest.TestCase):
+    def test_round_trip_preserves_fractional_frequencies(self):
+        parent = QObject()
+        original = Sweep_Generator_Settings_View_Model(parent)
+        original.start_frequency = 20.5
+        original.stop_frequency = 21999.5
+
+        with tempfile.TemporaryDirectory() as directory:
+            settings = QtCore.QSettings(
+                os.path.join(directory, "sweep.ini"), QtCore.QSettings.Format.IniFormat)
+            original.saveState(settings)
+            restored = Sweep_Generator_Settings_View_Model(parent)
+
+            restored.restoreState(settings)
+
+            self.assertEqual(restored.start_frequency, 20.5)
+            self.assertEqual(restored.stop_frequency, 21999.5)
+
+    def test_restores_fractional_frequencies_from_ini(self):
+        parent = QObject()
+        with tempfile.TemporaryDirectory() as directory:
+            filename = os.path.join(directory, "sweep.ini")
+            with open(filename, "w", encoding="utf-8") as settings_file:
+                settings_file.write(
+                    "[General]\n"
+                    "sweep%20start%20frequency=20.5\n"
+                    "sweep%20stop%20frequency=21999.5\n")
+            settings = QtCore.QSettings(filename, QtCore.QSettings.Format.IniFormat)
+            restored = Sweep_Generator_Settings_View_Model(parent)
+
+            restored.restoreState(settings)
+
+            self.assertEqual(restored.start_frequency, 20.5)
+            self.assertEqual(restored.stop_frequency, 21999.5)
+
+
 if __name__ == '__main__':
     unittest.main()
